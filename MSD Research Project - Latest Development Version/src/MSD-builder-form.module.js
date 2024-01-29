@@ -12,6 +12,7 @@
 const { defineExports } = MSDBuilder.util;
 const { updateCamera } = MSDBuilder.render;
 const { iterate } = MSDBuilder.simulation;
+const { MSD } = MSDBuilder.simulation;
 
 
 // ---- Classes: --------------------------------------------------------------
@@ -217,23 +218,23 @@ function replaceValues(template, name, value, x, y, z) {
  * @author Robert J.
  */
 function loadFileContent(msd) {
-	buildJSON(msd);
+	json = buildJSON(msd);
 
 	let content = `simCount = 10000000
 freq = 50000
 
 # dimensions of bounding box
-width = ${msd_width}
-height = ${msd_height}
-depth = ${msd_depth}
+width = ${json.width}
+height = ${json.height}
+depth = ${json.depth}
 
 # boundaries which define the exact dimensions of FM_L, FM_R, and mol.
-molPosL = ${molPosL}
-molPosR = ${molPosR}
-topL = ${topL}
-bottomL = ${bottomL}
-frontR = ${frontR}
-backR = ${backR}
+molPosL = ${json.molPosL}
+molPosR = ${json.molPosR}
+topL = ${json.topL}
+bottomL = ${json.bottomL}
+frontR = ${json.frontR}
+backR = ${json.backR}
 
 # turn off front edge of mol.
 # [5 11 10] = 0
@@ -407,6 +408,216 @@ function buildJSON(msd) {
 	return json;
 }
 
+// Robert J.
+function getValues(line) {
+	[id, value] = line.split('=');
+	return [id, parseFloat(value)];
+}
+
+// Robert J.
+function importFileContent(content) {
+
+	// send to workload msd-builder	
+	json = {
+		flippingAlgorithm: "CONTINUOUS_SPIN_MODEL",
+		molType: "LINEAR", // TODO allow change
+		randomize: true, // T/F
+		// seed: 0 // (TODO add later) Can be null (random), or set 
+	}
+
+	lines = content.split('\n');
+	ext_vars = {}
+
+
+	for(let line of lines) {
+		if (line.includes('=') && !line.includes("#")) {
+			line = line.replace(/\s*=\s*/, "=").replace(/\s+/g, ' ').trim();
+			const [id,value] = getValues(line)
+			if((line.split(' ')).length > 1) {
+				nline = line
+				let [x,y,z] = nline.split('=')[1].split(' ')
+				replaceJSONValues(json, id, null, x, y, z)
+				if(document.getElementById(id) == null) {
+					document.getElementById(id + "_x").value = x
+					document.getElementById(id + "_y").value = y
+					document.getElementById(id + "_z").value = z
+				}
+			} else {
+				replaceJSONValues(json, id, value)
+				if(document.getElementById(id) != null) {
+					document.getElementById(id).value = value
+				} else {
+					ext_vars[id] = value;
+				}
+			}
+		}
+	}
+
+
+
+	msd_width = ext_vars["width"];
+	// height of FML can never exceed depth of FMR (making it automatically the maximum)
+	msd_height = ext_vars["height"];
+	// depth of FMR can never exceed depth of FML
+	msd_depth = ext_vars["depth"];
+
+	topL = ext_vars["topL"];
+	bottomL = ext_vars["bottomL"];
+
+	molPosL = ext_vars["molPosL"];
+	molPosR = ext_vars["molPosR"];
+
+	frontR = ext_vars["frontR"];
+	backR = ext_vars["backR"];
+
+	fml_width = molPosL; 
+	fml_height = 1 + (bottomL - topL);
+	fml_depth = msd_depth;
+
+	fmr_height = msd_height;
+	fmr_depth = 1 + (backR - frontR)
+
+	mol_width = 1 + (molPosR - molPosL)
+	mol_height = fml_height
+	mol_depth = fmr_depth
+	y_off = -(topL - Math.floor((msd_height - mol_height) / 2))
+	z_off = -(frontR - Math.floor((msd_depth - mol_depth) / 2))
+
+	fmr_width = (msd_width - fml_width - mol_width)
+
+	document.getElementById("FML-width").value = fml_width;
+	document.getElementById("FML-height").value = fml_height;
+	document.getElementById("FML-depth").value = fml_depth;
+
+	document.getElementById("FMR-height").value = fmr_height;
+	document.getElementById("FMR-depth").value = fmr_depth;
+
+	document.getElementById("mol-width").value = mol_width;
+	document.getElementById("mol-height").value = mol_height;
+	document.getElementById("mol-depth").value = mol_depth;
+
+	document.getElementById("mol-y").value = y_off;
+	document.getElementById("mol-z").value = z_off;
+
+	document.getElementById("FMR-width").value = fmr_width;
+
+	vals = [];
+
+	for(let id of DEFAULTS.DIM_FIELDS.keys())
+	{	
+		vals.push([id, +document.getElementById(id).value])
+	}
+
+	for(let id of DEFAULTS.PARAM_FIELDS.keys())
+	{	
+		vals.push([id, +document.getElementById(id).value])
+	}
+
+	const vectors = ["AL", "Am", "AR", "DL", "Dm", "DR", "DmL", "DmR", "DLR", "B"];
+
+	for(let id of vectors)
+	{	
+		const id_x = document.getElementById(id + "_x");
+		const id_y = document.getElementById(id + "_y");
+		const id_z = document.getElementById(id + "_z");
+		vals.push([id_x.id, +id_x.value], [id_y.id, +id_y.value], [id_z.id, +id_z.value])
+	}
+
+	// Adding or updating a value in localStorage
+	localStorage.setItem('valueCache', JSON.stringify(vals));
+
+}
+
+// Returns spherical coordinates in radians
+function rectToSph(x, y, z) {
+	rho = Math.sqrt(x**2+y**2+z**2)
+	theta = isNaN(Math.atan2(y,x)) ? 0 : Math.atan2(y,x);
+	phi = isNaN(Math.asin(z/rho)) ? 0 : Math.asin(z/rho);	
+
+	return [rho, theta, phi]
+}
+
+function initCSV(json) {
+	row_results = ""
+
+	// Components need _x, _y, _z, _norm, _theta _phi
+	titles_xyz_sph = ['M', 'ML', 'MR', 'Mm', 'MS', 'MSL', 'MSR', 'MSm', 'MF', 'MFL', 'MFR', 'MFm']
+	// Components are as named
+	titles_raw = ['U', 'UL', 'UR', 'Um', 'UmL', 'UmR', 'ULR']
+	// Components need _x, _y and _z.
+	titles_xyz = ['m', 's', 'f']
+	row_results = "t,,"
+		for(let comp of titles_xyz_sph) {
+			row_results += comp + "_x" + "," + comp + "_y" + "," + comp + "_z" + "," + comp + "_norm" + "," + comp + "_theta" + "," + comp + "_phi" + ",,"
+		}
+		
+		for(let comp of titles_raw) {
+			row_results += comp + ","
+		}
+			row_results += ",,x,y,z,"
+
+		for(let comp of titles_xyz) {
+			row_results += comp + "_x" + "," + comp + "_y" + "," + comp + "_z" + ","
+		}
+		row_results += ",,"
+		for(const key in json) {
+			if(!(key.includes("_") || key.includes("flip"))) {
+			if(Array.isArray(json[key])) {
+				row_results += `"${key} = <${json[key].join(", ")}>"`
+			} else {
+				row_results += `${key} = ${json[key]}`
+			}
+			row_results += ","
+		}
+	}
+		row_results += ",msd_version = 6.2a"
+		row_results += "\n"
+		
+		row_results = row_results.replace("seed = undefined", "seed = unique");
+	return row_results
+}
+
+function buildCSVRow(row_data) {
+	row_results = ""
+
+	// Components need _x, _y, _z, _norm, _theta _phi
+	titles_xyz_sph = ['M', 'ML', 'MR', 'Mm', 'MS', 'MSL', 'MSR', 'MSm', 'MF', 'MFL', 'MFR', 'MFm']
+	// Components are as named
+	titles_raw = ['U', 'UL', 'UR', 'Um', 'UmL', 'UmR', 'ULR']
+	// Components need _x, _y and _z.
+	titles_xyz = ['m', 's', 'f']
+
+	row_results += row_data['t'] + ",,"
+
+	for(let comp of titles_xyz_sph) {
+		x = row_data[comp][0]
+		y = row_data[comp][1]
+		z = row_data[comp][2]
+		const [r,t,p] = rectToSph(x,y,z)
+		row_results += [x,y,z,r,t,p].join(",") + ",,"
+	}
+
+	for(let comp of titles_raw) {
+		row_results += row_data[comp] + ","
+	}
+
+	row_results += ",,"
+	return row_results
+}
+
+function buildMSDIterations(msd, index) {
+	pos = msd[index].pos
+	localM = msd[index].localM
+	spin = msd[index].spin
+	flux = msd[index].flux
+
+	msd_results = ""
+	msd_results += pos.join(",") + "," + localM.join(",") + "," + spin.join(",") + "," + flux.join(",") + ","
+
+	return msd_results
+}
+
+
 
 // ---- TODO: Unused ----------------------------------------------------------
 const splitParam = (param_name) => param_name.split("_", 2);
@@ -495,16 +706,72 @@ const initForm = ({ camera, msdView }) => {
 
 	const paramsForm = document.getElementById("msd-params-form");
 
+	paramsForm.addEventListener("change", (event) => {
+		event.preventDefault();
+		if (event.target.id == 'getFile') {
+			const file = event.target.files[0];
+			if (file) {
+				const reader = new FileReader();
+
+				reader.onload = function (e) {
+					const content = e.target.result;
+					importFileContent(content)
+				};
+
+				reader.readAsText(file);
+			}
+
+			location.reload()
+		}
+	});
+
 	paramsForm.addEventListener("submit", (event) => {
 		event.preventDefault();
 		if (event.submitter.id == 'runButton') {
 			let json = buildJSON(msdView);
 			simCount = +document.getElementById("simCount").value;
 			freq = +document.getElementById("freq").value;
-			iterate(json, { simCount, freq });
+			final_results = initCSV(json)
+			final_index = 0
+			final_state = null
+			const iterate = async (createArgs, runArgs) => {
+				try {
 
+					let msd = await MSD.create(createArgs);
+					await msd.run(runArgs);
+					await msd.wait((state, index) => {
+						row = buildCSVRow(state.results)
+						row += "ITER"
+						final_results += row + "\n"
+						final_index = index
+						final_state = state
+					});
+					for(i in final_state.msd) {
+						if(!(final_results.includes("ITER"))) {
+							row = ""
+							row += ",".repeat(95) + buildMSDIterations(final_state.msd, i)
+							final_results += row + "\n"
+						} else {
+							final_results = final_results.replace("ITER", buildMSDIterations(final_state.msd, i))
+						}
+						
+					}
+					msd.destory();
+					let blob = new Blob([final_results], { type: 'text/csv' });
+					let link = document.createElement('a');
+					link.download = 'parameters-iterate.csv';
+					link.href = window.URL.createObjectURL(blob);
+					link.click();
+					window.URL.revokeObjectURL(link.href);
+				} catch(ex) {
+					console.error(ex);
+				}
+			};
+
+			iterate(json, { simCount, freq });
 			// TODO: replace with a better UI
 			alert(`Running...\nOpen JS console (Ctrl-Shift-J or Cmd-Shift-J) to see results.`);
+			
 		}
 	});
 

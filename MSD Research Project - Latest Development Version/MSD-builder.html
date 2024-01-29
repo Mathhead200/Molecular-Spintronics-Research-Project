@@ -19,6 +19,8 @@
 	<form id="msd-params-form">
 		<fieldset-row>
 			<fieldset class="controls">
+				<input type="submit", onclick="document.getElementById('getFile').click()", value="Import">
+  				<input type='file' id="getFile" style="display:none">
 				<input type="submit", id="exportFile", value="Export">
 				<input type="submit", id="runButton", value="Run">
 				<input type="reset" value="Reset">
@@ -122,10 +124,10 @@
 					<input-row>
 						<label for="JL"> J: </label>
 						<input-list>
-							<input id="JL" title="JL" placeholder="JL" type="number" value="1">
-							<input id="Je0L" title="Je0L" placeholder="Je0L" type="number" value="0">
-							<input id="Je1L" title="Je1L" placeholder="Je1L" type="number" value="0">
-							<input id="JeeL" title="JeeL" placeholder="JeeL" type="number" value="0">
+							<input id="JL" title="JL" placeholder="JL" type="number" value="1" step="any">
+							<input id="Je0L" title="Je0L" placeholder="Je0L" type="number" value="0" step="any">
+							<input id="Je1L" title="Je1L" placeholder="Je1L" type="number" value="0" step="any">
+							<input id="JeeL" title="JeeL" placeholder="JeeL" type="number" value="0" step="any">
 						</input-list>
 					</input-row>
 				</input-group>
@@ -254,10 +256,10 @@
 					<input-row>
 						<label for="Jm"> J: </label>
 						<input-list>
-							<input id="Jm" title="Jm" placeholder="Jm" type="number" value="1">
-							<input id="Je0m" title="Je0m" placeholder="Je0m" type="number" value="0">
-							<input id="Je1m" title="Je1m" placeholder="Je1m" type="number" value="0">
-							<input id="Jeem" title="Jeem" placeholder="Jeem" type="number" value="0">
+							<input id="Jm" title="Jm" placeholder="Jm" type="number" value="1" step="any">
+							<input id="Je0m" title="Je0m" placeholder="Je0m" type="number" value="0" step="any">
+							<input id="Je1m" title="Je1m" placeholder="Je1m" type="number" value="0" step="any">
+							<input id="Jeem" title="Jeem" placeholder="Jeem" type="number" value="0" step="any">
 						</input-list>
 					</input-row>
 				</input-group>
@@ -355,10 +357,10 @@
 					<input-row>
 						<label for="JR"> J: </label>
 						<input-list>
-							<input id="JR" title="JR" placeholder="JR" type="number" value="1">
-							<input id="Je0R" title="Je0R" placeholder="Je0R" type="number" value="0">
-							<input id="Je1R" title="Je1R" placeholder="Je1R" type="number" value="0">
-							<input id="JeeR" title="JeeR" placeholder="JeeR" type="number" value="0">
+							<input id="JR" title="JR" placeholder="JR" type="number" value="1" step="any">
+							<input id="Je0R" title="Je0R" placeholder="Je0R" type="number" value="0" step="any">
+							<input id="Je1R" title="Je1R" placeholder="Je1R" type="number" value="0" step="any">
+							<input id="JeeR" title="JeeR" placeholder="JeeR" type="number" value="0" step="any">
 						</input-list>
 					</input-row>
 				</input-group>
@@ -423,9 +425,9 @@
 					<input-row>
 						<label for="JLR"> J: </label>
 						<input-list>
-							<input id="JLR" title="JLR" placeholder="JLR" type="number" value="0">
-							<input id="Je1LR" title="Je1LR" placeholder="Je1LR" type="number" value="0">
-							<input id="JeeLR" title="JeeLR" placeholder="JeeLR" type="number" value="0">
+							<input id="JLR" title="JLR" placeholder="JLR" type="number" value="0" step="any">
+							<input id="Je1LR" title="Je1LR" placeholder="Je1LR" type="number" value="0" step="any">
+							<input id="JeeLR" title="JeeLR" placeholder="JeeLR" type="number" value="0" step="any">
 						</input-list>
 					</input-row>
 				</input-group>
@@ -467,9 +469,9 @@
 					<input-row>
 						<label for="JmL"> J: </label>
 						<input-list>
-							<input id="JmL" title="JmL" placeholder="JmL" type="number" value="1">
-							<input id="Je1mL" title="Je1mL" placeholder="Je1mL" type="number" value="0">
-							<input id="JeemL" title="JeemL" placeholder="JeemL" type="number" value="0">
+							<input id="JmL" title="JmL" placeholder="JmL" type="number" value="1" step="any">
+							<input id="Je1mL" title="Je1mL" placeholder="Je1mL" type="number" value="0" step="any">
+							<input id="JeemL" title="JeemL" placeholder="JeemL" type="number" value="0" step="any">
 						</input-list>
 					</input-row>
 				</input-group>
@@ -511,9 +513,9 @@
 					<input-row>
 						<label for="JmR"> J: </label>
 						<input-list>
-							<input id="JmR" title="JmR" placeholder="JmR" type="number" value="-1">
-							<input id="Je1mR" title="Je1mR" placeholder="Je1mR" type="number" value="0">
-							<input id="JeemR" title="JeemR" placeholder="JeemR" type="number" value="0">
+							<input id="JmR" title="JmR" placeholder="JmR" type="number" value="-1" step="any">
+							<input id="Je1mR" title="Je1mR" placeholder="Je1mR" type="number" value="0" step="any">
+							<input id="JeemR" title="JeemR" placeholder="JeemR" type="number" value="0" step="any">
 						</input-list>
 					</input-row>
 				</input-group>
