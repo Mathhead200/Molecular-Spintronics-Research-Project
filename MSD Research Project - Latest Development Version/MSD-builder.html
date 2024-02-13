@@ -13,7 +13,7 @@
 	<!-- Utilities, Settings, Assets, and other files with no dependancies. -->
 	<script src="src/msd_builder/util.js"></script>
 	<script src="src/msd_builder/defaults.js"></script>
-	<!-- <script src="src/msd_builder/assets.js"></script> -->
+	<script src="src/msd_builder/assets.js"></script>
 
 	<!-- Core logic -->
 	<script src="src/msd_builder/simulation.js"></script>
@@ -40,6 +40,16 @@
 
 	<form id="msd-params-form">
 		<fieldset-row>
+			<fieldset>
+				<label for="lens"> Lens: </label>
+				<select id="lens">
+					<optgroup label="Detailed">
+						<option value="Mx">Mx</option>
+						<option value="My">My</option>
+						<option value="Mz">Mz</option>
+					</optgroup>
+				</select>
+			</fieldset>
 			<fieldset class="controls">
 				<input type="submit", onclick="document.getElementById('getFile').click()", value="Import">
   				<input type='file' id="getFile" style="display:none">

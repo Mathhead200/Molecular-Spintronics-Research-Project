@@ -201,6 +201,7 @@ Second bug fix. In MSD::setParameters()
 	and saves as CSV after run.
 (2-1-2024) Added basic realtime animations to the 3D MSD model.
 (2-2-2024) Added a basic timeline to GUI.
+(2-13-2024) Added lens selector to GUI.
 
 TODO: Add a timeline.
 TODO: Send C++ MSD version through MSD Server to Javascript.

@@ -61,7 +61,7 @@ class Timeline {
 		if (ele) {
 			ele.classList.add("active");
 			ele.focus();
-			this.view.viewDetailedMagnetization(this.states[+ele.dataset.idx], Vector.i());
+			this.view.update(this.states[+ele.dataset.idx]);
 		}
 	}
 };

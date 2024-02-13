@@ -117,6 +117,14 @@ class MSDRegion extends Group {
 	 * @public
 	 * Should be overriden in subclass.
 	 */
+	viewDefault(...args) {
+		console.warn("Unimlemented method: MSD.viewDefault(...args)");
+	}
+
+	/**
+	 * @public
+	 * Should be overriden in subclass.
+	 */
 	viewDetailedMagnetization(data, ...args) {
 		console.warn("Unimlemented method: MSD.viewDetailedMagnetization(data, ...args)");
 	}
@@ -671,6 +679,8 @@ class YZFaceLatticeRegion extends SlowLatticeRegion {
  * GUI logic for 3D redering an MSD.
  */
 class MSDView extends Group {
+	lens = null;
+	state = null;
 
 	/**
 	 * @param {...<? extends MSDRegion>} RegionTypes
@@ -1034,6 +1044,41 @@ class MSDView extends Group {
 	get width() { return this.FML.width + this._mol.width + this._FMR.width; }
 	get height() { return this.FMR.height; }
 	get depth() { return this.FML.depth; }
+
+	/**
+	 * @public
+	 * @param {Object} state Object containing the current MSD record state you wish to view. 
+	 * @param {String?} lens (optional) Which "lens" you want to view state through.
+	 */
+	update(state = this.state, lens = this.lens) {
+		this.state = state;
+		this.lens = lens;
+
+		if (!state) {
+			this.viewDefault();
+			return
+		}
+
+		switch(lens) {
+		 case "Mx":
+			this.viewDetailedMagnetization(state, Vector.i());
+			break;
+		 case "My":
+			this.viewDetailedMagnetization(state, Vector.j());
+			break;
+		 case "Mz":
+			this.viewDetailedMagnetization(state, Vector.k());
+			break;
+		 default:
+			this.viewDefault();
+		}
+	}
+
+	viewDefault() {
+		this.FML.view.viewDefault();
+		this.FMR.view.viewDefault();
+		this.mol.view.viewDefault();
+	}
 
 	viewDetailedMagnetization(data, direction) {
 		const x1Offset = this.FML.width;

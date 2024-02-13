@@ -396,6 +396,11 @@ const initForm = ({ camera, msdView, timeline }) => {
 		}
 	});
 
+	document.getElementById("lens").addEventListener("change", event => {
+		msdView.lens = event.currentTarget.value;
+		msdView.update();
+	});
+
 	document.getElementById("FML-legend").innerText = `[${msdView.FML.name}]`;
 	document.getElementById("FMR-legend").innerText = `[${msdView.FMR.name}]`;
 	document.getElementById("mol-legend").innerText = `[${msdView.mol.name}]`;

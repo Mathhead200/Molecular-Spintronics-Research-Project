@@ -38,13 +38,37 @@ const main = () => {
 	Object.assign(window, { msdView, camera, scene });
 
 	// DEBUG: FBX test
-	const { FBXLoader } = Three;  // import
+	/*
+	const {
+		// import:
+		FBXLoader, AmbientLight, DirectionalLight,
+		Mesh, PlaneGeometry, MeshLambertMaterial
+	} = Three;
 	// TODO: need to server FBX files via server because of CORS
-	// console.log(MSDBuilder.assets.TestFBX);
-	// new FBXLoader().load(MSDBuilder.assets.TestFBX, fbx => {
-	// 	console.log("FBX:", fbx);
-	// 	scene.add(fbx);
-	// })
+	new FBXLoader().load(MSDBuilder.assets.TestFBX, fbx => {
+		console.log("FBX:", fbx);
+		scene.add(fbx);
+		camera.lookAt(fbx.position);
+	});
+
+	// TEST Add lights:
+	scene.add(new AmbientLight(0x666666));
+	camera.position.set(0, 100, 300);
+
+	let sun = new DirectionalLight(0xaaaaaa);
+	sun.position.set(100, 100, -50);
+	sun.castShadow = true;
+	scene.add(sun);
+
+	// TEST add ground:
+	let ground = new Mesh(
+		new PlaneGeometry(1000, 1000),
+		new MeshLambertMaterial({color: 0xffffff}) );
+	ground.position.set(0, -100, 0);
+	ground.receiveShadow = true;
+	ground.rotation.x = -Math.PI / 2;
+	scene.add(ground);
+	*/
 };
 
 document.addEventListener("DOMContentLoaded", main);

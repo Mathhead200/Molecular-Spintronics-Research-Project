@@ -32,8 +32,8 @@ async function runSim(json, runArgs, timeline) {
 	await iterate(json, runArgs, (state, index, id) => {
 		iterate.LOG(state, index, id);
 
-		// TODO: this should be based on current "lens" settings
-		msdView.viewDetailedMagnetization(state, Vector.i());
+		// update view based on current "lens" settings
+		msdView.update(state, document.getElementById("lens").value);
 
 		timeline.add(index, state);
 
