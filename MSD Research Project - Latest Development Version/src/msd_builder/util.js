@@ -324,6 +324,19 @@ function lerp(a, b, t) {
 	return a + (b - a) * t;
 }
 
+// TODO: unused
+function decodeAsset(dataURL) {
+	console.log(dataURL);
+	let i = dataURL.indexOf(",");
+	if (i < 0) {
+		const MAX_LEN = 16;
+		if (dataURL.length > MAX_LEN)
+			dataURL = asset.substring(0, MAX_LEN) + "...";
+		throw new Error("Invalid data URL: " + dataURL);
+	}
+	return atob(dataURL.substring(i));
+}
+
 // ---- Exports: --------------------------------------------------------------
 defineExports("MSDBuilder.util", {
 	AsyncPool, Map2, SavedMap, Vector,

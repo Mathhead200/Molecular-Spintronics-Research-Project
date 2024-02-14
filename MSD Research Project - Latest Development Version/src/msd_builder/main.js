@@ -7,6 +7,7 @@
 (function() {  // IIFE
 
 // ---- Imports: --------------------------------------------------------------
+const { SELECTORS } = MSDBuilder.defaults;
 const { startRendering, BoxRegion, LatticeRegion, YZFaceLatticeRegion } = MSDBuilder.render;
 const { initForm } = MSDBuilder.form;
 const { Timeline } = MSDBuilder.timeline;
@@ -21,11 +22,11 @@ const main = () => {
 		// 	console.log(loop.time, loop.deltaTime);
  		// }
 	});
-	let timeline = new Timeline("timeline", msdView);
-	initForm({ camera, msdView, timeline });
-
 	msdView.rotation.x = Math.PI / 6;
 	msdView.rotation.y = -Math.PI / 24;
+	
+	let timeline = new Timeline(SELECTORS.timeline, msdView);
+	initForm({ camera, msdView, timeline });
 	
 	// renderer.domElement.addEventListener("click", (event) => {
 	// 	if (loop.isRunning)

@@ -66,7 +66,9 @@ const PARAM_FIELDS = new Map([
 
 SELECTORS = {
 	threeCanvasContainer: "#msd-3d",
-	paramsForm: "#msd-params-form"
+	paramsForm: "#msd-params-form",
+	timeline: "#timeline",
+	settingsIconContainer: "#settingsIcon",
 	// TODO: move hard-coded selectors and ids to this section
 };
 

@@ -10,8 +10,8 @@ class Timeline {
 	_active = null;  // which "snapshot" is active, if any
 	states = [];
 
-	constructor(id, view) {
-		this.timelineEle = document.getElementById("timeline");
+	constructor(selector, view) {
+		this.timelineEle = document.querySelector(selector);
 		this.view = view;
 	}
 
