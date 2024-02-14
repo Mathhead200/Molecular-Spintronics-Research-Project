@@ -9,6 +9,7 @@
 // ---- Imports: --------------------------------------------------------------
 const { sqrt, floor } = Math;
 const { Map2, Vector, defineExports, interpolate, lerp } = MSDBuilder.util;
+const { SELECTORS } = MSDBuilder.defaults;
 const {
 	WebGLRenderer, Scene, Camera, PerspectiveCamera,
 	BufferGeometry, BoxGeometry, SphereGeometry,
@@ -1184,7 +1185,7 @@ const startRendering = ({
 	// renderer.setSize(canvasWidth, canvasHeight, false);
 	
 	// add canvas to DOM
-	let container = document.querySelector("#msdBuilder");
+	let container = document.querySelector(SELECTORS.threeCanvasContainer);
 	let canvas = renderer.domElement;
 	container.append(canvas);
 

@@ -10,13 +10,13 @@ no-wrap {
 
 
 /* Canvas (ThreeJS/WebGL) */
-#msdBuilder {
+#msd-3d {
 	width: 100%;
 	height: calc(100vh - 7em);
 	background-color: black;  /* the entire canvas isn't drawn */
 }
 
-#msdBuilder canvas {
+#msd-3d canvas {
 	width: inherit;
 	height: inherit;
 	object-fit: contain;  /* the entire canvas isn't drawn */

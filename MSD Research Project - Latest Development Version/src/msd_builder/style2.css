@@ -1,0 +1,39 @@
+body {
+	margin: 0;
+}
+
+#msd-3d {
+	width: 100%;
+	height: 100vh;
+	background-color: black;
+}
+
+#msd-3d canvas {
+	width: inherit;
+	height: inherit;
+	object-fit: contain;
+	object-position: right;
+	transition: object-position 1s;
+}
+
+body.hide-params-form #msd-3d canvas {
+	object-position: center;
+}
+
+#msd-params-form {
+	position: absolute;
+	z-index: 2;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	width: 31.640625vw;
+	height: 100vh;
+	resize: horizontal;
+	background-color: white;
+	overflow: auto;
+	transition: left 1s;
+}
+
+body.hide-params-form #msd-params-form {
+	left: -100%;
+}

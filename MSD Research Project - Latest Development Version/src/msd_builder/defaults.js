@@ -64,9 +64,14 @@ const PARAM_FIELDS = new Map([
 	["DL_z", val(0)], ["Dm_z", val(0)], ["DR_z", val(0)], ["DmL_z", val(0)], ["DmR_z", val(0)], ["DLR_z", val(0)],
 ]);
 
+SELECTORS = {
+	threeCanvasContainer: "#msd-3d",
+	paramsForm: "#msd-params-form"
+	// TODO: move hard-coded selectors and ids to this section
+};
 
 // ---- Exports: --------------------------------------------------------------
-defineExports("MSDBuilder.defaults", { DIM_FIELDS, PARAM_FIELDS });
+defineExports("MSDBuilder.defaults", { DIM_FIELDS, PARAM_FIELDS, SELECTORS });
 
 
 })();  // end IIFE

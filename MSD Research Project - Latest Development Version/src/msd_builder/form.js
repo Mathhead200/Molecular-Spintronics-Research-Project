@@ -333,7 +333,7 @@ const initForm = ({ camera, msdView, timeline }) => {
 		// }
 	};
 
-	const paramsForm = document.getElementById("msd-params-form");
+	const paramsForm = document.querySelector(SELECTORS.paramsForm);
 
 	// Robert J.
 	paramsForm.querySelector("#getFile").addEventListener("change", (event) => {
