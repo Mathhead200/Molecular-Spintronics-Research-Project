@@ -1177,12 +1177,14 @@ const startRendering = ({
 	maxCanvasWidth = Infinity,
 	maxCanvasHeight = Infinity,
 	MSDRegionTypes = [],
-	onAnimationFrame = null
+	onAnimationFrame = null,
+	bgColor = 0x000000,
+	bgAlpha = 1
 } = {}) => {
 	const scene = new Scene();
 	const camera = new PerspectiveCamera(90, aspectRatio);  // params: fov, aspect ratio
 	const renderer = new WebGLRenderer();
-	// renderer.setSize(canvasWidth, canvasHeight, false);
+	renderer.setClearColor(bgColor, bgAlpha);
 	
 	// add canvas to DOM
 	let container = document.querySelector(SELECTORS.threeCanvasContainer);
@@ -1193,7 +1195,7 @@ const startRendering = ({
 	const resize = () => {
 		let { width, height } = container.getBoundingClientRect();
 		width = Math.min(width, maxCanvasWidth);
-		height = Math.min(height, maxCanvasWidth);
+		height = Math.min(height, maxCanvasHeight);
 		
 		let expectedWidth = height * aspectRatio;
 		if (width > expectedWidth)  // too wide, make smaller

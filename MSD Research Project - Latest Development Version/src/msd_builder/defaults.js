@@ -69,6 +69,7 @@ SELECTORS = {
 	paramsForm: "#msd-params-form",
 	timeline: "#timeline",
 	settingsIconContainer: "#settingsIcon",
+	lens: "#lens",
 	// TODO: move hard-coded selectors and ids to this section
 };
 

@@ -17,6 +17,7 @@ const { Timeline } = MSDBuilder.timeline;
 const main = () => {
 	const { camera, msdView, /* DEBUG: */ scene } = startRendering({
 		MSDRegionTypes: [LatticeRegion, YZFaceLatticeRegion],
+		bgAlpha: 0,
 		// onAnimationFrame: ({ loop }) => {
 		// 	camera.rotation.y += 0.0001 * 10 * loop.deltaTime;
 		// 	console.log(loop.time, loop.deltaTime);

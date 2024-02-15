@@ -2,40 +2,60 @@
 	--header-height: 3rem;
 	--timeline-height: 5rem;
 	--params-form-width: 31.640625vw;
+	--dark: black;
+	--fg-color: white;
 }
 
+
+/* ---- General Styles ----------------------------------------------------- */
 body {
 	max-width: 100vw;
 	max-height: 100vh;
 	overflow: hidden;
 	margin: 0;
+	
 	font-family: 'Courier New', Courier, monospace;
 }
 
 h1, h2, h3, h4, h5, h6 {
 	margin: 0;
+	font-weight: bold;
 }
 
-header {
+select, input, button {
+	font: inherit;
+}
+
+.sideways {
+	writing-mode: vertical-lr;
+	transform: rotate(180deg);
+}
+
+
+/* ---- Header ------------------------------------------------------------- */
+body > header {
+	--header-padding: 0.6rem;
+
 	display: flex;
 	justify-content: space-between;
 	box-sizing: border-box;
 	height: var(--header-height);
-	padding: 0.5rem;
+	padding: var(--header-padding);
 
 	background-color: black;
 	color: white;
 }
 
-h1 {
+body > header h1 {
 	font-size: 1rem;
-	font-weight: bold;
-	margin: 0.5rem;
+	margin: calc(1rem - var(--header-padding));
 }
 
-header svg {
-	width: 2rem;
-	height: 2rem;
+body > header svg {
+	--logo-dim: calc(var(--header-height) - 2 * var(--header-padding));
+
+	width: var(--logo-dim);
+	height: var(--logo-dim);
 	object-fit: contain;
 	cursor: pointer;
 
@@ -43,18 +63,20 @@ header svg {
 	transform: rotate(0deg);
 }
 
-body.show-settings header svg {
+body.show-settings > header svg {
 	transform: rotate(360deg);
 }
 
-header svg > * {
+body > header svg > * {
 	fill: white;
 }
 
+
+/* ---- Canvas (Three.js) -------------------------------------------------- */
 #msd-3d {
 	width: 100%;
 	height: calc(100vh - 3rem);
-	background-color: black;
+	background-color: #222222;
 }
 
 #msd-3d canvas {
@@ -77,6 +99,8 @@ body.show-params-form.show-timeline #msd-3d canvas {
 	object-position: right top;
 }
 
+
+/* ---- Parameters Form ---------------------------------------------------- */
 #msd-params-form {
 	position: absolute;
 	z-index: 2;
@@ -85,9 +109,15 @@ body.show-params-form.show-timeline #msd-3d canvas {
 	left: 0;
 	width: var(--params-form-width);
 	resize: horizontal;
+	overflow: hidden;
+	min-width: 10rem;  /* TODO: change to fit content */
+	max-width: 100vw;
+	/* TODO: add snap to default? */
+	
+	display: flex;
+	flex-direction: column;
 
 	background-color: white;
-	overflow: auto;
 
 	transition: transform 1s, bottom 1s;
 	transform: translateX(-100%);
@@ -101,6 +131,109 @@ body.show-timeline #msd-params-form {
 	bottom: var(--timeline-height);
 }
 
+#workspaces {
+	--ws-margin: 1em;
+
+	width: calc(100% - 2 * var(--ws-margin));
+	margin: var(--ws-margin);
+	border: 0px hidden;
+	padding: 0.25em 0.5em;
+	
+	background-color: #cecece;
+	font-weight: bold;
+}
+
+#msd-params-form h2 {
+	margin: 0.5em 1em;
+	font-size: 2rem;
+}
+
+
+/* ---- Parameters Table --------------------------------------------------- */
+#msd-params-table {
+	flex-grow: 1;
+	overflow: auto;
+}
+
+#msd-params-table > *  {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+	gap: 1px;
+	min-width: 40rem;
+}
+
+#msd-params-table > * > * {
+	outline: 1px solid #e1e1e1;
+}
+
+#msd-params-table > header {
+	text-align: center;
+}
+
+#msd-params-table input, #msd-params-table button {
+	border: 2px solid;
+	border-radius: 0.5em;
+	box-sizing: border-box;
+	padding: 0.25em;
+}
+
+#msd-params-table input {
+	width: 80%;
+	margin: 10%;
+	text-align: right;
+}
+
+#msd-params-table > section > div:nth-child(2) input {
+	border-color: lightskyblue;
+}
+
+#msd-params-table > section > div:nth-child(3) input {
+	border-color: forestgreen;
+}
+
+#msd-params-table > section > div:nth-child(4) input {
+	border-color: crimson;
+}
+
+#msd-params-table > .vector > *:first-child {
+	display: flex;
+	justify-content: space-evenly;
+}
+
+#msd-params-table > .vector > *:first-child > * {
+	flex-grow: 1;
+	text-align: center;
+}
+
+#msd-params-table > .vector .buttons {
+	display: grid;
+	grid-template-rows: 1fr 1fr 1f;
+}
+
+#msd-params-table > .vector .buttons button {
+	box-sizing: border-box;
+	width: 2em;
+	margin: 20%;
+	cursor: pointer;
+}
+
+
+
+/* ---- Lens --------------------------------------------------------------- */
+#lens {
+	position: absolute;
+	z-index: 1;
+	top: calc(var(--header-height) + 1rem);
+	right: 1rem;
+
+	box-sizing: border-box;
+	padding: 0.5em 1em;
+	border: 0px hidden;
+	text-align: center;
+}
+
+
+/* ---- Timeline ----------------------------------------------------------- */
 #timeline {
 	position: absolute;
 	bottom: 0;

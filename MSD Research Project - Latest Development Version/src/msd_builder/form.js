@@ -396,7 +396,7 @@ const initForm = ({ camera, msdView, timeline }) => {
 		}
 	});
 
-	document.getElementById("lens").addEventListener("change", event => {
+	document.querySelector(SELECTORS.lens).addEventListener("change", event => {
 		msdView.lens = event.currentTarget.value;
 		msdView.update();
 	});

@@ -74,8 +74,124 @@
 	<main id="msd-3d"></main>
 
 	<form id="msd-params-form">
-		<!-- TODO -->
+		<!-- TODO: place holder for future workspace save feature -->
+		<nav>
+			<select id="workspaces">
+				<option>{Default Workspace}</option>
+			</select>
+		</nav>
+
+		<header>
+			<h2> Parameters </h2>
+		</header>
+		
+		<!-- TODO: add "mode" buttons for "Experiment Group" and "Ensemble" -->
+		<nav></nav>
+
+		<!-- Parameters Table -->
+		<section id="msd-params-table">
+			<header>
+				<div></div>
+				<div> FML </div>
+				<div> mol </div>
+				<div> FMR </div>
+				<div> mL </div>
+				<div> mR </div>
+				<div> LR </div>
+			</header>
+			<section id="param-width">
+				<header> width </header>
+				<div> <input id="FML-width" title="FML-width" type="number" min="0" step="1" value="1"> </div>
+				<div> <input id="mol-width" title="mol-width" type="number" min="0" step="1" value="1"> </div>
+				<div> <input id="FMR-width" title="FMR-width" type="number" min="0" step="1" value="1"> </div>
+				<div></div>
+				<div></div>
+				<div></div>
+			</section>
+			<section id="param-height">
+				<header> height </header>
+				<div> <input id="FML-height" title="FML-height" type="number" min="0" step="1" value="1"> </div>
+				<div> <input id="mol-height" title="mol-height" type="number" min="0" step="1" value="1"> </div>
+				<div> <input id="FMR-height" title="FMR-height" type="number" min="0" step="1" value="1"> </div>
+				<div></div>
+				<div></div>
+				<div></div>
+			</section>
+			<section id="param-depth">
+				<header> depth </header>
+				<div> <input id="FML-depth" title="FML-depth" type="number" min="0" step="1" value="1"> </div>
+				<div> <input id="mol-depth" title="mol-depth" type="number" min="0" step="1" value="1"> </div>
+				<div> <input id="FMR-depth" title="FMR-depth" type="number" min="0" step="1" value="1"> </div>
+				<div></div>
+				<div></div>
+				<div></div>
+			</section>
+			<section id="param-y">
+				<header> y-offset </header>
+				<div> <input id="FML-y" title="y-offset" type="number" step="1" value="0"> </div>
+				<div> <input id="mol-y" title="y-offset" type="number" step="1" value="0"> </div>
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+			</section>
+			<section id="param-z">
+				<header> z-offset </header>
+				<div></div>
+				<div> <input id="mol-z" title="z-offset" type="number" step="1" value="0"> </div>
+				<div> <input id="FMR-z" title="z-offset" type="number" step="1" value="0"> </div>
+				<div></div>
+				<div></div>
+				<div></div>
+			</section>
+			<section id="param-J">
+				<header> J </header>
+				<div> <input id="JL" title="JL" type="number" step="any" value="1"> </div>
+				<div> <input id="Jm" title="Jm" type="number" step="any" value="1"> </div>
+				<div> <input id="JR" title="JR" type="number" step="any" value="1"> </div>
+				<div> <input id="JmL" title="JmL" type="number" step="any" value="1"> </div>
+				<div> <input id="JmR" title="JmR" type="number" step="any" value="-1"> </div>
+				<div> <input id="JLR" title="JLR" type="number" step="any" value="0"> </div>
+			</section>
+			<section id="param-A" class="vector">
+				<div>
+					<header class="sideways"> Anisotropy </header>
+					<div class="buttons">
+						<button>x</button>
+						<button>y</button>
+						<button>z</button>
+					</div>
+				</div>
+				<div>
+					<input id="AL_x" title="AL_x" type="number" step="any" value="0">
+					<input id="AL_y" title="AL_y" type="number" step="any" value="0">
+					<input id="AL_z" title="AL_z" type="number" step="any" value="0">
+				</div>
+				<div>
+					<input id="Am_x" title="Am_x" type="number" step="any" value="0">
+					<input id="Am_y" title="Am_y" type="number" step="any" value="0">
+					<input id="Am_z" title="Am_z" type="number" step="any" value="0">
+				</div>
+				<div>
+					<input id="AR_x" title="AR_x" type="number" step="any" value="0">
+					<input id="AR_y" title="AR_y" type="number" step="any" value="0">
+					<input id="AR_z" title="AR_z" type="number" step="any" value="0">
+				</div>
+				<div></div>
+				<div></div>
+				<div></div>
+			</section>
+		</section>
 	</form>
+
+	<select id="lens">
+		<optgroup label="[Detailed]">
+			<option value="Mx">View Type: M_x</option>
+			<option value="My">View Type: M_y</option>
+			<option value="Mz">View Type: M_z</option>
+			<option value="Mrho">View Type: |M|</option>
+		</optgroup>
+	</select>
 
 	<footer id="timeline"> TODO: Timeline </footer>
 </body>
