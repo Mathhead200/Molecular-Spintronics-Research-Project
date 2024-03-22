@@ -221,3 +221,6 @@ TODO: (Potentially Very Hard) Compile-time optimize
 	MSD.setLocalM, MSD.setParameters, and MSD.setMolProto
 	so that they ignore parameters that are not used.
 TODO: MSR (Magnetic Spin Resonance)
+TODO: Consider a way to save the state of an MSD including any PRNG state,
+	so that it can be stored to secondary storage and restored and resumed
+	at a later time.
