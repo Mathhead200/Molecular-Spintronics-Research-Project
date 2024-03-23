@@ -1,5 +1,5 @@
-simCount = 1000000
-freq = 100000
+simCount = 10000000
+freq = 412
 
 # dimensions of bounding box
 width  = 11
@@ -28,7 +28,7 @@ backR   = 6
 
 
 # Tempurature
-kT = 0.1
+kT = 1.0
 
 # External Magnetic Field
 B = 0 0 0

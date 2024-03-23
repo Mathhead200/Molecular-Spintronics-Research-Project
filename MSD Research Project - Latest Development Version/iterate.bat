@@ -10,7 +10,7 @@
 @set model=CONTINUOUS_SPIN_MODEL
 @set mol_type=LINEAR
 @set randomize=1
-@set seed=0
+@set seed=unique
 
 @set input_file=parameters-iterate.txt
 @set out_head=iteration

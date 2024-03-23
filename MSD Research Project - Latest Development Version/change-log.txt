@@ -224,3 +224,11 @@ TODO: MSR (Magnetic Spin Resonance)
 TODO: Consider a way to save the state of an MSD including any PRNG state,
 	so that it can be stored to secondary storage and restored and resumed
 	at a later time.
+TODO: Could you create a meta program which when given an MSD geometry configuration, outputs
+	the ASM code required to implement the MSD interface methods? (MSD programming language?)
+	This way the underlying ASM could be branchless as much as possible.
+	You could use 0-spin bounardy conditions to assure all nodes have the same number of neighbors
+	for latice or periodic configurations. For arbitrary, non-periodic configurations,
+	either 0-padding neighbors, or some other method like chunking like regions into task could
+	be used to eliminate or optimize away some of the need for branching structures like "if" and loops.
+	Remember to leverage persistant registars, caching, and AVX.
