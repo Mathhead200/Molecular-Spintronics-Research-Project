@@ -232,3 +232,4 @@ TODO: Could you create a meta program which when given an MSD geometry configura
 	either 0-padding neighbors, or some other method like chunking like regions into task could
 	be used to eliminate or optimize away some of the need for branching structures like "if" and loops.
 	Remember to leverage persistant registars, caching, and AVX.
+	(Maybe each node could carry around its own custom recalculate total energy function for non-periodic graph systems.)
