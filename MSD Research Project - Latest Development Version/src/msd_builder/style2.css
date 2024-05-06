@@ -148,6 +148,18 @@ body.show-timeline #msd-params-form {
 	font-size: 2rem;
 }
 
+#msd-params-table header {
+	position: sticky;
+	top: 0;
+	background-color: var(--fg-color)
+}
+
+#msd-params-table section > *:first-child {
+	position: sticky;
+	left: 0;
+	background-color: var(--fg-color);
+}
+
 
 /* ---- Parameters Table --------------------------------------------------- */
 #msd-params-table {

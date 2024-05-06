@@ -144,6 +144,53 @@
 				<div></div>
 				<div></div>
 			</section>
+			<section id="param-kT">
+				<header> kT </header>
+				<div> <input id="kT" title="kT" type="number" min="0" step="any" value="0.1"> </div>
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+			</section>
+			<section id="param-B" class="vector">
+				<div>
+					<header> B </header>
+					<div class="buttons">
+						<button>x</button>
+						<button>y</button>
+						<button>z</button>
+					</div>
+				</div>
+				<div>
+					<input id="B_x" title="B_x" type="number" step="any" value="0">
+					<input id="B_y" title="B_y" type="number" step="any" value="0">
+					<input id="B_z" title="B_z" type="number" step="any" value="0">
+				</div>
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+			</section>
+			<section id="param-S">
+				<header> S </header>
+				<div> <input id="SL" title="SL" type="number" min="0" step="any" value="1"> </div>
+				<div> <input id="SR" title="SR" type="number" min="0" step="any" value="1"> </div>
+				<div> <input id="Sm" title="Sm" type="number" min="0" step="any" value="1"> </div>
+				<div></div>
+				<div></div>
+				<div></div>
+			</section>
+			<section id="param-F">
+				<header> F </header>
+				<div> <input id="FL" title="FL" type="number" min="0" step="any" value="0"> </div>
+				<div> <input id="FR" title="FR" type="number" min="0" step="any" value="0"> </div>
+				<div> <input id="Fm" title="Fm" type="number" min="0" step="any" value="0"> </div>
+				<div></div>
+				<div></div>
+				<div></div>
+			</section>
 			<section id="param-J">
 				<header> J </header>
 				<div> <input id="JL" title="JL" type="number" step="any" value="1"> </div>
@@ -152,6 +199,15 @@
 				<div> <input id="JmL" title="JmL" type="number" step="any" value="1"> </div>
 				<div> <input id="JmR" title="JmR" type="number" step="any" value="-1"> </div>
 				<div> <input id="JLR" title="JLR" type="number" step="any" value="0"> </div>
+			</section>
+			<section id="param-b">
+				<header> b </header>
+				<div> <input id="bL" title="bL" type="number" step="any" value="0"> </div>
+				<div> <input id="bm" title="bm" type="number" step="any" value="0"> </div>
+				<div> <input id="bR" title="bR" type="number" step="any" value="0"> </div>
+				<div> <input id="bmL" title="bmL" type="number" step="any" value="0"> </div>
+				<div> <input id="bmR" title="bmR" type="number" step="any" value="0"> </div>
+				<div> <input id="bLR" title="bLR" type="number" step="any" value="0"> </div>
 			</section>
 			<section id="param-A" class="vector">
 				<div>
@@ -177,6 +233,82 @@
 					<input id="AR_y" title="AR_y" type="number" step="any" value="0">
 					<input id="AR_z" title="AR_z" type="number" step="any" value="0">
 				</div>
+				<div></div>
+				<div></div>
+				<div></div>
+			</section>
+			<section id="param-D" class="vector">
+				<div>
+					<header class="sideways"> DMI </header>
+					<div class="buttons">
+						<button>x</button>
+						<button>y</button>
+						<button>z</button>
+					</div>
+				</div>
+				<div>
+					<input id="DL_x" title="DL_x" type="number" step="any" value="0">
+					<input id="DL_y" title="DL_y" type="number" step="any" value="0">
+					<input id="DL_z" title="DL_z" type="number" step="any" value="0">
+				</div>
+				<div>
+					<input id="Dm_x" title="Dm_x" type="number" step="any" value="0">
+					<input id="Dm_y" title="Dm_y" type="number" step="any" value="0">
+					<input id="Dm_z" title="Dm_z" type="number" step="any" value="0">
+				</div>
+				<div>
+					<input id="DR_x" title="DR_x" type="number" step="any" value="0">
+					<input id="DR_y" title="DR_y" type="number" step="any" value="0">
+					<input id="DR_z" title="DR_z" type="number" step="any" value="0">
+				</div>
+				<div>
+					<input id="DmL_x" title="DmL_x" type="number" step="any" value="0">
+					<input id="DmL_y" title="DmL_y" type="number" step="any" value="0">
+					<input id="DmL_z" title="DmL_z" type="number" step="any" value="0">
+				</div>
+				<div>
+					<input id="DmR_x" title="DmR_x" type="number" step="any" value="0">
+					<input id="DmR_y" title="DmR_y" type="number" step="any" value="0">
+					<input id="DmR_z" title="DmR_z" type="number" step="any" value="0">
+				</div>
+				<div>
+					<input id="DLR_x" title="DLR_x" type="number" step="any" value="0">
+					<input id="DLR_y" title="DLR_y" type="number" step="any" value="0">
+					<input id="DLR_z" title="DLR_z" type="number" step="any" value="0">
+				</div>
+			</section>
+			<section id="param-simCount">
+				<header> Sim. Count </header>
+				<div> <input id="simCount" title="simCount" type="number" min="0" step="1" value="1000000"> </div>
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+			</section>
+			<section id="param-freq">
+				<header> Freq. </header>
+				<div> <input id="freq" title="freq" type="number" min="0" step="1" value="100000"> </div>
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+			</section>
+			<section id="param-seed">
+				<header> PRNG Seed </header>
+				<div> <input id="seed" title="seed" type="number" min="0" step="1" value=""></div>
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+			</section>
+			<section id="param-randomize">
+				<header> Randomize </header>
+				<div> <input id="randomize" title="randomzie" type="checkbox" checked> </div>
+				<div></div>
+				<div></div>
 				<div></div>
 				<div></div>
 				<div></div>
