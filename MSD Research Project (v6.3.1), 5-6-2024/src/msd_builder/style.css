@@ -1,0 +1,184 @@
+body {
+	margin: 0;
+	text-align: center;
+	font-family: Arial;
+}
+
+no-wrap {
+	white-space: nowrap;
+}
+
+
+/* Canvas (ThreeJS/WebGL) */
+#msd-3d {
+	width: 100%;
+	height: calc(100vh - 7em);
+	background-color: black;  /* the entire canvas isn't drawn */
+}
+
+#msd-3d canvas {
+	width: inherit;
+	height: inherit;
+	object-fit: contain;  /* the entire canvas isn't drawn */
+}
+
+
+/* Timeline */
+#timeline {
+	position: fixed;
+	z-index: 1;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background-color: white;
+	overflow-x: auto;
+	border-top: 2px solid black;
+	white-space: nowrap;
+}
+
+#timeline > * {
+	display: inline-block;
+	box-sizing: border-box;
+	min-width: 3vw;
+	min-height: 3vw;
+	margin: 0.75vw;
+	border: 1px solid black;
+	border-radius: 50%;
+	font-size: 10pt;
+	text-align: center;
+	background-color: burlywood;
+	font-family: monospace;
+	cursor: pointer;
+	padding: 1em;
+}
+
+#timeline > *:hover {
+	filter: brightness(0.7);
+	border-color: darkgoldenrod;
+}
+
+#timeline > *.active {
+	border-color: yellow;
+	background-color: aqua;
+}
+
+
+/* Form (MSD Parameters) */
+#msd-params-form {
+	width: 80%;
+	margin: auto;
+
+	--FML-color: cornflowerblue;
+	--mol-color: plum;
+	--FMR-color: tomato;
+}
+
+#msd-params-form fieldset-row {
+	display: flex;
+	justify-content: space-evenly;
+	width: 100%;
+}
+
+#msd-params-form fieldset {
+	margin: 1em;
+	vertical-align: top;
+}
+
+#FML {
+	background-color: var(--FML-color);
+}
+
+#mol {
+	background-color: var(--mol-color);	
+}
+
+#FMR {
+	background-color: var(--FMR-color);
+}
+
+#LR {
+	background-image: linear-gradient(90deg, var(--FML-color), transparent, var(--FMR-color));
+}
+
+#mL {
+	background-image: linear-gradient(90deg, var(--FML-color), var(--mol-color));
+}
+
+#mR {
+	background-image: linear-gradient(90deg, var(--mol-color), var(--FMR-color));
+}
+
+#msd-params-form .controls {
+	width: 100%;
+}
+
+#msd-params-form input-group:first-of-type {
+	border: 0px hidden transparent;
+	padding-top: 0;
+	margin-top: 0;
+}
+
+#msd-params-form input-group {
+	display: block;
+	padding-top: 1em;
+	border-top: 1px inset black;
+	margin-top: 1em;
+}
+
+#msd-params-form input-group h2 {
+	font-weight: normal;
+	font-size: 1em;
+	margin: 0 0 1em 0;
+}
+
+#msd-params-form input-row {
+	display: grid;
+	grid-template-columns: 4em auto;
+	column-gap: 0.5em;
+}
+
+#msd-params-form label {
+	white-space: nowrap;
+	text-align: right;
+}
+
+#msd-params-form input-list {
+	display: flex;
+}
+
+#msd-params-form input-list > * {
+	width: 100%;
+}
+
+#msd-params-form .spacer {
+	visibility: hidden;
+}
+
+#mol-edges input[type=checkbox] {
+	position: absolute;
+	left: -100%;
+}
+
+#mol-edges input[type=checkbox] + label {
+	border: 1px inset rgb(118, 118, 118);
+	cursor: pointer;
+	display: inline-block;
+	min-height: 1em;
+	min-width: 1.5em;
+	text-align: center;
+	color: fieldtext;
+	font-size: 0.8em;
+	font-weight: bold;
+	padding: 0.1em;
+	margin: 0 0.1em;
+}
+
+#mol-edges input[type=checkbox]:focus + label {
+	outline: 1px outset black;
+	border-radius: 2px;
+}
+
+#mol-edges input[type=checkbox]:checked + label {
+	background-color: darkslategrey;
+	color: white;
+}

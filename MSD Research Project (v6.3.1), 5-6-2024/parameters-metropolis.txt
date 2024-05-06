@@ -1,0 +1,120 @@
+# dimensions of bounding box
+width  = 17
+height = 11
+depth  = 11
+
+# boundaries which define the exact dimensions of FM_L, FM_R, and mol.
+molPosL = 5    # molecule (mol.) x-position (inclusive)
+molPosR = 11
+topL = 3       # left ferromagnet (FM_L) y-position (inclusive)
+bottomL = 7
+frontR = 3     # right ferromagnet (FM_R) z-position (inclusive)
+backR = 7
+
+# custom spin magnitudes
+[5 4 3] = 0    # front edge of mol. left side
+[5 5 3] = 0
+[5 6 3] = 0
+[5 4 7] = 0    # back edge of mol. left side
+[5 5 7] = 0
+[5 6 7] = 0
+[11 4 3] = 0    # front edge of mol. right side
+[11 5 3] = 0
+[11 6 3] = 0
+[11 4 7] = 0    # back edge of mol. right side
+[11 5 7] = 0
+[11 6 7] = 0
+
+
+t_eq     = 1000000    # time to equilibrium
+simCount = 100000     # time to run after equilibrium
+freq     = 1000       # frequency of data recording
+
+
+kT : 0.1  0.3  0.1    # temperature
+
+B_x = 0    # External magnetic field
+B_y = 0
+B_z = 0
+
+SL = 1    # Magnitude of spin vectors
+SR = 1
+Sm = 1
+FL = 0.5  # Magnitude of spin fluctuation ("flux") vectors
+FR = 0.5
+Fm = 0.5
+
+# Heisenberg exchange coupling between two neighboring spins
+JL  = 1
+JR  = 1
+Jm  = 0
+JmL _j : -1.2  1.2  0.4
+JmR _j : 1.2  -1.2  -0.4
+JLR = 0
+
+# exchange coupling between a spin and its local flux
+Je0L  = 0.25
+Je0R  = 0.25
+Je0m  = 0.25
+
+# exchange coupling between a spin and its neighboring flux (and vice versa)
+Je1L  = 0
+Je1R  = 0
+Je1m  = 0
+Je1mL = 0
+Je1mR = 0
+Je1LR = 0
+
+# exchange coupling between two neighboring fluxes
+JeeL  = 0
+JeeR  = 0
+Jeem  = 0
+JeemL = 0
+JeemR = 0
+JeeLR = 0
+
+# Anisotropy constant(s), as vectors 
+AL_x = 0
+AL_y = 0
+AL_z = 0
+
+AR_x = 0
+AR_y = 0
+AR_z = 0
+
+Am_x = 0
+Am_y = 0
+Am_z = 0
+
+# Biquadratic coupling
+bL  = 0
+bR  = 0
+bm  = 0
+bmL = 0
+bmR = 0
+bLR = 0
+
+# Dzyaloshinskii-Moriya (i.e. Skyrmion) interaction, as vectors
+DL_x = 0
+DL_y = 0
+DL_z = 0
+
+DR_x = 0
+DR_y = 0
+DR_z = 0
+
+Dm_x = 0
+Dm_y = 0
+Dm_z = 0
+
+DmL_x = 0
+DmL_y = 0
+DmL_z = 0
+
+DmR_x = 0
+DmR_y = 0
+DmR_z = 0
+
+DLR_x = 0
+DLR_y = 0
+DLR_z = 0
