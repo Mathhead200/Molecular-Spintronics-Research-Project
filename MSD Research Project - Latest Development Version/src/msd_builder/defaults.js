@@ -67,6 +67,7 @@ const PARAM_FIELDS = new Map([
 SELECTORS = {
 	threeCanvasContainer: "#msd-3d",
 	paramsForm: "#msd-params-form",
+	actionsForm: "#msd-actions-form",
 	timeline: "#timeline",
 	settingsIconContainer: "#settingsIcon",
 	lens: "#lens",

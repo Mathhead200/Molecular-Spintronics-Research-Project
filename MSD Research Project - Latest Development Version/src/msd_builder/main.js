@@ -71,6 +71,18 @@ const main = () => {
 	ground.rotation.x = -Math.PI / 2;
 	scene.add(ground);
 	*/
+
+	// ---- New stuff for MSD-Builder v2 ----
+	const body = document.querySelector("body");
+	document.querySelector("#toggle-params-form").addEventListener("click", event => {
+		body.classList.toggle("show-params-form");
+	});
+	document.querySelector("#toggle-timeline").addEventListener("click", event => {
+		body.classList.toggle("show-timeline");
+	});
+	document.querySelector("header svg").addEventListener("click", event => {
+		body.classList.toggle("show-settings");
+	});
 };
 
 document.addEventListener("DOMContentLoaded", main);

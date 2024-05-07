@@ -36,6 +36,22 @@
 <body class="show-params-form show-timeline show-settings">
 	<header>
 		<h1> Molecular Spintronics Device Simulation </h1>
+		
+		<!-- TODO: replace these with a better UI solution -->
+		<form id="msd-actions-form">
+			<button id="toggle-params-form"> Parameters </button>
+			<button id="toggle-timeline"> Timeline </button>
+			&emsp;
+
+			<input type="submit", id="runButton", value="Run">
+			<input type="reset" value="Reset">
+			&emsp;
+
+			<input type="submit", onclick="document.getElementById('getFile').click();" value="Import">
+			<input type='file' id="getFile" style="display:none;">
+			<input type="submit", id="exportFile", value="Export">
+		</form>
+
 		<svg viewBox="0 0 512.002 512.002" tabindex="0">
 			<title>Settings</title>
 			<path d="M256,512c-35.567,0-64.503-28.936-64.503-64.502v-4.397c-7.56-2.609-14.969-5.681-22.175-9.2
@@ -144,6 +160,21 @@
 				<div></div>
 				<div></div>
 			</section>
+			<section id="param-mol-type">
+				<header> mol. type </header>
+				<div>
+					<select id="mol-type">
+						<option value="LINEAR"> Linear </option>
+						<option value="CIRCULAR"> Circular </option>
+						<!-- TODO: <option value="_MMT"> Custom (MMT) </option> -->
+					</select>
+				</div>
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+				<div></div>
+			</section>
 			<section id="param-kT">
 				<header> kT </header>
 				<div> <input id="kT" title="kT" type="number" min="0" step="any" value="0.1"> </div>
@@ -199,6 +230,33 @@
 				<div> <input id="JmL" title="JmL" type="number" step="any" value="1"> </div>
 				<div> <input id="JmR" title="JmR" type="number" step="any" value="-1"> </div>
 				<div> <input id="JLR" title="JLR" type="number" step="any" value="0"> </div>
+			</section>
+			<section id="param-Je0">
+				<header> Je0 </header>
+				<div> <input id="Je0L" title="Je0L" type="number" step="any" value="1"> </div>
+				<div> <input id="Je0m" title="Je0m" type="number" step="any" value="1"> </div>
+				<div> <input id="Je0R" title="Je0R" type="number" step="any" value="1"> </div>
+				<div></div>
+				<div></div>
+				<div></div>
+			</section>
+			<section id="param-Je1">
+				<header> Je1 </header>
+				<div> <input id="Je1L" title="Je1L" type="number" step="any" value="1"> </div>
+				<div> <input id="Je1m" title="Je1m" type="number" step="any" value="1"> </div>
+				<div> <input id="Je1R" title="Je1R" type="number" step="any" value="1"> </div>
+				<div> <input id="Je1mL" title="Je1mL" type="number" step="any" value="1"> </div>
+				<div> <input id="Je1mR" title="Je1mR" type="number" step="any" value="-1"> </div>
+				<div> <input id="Je1LR" title="Je1LR" type="number" step="any" value="0"> </div>
+			</section>
+			<section id="param-Jee">
+				<header> J </header>
+				<div> <input id="JeeL" title="JeeL" type="number" step="any" value="1"> </div>
+				<div> <input id="Jeem" title="Jeem" type="number" step="any" value="1"> </div>
+				<div> <input id="JeeR" title="JeeR" type="number" step="any" value="1"> </div>
+				<div> <input id="JeemL" title="JeemL" type="number" step="any" value="1"> </div>
+				<div> <input id="JeemR" title="JeemR" type="number" step="any" value="-1"> </div>
+				<div> <input id="JeeLR" title="JeeLR" type="number" step="any" value="0"> </div>
 			</section>
 			<section id="param-b">
 				<header> b </header>

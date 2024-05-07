@@ -334,9 +334,10 @@ const initForm = ({ camera, msdView, timeline }) => {
 	};
 
 	const paramsForm = document.querySelector(SELECTORS.paramsForm);
+	const actionsForm = document.querySelector(SELECTORS.actionsForm);
 
 	// Robert J.
-	paramsForm.querySelector("#getFile").addEventListener("change", (event) => {
+	actionsForm.querySelector("#getFile").addEventListener("change", (event) => {
 		const file = event.currentTarget.files[0];
 		if (!file)
 			return;
@@ -350,7 +351,7 @@ const initForm = ({ camera, msdView, timeline }) => {
 	});
 
 	let runId = 0;  // TODO: Used for timing each simulation in the console
-	paramsForm.addEventListener("submit", (event) => {
+	actionsForm.addEventListener("submit", (event) => {
 		event.preventDefault();
 
 		// run simulation:
@@ -367,7 +368,7 @@ const initForm = ({ camera, msdView, timeline }) => {
 		}
 	});
 
-	paramsForm.addEventListener("reset", (event) => {
+	actionsForm.addEventListener("reset", (event) => {
 		event.preventDefault();
 		if (confirm("Reset all parameters to a default state?")) {
 			endSim();
@@ -401,12 +402,15 @@ const initForm = ({ camera, msdView, timeline }) => {
 		msdView.update();
 	});
 
+	// TODO: Remove?
+	/*
 	document.getElementById("FML-legend").innerText = `[${msdView.FML.name}]`;
 	document.getElementById("FMR-legend").innerText = `[${msdView.FMR.name}]`;
 	document.getElementById("mol-legend").innerText = `[${msdView.mol.name}]`;
 	document.getElementById("LR-legend").innerText = `[${msdView.FML.name}~~${msdView.FMR.name}]`;
 	document.getElementById("mL-legend").innerText = `[${msdView.FML.name}~~${msdView.mol.name}]`;
 	document.getElementById("mR-legend").innerText = `[${msdView.mol.name}~~${msdView.FMR.name}]`;
+	*/
 };
 
 
