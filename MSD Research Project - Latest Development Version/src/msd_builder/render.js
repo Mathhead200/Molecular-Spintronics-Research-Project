@@ -1070,6 +1070,10 @@ class MSDView extends Group {
 		 case "Mz":
 			this.viewDetailedMagnetization(state, Vector.k());
 			break;
+		 case "Mrho":
+			// TODO: implement
+			console.warn("Mrho view not implemented. Using default!");
+			this.viewDefault();
 		 default:
 			this.viewDefault();
 		}

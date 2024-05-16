@@ -60,7 +60,7 @@ class Timeline {
 		this._active = ele;
 		if (ele) {
 			ele.classList.add("active");
-			ele.focus();
+			ele.focus({ preventScroll: true });
 			this.view.update(this.states[+ele.dataset.idx]);
 		}
 	}

@@ -204,6 +204,7 @@ Second bug fix. In MSD::setParameters()
 (2-13-2024) Added lens selector to GUI.
 
 6.3.2:
+(5-10-2024) MSD-Builder2.html (GUI v2) is now working consistantly with GUI v1.
 
 
 TODO: Add a better timeline.
