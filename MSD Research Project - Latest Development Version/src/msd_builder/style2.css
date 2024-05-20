@@ -1,12 +1,18 @@
+/*
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lekton:ital,wght@0,400;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sometype+Mono:ital,wght@0,400..700;1,400..700&display=swap');
+*/
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Sometype+Mono:ital,wght@0,400..700;1,400..700&display=swap');
+
 :root {
-	--header-height: 3rem;
+	--header-height: 3.4em;
 	--timeline-height: 5rem;
 	--params-form-width: 50vw;
-	--dark: black;
+	--brand-color: white;
 	--fg-color: white;
 	--vector-input-width: 24%;
 }
-
 
 /* ---- General Styles ----------------------------------------------------- */
 body {
@@ -15,12 +21,13 @@ body {
 	overflow: hidden;
 	margin: 0;
 	
-	font-family: 'Courier New', Courier, monospace;
+	font-family: "Sometype Mono", monospace;
 }
 
 h1, h2, h3, h4, h5, h6 {
 	margin: 0;
 	font-weight: bold;
+	font-family: "Open Sans", sans-serif;
 }
 
 select, input, button {
@@ -50,6 +57,7 @@ body > header {
 body > header h1 {
 	font-size: 1rem;
 	margin: calc(1rem - var(--header-padding));
+	color: var(--brand-color);
 }
 
 body > header svg {
@@ -69,15 +77,15 @@ body.show-settings > header svg {
 }
 
 body > header svg > * {
-	fill: white;
+	fill: var(--brand-color);
+	stroke: var(--brand-color);
 }
-
 
 /* ---- Canvas (Three.js) -------------------------------------------------- */
 #msd-3d {
 	width: 100%;
-	height: calc(100vh - 3rem);
-	background-color: #222222;
+	height: calc(100vh - var(--header-height));
+	background-color: #1c1a1a;
 }
 
 #msd-3d canvas {
@@ -105,7 +113,7 @@ body.show-params-form.show-timeline #msd-3d canvas {
 #msd-params-form {
 	position: absolute;
 	z-index: 2;
-	top: 3rem;
+	top: var(--header-height);
 	bottom: 0;
 	left: 0;
 	width: var(--params-form-width);
@@ -140,13 +148,14 @@ body.show-timeline #msd-params-form {
 	border: 0px hidden;
 	padding: 0.25em 0.5em;
 	
-	background-color: #cecece;
+	background-color: #f7f7f7;
+	outline: 2px solid #e6e6e6;
 	font-weight: bold;
 }
 
 #msd-params-form h2 {
 	margin: 0.5em 1em;
-	font-size: 2rem;
+	font-size: 1.5rem;
 }
 
 #msd-params-table header {
@@ -155,10 +164,17 @@ body.show-timeline #msd-params-form {
 	background-color: var(--fg-color)
 }
 
-#msd-params-table section > *:first-child {
+#msd-params-table section > :first-child {
 	position: sticky;
 	left: 0;
 	background-color: var(--fg-color);
+	text-align: center;
+}
+
+#msd-params-table > * > :first-child {
+	font-size: 0.9rem;
+	padding: 0rem 1.5rem;
+	width: 6em;
 }
 
 .vector div {
@@ -209,8 +225,13 @@ body.show-timeline #msd-params-form {
 #msd-params-table > *  {
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-	gap: 1px;
+	/* gap: 1px; */
 	min-width: 40rem;
+	/* margin: 1em 0em; */
+}
+
+#msd-params-table > .global {
+	/* background-color: #f7f7f7; */
 }
 
 #msd-params-table > .global > :not(:first-child) {
@@ -218,11 +239,25 @@ body.show-timeline #msd-params-form {
 }
 
 #msd-params-table > * > * {
-	outline: 1px solid #e1e1e1;
+	outline: 1px solid #e6e6e6;
+}
+
+#msd-params-table > * > header {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
 }
 
 #msd-params-table > header {
 	text-align: center;
+	font-size: 0.9em;
+	box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.27);
+	background-color: white;
+	z-index: 1;
+}
+
+#msd-params-table > header > * {
+	padding: 0.5em 0em;
 }
 
 #msd-params-table input,
