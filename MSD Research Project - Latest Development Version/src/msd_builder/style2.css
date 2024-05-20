@@ -1,9 +1,10 @@
 :root {
 	--header-height: 3rem;
 	--timeline-height: 5rem;
-	--params-form-width: 31.640625vw;
+	--params-form-width: 50vw;
 	--dark: black;
 	--fg-color: white;
+	--vector-input-width: 24%;
 }
 
 
@@ -160,6 +161,44 @@ body.show-timeline #msd-params-form {
 	background-color: var(--fg-color);
 }
 
+.vector div {
+	line-height: 1em;
+}
+
+.vector > div:not(:first-child):not(:empty) {
+	/* Column vector brackets as SVG background image. */
+	background-image:
+		url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewbox='0 0 25 300' width='25' height='300' preserveAspectRatio='none'><path fill='transparent' stroke='black' stroke-width='2' d='M20,5 H5 V295 H20' /></svg>"),
+		url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewbox='0 0 25 300' width='25' height='300' preserveAspectRatio='none'><path fill='transparent' stroke='black' stroke-width='2' d='M5,5 H20 V295 H5' /></svg>");
+	background-size: contain, contain;
+	background-position: left, right;
+	background-repeat: no-repeat;
+	/* Scaling of SVG backgrounds: https://developer.mozilla.org/en-US/docs/Web/CSS/Scaling_of_SVG_backgrounds */
+	/* preserveAspectRatio: https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/preserveAspectRatio */
+}
+
+.vector:not(.global) > div:nth-child(2):not(:empty) {
+	background-image:
+		url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewbox='0 0 25 300' width='25' height='300' preserveAspectRatio='none'><path fill='transparent' stroke='lightskyblue' stroke-width='2' d='M20,5 H5 V295 H20' /></svg>"),
+		url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewbox='0 0 25 300' width='25' height='300' preserveAspectRatio='none'><path fill='transparent' stroke='lightskyblue' stroke-width='2' d='M5,5 H20 V295 H5' /></svg>");
+}
+
+.vector:not(.global) > div:nth-child(3):not(:empty) {
+	background-image:
+		url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewbox='0 0 25 300' width='25' height='300' preserveAspectRatio='none'><path fill='transparent' stroke='forestgreen' stroke-width='2' d='M20,5 H5 V295 H20' /></svg>"),
+		url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewbox='0 0 25 300' width='25' height='300' preserveAspectRatio='none'><path fill='transparent' stroke='forestgreen' stroke-width='2' d='M5,5 H20 V295 H5' /></svg>");
+}
+
+.vector:not(.global) > div:nth-child(4):not(:empty) {
+	background-image:
+		url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewbox='0 0 25 300' width='25' height='300' preserveAspectRatio='none'><path fill='transparent' stroke='crimson' stroke-width='2' d='M20,5 H5 V295 H20' /></svg>"),
+		url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewbox='0 0 25 300' width='25' height='300' preserveAspectRatio='none'><path fill='transparent' stroke='crimson' stroke-width='2' d='M5,5 H20 V295 H5' /></svg>");
+}
+
+.vector.global > div:not(:first-child):not(:empty) {
+	background-position: left, calc(var(--vector-input-width) + 1.6%) center;
+}
+
 
 /* ---- Parameters Table --------------------------------------------------- */
 #msd-params-table {
@@ -174,6 +213,10 @@ body.show-timeline #msd-params-form {
 	min-width: 40rem;
 }
 
+#msd-params-table > .global > :not(:first-child) {
+	grid-column: 2 / -1;
+}
+
 #msd-params-table > * > * {
 	outline: 1px solid #e1e1e1;
 }
@@ -182,28 +225,45 @@ body.show-timeline #msd-params-form {
 	text-align: center;
 }
 
-#msd-params-table input, #msd-params-table button {
+#msd-params-table input,
+#msd-params-table button,
+#msd-params-table select {
 	border: 2px solid;
 	border-radius: 0.5em;
 	box-sizing: border-box;
 	padding: 0.25em;
 }
 
-#msd-params-table input {
+#msd-params-table input,
+#msd-params-table select {
+	display: block;
 	width: 80%;
-	margin: 10%;
+	margin: 0.5em;
 	text-align: right;
 }
 
-#msd-params-table > section > div:nth-child(2) input {
+#msd-params-table .global input,
+#msd-params-table .global select {
+	width: var(--vector-input-width);
+}
+
+#msd-params-table > section > div input,
+#msd-params-table > section > div select {
+	border-color: black;
+}
+
+#msd-params-table > section:not(.global) > div:nth-child(2) input,
+#msd-params-table > section:not(.global) > div:nth-child(2) select {
 	border-color: lightskyblue;
 }
 
-#msd-params-table > section > div:nth-child(3) input {
+#msd-params-table > section:not(.global) > div:nth-child(3) input,
+#msd-params-table > section:not(.global) > div:nth-child(3) select {
 	border-color: forestgreen;
 }
 
-#msd-params-table > section > div:nth-child(4) input {
+#msd-params-table > section:not(.global) > div:nth-child(4) input,
+#msd-params-table > section:not(.global) > div:nth-child(4) select {
 	border-color: crimson;
 }
 
@@ -213,13 +273,13 @@ body.show-timeline #msd-params-form {
 }
 
 #msd-params-table > .vector > *:first-child > * {
-	flex-grow: 1;
+	/* flex-grow: 1; */
 	text-align: center;
 }
 
 #msd-params-table > .vector .buttons {
 	display: grid;
-	grid-template-rows: 1fr 1fr 1f;
+	grid-template-rows: 1fr 1fr 1fr;  /* TODO: Not working. What is this for? */
 }
 
 #msd-params-table > .vector .buttons button {
