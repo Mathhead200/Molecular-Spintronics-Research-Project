@@ -7,7 +7,7 @@
 	--params-form-width: 50vw;
 	--brand-color: white;
 	--fg-color: white;
-	--vector-input-width: 24%;
+	--global-input-width: 24%;
 }
 
 /* ---- General Styles ----------------------------------------------------- */
@@ -33,6 +33,10 @@ select, input, button {
 .sideways {
 	writing-mode: vertical-lr;
 	transform: rotate(180deg);
+}
+
+.hide {
+	display: none;
 }
 
 
@@ -136,11 +140,19 @@ body.show-timeline #msd-params-form {
 	bottom: var(--timeline-height);
 }
 
-#workspaces {
-	--ws-margin: 1em;
+#msd-params-form nav {
+	border-bottom: 3px double black;
+}
 
-	width: calc(100% - 2 * var(--ws-margin));
-	margin: var(--ws-margin);
+#msd-params-form nav > * {
+	display: flex;
+	justify-content: center;
+	margin: 1em;
+	gap: 1em;
+}
+
+#workspaces {
+	width: 100%;
 	border: 0px hidden;
 	padding: 0.25em 0.5em;
 	
@@ -150,8 +162,8 @@ body.show-timeline #msd-params-form {
 }
 
 #msd-params-form h2 {
-	margin: 0.5em 1em;
-	font-size: 1.5rem;
+	font-size: inherit;
+	padding-block-end: 0.15em;  /* lines up baseline since we are using a different font face */
 }
 
 
@@ -161,12 +173,19 @@ body.show-timeline #msd-params-form {
 	overflow: auto;
 }
 
+#msd-params-table header {
+	position: sticky;
+	background-color: var(--fg-color);
+	text-align: center;
+	font-size: 0.9em;
+}
+
 #msd-params-table > *  {
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-	/* gap: 1px; */
 	min-width: 40rem;
 	/* margin: 1em 0em; */
+	/* gap: 1px; */
 }
 
 #msd-params-table > .global > :not(:first-child) {
@@ -177,6 +196,7 @@ body.show-timeline #msd-params-form {
 	outline: 1px solid #e6e6e6;
 }
 
+#msd-params-table > header > *,
 #msd-params-table > * > header {
 	display: flex;
 	flex-direction: column;
@@ -184,34 +204,23 @@ body.show-timeline #msd-params-form {
 }
 
 #msd-params-table > header {
-	text-align: center;
-	font-size: 0.9em;
+	top: 0;
+	z-index: 1;
 	box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.27);
 	background-color: white;
-	z-index: 1;
 }
 
 #msd-params-table > header > * {
-	padding: 0.5em 0em;
-}
-
-#msd-params-table header {
-	position: sticky;
-	top: 0;
-	background-color: var(--fg-color)
+	padding-block: 0.5em;
 }
 
 #msd-params-table section > :first-child {
-	position: sticky;
 	left: 0;
-	background-color: var(--fg-color);
-	text-align: center;
 }
 
 #msd-params-table > * > :first-child {
-	font-size: 0.9rem;
-	padding: 0rem 1.5rem;
 	width: 6em;
+	padding-inline: 1.5rem;
 }
 
 #msd-params-table input,
@@ -229,16 +238,25 @@ body.show-timeline #msd-params-form {
 	width: 80%;
 	margin: 0.5em;
 	text-align: right;
+	border-color: black;
+}
+
+#msd-params-table input:focus,
+#msd-params-table input.focus,  /* synced (faux) focus */
+#msd-params-table select:focus {
+	outline: none;
+	background-color: rgba(0, 0, 0, 0.125);
+}
+
+#msd-params-table section:not(.vector) input:not(.set):not(.focus),
+#msd-params-table section.vector > div:not(:first-child):not(.set),
+#msd-params-table section.vector > div:not(:first-child).set input:not(.set) {
+	opacity: 0.375;
 }
 
 #msd-params-table .global input,
 #msd-params-table .global select {
-	width: var(--vector-input-width);
-}
-
-#msd-params-table > section > div input,
-#msd-params-table > section > div select {
-	border-color: black;
+	width: var(--global-input-width);
 }
 
 #msd-params-table > section:not(.global) > div:nth-child(2) input,
@@ -246,9 +264,21 @@ body.show-timeline #msd-params-form {
 	border-color: lightskyblue;
 }
 
+#msd-params-table > section:not(.global) > div:nth-child(2) input:focus,
+#msd-params-table > section:not(.global) > div:nth-child(2) input.focus,  /* synced (faux) focus */
+#msd-params-table > section:not(.global) > div:nth-child(2) select:focus {
+	background-color: rgba(135, 206, 250, 0.25);
+}
+
 #msd-params-table > section:not(.global) > div:nth-child(3) input,
 #msd-params-table > section:not(.global) > div:nth-child(3) select {
 	border-color: forestgreen;
+}
+
+#msd-params-table > section:not(.global) > div:nth-child(3) input:focus,
+#msd-params-table > section:not(.global) > div:nth-child(3) input.focus,  /* synced (faux) focus */
+#msd-params-table > section:not(.global) > div:nth-child(3) select:focus {
+	background-color: rgba(34, 139, 34, 0.125);
 }
 
 #msd-params-table > section:not(.global) > div:nth-child(4) input,
@@ -256,11 +286,39 @@ body.show-timeline #msd-params-form {
 	border-color: crimson;
 }
 
-.vector div {
+#msd-params-table > section:not(.global) > div:nth-child(4) input:focus,
+#msd-params-table > section:not(.global) > div:nth-child(4) input.focus,  /* synced (faux) focus */
+#msd-params-table > section:not(.global) > div:nth-child(4) select:focus {
+	background-color: rgba(220, 20, 60, 0.125);
+}
+
+.vector > * {
 	line-height: 1em;
 }
 
-.vector > div:not(:first-child):not(:empty) {
+.vector > :first-child {
+	position: relative;
+}
+
+.vector .coordinate-labels {
+	position: absolute;
+	right: 0.5em;
+	top: 0;
+	bottom: 0;
+
+	/* align labels with number fields */
+	display: flex;
+	flex-direction: column;
+	justify-content: space-evenly;
+	margin-block: -0.5em;
+	overflow-y: hidden;
+
+	color: #bbbbbb;
+	font-size: 0.75rem;
+	font-weight: bold;
+}
+
+.vector > :not(:first-child):not(:empty) {
 	/* Column vector brackets as SVG background image. */
 	background-image:
 		url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewbox='0 0 25 300' width='25' height='300' preserveAspectRatio='none'><path fill='transparent' stroke='black' stroke-width='2' d='M20,5 H5 V295 H20' /></svg>"),
@@ -272,48 +330,26 @@ body.show-timeline #msd-params-form {
 	/* preserveAspectRatio: https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/preserveAspectRatio */
 }
 
-.vector:not(.global) > div:nth-child(2):not(:empty) {
+.vector:not(.global) > :nth-child(2):not(:empty) {
 	background-image:
 		url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewbox='0 0 25 300' width='25' height='300' preserveAspectRatio='none'><path fill='transparent' stroke='lightskyblue' stroke-width='2' d='M20,5 H5 V295 H20' /></svg>"),
 		url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewbox='0 0 25 300' width='25' height='300' preserveAspectRatio='none'><path fill='transparent' stroke='lightskyblue' stroke-width='2' d='M5,5 H20 V295 H5' /></svg>");
 }
 
-.vector:not(.global) > div:nth-child(3):not(:empty) {
+.vector:not(.global) > :nth-child(3):not(:empty) {
 	background-image:
 		url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewbox='0 0 25 300' width='25' height='300' preserveAspectRatio='none'><path fill='transparent' stroke='forestgreen' stroke-width='2' d='M20,5 H5 V295 H20' /></svg>"),
 		url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewbox='0 0 25 300' width='25' height='300' preserveAspectRatio='none'><path fill='transparent' stroke='forestgreen' stroke-width='2' d='M5,5 H20 V295 H5' /></svg>");
 }
 
-.vector:not(.global) > div:nth-child(4):not(:empty) {
+.vector:not(.global) > :nth-child(4):not(:empty) {
 	background-image:
 		url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewbox='0 0 25 300' width='25' height='300' preserveAspectRatio='none'><path fill='transparent' stroke='crimson' stroke-width='2' d='M20,5 H5 V295 H20' /></svg>"),
 		url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewbox='0 0 25 300' width='25' height='300' preserveAspectRatio='none'><path fill='transparent' stroke='crimson' stroke-width='2' d='M5,5 H20 V295 H5' /></svg>");
 }
 
-.vector.global > div:not(:first-child):not(:empty) {
-	background-position: left, calc(var(--vector-input-width) + 1.6%) center;
-}
-
-#msd-params-table > .vector > *:first-child {
-	display: flex;
-	justify-content: space-evenly;
-}
-
-#msd-params-table > .vector > *:first-child > * {
-	/* flex-grow: 1; */
-	text-align: center;
-}
-
-#msd-params-table > .vector .buttons {
-	display: grid;
-	grid-template-rows: 1fr 1fr 1fr;  /* TODO: Not working. What is this for? */
-}
-
-#msd-params-table > .vector .buttons button {
-	box-sizing: border-box;
-	width: 2em;
-	margin: 20%;
-	cursor: pointer;
+.vector.global > :not(:first-child):not(:empty) {
+	background-position: left, calc(var(--global-input-width) + 1.6%) center;
 }
 
 

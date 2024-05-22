@@ -37,6 +37,32 @@ const forEachDimField = (f) => {
 	}
 };
 
+const isSet = function(input) {
+	if(input.type === "checkbox")  return input.checked;
+	if(input.id === "seed")        return input.value !== "";
+	/* else */                     return input.value != 0;
+};
+
+/**
+ * Check the given #msd-params-table input elements, and .set
+ * or unset it appropriately.
+ * @param {HTMLElement}
+ */
+const syncSet = function(input) {
+	if (isSet(input))
+		input.classList.add("set");
+	else
+		input.classList.remove("set");
+}
+
+/**
+ * Check all #msd-params-table input elements, and .set
+ * or unset them appropriately.
+ */
+const syncSetAll = function() {
+	document.querySelectorAll("#msd-params-table input").forEach(input => syncSet(input));
+}
+
 /**
  * Resets the 3D {@link Scene} and {@link MSDView} object with default values.
  * @param {MSDView} msd - will be modified
@@ -103,7 +129,8 @@ const syncHTMLDimFields = (msd) => {
 		input.value = Math.floor(msd[region][prop]);
 		input.min = msd[region].bounds[prop]?.min;
 		input.max = msd[region].bounds[prop]?.max;
-	})
+		if (document.activeElement !== input)  syncSet(input);
+	});
 };
 
 /**
@@ -333,11 +360,23 @@ const initForm = ({ camera, msdView, timeline }) => {
 		// }
 	};
 
-	const paramsForm = document.querySelector(SELECTORS.paramsForm);
 	const actionsForm = document.querySelector(SELECTORS.actionsForm);
+	const paramsForm = document.querySelector(SELECTORS.paramsForm);
+
+	actionsForm.addEventListener("submit", event => {
+		event.preventDefault();
+
+		// run simulation:
+		let json = buildJSON(msdView);
+		let simCount = +document.getElementById("simCount").value;
+		let freq = +document.getElementById("freq").value;
+		runSim(json, { simCount, freq }, timeline);
+	});
+
+	paramsForm.addEventListener("submit", event => event.preventDefault());
 
 	// Robert J.
-	actionsForm.querySelector("#getFile").addEventListener("change", (event) => {
+	paramsForm.querySelector("#file").addEventListener("change", (event) => {
 		const file = event.currentTarget.files[0];
 		if (!file)
 			return;
@@ -350,25 +389,17 @@ const initForm = ({ camera, msdView, timeline }) => {
 		reader.readAsText(file);
 	});
 
-	let runId = 0;  // TODO: Used for timing each simulation in the console
-	actionsForm.addEventListener("submit", (event) => {
-		event.preventDefault();
-
-		// run simulation:
-		if (event.submitter.id === 'runButton') {
-			let json = buildJSON(msdView);
-			let simCount = +document.getElementById("simCount").value;
-			let freq = +document.getElementById("freq").value;
-			runSim(json, { simCount, freq }, timeline);
-		}
-		
-		// export iterate-parameters file:
-		else if (event.submitter.id === 'exportFile') {
-			exportParameters(buildJSON(msdView));
-		}
+	// Robert J.
+	paramsForm.querySelector("#import").addEventListener("click", () => {
+		document.getElementById('file').click();
 	});
 
-	actionsForm.addEventListener("reset", (event) => {
+	// Robert J.
+	paramsForm.querySelector("#export").addEventListener("click", () => {
+		exportParameters(buildJSON(msdView));
+	});
+
+	paramsForm.addEventListener("reset", event => {
 		event.preventDefault();
 		if (confirm("Reset all parameters to a default state?")) {
 			endSim();
@@ -378,9 +409,54 @@ const initForm = ({ camera, msdView, timeline }) => {
 			updateCamera(camera, msdView);
 			syncHTMLDimFields(msdView);
 			loadHTMLParamFields();
+			syncSetAll();
 		}
 	});
 
+	// handle toggling .set
+	paramsForm.querySelectorAll("#msd-params-table input").forEach(input => {
+		if (isSet(input))
+			input.classList.add("set");
+
+		input.addEventListener("focus", ({currentTarget}) => {
+			let parent = currentTarget.parentElement;  // containing <div>
+			let section = parent.parentElement;        // containing <section>
+
+			currentTarget.classList.add("set");
+			if (section.classList.contains("vector"))
+				parent.classList.add("set");
+		});
+
+		input.addEventListener("blur", ({currentTarget}) => {
+			if (!isSet(currentTarget)) {
+				let parent = currentTarget.parentElement;  // containing <div>
+				let section = parent.parentElement;        // containing <section>
+
+				currentTarget.classList.remove("set");
+				if (
+					section.classList.contains("vector") &&
+					![...parent.children].map(sibling => isSet(sibling)).includes(true)  // no sibling .set
+				) /* then: */
+					parent.classList.remove("set");
+			}
+		})
+	});
+
+	// handle faux .focus for synced dim. fileds
+	const syncFocus = (a, b) => {
+		a = paramsForm.querySelector(a);
+		b = paramsForm.querySelector(b);
+		a.addEventListener("focus", () => b.classList.add("focus"));
+		b.addEventListener("focus", () => a.classList.add("focus"));
+		a.addEventListener("blur", () => b.classList.remove("focus"));
+		b.addEventListener("blur", () => a.classList.remove("focus"));
+	};
+	syncFocus("#FML-height", "#mol-height");
+	syncFocus("#mol-depth", "#FMR-depth");
+	syncFocus("#FML-y", "#mol-y");
+	syncFocus("#mol-z", "#FMR-z");
+
+	// timeline controls
 	document.addEventListener("keydown", (event) => {
 		if (!timeline.timelineEle.contains(document.activeElement))
 			return;

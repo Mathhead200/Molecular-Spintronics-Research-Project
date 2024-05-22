@@ -39,17 +39,11 @@
 		
 		<!-- TODO: replace these with a better UI solution -->
 		<form id="msd-actions-form">
-			<button id="toggle-params-form"> Parameters </button>
-			<button id="toggle-timeline"> Timeline </button>
+			<input id="toggle-params-form" type="button" value="Parameters">
+			<input id="toggle-timeline" type="button" value="Timeline">
 			&emsp;
 
-			<input type="submit", id="runButton", value="Run">
-			<input type="reset" value="Reset">
-			&emsp;
-
-			<input type="submit", onclick="document.getElementById('getFile').click();" value="Import">
-			<input type='file' id="getFile" style="display:none;">
-			<input type="submit", id="exportFile", value="Export">
+			<input type="submit" value="Run">
 		</form>
 
 		<svg viewBox="0 0 512.002 512.002" tabindex="0">
@@ -92,23 +86,27 @@
 	<form id="msd-params-form">
 		<!-- TODO: place holder for future workspace save feature -->
 		<nav>
-			<select id="workspaces">
-				<option>{Default Workspace}</option>
-			</select>
-			<!-- TODO: Add (+) for new workspace, and (trash) for delete workspace -->
-		</nav>
+			<div>
+				<select id="workspaces">
+					<option>{Default Workspace}</option>
+				</select>
+				<input type="reset" value="Reset">
+				<!-- TODO: Add (+) for new workspace, and (trash) for delete workspace -->
+			</div>
+			
+			<div>
+				<input type="button" id="import" value="Import">
+				<input type='file' id="file" class="hide">
+				<input type="button" id="export" value="Export">
+			</div>
 
-		<header>
-			<h2> Parameters </h2>
-		</header>
-		
-		<!-- TODO: add "mode" buttons for "Experiment Group" and "Ensemble" -->
-		<nav></nav>
+			<!-- TODO: add "mode" buttons for "Experiment Group" and "Ensemble" -->
+		</nav>
 
 		<!-- Parameters Table -->
 		<section id="msd-params-table">
 			<header>
-				<div></div>
+				<div> <h2>Parameters</h2> </div>
 				<div> FML </div>
 				<div> mol </div>
 				<div> FMR </div>
@@ -190,14 +188,14 @@
 				-->
 			</section>
 			<section id="param-B" class="global vector">
-				<div>
-					<header> B </header>
-					<div class="buttons">
-						<button>x</button>
-						<button>y</button>
-						<button>z</button>
+				<header>
+					<spna> B </span>
+					<div class="coordinate-labels">
+						<div>x</div>
+						<div>y</div>
+						<div>z</div>
 					</div>
-				</div>
+				</header>
 				<div>
 					<input id="B_x" title="B_x" type="number" step="any" value="0">
 					<input id="B_y" title="B_y" type="number" step="any" value="0">
@@ -275,14 +273,14 @@
 				<div> <input id="bLR" title="bLR" type="number" step="any" value="0"> </div>
 			</section>
 			<section id="param-A" class="vector">
-				<div>
-					<header class="sideways"> Anisotropy </header>
-					<div class="buttons">
-						<button>x</button>
-						<button>y</button>
-						<button>z</button>
+				<header>
+					<span> A <!--Anisotropy--> </span>
+					<div class="coordinate-labels">
+						<div>x</div>
+						<div>y</div>
+						<div>z</div>
 					</div>
-				</div>
+				</header>
 				<div>
 					<input id="AL_x" title="AL_x" type="number" step="any" value="0">
 					<input id="AL_y" title="AL_y" type="number" step="any" value="0">
@@ -303,14 +301,14 @@
 				<div></div>
 			</section>
 			<section id="param-D" class="vector">
-				<div>
-					<header class="sideways"> DMI </header>
-					<div class="buttons">
-						<button>x</button>
-						<button>y</button>
-						<button>z</button>
+				<header>
+					<span> D <!--DMI--> </span>
+					<div class="coordinate-labels">
+						<div>x</div>
+						<div>y</div>
+						<div>z</div>
 					</div>
-				</div>
+				</header>
 				<div>
 					<input id="DL_x" title="DL_x" type="number" step="any" value="0">
 					<input id="DL_y" title="DL_y" type="number" step="any" value="0">
