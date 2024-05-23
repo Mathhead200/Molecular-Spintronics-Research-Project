@@ -205,7 +205,7 @@ Second bug fix. In MSD::setParameters()
 
 6.3.2:
 (5-10-2024) MSD-Builder2.html (GUI v2) is now working consistantly with GUI v1.
-
+(5-23-2024) Renamed MSD-Builder2 to MSD-Builder. Now have working workspaces!
 
 TODO: Add a better timeline.
 TODO: Send C++ MSD version through MSD Server to Javascript.
