@@ -274,6 +274,70 @@ function updateForm(ext_vars) {
 	location.reload();  // TODO: HACK! Find a better way to do this.
 }
 
+class Workspaces {
+	static STORE_NAME = "workspaces";
+
+	static get() {
+		let workspaces = localStorage.getItem(Workspaces.STORE_NAME);
+		if (workspaces === null)
+			return {};
+		return JSON.parse(workspaces);
+	}
+
+	static save(workspaces) {
+		localStorage.setItem(Workspaces.STORE_NAME, JSON.stringify(workspaces));
+	}
+
+	static markUnsaved(wsSelect = document.querySelector(SELECTORS.workspacesSelect)) {
+		localStorage.removeItem("saved");
+		let option = wsSelect.options[wsSelect.selectedIndex];
+		if (option && option.innerText === option.value)
+			option.innerText = "*" + option.innerText;
+	}
+
+	static markSaved(wsSelect = document.querySelector(SELECTORS.workspacesSelect)) {
+		localStorage.setItem("saved", true);
+		let option = wsSelect.options[wsSelect.selectedIndex];
+		if (option && !option.value.startsWith("_"))
+			option.innerText = option.value;
+	}
+
+	static initMark(wsSelect) {
+		if (!localStorage.getItem("saved"))
+			Workspaces.markUnsaved(wsSelect);
+	}
+
+	static load({ msdView, camera, timeline, value, wsSelect = document.querySelector(SELECTORS.workspacesSelect) }) {
+		endSim();
+		timeline.clear();
+		valueCache.clear();
+		for (let [k, v] of JSON.parse(Workspaces.get()[value]))
+			valueCache.set(k, v);
+		loadView(msdView);
+		updateCamera(camera, msdView);
+		syncHTMLDimFields(msdView);
+		loadHTMLParamFields();
+		syncSetAll();
+		localStorage.setItem("workspace", value);
+		Workspaces.markSaved(wsSelect);
+		wsSelect.value = value;
+	}
+
+	static defaults({ msdView, camera, timeline, value = "_default", wsSelect = document.querySelector(SELECTORS.workspacesSelect) }) {
+		endSim();
+		timeline.clear();
+		valueCache.clear();
+		resetView(msdView, DEFAULTS);
+		updateCamera(camera, msdView);
+		syncHTMLDimFields(msdView);
+		loadHTMLParamFields();
+		syncSetAll();
+		localStorage.removeItem("workspace");
+		Workspaces.markSaved(wsSelect);
+		wsSelect.value = value;
+	}
+}
+
 
 // ---- TODO: Unused ----------------------------------------------------------
 const splitParam = (param_name) => param_name.split("_", 2);
@@ -336,6 +400,7 @@ const initForm = ({ camera, msdView, timeline }) => {
 				ids.forEach(id => valueCache.set(id, value));
 				syncHTMLDimFields(msdView);
 				updateCamera(camera, msdView);
+				Workspaces.markUnsaved(wsSelect);
 			} catch(ex) {
 				document.querySelector(`#${id}`).value = valueCache.get(id);
 				console.log(ex);
@@ -351,7 +416,10 @@ const initForm = ({ camera, msdView, timeline }) => {
 			let { getter } = DEFAULTS.PARAM_FIELDS.get(param_name);
 			const save = event =>
 				valueCache.set(param_name, getter(event.currentTarget));
-			ele.addEventListener("change", save);
+			ele.addEventListener("change", event => {
+				save(event);
+				Workspaces.markUnsaved(wsSelect);
+			});
 			ele.addEventListener("keyup", save);
 			ele.addEventListener("mouseup", save);
 
@@ -362,6 +430,7 @@ const initForm = ({ camera, msdView, timeline }) => {
 
 	const actionsForm = document.querySelector(SELECTORS.actionsForm);
 	const paramsForm = document.querySelector(SELECTORS.paramsForm);
+	const wsSelect = paramsForm.querySelector(SELECTORS.workspacesSelect);
 
 	actionsForm.addEventListener("submit", event => {
 		event.preventDefault();
@@ -399,9 +468,106 @@ const initForm = ({ camera, msdView, timeline }) => {
 		exportParameters(buildJSON(msdView));
 	});
 
+	// workspace controls
+	{	// create <option> elements for saved workspaces
+		let last = wsSelect.querySelector("option[value=_new]");
+		let workspaces = Workspaces.get();
+		for (let name in workspaces) {
+			let option = document.createElement("option");
+			option.value = name;
+			option.innerText = name;
+			last.before(option);
+		}
+		// initialize workspaces <select>
+		let init = localStorage.getItem("workspace");
+		if (init)  wsSelect.value = init;
+		Workspaces.initMark(wsSelect);
+	}
+	let prevWorkspaceValue = wsSelect.value;
+
+	wsSelect.addEventListener("change", event => {
+		let value = wsSelect.value;            // new value
+		wsSelect.value = prevWorkspaceValue;  // old value
+
+		switch (value) {
+		 case "_new": {
+			let name = prompt("Name this new workspace:").trim();
+			if (name.length === 0) {
+				alert("Error: Workspace name can't be empty.");
+				break;
+			}
+			if (name.startsWith("_")) {
+				alert("Error: Workspace names starting with an _underscore are reserved. Choose a different name.");
+				break;
+			}
+
+			let workspaces = Workspaces.get();
+			let alreadyExists = (workspaces[name] !== undefined);
+			if (alreadyExists && !confirm(`A workspace named "${name}" already exists. Overwrite?`))
+				break;
+
+			workspaces[name] = localStorage.getItem(valueCache.name);
+			Workspaces.save(workspaces);
+
+			Workspaces.markSaved(wsSelect);
+			if (!alreadyExists) {
+				let option = document.createElement("option");
+				option.value = name;
+				option.innerText = name;
+				wsSelect.querySelector("option[value=_new]").before(option);
+				wsSelect.value = name;
+				localStorage.setItem("workspace", name);
+			}
+			break;
+		 }
+
+		 case "_default":
+			if (confirm("Reset all parameters to a default state? All unsaved parameters and simulation data will be lost!"))
+				Workspaces.defaults({ value, msdView, camera, timeline, wsSelect });
+			break;
+			
+		 default: {
+			let text = wsSelect.querySelector(`option[value='${value}'`).innerText;
+			if(confirm(`Change to ${text}? All unsaved parameters and simulation data will be lost!`))
+				Workspaces.load({ value, msdView, camera, timeline, wsSelect });
+		 }
+		}
+
+		prevWorkspaceValue = wsSelect.value;
+	});
+
+	paramsForm.querySelector("#save-workspace").addEventListener("click", () => {
+		let name = wsSelect.value;
+		if (name.startsWith("_")) {
+			alert(`Error: Can't save to ${wsSelect.options[wsSelect.selectedIndex].innerText}. Please create a new workspace to save your changes.`);
+			return;
+		}
+
+		let worksapces = Workspaces.get();
+		worksapces[name] = localStorage.getItem(valueCache.name);
+		Workspaces.save(worksapces);
+		Workspaces.markSaved();
+	});
+
+	paramsForm.querySelector("#revert-workspace").addEventListener("click", () => {
+		if (localStorage.getItem("saved")) {
+			alert("Nothing to revert.");
+		} else if (confirm("Revert back to the last save? You will loes your unsaved parameters and simulation data!")) {
+			let value = localStorage.getItem("workspace");
+			if (value)
+				Workspaces.load({ value, msdView, camera, timeline, wsSelect });
+			else
+				Workspaces.defaults({ msdView, camera, timeline, wsSelect })
+		}
+	});
+
+	paramsForm.querySelector("#delete-workspace").addEventListener("click", () => {
+		// TODO
+	});
+
 	paramsForm.addEventListener("reset", event => {
 		event.preventDefault();
-		if (confirm("Reset all parameters to a default state?")) {
+		if (confirm("Wipe all parameters, clear all workspaces, and return to a default state?")) {
 			endSim();
 			timeline.clear();
 			valueCache.clear();
@@ -410,6 +576,12 @@ const initForm = ({ camera, msdView, timeline }) => {
 			syncHTMLDimFields(msdView);
 			loadHTMLParamFields();
 			syncSetAll();
+
+			localStorage.removeItem("workspace");
+			localStorage.removeItem(Workspaces.STORE_NAME);
+			for (let option of wsSelect.options)
+				if (!option.value.startsWith("_"))
+					option.remove();
 		}
 	});
 

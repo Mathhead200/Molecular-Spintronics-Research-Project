@@ -33,7 +33,8 @@
 	<!-- Main -->
 	<script src="src/msd_builder/main.js" defer></script>
 </head>
-<body class="show-params-form show-timeline show-settings">
+<body class="show-params-form">
+	<!-- <body> classes: show-params-form, show-timeline, show-settings -->
 	<header>
 		<h1> Molecular Spintronics Device Simulation </h1>
 		
@@ -88,9 +89,13 @@
 		<nav>
 			<div>
 				<select id="workspaces">
-					<option>{Default Workspace}</option>
+					<option value="_default">{Default Workspace}</option>
+					<option value="_new">[+ Create New Workspace]</option>
 				</select>
-				<input type="reset" value="Reset">
+				<input id="save-workspace" type="button" value="Save">
+				<input id="revert-workspace" type="button" value="Revert">
+				<input id="delete-workspace" type="button" value="Delete">
+				<input type="reset" value="Wipe">
 				<!-- TODO: Add (+) for new workspace, and (trash) for delete workspace -->
 			</div>
 			
