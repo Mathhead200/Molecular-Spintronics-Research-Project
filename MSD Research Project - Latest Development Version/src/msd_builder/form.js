@@ -584,7 +584,8 @@ const initForm = ({ camera, msdView, timeline }) => {
 			Workspaces.save(workspaces);
 			wsSelect.options[wsSelect.selectedIndex].remove();
 			wsSelect.value = "_default";
-			Workspaces.markSaved();
+			Workspaces.markUnsaved();
+			localStorage.removeItem("workspace");
 		}
 	});
 
