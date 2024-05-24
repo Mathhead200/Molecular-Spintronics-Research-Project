@@ -277,6 +277,10 @@ function updateForm(ext_vars) {
 class Workspaces {
 	static STORE_NAME = "workspaces";
 
+	/**
+	 * @return all saved workspaces as an object:
+	 * 	workspace-name -> String JSON of valueCache
+	 */
 	static get() {
 		let workspaces = localStorage.getItem(Workspaces.STORE_NAME);
 		if (workspaces === null)
@@ -284,10 +288,12 @@ class Workspaces {
 		return JSON.parse(workspaces);
 	}
 
+	/** Save workspaces object */
 	static save(workspaces) {
 		localStorage.setItem(Workspaces.STORE_NAME, JSON.stringify(workspaces));
 	}
 
+	/** Mark the current workspace as *unsaved. */
 	static markUnsaved(wsSelect = document.querySelector(SELECTORS.workspacesSelect)) {
 		localStorage.removeItem("saved");
 		let option = wsSelect.options[wsSelect.selectedIndex];
@@ -295,6 +301,7 @@ class Workspaces {
 			option.innerText = "*" + option.innerText;
 	}
 
+	/** Mark the current worksapce as saved. */
 	static markSaved(wsSelect = document.querySelector(SELECTORS.workspacesSelect)) {
 		localStorage.setItem("saved", true);
 		let option = wsSelect.options[wsSelect.selectedIndex];
@@ -302,11 +309,13 @@ class Workspaces {
 			option.innerText = option.value;
 	}
 
+	/** Used onload to set saved or unsaved for current workspace based on localStorage. */
 	static initMark(wsSelect) {
 		if (!localStorage.getItem("saved"))
 			Workspaces.markUnsaved(wsSelect);
 	}
 
+	/** Load the worksapce with the given value. */
 	static load({ msdView, camera, timeline, value, wsSelect = document.querySelector(SELECTORS.workspacesSelect) }) {
 		endSim();
 		timeline.clear();
@@ -323,6 +332,7 @@ class Workspaces {
 		wsSelect.value = value;
 	}
 
+	/** Load the default worksapce. */
 	static defaults({ msdView, camera, timeline, value = "_default", wsSelect = document.querySelector(SELECTORS.workspacesSelect) }) {
 		endSim();
 		timeline.clear();
@@ -562,7 +572,20 @@ const initForm = ({ camera, msdView, timeline }) => {
 	});
 
 	paramsForm.querySelector("#delete-workspace").addEventListener("click", () => {
-		// TODO
+		let {value} = wsSelect;
+		let text = wsSelect.options[wsSelect.selectedIndex].innerText;
+		if (value.startsWith("_")) {
+			alert(`Error: Cannot delete "${text}".`);
+			return;
+		}
+		if (confirm(`Delete "${text}"?`)) {
+			let workspaces = Workspaces.get();
+			delete workspaces[value];
+			Workspaces.save(workspaces);
+			wsSelect.options[wsSelect.selectedIndex].remove();
+			wsSelect.value = "_default";
+			Workspaces.markSaved();
+		}
 	});
 
 	paramsForm.addEventListener("reset", event => {
