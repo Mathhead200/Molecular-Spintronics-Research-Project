@@ -73,7 +73,9 @@ SELECTORS = {
 	timeline: "#timeline",
 	settingsIconContainer: "#settingsIcon",
 	lens: "#lens",
-	workspacesSelect: "#workspaces"
+	workspacesSelect: "#workspaces",
+	paramsMenu: "#params-menu",
+	toggleParamsMenu: "#toggle-params-menu"
 	// TODO: move hard-coded selectors and ids to this section
 };
 

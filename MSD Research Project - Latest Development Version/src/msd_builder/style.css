@@ -4,7 +4,7 @@
 :root {
 	--header-height: 3.4em;
 	--timeline-height: 5rem;
-	--params-form-width: 50vw;
+	--params-form-width: 683px;
 	--brand-color: white;
 	--global-input-width: 24%;
 }
@@ -54,8 +54,8 @@ body > header {
 }
 
 body > header h1 {
-	font-size: 1rem;
-	margin: calc(1rem - var(--header-padding));
+	font-size: 1.1rem;
+	margin: calc(0.9rem - var(--header-padding));
 	color: var(--brand-color);
 }
 
@@ -211,6 +211,13 @@ body.show-timeline #msd-params-form {
 	background-color: white;
 }
 
+#msd-params-table > header > :first-child {
+	position: sticky;
+	left: 0;
+	z-index: 3; /* On top of both vertical row headers (z-index: 1) AND horizontal column headers (z-index: 2) */
+	background-color: white;
+}
+
 #msd-params-table > header > * {
 	padding-block: 0.5em;
 }
@@ -220,7 +227,7 @@ body.show-timeline #msd-params-form {
 }
 
 #msd-params-table > * > :first-child {
-	width: 6em;
+	width: 7.5em;
 	padding-inline: 1.5rem;
 }
 
@@ -352,6 +359,122 @@ body.show-timeline #msd-params-form {
 
 .vector.global > :not(:first-child):not(:empty) {
 	background-position: left, var(--global-input-width) center;
+}
+
+#toggle-params-menu {
+	cursor: pointer;
+}
+
+#toggle-params-menu:hover,
+#toggle-params-menu:focus {
+	text-decoration: underline;
+}
+
+#toggle-params-menu:focus h2 {
+	background-color: rgba(0, 0, 0, 0.0875);
+}
+
+#toggle-params-menu h2::after {
+	content: "(+)";
+}
+
+body.show-params-menu #toggle-params-menu h2::after {
+	content: "(-)";
+}
+
+#toggle-params-menu:hover .symbol,
+#toggle-params-menu:focus .symbol {
+	/* TODO: (see above) */
+}
+
+#msd-params-table .hide {
+	display: none;
+}
+
+
+/* ---- Show Params Menu --------------------------------------------------- */
+#params-menu {
+	--params-menu-header-width: 3em;
+
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	z-index: 4; /* On top of everything */
+	width: calc(0.5 * var(--params-form-width));
+	height: calc(0.65 * var(--params-form-width));
+	box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.4);
+	background-color: white;
+	box-sizing: border-box;
+
+	font-size: 0.9rem;
+
+	transition: transform 1s;
+	transform: translateY(100%);
+}
+
+body.show-params-menu #params-menu {
+	transform: translateY(0);
+}
+
+#params-menu > * {
+	position: absolute;
+	top: 1rem;
+	bottom: 1rem;
+	left: 0;
+	right: 0;
+	overflow-y: auto;
+	box-sizing: border-box;
+	margin-bottom: -1rem;
+}
+
+#params-menu section {
+	--params-menu-section-border-width: 1px;
+	display: flex;
+	justify-content: flex-start;
+	margin: 0em 1rem 1rem 1rem;
+	cursor: pointer;
+	box-sizing: border-box;
+	border: var(--params-menu-section-border-width) solid transparent;
+}
+
+#params-menu section:hover,
+#params-menu section:focus {
+	border: var(--params-menu-section-border-width) solid black;
+}
+
+#params-menu section > * {
+	padding: 0.5em 1em;
+}
+
+#params-menu section header {
+	width: var(--params-menu-header-width);
+	background-color: #e6e6e6;
+	text-align: center;
+	font-weight: bold;
+}
+
+#params-menu section .description {
+	display: flex;
+	justify-content: space-between;
+	width: calc(100% - var(--params-menu-header-width));
+	background-color: #d0d0d0;
+	font: 0.85rem "Open Sans", sans-serif;
+}
+
+#params-menu .add {
+	margin-left: 1em;
+	font-weight: bold;
+}
+
+#params-menu section header,
+#params-menu section .description > * {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+#params-menu .hide {
+	display: none;
 }
 
 

@@ -20,7 +20,10 @@ const { WS_STORE_NAME, getWorkspaces, saveWorkspaces,
 
 // ---- Globals: --------------------------------------------------------------
 const valueCache = new SavedMap(localStorage, "valueCache");
-
+const PARAM_NAMES = [
+	"width", "height", "depth", "y", "z", "mol-type", "kT", "B", "S", "F", "J",
+	"Je0", "Je1", "Jee", "b", "A", "D", "simCount", "freq", "seed", "randomize" ];
+let defaultShownParams = new Set();  // initalized on page load
 
 // ---- Functions: ------------------------------------------------------------
 const forEachDimField = (f) => {
@@ -354,6 +357,11 @@ const initForm = ({ camera, msdView, timeline }) => {
 	updateCamera(camera, msdView);
 	syncHTMLDimFields(msdView);
 	loadHTMLParamFields();
+	
+	// initialize defaultShownParams
+	for (let [name, paramEle] of PARAM_NAMES.map(name => [name, document.querySelector(`#param-${name}`)]))
+		if (!paramEle.classList.contains("hide"))
+			defaultShownParams.add(name);
 
 	// Event Listeners
 	forEachDimField(({ id, input, region, prop }) => {
@@ -578,6 +586,20 @@ const initForm = ({ camera, msdView, timeline }) => {
 			for (let option of wsSelect.options)
 				if (!option.value.startsWith("_"))
 					option.remove();
+			
+			localStorage.removeItem("parameters");
+			let paramElements = PARAM_NAMES.map(name => [name,
+				[`#add-param-${name}`, `#param-${name}`].map(id =>
+					document.querySelector(id))]);
+			for (let [name, [addEle, paramEle]] of paramElements) {
+				if (defaultShownParams.has(name)) {
+					addEle.classList.add("hide");
+					paramEle.classList.remove("hide");
+				} else {
+					addEle.classList.remove("hide");
+					paramEle.classList.add("hide");
+				}
+			}
 		}
 	});
 
@@ -623,6 +645,41 @@ const initForm = ({ camera, msdView, timeline }) => {
 	syncFocus("#mol-depth", "#FMR-depth");
 	syncFocus("#FML-y", "#mol-y");
 	syncFocus("#mol-z", "#FMR-z");
+
+	// show/hide parameters menu
+	let toggleParamsMenuEle = document.querySelector(SELECTORS.toggleParamsMenu);
+	toggleParamsMenuEle.addEventListener("click", () => {
+		document.body.classList.toggle("show-params-menu");
+	});
+
+	let paramElements = PARAM_NAMES.map(name => [name,
+		[`#add-param-${name}`, `#param-${name}`].map(id =>
+			document.querySelector(id))]);
+	let initParameters = JSON.parse(localStorage.getItem("parameters")) || {};
+	for (let [name, [addEle, paramEle]] of paramElements) {
+		// init shown parameters from localStorage
+		let isShown = initParameters[name];
+		if (isShown !== undefined) {
+			if (isShown) {
+				addEle.classList.add("hide");
+				paramEle.classList.remove("hide");
+			} else {
+				addEle.classList.remove("hide");
+				paramEle.classList.add("hide");
+			}
+		}
+
+		// show params event listeners
+		addEle.addEventListener("click", () => {
+			addEle.classList.add("hide");
+			paramEle.classList.remove("hide");
+
+			// store shown parameters in localStorage
+			let parameters = JSON.parse(localStorage.getItem("parameters")) || {};
+			parameters[name] = true;
+			localStorage.setItem("parameters", JSON.stringify(parameters));
+		});
+	}
 
 	// timeline controls
 	document.addEventListener("keydown", (event) => {

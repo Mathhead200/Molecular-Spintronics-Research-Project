@@ -112,7 +112,7 @@
 		<!-- Parameters Table -->
 		<section id="msd-params-table">
 			<header>
-				<div> <h2>Parameters</h2> </div>
+				<div id="toggle-params-menu" tabindex="0"> <h2> Parameters </h2> </div>
 				<div> FML </div>
 				<div> mol </div>
 				<div> FMR </div>
@@ -147,7 +147,7 @@
 				<div></div>
 				<div></div>
 			</section>
-			<section id="param-y">
+			<section id="param-y" class="hide">
 				<header> y-offset </header>
 				<div> <input id="FML-y" title="y-offset" type="number" step="1" value="0"> </div>
 				<div> <input id="mol-y" title="y-offset" type="number" step="1" value="0"> </div>
@@ -156,7 +156,7 @@
 				<div></div>
 				<div></div>
 			</section>
-			<section id="param-z">
+			<section id="param-z" class="hide">
 				<header> z-offset </header>
 				<div></div>
 				<div> <input id="mol-z" title="z-offset" type="number" step="1" value="0"> </div>
@@ -165,7 +165,7 @@
 				<div></div>
 				<div></div>
 			</section>
-			<section id="param-mol-type" class="global">
+			<section id="param-mol-type" class="global hide">
 				<header> mol. type </header>
 				<div>
 					<select id="mol-type">
@@ -193,7 +193,7 @@
 				<div></div>
 				-->
 			</section>
-			<section id="param-B" class="global vector">
+			<section id="param-B" class="global vector hide">
 				<header>
 					<spna> B </span>
 					<div class="coordinate-labels">
@@ -215,7 +215,7 @@
 				<div></div>
 				-->
 			</section>
-			<section id="param-S">
+			<section id="param-S" class="hide">
 				<header> S </header>
 				<div> <input id="SL" title="SL" type="number" min="0" step="any" value="1"> </div>
 				<div> <input id="SR" title="SR" type="number" min="0" step="any" value="1"> </div>
@@ -224,7 +224,7 @@
 				<div></div>
 				<div></div>
 			</section>
-			<section id="param-F">
+			<section id="param-F" class="hide">
 				<header> F </header>
 				<div> <input id="FL" title="FL" type="number" min="0" step="any" value="0"> </div>
 				<div> <input id="FR" title="FR" type="number" min="0" step="any" value="0"> </div>
@@ -242,7 +242,7 @@
 				<div> <input id="JmR" title="JmR" type="number" step="any" value="-1"> </div>
 				<div> <input id="JLR" title="JLR" type="number" step="any" value="0"> </div>
 			</section>
-			<section id="param-Je0">
+			<section id="param-Je0" class="hide">
 				<header> Je0 </header>
 				<div> <input id="Je0L" title="Je0L" type="number" step="any" value="1"> </div>
 				<div> <input id="Je0m" title="Je0m" type="number" step="any" value="1"> </div>
@@ -251,7 +251,7 @@
 				<div></div>
 				<div></div>
 			</section>
-			<section id="param-Je1">
+			<section id="param-Je1" class="hide">
 				<header> Je1 </header>
 				<div> <input id="Je1L" title="Je1L" type="number" step="any" value="1"> </div>
 				<div> <input id="Je1m" title="Je1m" type="number" step="any" value="1"> </div>
@@ -260,8 +260,8 @@
 				<div> <input id="Je1mR" title="Je1mR" type="number" step="any" value="-1"> </div>
 				<div> <input id="Je1LR" title="Je1LR" type="number" step="any" value="0"> </div>
 			</section>
-			<section id="param-Jee">
-				<header> J </header>
+			<section id="param-Jee" class="hide">
+				<header> Jee </header>
 				<div> <input id="JeeL" title="JeeL" type="number" step="any" value="1"> </div>
 				<div> <input id="Jeem" title="Jeem" type="number" step="any" value="1"> </div>
 				<div> <input id="JeeR" title="JeeR" type="number" step="any" value="1"> </div>
@@ -269,7 +269,7 @@
 				<div> <input id="JeemR" title="JeemR" type="number" step="any" value="-1"> </div>
 				<div> <input id="JeeLR" title="JeeLR" type="number" step="any" value="0"> </div>
 			</section>
-			<section id="param-b">
+			<section id="param-b" class="hide">
 				<header> b </header>
 				<div> <input id="bL" title="bL" type="number" step="any" value="0"> </div>
 				<div> <input id="bm" title="bm" type="number" step="any" value="0"> </div>
@@ -278,7 +278,7 @@
 				<div> <input id="bmR" title="bmR" type="number" step="any" value="0"> </div>
 				<div> <input id="bLR" title="bLR" type="number" step="any" value="0"> </div>
 			</section>
-			<section id="param-A" class="vector">
+			<section id="param-A" class="vector hide">
 				<header>
 					<span> A <!--Anisotropy--> </span>
 					<div class="coordinate-labels">
@@ -306,7 +306,7 @@
 				<div></div>
 				<div></div>
 			</section>
-			<section id="param-D" class="vector">
+			<section id="param-D" class="vector hide">
 				<header>
 					<span> D <!--DMI--> </span>
 					<div class="coordinate-labels">
@@ -368,7 +368,7 @@
 				<div></div>
 				-->
 			</section>
-			<section id="param-seed" class="global">
+			<section id="param-seed" class="global hide">
 				<header> PRNG Seed </header>
 				<div> <input id="seed" title="seed" type="number" min="0" step="1" value=""></div>
 				<!--
@@ -379,7 +379,7 @@
 				<div></div>
 				-->
 			</section>
-			<section id="param-randomize" class="global">
+			<section id="param-randomize" class="global hide">
 				<header> Randomize </header>
 				<div> <input id="randomize" title="randomzie" type="checkbox" checked> </div>
 				<!--
@@ -391,6 +391,156 @@
 				-->
 			</section>
 		</section>
+
+		<aside id="params-menu"><div>
+			<section id="add-param-width" tabindex="0" class="hide">
+				<header>width</header>
+				<div class="description">
+					<span>Width of FML/mol./FMR</span>
+					<span class="add">+</span>
+				</div>
+			</section>
+			<section id="add-param-height" tabindex="0" class="hide">
+				<header>height</header>
+				<div class="description">
+					<span>Height of FML/mol./FMR</span>
+					<span class="add">+</span>
+				</div>
+			</section>
+			<section id="add-param-depth" tabindex="0" class="hide">
+				<header>depth</header>
+				<div class="description">
+					<span>Depth of FML/mol./FMR</span>
+					<span class="add">+</span>
+				</div>
+			</section>
+			<section id="add-param-y" tabindex="0">
+				<header>y</header>
+				<div class="description">
+					<span>mol./FMR y-Offset</span>
+					<span class="add">+</span>
+				</div>
+			</section>
+			<section id="add-param-z" tabindex="0">
+				<header>z</header>
+				<div class="description">
+					<span>FML/mol. z-Offset</span>
+					<span class="add">+</span>
+				</div>
+			</section>
+			<section id="add-param-mol-type" tabindex="0" class="hide">
+				<header>mol</header>
+				<div class="description">
+					<span>Molecule Type</span>
+					<span class="add">+</span>
+				</div>
+			</section>
+			<section id="add-param-kT" tabindex="0" class="hide">
+				<header>kT</header>
+				<div class="description">
+					<span>External Kinetic Energy (Temperature)</span>
+					<span class="add">+</span>
+				</div>
+			</section>
+			<section id="add-param-B" tabindex="0">
+				<header>B</header>
+				<div class="description">
+					<span>External Magnetic Field (DC)</span>
+					<span class="add">+</span>
+				</div>
+			</section>
+			<section id="add-param-S" tabindex="0">
+				<header>S</header>
+				<div class="description">
+					<span>Spin Magnitude</span>
+					<span class="add">+</span>
+				</div>
+			</section>
+			<section id="add-param-F" tabindex="0">
+				<header>F</header>
+				<div class="description">
+					<span>Spin Fluctuation (Flux) Max. Magnitude</span>
+					<span class="add">+</span>
+				</div>
+			</section>
+			<section id="add-param-J" tabindex="0">
+				<header>J</header>
+				<div class="description">
+					<span>Heisenberg Exchange Coupling</span>
+					<span class="add">+</span>
+				</div>
+			</section>
+			<section id="add-param-Je0" tabindex="0">
+				<header>Je0</header>
+				<div class="description">
+					<span>Local (r=0) Spin-Flux. Exchange Coupling</span>
+					<span class="add">+</span>
+				</div>
+			</section>
+			<section id="add-param-Je1" tabindex="0">
+				<header>Je1</header>
+				<div class="description">
+					<span>Neighboring (r=1) Spin-Flux Exchange Coupling</span>
+					<span class="add">+</span>
+				</div>
+			</section>
+			<section id="add-param-Jee" tabindex="0">
+				<header>Jee</header>
+				<div class="description">
+					<span>Flux-Flux Exchange Coupling</span>
+					<span class="add">+</span>
+				</div>
+			</section>
+			<section id="add-param-b" tabindex="0">
+				<header>b</header>
+				<div class="description">
+					<span>Biquadratic Coupling</span>
+					<span class="add">+</span>
+				</div>
+			</section>
+			<section id="add-param-A" tabindex="0">
+				<header>A</header>
+				<div class="description">
+					<span>Anisotropy</span>
+					<span class="add">+</span>
+				</div>
+			</section>
+			<section id="add-param-D" tabindex="0">
+				<header>D</header>
+				<div class="description">
+					<span>Dzyaloshinskii-Moriya interaction (DMI, Skyrmion)</span>
+					<span class="add">+</span>
+				</div>
+			</section>
+			<section id="add-param-simCount" tabindex="0" class="hide">
+				<header>sim</header>
+				<div class="description">
+					<span>Number of Simulation Iteration</span>
+					<span class="add">+</span>
+				</div>
+			</section>
+			<section id="add-param-freq" tabindex="0" class="hide">
+				<header>freq</header>
+				<div class="description">
+					<span>Recording Frequency (Period) in Iterations</span>
+					<span class="add">+</span>
+				</div>
+			</section>
+			<section id="add-param-seed" tabindex="0">
+				<header>seed</header>
+				<div class="description">
+					<span>Pseudo-Random Number Generator (PRNG) Seed</span>
+					<span class="add">+</span>
+				</div>
+			</section>
+			<section id="add-param-randomize" tabindex="0">
+				<header>rand</header>
+				<div class="description">
+					<span>Initial (t=0) State</span>
+					<span class="add">+</span>
+				</div>
+			</section>
+		</div></aside>
 	</form>
 
 	<select id="lens">
