@@ -308,6 +308,18 @@ function defaultWorkspace({ msdView, camera, timeline, value = "_default", wsSel
 	wsSelect.value = value;
 }
 
+function scrollToParam(paramId) {
+	// Note: table position MUST be set to either relative or absolute for target.offsetTop to work correctly.
+	// https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetTop 
+    let table = document.querySelector("#msd-params-table");
+	let header = document.querySelector("#msd-params-table > header");
+	let target = document.getElementById(paramId);
+	table.scroll({
+        top: target.offsetTop - header.offsetHeight,
+        behavior: "smooth"
+    });
+}
+
 
 // ---- TODO: Unused ----------------------------------------------------------
 const splitParam = (param_name) => param_name.split("_", 2);

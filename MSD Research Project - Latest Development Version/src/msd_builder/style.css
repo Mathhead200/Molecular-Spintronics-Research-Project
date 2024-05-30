@@ -6,7 +6,6 @@
 	--timeline-height: 5rem;
 	--params-form-width: 50vw;
 	--brand-color: white;
-	--fg-color: white;
 	--global-input-width: 24%;
 }
 
@@ -169,13 +168,15 @@ body.show-timeline #msd-params-form {
 
 /* ---- Parameters Table --------------------------------------------------- */
 #msd-params-table {
+	position: relative;  /* Used for JS posistion offset calculation. [See: scrollTo() in form.js] */
 	flex-grow: 1;
 	overflow: auto;
 }
 
 #msd-params-table header {
 	position: sticky;
-	background-color: var(--fg-color);
+	background-color: white;
+	z-index: 1;
 	text-align: center;
 	font-size: 0.9em;
 }
@@ -205,7 +206,7 @@ body.show-timeline #msd-params-form {
 
 #msd-params-table > header {
 	top: 0;
-	z-index: 1;
+	z-index: 2; /* On top of vertical row headers which have z-index: 1 */
 	box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.27);
 	background-color: white;
 }
