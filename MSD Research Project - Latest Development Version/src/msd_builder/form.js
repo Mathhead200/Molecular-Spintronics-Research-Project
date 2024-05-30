@@ -485,9 +485,9 @@ const initForm = ({ camera, msdView, timeline }) => {
 				option.value = name;
 				option.innerText = name;
 				wsSelect.querySelector("option[value=_new]").before(option);
-				wsSelect.value = name;
 				localStorage.setItem("workspace", name);
 			}
+			wsSelect.value = name;
 			break;
 		 }
 
