@@ -284,8 +284,11 @@ function loadWorkspace({ msdView, camera, timeline, value, wsSelect = document.q
 	endSim();
 	timeline.clear();
 	valueCache.clear();
-	for (let [k, v] of JSON.parse(getWorkspaces()[value]))
-		valueCache.set(k, v);
+	let workspace = getWorkspaces()[value];
+	console.log("workspace", typeof(workspace), workspace);
+	if (workspace.valueCache)
+		for (let [k, v] of workspace.valueCache)
+			valueCache.set(k, v);
 	loadView(msdView);
 	updateCamera(camera, msdView);
 	syncHTMLDimFields(msdView);
@@ -294,6 +297,10 @@ function loadWorkspace({ msdView, camera, timeline, value, wsSelect = document.q
 	localStorage.setItem("workspace", value);
 	markSaved(wsSelect);
 	wsSelect.value = value;
+
+	// show correct parameters
+	showDefaultParameters();
+	updateShownParameters(JSON.parse(workspace.parameters));
 }
 
 /** Load the default worksapce. */
@@ -309,14 +316,46 @@ function defaultWorkspace({ msdView, camera, timeline, value = "_default", wsSel
 	localStorage.removeItem("workspace");
 	markSaved(wsSelect);
 	wsSelect.value = value;
+	showDefaultParameters();
 }
 
-function scrollToParam(paramId) {
+function showDefaultParameters() {
+	let paramElements = PARAM_NAMES.map(name => [name,
+		[`#add-param-${name}`, `#param-${name}`].map(id =>
+			document.querySelector(id))]);
+	for (let [name, [addEle, paramEle]] of paramElements) {
+		if (defaultShownParams.has(name)) {
+			addEle.classList.add("hide");
+			paramEle.classList.remove("hide");
+		} else {
+			addEle.classList.remove("hide");
+			paramEle.classList.add("hide");
+		}
+	}
+	localStorage.removeItem("parameters");
+}
+
+function updateShownParameters(parameters) {
+	console.log("parameters", typeof(parameters), parameters);
+	for (let name in parameters) {
+		let addEle = document.querySelector(`#add-param-${name}`);
+		let paramEle = document.querySelector(`#param-${name}`);
+		if (parameters[name]) {
+			addEle.classList.add("hide");
+			paramEle.classList.remove("hide");
+		} else {
+			addEle.classList.remove("hide");
+			paramEle.classList.add("hide");
+		}
+	}
+	localStorage.setItem("parameters", JSON.stringify(parameters));
+}
+
+function scrollToParam(target) {
 	// Note: table position MUST be set to either relative or absolute for target.offsetTop to work correctly.
 	// https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetTop 
     let table = document.querySelector("#msd-params-table");
 	let header = document.querySelector("#msd-params-table > header");
-	let target = document.getElementById(paramId);
 	table.scroll({
         top: target.offsetTop - header.offsetHeight,
         behavior: "smooth"
@@ -496,7 +535,10 @@ const initForm = ({ camera, msdView, timeline }) => {
 			if (alreadyExists && !confirm(`A workspace named "${name}" already exists. Overwrite?`))
 				break;
 
-			workspaces[name] = localStorage.getItem(valueCache.name);
+			workspaces[name] = {
+				valueCache: localStorage.getItem(valueCache.name),
+				parameters: localStorage.getItem("parameters")
+			};
 			saveWorkspaces(workspaces);
 
 			markSaved(wsSelect);
@@ -534,7 +576,10 @@ const initForm = ({ camera, msdView, timeline }) => {
 		}
 
 		let worksapces = getWorkspaces();
-		worksapces[name] = localStorage.getItem(valueCache.name);
+		worksapces[name] = {
+			localCache: localStorage.getItem(valueCache.name),
+			parameters: localStorage.getItem("parameters")
+		};
 		saveWorkspaces(worksapces);
 		markSaved();
 	});
@@ -564,7 +609,7 @@ const initForm = ({ camera, msdView, timeline }) => {
 			saveWorkspaces(workspaces);
 			wsSelect.options[wsSelect.selectedIndex].remove();
 			wsSelect.value = "_default";
-			markUnsaved();
+			markUnsaved(wsSelect);
 			localStorage.removeItem("workspace");
 		}
 	});
@@ -588,18 +633,7 @@ const initForm = ({ camera, msdView, timeline }) => {
 					option.remove();
 			
 			localStorage.removeItem("parameters");
-			let paramElements = PARAM_NAMES.map(name => [name,
-				[`#add-param-${name}`, `#param-${name}`].map(id =>
-					document.querySelector(id))]);
-			for (let [name, [addEle, paramEle]] of paramElements) {
-				if (defaultShownParams.has(name)) {
-					addEle.classList.add("hide");
-					paramEle.classList.remove("hide");
-				} else {
-					addEle.classList.remove("hide");
-					paramEle.classList.add("hide");
-				}
-			}
+			showDefaultParameters();
 		}
 	});
 
@@ -647,9 +681,38 @@ const initForm = ({ camera, msdView, timeline }) => {
 	syncFocus("#mol-z", "#FMR-z");
 
 	// show/hide parameters menu
+	let nextTabEle = null;
 	let toggleParamsMenuEle = document.querySelector(SELECTORS.toggleParamsMenu);
-	toggleParamsMenuEle.addEventListener("click", () => {
+	let toggleParamsMenu = event => {
 		document.body.classList.toggle("show-params-menu");
+		if (document.body.classList.contains("show-params-menu")) {
+			for (let addEle of document.querySelectorAll("#params-menu section")) {
+				if (!addEle.classList.contains("hide")) {
+					nextTabEle = addEle;
+					break;
+				}
+			}
+		} else {
+			nextTabEle = null;
+		}
+	};
+	toggleParamsMenuEle.addEventListener("click", event => {
+		event.stopPropagation();  // so that the click doens't immediately hide the #params-menu
+		toggleParamsMenu(event);
+	});
+	toggleParamsMenuEle.addEventListener("keypress", event => {
+		if (event.key === "Enter" || event.key === " ") {
+			event.preventDefault();  // to prevent scrolling when " " is pressed
+			toggleParamsMenu(event);
+		}
+	});
+	document.addEventListener("keydown", event => {
+		// deal with special tab after pressing show parameters for keyboard controlls
+		if (event.key == "Tab" && nextTabEle) {
+			event.preventDefault();
+			nextTabEle.focus();
+			nextTabEle = null;
+		}
 	});
 
 	let paramElements = PARAM_NAMES.map(name => [name,
@@ -673,13 +736,23 @@ const initForm = ({ camera, msdView, timeline }) => {
 		addEle.addEventListener("click", () => {
 			addEle.classList.add("hide");
 			paramEle.classList.remove("hide");
+			scrollToParam(paramEle);
 
 			// store shown parameters in localStorage
 			let parameters = JSON.parse(localStorage.getItem("parameters")) || {};
 			parameters[name] = true;
 			localStorage.setItem("parameters", JSON.stringify(parameters));
+			markUnsaved(wsSelect);
 		});
 	}
+
+	// hide parameters menu on focusin or click outside #parasm-menu, like a modal
+	const paramsMenu = document.querySelector("#params-menu");
+	const hideParamsMenu = () => document.body.classList.remove("show-params-menu");
+	document.addEventListener("focusin", hideParamsMenu);
+	document.addEventListener("click", hideParamsMenu);
+	paramsMenu.addEventListener("focusin", event => event.stopPropagation());
+	paramsMenu.addEventListener("click", event => event.stopPropagation());
 
 	// timeline controls
 	document.addEventListener("keydown", (event) => {

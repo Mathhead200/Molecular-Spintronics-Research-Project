@@ -382,11 +382,6 @@ body.show-params-menu #toggle-params-menu h2::after {
 	content: "(-)";
 }
 
-#toggle-params-menu:hover .symbol,
-#toggle-params-menu:focus .symbol {
-	/* TODO: (see above) */
-}
-
 #msd-params-table .hide {
 	display: none;
 }
