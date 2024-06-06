@@ -681,46 +681,47 @@ const initForm = ({ camera, msdView, timeline }) => {
 	syncFocus("#mol-z", "#FMR-z");
 
 	// show/hide parameters menu
-	let nextTabEle = null;
-	let toggleParamsMenuEle = document.querySelector(SELECTORS.toggleParamsMenu);
-	let toggleParamsMenu = event => {
-		document.body.classList.toggle("show-params-menu");
-		if (document.body.classList.contains("show-params-menu")) {
-			for (let addEle of document.querySelectorAll("#params-menu section")) {
-				if (!addEle.classList.contains("hide")) {
-					nextTabEle = addEle;
-					break;
-				}
-			}
-		} else {
-			nextTabEle = null;
-		}
+	const paramsMenu = document.querySelector("#params-menu");
+	const paramsMenuHeader = document.querySelector("#params-menu > * > header");
+	const toggleParamsMenuEle = document.querySelector(SELECTORS.toggleParamsMenu);
+	
+	const showParamsMenu = () => document.body.classList.add("show-params-menu");
+	const hideParamsMenu = () => document.body.classList.remove("show-params-menu");
+	const toggleParamsMenu = () => {
+		if (document.body.classList.toggle("show-params-menu"))
+			paramsMenuHeader.focus();
 	};
-	toggleParamsMenuEle.addEventListener("click", event => {
-		event.stopPropagation();  // so that the click doens't immediately hide the #params-menu
-		toggleParamsMenu(event);
-	});
-	toggleParamsMenuEle.addEventListener("keypress", event => {
+	const toggleParamsMenuWithKey = event => {
 		if (event.key === "Enter" || event.key === " ") {
 			event.preventDefault();  // to prevent scrolling when " " is pressed
-			toggleParamsMenu(event);
+			toggleParamsMenu();
 		}
-	});
-	document.addEventListener("keydown", event => {
-		// deal with special tab after pressing show parameters for keyboard controlls
-		if (event.key == "Tab" && nextTabEle) {
-			event.preventDefault();
-			nextTabEle.focus();
-			nextTabEle = null;
-		}
-	});
+	};
 
+	paramsMenuHeader.addEventListener("mousedown", event => event.preventDefault());  // prevents "focusin" event (tested on chrome, edge, firefox, and opera gx)
+	paramsMenuHeader.addEventListener("focusin", showParamsMenu);
+	paramsMenuHeader.addEventListener("click", toggleParamsMenu);
+	paramsMenuHeader.addEventListener("keypress", toggleParamsMenuWithKey);
+
+	toggleParamsMenuEle.addEventListener("focusin", event => event.stopPropagation());  // so that the click doens't immediately hide the #params-menu
+	toggleParamsMenuEle.addEventListener("click", event => {
+		event.stopPropagation();  // so that the click doens't immediately hide the #params-menu
+		toggleParamsMenu();
+	});
+	toggleParamsMenuEle.addEventListener("keypress", toggleParamsMenuWithKey);
+	
+	paramsMenu.addEventListener("focusin", event => event.stopPropagation());
+	paramsMenu.addEventListener("click", event => event.stopPropagation());
+
+	document.addEventListener("focusin", hideParamsMenu);
+	document.addEventListener("click", hideParamsMenu);
+	
+	// init shown parameters from localStorage
 	let paramElements = PARAM_NAMES.map(name => [name,
 		[`#add-param-${name}`, `#param-${name}`].map(id =>
 			document.querySelector(id))]);
 	let initParameters = JSON.parse(localStorage.getItem("parameters")) || {};
 	for (let [name, [addEle, paramEle]] of paramElements) {
-		// init shown parameters from localStorage
 		let isShown = initParameters[name];
 		if (isShown !== undefined) {
 			if (isShown) {
@@ -745,14 +746,6 @@ const initForm = ({ camera, msdView, timeline }) => {
 			markUnsaved(wsSelect);
 		});
 	}
-
-	// hide parameters menu on focusin or click outside #parasm-menu, like a modal
-	const paramsMenu = document.querySelector("#params-menu");
-	const hideParamsMenu = () => document.body.classList.remove("show-params-menu");
-	document.addEventListener("focusin", hideParamsMenu);
-	document.addEventListener("click", hideParamsMenu);
-	paramsMenu.addEventListener("focusin", event => event.stopPropagation());
-	paramsMenu.addEventListener("click", event => event.stopPropagation());
 
 	// timeline controls
 	document.addEventListener("keydown", (event) => {
