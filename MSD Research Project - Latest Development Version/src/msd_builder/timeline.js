@@ -11,7 +11,7 @@ class Timeline {
 	states = [];
 
 	constructor(selector, view) {
-		this.timelineEle = document.querySelector(selector);
+		this.resultsEle = document.querySelector(selector);
 		this.view = view;
 	}
 
@@ -25,30 +25,30 @@ class Timeline {
 		stateEle.tabIndex = 0;
 		stateEle.addEventListener("click", () => this.active = stateEle);
 		stateEle.addEventListener("focus", () => this.active = stateEle);
-		this.timelineEle.append(stateEle);
+		this.resultsEle.append(stateEle);
 		this.active = stateEle;
 	}
 
 	clear() {
 		this._active = null;
 		this.state = [];
-		this.timelineEle.innerHTML = "";
+		this.resultsEle.innerHTML = "";
 	}
 
 	inc() {
 		this.active = this.active?.nextElementSibling;
 		if (!this.active)
-			this.active = this.timelineEle.children[0];
+			this.active = this.resultsEle.children[0];
 	}
 
 	dec() {
 		this.active = this.active?.previousElementSibling;
 		if (!this.active)
-			this.active = this.timelineEle.children[this.timelineEle.children.length - 1];
+			this.active = this.resultsEle.children[this.resultsEle.children.length - 1];
 	}
 
 	show(index) {
-		this.active = this.timelineEle.children[index];
+		this.active = this.resultsEle.children[index];
 	}
 
 	get active() {

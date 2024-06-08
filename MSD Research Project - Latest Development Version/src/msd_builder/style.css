@@ -3,7 +3,7 @@
 
 :root {
 	--header-height: 3.4em;
-	--timeline-height: 5rem;
+	--timeline-height: 8rem;
 	--params-form-width: 683px;
 	--brand-color: white;
 	--global-input-width: 24%;
@@ -568,6 +568,10 @@ body.show-params-menu #params-menu > * > header svg {
 
 /* ---- Timeline ----------------------------------------------------------- */
 #timeline {
+	--scrollbar-width: 20px;  /* chrome */ 
+	--timeline-nav-height: 2rem;
+	--results-height: calc(var(--timeline-height) - var(--timeline-nav-height) - var(--scrollbar-width));
+
 	position: absolute;
 	bottom: 0;
 	left: 0;
@@ -578,6 +582,7 @@ body.show-params-menu #params-menu > * > header svg {
 	background-color: white;
 	border-top: 2px solid black;
 	white-space: nowrap;
+	font-size: 10pt;
 
 	transition: transform 1s;
 	transform: translateY(100%);
@@ -589,29 +594,73 @@ body.show-timeline #timeline {
 	overflow-x: auto;
 }
 
-#timeline > * {
+#results {
+	height: var(--results-height);
+}
+
+#results > * {
 	display: inline-block;
 	box-sizing: border-box;
-	min-width: 3vw;
-	min-height: 3vw;
-	margin: 0.75vw;
-	border: 1px solid black;
-	border-radius: 50%;
-	font-size: 10pt;
-	text-align: center;
-	background-color: burlywood;
-	font-family: monospace;
+	min-width: 2.5vw;  /* TODO */
+	height: var(--results-height);
+	border-right: 1px solid #f4f4f4;
+	text-align: center;  /* TODO */
+	background-color: white;
 	cursor: pointer;
-	padding: 1em;
+	padding: 0.5em;
+	transition: min-width 0.2s;
 }
 
-#timeline > *:hover {
-	filter: brightness(0.7);
-	border-color: darkgoldenrod;
+#results > :first-child {
+	border-left: 1px solid #e6e6e6;
 }
 
-#timeline > *.active {
-	border-color: yellow;
-	background-color: aqua;
+#results > :hover {
+	/* filter: brightness(0.7); */
+	background-color: #f7f7f7;
 }
 
+#results > .active {
+	min-width: 10em;
+	border-color: #2b2b2b;  /* TODO */
+	background-color: #2b2b2b;
+	color: white;
+}
+
+#timeline nav {
+	position: sticky;
+	top: 0;
+	left: 0;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	height: var(--timeline-nav-height);
+	width: 100%;
+}
+
+#timeline form {
+	display: flex;
+	justify-content: center;
+	text-align: center;
+}
+
+#timeline form > * {
+	margin-inline: 0.5em;
+}
+
+#timeline form input[type=text],
+#timeline form input[type=number] {
+	text-align: right;
+}
+
+#timeline form input[type=button] {
+	background-color: #f7f7f7;
+	border: 0px hidden transparent;
+	outline: 2px solid #e6e6e6;
+	cursor: pointer;
+}
+
+#timeline form input[type=button]:hover,
+#timeline form input[type=button]:focus {
+	background-color: #e6e6e6;
+}

@@ -71,6 +71,7 @@ SELECTORS = {
 	paramsForm: "#msd-params-form",
 	actionsForm: "#msd-actions-form",
 	timeline: "#timeline",
+	timelineResults: "#results",
 	settingsIconContainer: "#settingsIcon",
 	lens: "#lens",
 	workspacesSelect: "#workspaces",

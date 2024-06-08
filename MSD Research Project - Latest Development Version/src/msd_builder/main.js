@@ -26,7 +26,7 @@ const main = () => {
 	msdView.rotation.x = Math.PI / 6;
 	msdView.rotation.y = -Math.PI / 24;
 	
-	let timeline = new Timeline(SELECTORS.timeline, msdView);
+	let timeline = new Timeline(SELECTORS.timelineResults, msdView);
 	initForm({ camera, msdView, timeline });
 	
 	// renderer.domElement.addEventListener("click", (event) => {
