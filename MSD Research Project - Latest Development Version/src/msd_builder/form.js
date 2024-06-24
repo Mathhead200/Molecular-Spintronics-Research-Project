@@ -285,9 +285,8 @@ function loadWorkspace({ msdView, camera, timeline, value, wsSelect = document.q
 	timeline.clear();
 	valueCache.clear();
 	let workspace = getWorkspaces()[value];
-	console.log("workspace", typeof(workspace), workspace);
 	if (workspace.valueCache)
-		for (let [k, v] of workspace.valueCache)
+		for (let [k, v] of JSON.parse(workspace.valueCache))
 			valueCache.set(k, v);
 	loadView(msdView);
 	updateCamera(camera, msdView);
@@ -536,7 +535,7 @@ const initForm = ({ camera, msdView, timeline }) => {
 				break;
 
 			workspaces[name] = {
-				valueCache: localStorage.getItem(valueCache.name),
+				valueCache: localStorage.getItem("valueCache"),
 				parameters: localStorage.getItem("parameters")
 			};
 			saveWorkspaces(workspaces);
@@ -577,7 +576,7 @@ const initForm = ({ camera, msdView, timeline }) => {
 
 		let worksapces = getWorkspaces();
 		worksapces[name] = {
-			localCache: localStorage.getItem(valueCache.name),
+			valueCache: localStorage.getItem("valueCache"),
 			parameters: localStorage.getItem("parameters")
 		};
 		saveWorkspaces(worksapces);
@@ -749,7 +748,7 @@ const initForm = ({ camera, msdView, timeline }) => {
 
 	// timeline controls
 	document.addEventListener("keydown", (event) => {
-		if (!timeline.timelineEle.contains(document.activeElement))
+		if (!timeline.resultsEle.contains(document.activeElement))
 			return;
 
 		if (event.key === "ArrowRight") {

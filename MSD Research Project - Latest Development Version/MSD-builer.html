@@ -41,11 +41,11 @@
 		
 		<!-- TODO: replace these with a better UI solution -->
 		<form id="msd-actions-form">
-			<input id="toggle-params-form" type="button" value="Parameters">
-			<input id="toggle-timeline" type="button" value="Timeline">
+			<input type="submit" value="Run &#x25B6;">
 			&emsp;
 
-			<input type="submit" value="Run">
+			<input id="toggle-params-form" type="button" value="Show/Hide Parameters">
+			<input id="toggle-timeline" type="button" value="Show/Hide Timeline">
 		</form>
 
 		<svg viewBox="0 0 512.002 512.002" tabindex="0">
@@ -121,7 +121,10 @@
 				<div> LR </div>
 			</header>
 			<section id="param-width">
-				<header> width </header>
+				<header><div>
+					<span>width</span>
+					<span class="remove-param"><!-- TODO: fill with JS SVG trash icons?? --></span>
+				</div></header>
 				<div> <input id="FML-width" title="FML-width" type="number" min="0" step="1" value="1"> </div>
 				<div> <input id="mol-width" title="mol-width" type="number" min="0" step="1" value="1"> </div>
 				<div> <input id="FMR-width" title="FMR-width" type="number" min="0" step="1" value="1"> </div>
