@@ -459,16 +459,36 @@ const initForm = ({ camera, msdView, timeline }) => {
 	const actionsForm = document.querySelector(SELECTORS.actionsForm);
 	const paramsForm = document.querySelector(SELECTORS.paramsForm);
 	const wsSelect = paramsForm.querySelector(SELECTORS.workspacesSelect);
+	
+	let results;
 
 	actionsForm.addEventListener("submit", event => {
 		event.preventDefault();
 
+		if(event.submitter.id == "run-sim") {
 		// run simulation:
 		let json = buildJSON(msdView);
 		let simCount = +document.getElementById("simCount").value;
 		let freq = +document.getElementById("freq").value;
-		runSim(json, { simCount, freq }, timeline);
+		results = runSim(json, { simCount, freq }, timeline);
+		document.getElementById("download-csv").disabled = false;
+		} else if(event.submitter.id == "download-csv") {
+			results.then(data => {
+			if(results != null) {
+				let blob = new Blob([data], { type: 'text/csv' });
+				let link = document.createElement('a');
+				link.download = 'parameters-iterate.csv';
+				link.href = window.URL.createObjectURL(blob);
+				link.click();
+				window.URL.revokeObjectURL(link.href);
+			} else {
+				alert("You have not run a simulation to download the data from. Please click \"Run\" to begin a simulation.")
+			}
+			})
+		}
 	});
+
+	
 
 	paramsForm.addEventListener("submit", event => event.preventDefault());
 
@@ -495,6 +515,8 @@ const initForm = ({ camera, msdView, timeline }) => {
 	paramsForm.querySelector("#export").addEventListener("click", () => {
 		exportParameters(buildJSON(msdView));
 	});
+
+	
 
 	// workspace controls
 	{	// create <option> elements for saved workspaces
