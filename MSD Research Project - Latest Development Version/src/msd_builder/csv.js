@@ -63,7 +63,6 @@ function initCSV(json) {
 		row_results += ",msd_version = 6.2a"  // TODO: update server so we can get this from server
 		row_results += "\r\n"
 		
-		row_results = row_results.replace("seed = undefined", "seed = unique");
 	return row_results
 }
 

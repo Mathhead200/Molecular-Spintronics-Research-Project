@@ -15,7 +15,7 @@ const {
 	BufferGeometry, BoxGeometry, SphereGeometry,
 	MeshBasicMaterial, LineBasicMaterial,
 	Group, Mesh, Line,
-	Vector3, Color
+	Vector3, Color, ArcballControls
 } = Three;
 
 
@@ -1212,11 +1212,16 @@ const startRendering = ({
 	resize();
 	window.addEventListener("resize", resize);
 	
+	const controls = new ArcballControls( camera, renderer.domElement, scene );
 	// continuously redraw canvas (once per "frames")
 	const loop = new AnimationLoop(renderer, scene, camera);
 	const msdView = new MSDView(...MSDRegionTypes);
 	scene.add(msdView);
 	const _vars = { scene, camera, renderer, loop, msdView };
+
+	camera.updateProjectionMatrix();
+	controls.setGizmosVisible(false)
+	requestAnimationFrame(() => controls.update());
 
 	if (onAnimationFrame)
 		loop.start(() => onAnimationFrame(_vars));

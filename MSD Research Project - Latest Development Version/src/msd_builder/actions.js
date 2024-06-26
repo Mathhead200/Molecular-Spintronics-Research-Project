@@ -55,14 +55,8 @@ async function runSim(json, runArgs, timeline) {
 			final_results = final_results.replace("ITER", buildMSDIterations(final_state.msd, i));
 		}
 	}
-
-	// Save CSV file via Blob download
-	let blob = new Blob([final_results], { type: 'text/csv' });
-	let link = document.createElement('a');
-	link.download = 'iteration-results.csv';
-	link.href = window.URL.createObjectURL(blob);
-	link.click();
-	window.URL.revokeObjectURL(link.href);
+	final_results = final_results.replace("seed = undefined", "seed = " + final_state.seed)
+	return final_results
 }
 
 /**
