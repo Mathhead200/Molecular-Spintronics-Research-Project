@@ -1,5 +1,5 @@
-simCount = 10000000
-freq = 412
+simCount = 1000000
+freq = 50000
 
 # dimensions of bounding box
 width  = 11
