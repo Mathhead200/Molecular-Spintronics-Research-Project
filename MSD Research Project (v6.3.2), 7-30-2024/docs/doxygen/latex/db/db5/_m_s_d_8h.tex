@@ -1,0 +1,94 @@
+\hypertarget{_m_s_d_8h}{}\doxysection{C\+:/\+Users/mathh/\+Git\+Hub/\+Molecular-\/\+Spintronics-\/\+Research-\/\+Project/\+MSD Research Project -\/ Latest Development Version/src/\+MSD.h File Reference}
+\label{_m_s_d_8h}\index{C:/Users/mathh/GitHub/Molecular-\/Spintronics-\/Research-\/Project/MSD Research Project -\/ Latest Development Version/src/MSD.h@{C:/Users/mathh/GitHub/Molecular-\/Spintronics-\/Research-\/Project/MSD Research Project -\/ Latest Development Version/src/MSD.h}}
+
+
+The core logic which all the apps use to run \mbox{\hyperlink{namespace_m_s_d}{MSD}} simulations. Includes definitions and calculations.  
+
+
+{\ttfamily \#include $<$cstdlib$>$}\newline
+{\ttfamily \#include $<$cmath$>$}\newline
+{\ttfamily \#include $<$ctime$>$}\newline
+{\ttfamily \#include $<$cstring$>$}\newline
+{\ttfamily \#include $<$exception$>$}\newline
+{\ttfamily \#include $<$functional$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$memory$>$}\newline
+{\ttfamily \#include $<$random$>$}\newline
+{\ttfamily \#include $<$stdexcept$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include \char`\"{}Vector.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}udc.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Sparse\+Array.\+h\char`\"{}}\newline
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classudc_1_1_molecule}{udc\+::\+Molecule}}
+\begin{DoxyCompactList}\small\item\em An abstract molecule. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structudc_1_1_molecule_1_1_edge_parameters}{udc\+::\+Molecule\+::\+Edge\+Parameters}}
+\begin{DoxyCompactList}\small\item\em Information about an edge between two Nodes. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structudc_1_1_molecule_1_1_node_parameters}{udc\+::\+Molecule\+::\+Node\+Parameters}}
+\begin{DoxyCompactList}\small\item\em local parameters \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classudc_1_1_molecule_1_1_deserialization_exception}{udc\+::\+Molecule\+::\+Deserialization\+Exception}}
+\item 
+class \mbox{\hyperlink{classudc_1_1_molecule_1_1_node_iterator}{udc\+::\+Molecule\+::\+Node\+Iterator}}
+\item 
+class \mbox{\hyperlink{classudc_1_1_molecule_1_1_node_iterable}{udc\+::\+Molecule\+::\+Node\+Iterable}}
+\item 
+class \mbox{\hyperlink{classudc_1_1_molecule_1_1_edge_iterator}{udc\+::\+Molecule\+::\+Edge\+Iterator}}
+\item 
+class \mbox{\hyperlink{classudc_1_1_molecule_1_1_edge_iterable}{udc\+::\+Molecule\+::\+Edge\+Iterable}}
+\item 
+class \mbox{\hyperlink{classudc_1_1_m_s_d}{udc\+::\+MSD}}
+\begin{DoxyCompactList}\small\item\em An abstract Molecular Spintronic Device. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structudc_1_1_m_s_d_1_1_parameters}{udc\+::\+MSD\+::\+Parameters}}
+\item 
+struct \mbox{\hyperlink{structudc_1_1_m_s_d_1_1_results}{udc\+::\+MSD\+::\+Results}}
+\item 
+class \mbox{\hyperlink{classudc_1_1_m_s_d_1_1_iterator}{udc\+::\+MSD\+::\+Iterator}}
+\item 
+class \mbox{\hyperlink{classudc_1_1_m_s_d_1_1_molecule_exception}{udc\+::\+MSD\+::\+Molecule\+Exception}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespaceudc}{udc}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{_m_s_d_8h_aed08a6e3241c31dccac6a5bbbe306447}{UDC\+\_\+\+MSD\+\_\+\+VERSION}}~\char`\"{}6.\+2\char`\"{}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+ostream \& \mbox{\hyperlink{namespaceudc_a6b685c21976ba81485ee5434b8a7ca41}{udc\+::operator$<$$<$}} (ostream \&out, const MSD\+::\+Parameters \&p)
+\item 
+ostream \& \mbox{\hyperlink{namespaceudc_ada41040df7a93e1901296b334ebde2f3}{udc\+::operator$<$$<$}} (ostream \&out, const MSD\+::\+Results \&r)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The core logic which all the apps use to run \mbox{\hyperlink{namespace_m_s_d}{MSD}} simulations. Includes definitions and calculations. 
+
+\begin{DoxyAuthor}{Author}
+Christopher D\textquotesingle{}Angelo 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+6.\+2 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2022-\/11-\/29
+\end{DoxyDate}
+\begin{DoxyCopyright}{Copyright}
+Copyright (c) 2022 
+\end{DoxyCopyright}
+
+
+\doxysubsection{Macro Definition Documentation}
+\mbox{\Hypertarget{_m_s_d_8h_aed08a6e3241c31dccac6a5bbbe306447}\label{_m_s_d_8h_aed08a6e3241c31dccac6a5bbbe306447}} 
+\index{MSD.h@{MSD.h}!UDC\_MSD\_VERSION@{UDC\_MSD\_VERSION}}
+\index{UDC\_MSD\_VERSION@{UDC\_MSD\_VERSION}!MSD.h@{MSD.h}}
+\doxysubsubsection{\texorpdfstring{UDC\_MSD\_VERSION}{UDC\_MSD\_VERSION}}
+{\footnotesize\ttfamily \#define UDC\+\_\+\+MSD\+\_\+\+VERSION~\char`\"{}6.\+2\char`\"{}}
+

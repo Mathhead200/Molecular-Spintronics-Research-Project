@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_mmt_8h" xml:lang="en-US">
+<title>C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/src/mmt.h File Reference</title>
+<indexterm><primary>C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/src/mmt.h</primary></indexterm>
+<para>
+
+<para>Contains functions for reading and parsing MMT (<link linkend="_namespace_m_s_d">MSD</link> Molecule Text) files, such as those created by the <link linkend="_namespace_m_s_d">MSD</link> Molecule Builder webtool. </para>
+ 
+</para>
+<programlisting linenumbering="unnumbered">#include &lt;string&gt;<?linebreak?>#include &lt;vector&gt;<?linebreak?>#include &lt;iostream&gt;<?linebreak?>#include &lt;sstream&gt;<?linebreak?>#include &quot;MSD.h&quot;<?linebreak?></programlisting><simplesect>
+    <title>Namespaces    </title>
+        <itemizedlist>
+            <listitem><para>namespace <link linkend="_namespaceudc">udc</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Functions    </title>
+        <itemizedlist>
+            <listitem><para>template&lt;typename T &gt; </para><para>T <link linkend="_namespaceudc_1a03752c8f5c571a06fc1c32e823a319a5">udc::parseline</link> (istream &amp;in)</para>
+</listitem>
+            <listitem><para>template&lt;&gt; </para><para>string <link linkend="_namespaceudc_1aa53d390897b2cbbeb3f336b31ca8b121">udc::parseline</link> (istream &amp;in)</para>
+</listitem>
+            <listitem><para>template&lt;&gt; </para><para>istringstream <link linkend="_namespaceudc_1aa3ecd4349a02127aebcf910ebab2e4e4">udc::parseline</link> (istream &amp;in)</para>
+</listitem>
+            <listitem><para>template&lt;&gt; </para><para>void <link linkend="_namespaceudc_1a502730a2d07ef150a01ed02b6c116846">udc::parseline</link> (istream &amp;in)</para>
+</listitem>
+            <listitem><para>template&lt;typename T &gt; </para><para>T <link linkend="_namespaceudc_1ab5d1642f2042aa4f999a47f2de0db959">udc::parseline</link> (const string &amp;str)</para>
+</listitem>
+            <listitem><para>istream &amp; <link linkend="_namespaceudc_1a6a73767fbbacbcfa2f4d7db36e6c4230">udc::operator&gt;&gt;</link> (istream &amp;in, <link linkend="_classudc_1_1_vector">udc::Vector</link> &amp;v)</para>
+</listitem>
+            <listitem><para><link linkend="__m_s_d-export_8cpp_1aec2cc3918e5933a0bad019dd661cdbef">MSD::MolProto</link> <link linkend="_namespaceudc_1a2479706554f64b21239dca95b3c1465c">udc::readMMT</link> (istream &amp;src)</para>
+
+<para>Parses MMT file data from the given text istream, and saves it as a <link linkend="_classudc_1_1_m_s_d_1a7266f08d021d5a06960b152c95a9213e">MSD::MolProto</link> object. </para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Detailed Description</title>
+
+<para>Contains functions for reading and parsing MMT (<link linkend="_namespace_m_s_d">MSD</link> Molecule Text) files, such as those created by the <link linkend="_namespace_m_s_d">MSD</link> Molecule Builder webtool. </para>
+
+<para><formalpara><title>Author</title>
+
+<para>Christopher D&apos;Angelo (<link xlink:href="mailto:chris@mathhead200.com">chris@mathhead200.com</link>) </para>
+</formalpara>
+<formalpara><title>Version</title>
+
+<para>0.1 </para>
+</formalpara>
+<formalpara><title>Date</title>
+
+<para>September 2, 2022</para>
+</formalpara>
+</para>
+
+<para><formalpara><title>Copyright</title>
+
+<para>Copyright (c) 2022 </para>
+</formalpara>
+</para>
+</section>
+</section>

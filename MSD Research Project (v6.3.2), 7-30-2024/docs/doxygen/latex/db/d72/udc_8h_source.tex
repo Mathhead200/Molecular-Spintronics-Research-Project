@@ -1,0 +1,70 @@
+\hypertarget{udc_8h_source}{}\doxysection{udc.\+h}
+\label{udc_8h_source}\index{C:/Users/mathh/GitHub/Molecular-\/Spintronics-\/Research-\/Project/MSD Research Project -\/ Latest Development Version/src/udc.h@{C:/Users/mathh/GitHub/Molecular-\/Spintronics-\/Research-\/Project/MSD Research Project -\/ Latest Development Version/src/udc.h}}
+\mbox{\hyperlink{udc_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{comment}{/*}}
+\DoxyCodeLine{2 \textcolor{comment}{ * udc.h}}
+\DoxyCodeLine{3 \textcolor{comment}{ *}}
+\DoxyCodeLine{4 \textcolor{comment}{ *  Last Edited: Feb 25, 2014}}
+\DoxyCodeLine{5 \textcolor{comment}{ *       Author: Christopher D'Angelo}}
+\DoxyCodeLine{6 \textcolor{comment}{ */}}
+\DoxyCodeLine{7 }
+\DoxyCodeLine{8 \textcolor{preprocessor}{\#ifndef UDC\_H}}
+\DoxyCodeLine{9 \textcolor{preprocessor}{\#define UDC\_H}}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#include <cstring>}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#include <exception>}}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceudc}{udc}} \{}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{keyword}{using }std::exception;}
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18 }
+\DoxyCodeLine{20 \textcolor{keyword}{const} \textcolor{keywordtype}{double} \mbox{\hyperlink{namespaceudc_aa4b4d55516f1e34de5dc8b228f160597}{E}} = 2.71828182845904523536;}
+\DoxyCodeLine{21 }
+\DoxyCodeLine{23 \textcolor{keyword}{const} \textcolor{keywordtype}{double} \mbox{\hyperlink{namespaceudc_a1757f9fc50446243658974977dd95e7c}{PI}} = 3.14159265358979323846;}
+\DoxyCodeLine{24 }
+\DoxyCodeLine{25 }
+\DoxyCodeLine{27 \textcolor{keyword}{inline} \textcolor{keywordtype}{double} \mbox{\hyperlink{namespaceudc_aa7cee595bc6a15bdd189f00553c92349}{sq}}(\textcolor{keywordtype}{double} x) \{}
+\DoxyCodeLine{28     \textcolor{keywordflow}{return} x * x;}
+\DoxyCodeLine{29 \}}
+\DoxyCodeLine{30 }
+\DoxyCodeLine{32 \textcolor{keyword}{inline} \textcolor{keywordtype}{double} \mbox{\hyperlink{namespaceudc_a6d899413865bed9b0346dc4a2b6ed4b5}{cube}}(\textcolor{keywordtype}{double} x) \{}
+\DoxyCodeLine{33     \textcolor{keywordflow}{return} x * x * x;}
+\DoxyCodeLine{34 \}}
+\DoxyCodeLine{35 }
+\DoxyCodeLine{42 \textcolor{keyword}{inline} \textcolor{keywordtype}{void} \mbox{\hyperlink{namespaceudc_a51cb94811213523405b27e375b7a1b33}{bread}}(\textcolor{keywordtype}{void} * destination, \textcolor{keywordtype}{size\_t} dSize, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} * \&buffer) \{}
+\DoxyCodeLine{43     memcpy(destination, buffer, dSize);}
+\DoxyCodeLine{44     buffer += dSize;}
+\DoxyCodeLine{45 \}}
+\DoxyCodeLine{46 }
+\DoxyCodeLine{50 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{inline} \textcolor{keywordtype}{void} \mbox{\hyperlink{namespaceudc_a51cb94811213523405b27e375b7a1b33}{bread}}(T \&destination, \textcolor{keyword}{const} \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} * \&buffer) \{}
+\DoxyCodeLine{51     \mbox{\hyperlink{namespaceudc_a51cb94811213523405b27e375b7a1b33}{bread}}(\&destination, \textcolor{keyword}{sizeof}(T), buffer);}
+\DoxyCodeLine{52 \}}
+\DoxyCodeLine{53 }
+\DoxyCodeLine{60 \textcolor{keyword}{inline} \textcolor{keywordtype}{void} \mbox{\hyperlink{namespaceudc_a1e040d8326f2ad3b600f8f66a8de6305}{bwrite}}(\textcolor{keyword}{const} \textcolor{keywordtype}{void} * source, \textcolor{keywordtype}{size\_t} sSize, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} * \&buffer) \{}
+\DoxyCodeLine{61     memcpy(buffer, source, sSize);}
+\DoxyCodeLine{62     buffer += sSize;}
+\DoxyCodeLine{63 \}}
+\DoxyCodeLine{64 }
+\DoxyCodeLine{68 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{inline} \textcolor{keywordtype}{void} \mbox{\hyperlink{namespaceudc_a1e040d8326f2ad3b600f8f66a8de6305}{bwrite}}(\textcolor{keyword}{const} T \&source, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{char} * \&buffer) \{}
+\DoxyCodeLine{69     \mbox{\hyperlink{namespaceudc_a1e040d8326f2ad3b600f8f66a8de6305}{bwrite}}(\&source, \textcolor{keyword}{sizeof}(T), buffer);}
+\DoxyCodeLine{70 \}}
+\DoxyCodeLine{71 }
+\DoxyCodeLine{72 }
+\DoxyCodeLine{73 \textcolor{keyword}{class }\mbox{\hyperlink{classudc_1_1_u_d_c_exception}{UDCException}} : \textcolor{keyword}{public} exception \{}
+\DoxyCodeLine{74  \textcolor{keyword}{private}:}
+\DoxyCodeLine{75     \textcolor{keyword}{const} \textcolor{keywordtype}{char} *message;}
+\DoxyCodeLine{76 }
+\DoxyCodeLine{77  \textcolor{keyword}{public}:}
+\DoxyCodeLine{78     \mbox{\hyperlink{classudc_1_1_u_d_c_exception_a60f9a75be4d8880a5521dc50d4df05f7}{UDCException}}(\textcolor{keyword}{const} \textcolor{keywordtype}{char} *message) : message(message) \{\}}
+\DoxyCodeLine{79     }
+\DoxyCodeLine{80     \textcolor{keyword}{virtual} \textcolor{keyword}{const} \textcolor{keywordtype}{char} * \mbox{\hyperlink{classudc_1_1_u_d_c_exception_aed918c48351c4bf4673f438235cd3026}{what}}() const noexcept \{ \textcolor{keywordflow}{return} message; \}}
+\DoxyCodeLine{81 \};}
+\DoxyCodeLine{82 }
+\DoxyCodeLine{83 }
+\DoxyCodeLine{84 \} \textcolor{comment}{//end of namespace}}
+\DoxyCodeLine{85 }
+\DoxyCodeLine{86 \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

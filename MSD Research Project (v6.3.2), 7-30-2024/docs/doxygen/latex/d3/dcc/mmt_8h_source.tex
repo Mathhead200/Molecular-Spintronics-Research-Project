@@ -1,0 +1,162 @@
+\hypertarget{mmt_8h_source}{}\doxysection{mmt.\+h}
+\label{mmt_8h_source}\index{C:/Users/mathh/GitHub/Molecular-\/Spintronics-\/Research-\/Project/MSD Research Project -\/ Latest Development Version/src/mmt.h@{C:/Users/mathh/GitHub/Molecular-\/Spintronics-\/Research-\/Project/MSD Research Project -\/ Latest Development Version/src/mmt.h}}
+\mbox{\hyperlink{mmt_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 }
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#ifndef UDC\_MMT}}
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#define UDC\_MMT}}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 \textcolor{preprocessor}{\#include <string>}}
+\DoxyCodeLine{16 \textcolor{preprocessor}{\#include <vector>}}
+\DoxyCodeLine{17 \textcolor{preprocessor}{\#include <iostream>}}
+\DoxyCodeLine{18 \textcolor{preprocessor}{\#include <sstream>}}
+\DoxyCodeLine{19 \textcolor{preprocessor}{\#include "{}\mbox{\hyperlink{_m_s_d_8h}{MSD.h}}"{}}}
+\DoxyCodeLine{20 }
+\DoxyCodeLine{21 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceudc}{udc}} \{}
+\DoxyCodeLine{22 }
+\DoxyCodeLine{23 \textcolor{keyword}{using }std::string;}
+\DoxyCodeLine{24 \textcolor{keyword}{using }std::vector;}
+\DoxyCodeLine{25 \textcolor{keyword}{using }std::istream;}
+\DoxyCodeLine{26 \textcolor{keyword}{using }std::ostream;}
+\DoxyCodeLine{27 \textcolor{keyword}{using }std::istringstream;}
+\DoxyCodeLine{28 \textcolor{keyword}{using }std::getline;}
+\DoxyCodeLine{29 \textcolor{keyword}{using }\mbox{\hyperlink{classudc_1_1_m_s_d}{udc::MSD}};}
+\DoxyCodeLine{30 }
+\DoxyCodeLine{31 }
+\DoxyCodeLine{32 \textcolor{comment}{// getline, and parse using stringstream and extraction operator >>}}
+\DoxyCodeLine{33 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> T \mbox{\hyperlink{namespaceudc_a03752c8f5c571a06fc1c32e823a319a5}{parseline}}(istream \&in) \{}
+\DoxyCodeLine{34     \textcolor{keywordtype}{string} line;}
+\DoxyCodeLine{35     getline(in, line);}
+\DoxyCodeLine{36 }
+\DoxyCodeLine{37     T value;}
+\DoxyCodeLine{38     istringstream(line) >> value;}
+\DoxyCodeLine{39     \textcolor{keywordflow}{return} value;}
+\DoxyCodeLine{40 \}}
+\DoxyCodeLine{41 }
+\DoxyCodeLine{42 \textcolor{keyword}{template} <> \textcolor{keywordtype}{string} \mbox{\hyperlink{namespaceudc_a03752c8f5c571a06fc1c32e823a319a5}{parseline}}(istream \&in) \{}
+\DoxyCodeLine{43     \textcolor{keywordtype}{string} line;}
+\DoxyCodeLine{44     getline(in, line);}
+\DoxyCodeLine{45     \textcolor{keywordflow}{return} line;}
+\DoxyCodeLine{46 \} }
+\DoxyCodeLine{47 }
+\DoxyCodeLine{48 \textcolor{keyword}{template} <> istringstream \mbox{\hyperlink{namespaceudc_a03752c8f5c571a06fc1c32e823a319a5}{parseline}}(istream \&in) \{}
+\DoxyCodeLine{49     \textcolor{keywordtype}{string} line;}
+\DoxyCodeLine{50     getline(in, line);}
+\DoxyCodeLine{51     \textcolor{keywordflow}{return} istringstream(line); }
+\DoxyCodeLine{52 \}}
+\DoxyCodeLine{53 }
+\DoxyCodeLine{54 \textcolor{keyword}{template} <> \textcolor{keywordtype}{void} \mbox{\hyperlink{namespaceudc_a03752c8f5c571a06fc1c32e823a319a5}{parseline}}(istream \&in) \{}
+\DoxyCodeLine{55     \textcolor{keywordtype}{string} line;}
+\DoxyCodeLine{56     getline(in, line);}
+\DoxyCodeLine{57 \}}
+\DoxyCodeLine{58 }
+\DoxyCodeLine{59 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> T \mbox{\hyperlink{namespaceudc_a03752c8f5c571a06fc1c32e823a319a5}{parseline}}(\textcolor{keyword}{const} \textcolor{keywordtype}{string} \&str) \{}
+\DoxyCodeLine{60     \textcolor{keywordflow}{return} parseline<T>(istringstream(str));}
+\DoxyCodeLine{61 \}}
+\DoxyCodeLine{62 }
+\DoxyCodeLine{63 \textcolor{comment}{// for reading JS arrays as udc::Vector objects }}
+\DoxyCodeLine{64 istream\& \mbox{\hyperlink{namespaceudc_a6a73767fbbacbcfa2f4d7db36e6c4230}{operator>>}}(istream \&in, \mbox{\hyperlink{classudc_1_1_vector}{udc::Vector}} \&v) \{}
+\DoxyCodeLine{65     \textcolor{keywordtype}{string} x, y, z;}
+\DoxyCodeLine{66     getline(in, x, \textcolor{charliteral}{','});}
+\DoxyCodeLine{67     getline(in, y, \textcolor{charliteral}{','});}
+\DoxyCodeLine{68     getline(in, z, \textcolor{charliteral}{','});}
+\DoxyCodeLine{69     v.\mbox{\hyperlink{classudc_1_1_vector_ab974b6088fa419c17752cdf46fffd09c}{x}} = parseline<double>(x);}
+\DoxyCodeLine{70     v.\mbox{\hyperlink{classudc_1_1_vector_a136129725de33fe61592c3d5c5a485eb}{y}} = parseline<double>(y);}
+\DoxyCodeLine{71     v.\mbox{\hyperlink{classudc_1_1_vector_af5787922cda40c2139abdd31cd2f6251}{z}} = parseline<double>(z);}
+\DoxyCodeLine{72     \textcolor{keywordflow}{return} in;}
+\DoxyCodeLine{73 \}}
+\DoxyCodeLine{74 }
+\DoxyCodeLine{82 \mbox{\hyperlink{classudc_1_1_molecule}{MSD::MolProto}} \mbox{\hyperlink{namespaceudc_a2479706554f64b21239dca95b3c1465c}{readMMT}}(istream \&src) \{}
+\DoxyCodeLine{83     \mbox{\hyperlink{classudc_1_1_molecule}{MSD::MolProto}} mol;}
+\DoxyCodeLine{84 }
+\DoxyCodeLine{85     \textcolor{comment}{// First, read nodes section}}
+\DoxyCodeLine{86     \textcolor{comment}{// std::cout << "{} -\/-\/ Node section.\(\backslash\)n"{};  // DEBUG}}
+\DoxyCodeLine{87     vector<unsigned int> nodes;  \textcolor{comment}{// stores all node indices in the order they appear in the src file}}
+\DoxyCodeLine{88     \{   \textcolor{keywordtype}{size\_t} node\_count = parseline<size\_t>(src);}
+\DoxyCodeLine{89         \textcolor{comment}{// std::cout << "{} -\/-\/ node\_count="{} << node\_count << '\(\backslash\)n';  // DEBUG}}
+\DoxyCodeLine{90         \textcolor{keywordflow}{while} (nodes.size() < node\_count) \{}
+\DoxyCodeLine{91             \mbox{\hyperlink{structudc_1_1_molecule_1_1_node_parameters}{MSD::MolProto::NodeParameters}} params;}
+\DoxyCodeLine{92             }
+\DoxyCodeLine{93             istringstream line = parseline<istringstream>(src);}
+\DoxyCodeLine{94             \textcolor{keywordflow}{for} (\textcolor{keywordtype}{string} param\_str; line >> param\_str; ) \{}
+\DoxyCodeLine{95                 \textcolor{comment}{// std::cout << "{} -\/-\/ param\_str="{} << param\_str << '\(\backslash\)n';  // DEBUG}}
+\DoxyCodeLine{96                 \textcolor{keywordtype}{size\_t} key\_end = param\_str.find(\textcolor{stringliteral}{"{}="{}});}
+\DoxyCodeLine{97                 \textcolor{keywordtype}{size\_t} value\_start = key\_end + 1;}
+\DoxyCodeLine{98                 \textcolor{keywordtype}{size\_t} value\_end = param\_str.find(\textcolor{stringliteral}{"{};"{}}, value\_start);}
+\DoxyCodeLine{99                 \textcolor{keywordflow}{if} (value\_end == string::npos)}
+\DoxyCodeLine{100                     value\_end = param\_str.length();}
+\DoxyCodeLine{101                 }
+\DoxyCodeLine{102                 \textcolor{keywordtype}{string} key = param\_str.substr(0, key\_end);}
+\DoxyCodeLine{103                 istringstream value = istringstream(param\_str.substr(value\_start, value\_end -\/ value\_start));}
+\DoxyCodeLine{104                 }
+\DoxyCodeLine{105                 \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"{}Sm"{}})}
+\DoxyCodeLine{106                     value >> params.\mbox{\hyperlink{structudc_1_1_molecule_1_1_node_parameters_aa7b74cbea7b3cba87f57ad48232a3786}{Sm}};}
+\DoxyCodeLine{107                 \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"{}Fm"{}})}
+\DoxyCodeLine{108                     value >> params.\mbox{\hyperlink{structudc_1_1_molecule_1_1_node_parameters_a0a56503fd7eb794ba63f04a1ec25238e}{Fm}};}
+\DoxyCodeLine{109                 \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"{}Je0m"{}})}
+\DoxyCodeLine{110                     value >> params.\mbox{\hyperlink{structudc_1_1_molecule_1_1_node_parameters_a297971abdfd713f536d590ef8feb7fbc}{Je0m}};}
+\DoxyCodeLine{111                 \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"{}Am"{}})}
+\DoxyCodeLine{112                     value >> params.\mbox{\hyperlink{structudc_1_1_molecule_1_1_node_parameters_a821f45a250dc5e42bd03ab91e377605f}{Am}};}
+\DoxyCodeLine{113                 \textcolor{comment}{// TODO: Add warnings! Currently, silently ignores unrecognized/unused params.}}
+\DoxyCodeLine{114             \}}
+\DoxyCodeLine{115 }
+\DoxyCodeLine{116             nodes.push\_back(mol.\mbox{\hyperlink{classudc_1_1_molecule_ab18585360b5c1577f6be8cc1f565b260}{createNode}}(params));}
+\DoxyCodeLine{117         \}}
+\DoxyCodeLine{118     \}}
+\DoxyCodeLine{119     parseline<void>(src);  \textcolor{comment}{// skip blank line (TODO: check that line is blank)}}
+\DoxyCodeLine{120 }
+\DoxyCodeLine{121     \textcolor{comment}{// Second, read edges section}}
+\DoxyCodeLine{122     \textcolor{comment}{// std::cout << "{} -\/-\/ Edge section.\(\backslash\)n"{};  // DEBUG}}
+\DoxyCodeLine{123     vector<unsigned int> edges;  \textcolor{comment}{// stores all edge indices in the order they appear in the src file}}
+\DoxyCodeLine{124     \{   \textcolor{keywordtype}{size\_t} edge\_count = parseline<size\_t>(src);}
+\DoxyCodeLine{125         \textcolor{keywordflow}{while} (edges.size() < edge\_count) \{}
+\DoxyCodeLine{126             \mbox{\hyperlink{structudc_1_1_molecule_1_1_edge_parameters}{MSD::MolProto::EdgeParameters}} params;}
+\DoxyCodeLine{127             \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} src\_node = 0, dest\_node = 0;}
+\DoxyCodeLine{128 }
+\DoxyCodeLine{129             istringstream line = parseline<istringstream>(src);}
+\DoxyCodeLine{130             \textcolor{keywordflow}{for} (\textcolor{keywordtype}{string} param\_str; line >> param\_str; ) \{}
+\DoxyCodeLine{131                 \textcolor{keywordtype}{size\_t} key\_end = param\_str.find(\textcolor{stringliteral}{"{}="{}});}
+\DoxyCodeLine{132                 \textcolor{keywordtype}{size\_t} value\_start = key\_end + 1;}
+\DoxyCodeLine{133                 \textcolor{keywordtype}{size\_t} value\_end = param\_str.find(\textcolor{stringliteral}{"{};"{}}, value\_start);}
+\DoxyCodeLine{134                 \textcolor{keywordflow}{if} (value\_end == string::npos)}
+\DoxyCodeLine{135                     value\_end = param\_str.length();}
+\DoxyCodeLine{136                 }
+\DoxyCodeLine{137                 \textcolor{keywordtype}{string} key = param\_str.substr(0, key\_end);}
+\DoxyCodeLine{138                 istringstream value = istringstream(param\_str.substr(value\_start, value\_end -\/ value\_start));}
+\DoxyCodeLine{139 }
+\DoxyCodeLine{140                 \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"{}Jm"{}})}
+\DoxyCodeLine{141                     value >> params.\mbox{\hyperlink{structudc_1_1_molecule_1_1_edge_parameters_a888be7fafaea5cedfc9f59ce6291a5c8}{Jm}};}
+\DoxyCodeLine{142                 \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"{}Je1m"{}})}
+\DoxyCodeLine{143                     value >> params.\mbox{\hyperlink{structudc_1_1_molecule_1_1_edge_parameters_afe9b27d63588d6f6066137961556274b}{Je1m}};}
+\DoxyCodeLine{144                 \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"{}Jeem"{}})}
+\DoxyCodeLine{145                     value >> params.\mbox{\hyperlink{structudc_1_1_molecule_1_1_edge_parameters_a8e66fedceee8f6cbd949e2e39f68cb38}{Jeem}};}
+\DoxyCodeLine{146                 \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"{}bm"{}})}
+\DoxyCodeLine{147                     value >> params.\mbox{\hyperlink{structudc_1_1_molecule_1_1_edge_parameters_ae10a09e2ff621f6427be2bb5a69ba595}{bm}};}
+\DoxyCodeLine{148                 \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"{}Dm"{}})}
+\DoxyCodeLine{149                     value >> params.\mbox{\hyperlink{structudc_1_1_molecule_1_1_edge_parameters_a7c1edcd9071395e3e894f12c03a2a8b2}{Dm}};}
+\DoxyCodeLine{150                 \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"{}srcNode"{}})}
+\DoxyCodeLine{151                     src\_node = nodes.at(parseline<size\_t>(value));}
+\DoxyCodeLine{152                 \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (key == \textcolor{stringliteral}{"{}destNode"{}})}
+\DoxyCodeLine{153                     dest\_node = nodes.at(parseline<size\_t>(value));}
+\DoxyCodeLine{154                 \textcolor{comment}{// TODO: Add warnings! Currently, silently ignores unrecognized/unused params.}}
+\DoxyCodeLine{155             \}}
+\DoxyCodeLine{156 }
+\DoxyCodeLine{157             edges.push\_back(mol.\mbox{\hyperlink{classudc_1_1_molecule_ae1411a791a83503073a9dc8a7b1d3b33}{connectNodes}}(src\_node, dest\_node, params));}
+\DoxyCodeLine{158         \}}
+\DoxyCodeLine{159     \}}
+\DoxyCodeLine{160     parseline<void>(src);  \textcolor{comment}{// skip blank line (TODO: check that line is blank)}}
+\DoxyCodeLine{161 }
+\DoxyCodeLine{162     \textcolor{comment}{// Last, read left and right leads}}
+\DoxyCodeLine{163     \textcolor{comment}{// std::cout << "{} -\/-\/ Leads section.\(\backslash\)n"{};  // DEBUG}}
+\DoxyCodeLine{164     mol.\mbox{\hyperlink{classudc_1_1_molecule_a055eb97e7305e44ebb8a0d22a23f6752}{setLeftLead}}(parseline<unsigned int>(src));}
+\DoxyCodeLine{165     mol.\mbox{\hyperlink{classudc_1_1_molecule_a549536b6815dd4ffcedb3ab3895a064f}{setRightLead}}(parseline<unsigned int>(src));}
+\DoxyCodeLine{166 }
+\DoxyCodeLine{167     \textcolor{keywordflow}{return} mol;}
+\DoxyCodeLine{168 \}}
+\DoxyCodeLine{169 }
+\DoxyCodeLine{170 }
+\DoxyCodeLine{171 \}  \textcolor{comment}{// end of namespace udc}}
+\DoxyCodeLine{172 }
+\DoxyCodeLine{173 \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}
