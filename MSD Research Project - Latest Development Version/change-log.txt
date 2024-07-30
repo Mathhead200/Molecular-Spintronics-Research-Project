@@ -208,9 +208,7 @@ Second bug fix. In MSD::setParameters()
 (5-23-2024) Renamed MSD-Builder2 to MSD-Builder. Now have working workspaces!
 (5-24-2024) "Delete" button for workspaces now works. 
 
-TODO: Add a better timeline.
 TODO: Send C++ MSD version through MSD Server to Javascript.
-TODO: remove zdog
 TODO: connect mol-builder and MSD-builder (maybe just links?)
 TODO: add bars on Three.js canvas showing current values of non-zero parameters,
 	and hide unused parameters from MSD-builder interface.
@@ -219,7 +217,6 @@ TODO: Store results retrieved from server in JS for efficiency, and so further c
 TODO: (maybe?) add custom scripting support for advanced users to process data.
 TODO: Add a way to download data as CSV from the HTML/JS UI after simulation
 	and post-processing is done.
-TODO: Why does MSD Server shutdown not close app once an MSDWorker has been created?
 
 TODO: Fix flux != 0 on mol. that are "turned off"
 TODO: (Potentially Very Hard) Compile-time optimize
