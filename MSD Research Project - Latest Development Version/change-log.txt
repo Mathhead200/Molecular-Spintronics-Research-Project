@@ -208,6 +208,10 @@ Second bug fix. In MSD::setParameters()
 (5-23-2024) Renamed MSD-Builder2 to MSD-Builder. Now have working workspaces!
 (5-24-2024) "Delete" button for workspaces now works.
 
+6.3.3:
+(8-8-2024) Omari identified bug in iterate.exe. Je1m and Jeem not set properly. Fixed.
+	Fixed GUI bug that defaulted FL=1. Changed to FL=0.
+
 TODO: Send C++ MSD version through MSD Server to Javascript.
 TODO: connect mol-builder and MSD-builder (maybe just links?)
 TODO: add bars on Three.js canvas showing current values of non-zero parameters,

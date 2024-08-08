@@ -258,7 +258,7 @@ int main(int argc, char *argv[]) {
 		cout << '\n';
 		getParam(params, "JeeL ", p.Je1L);
 		getParam(params, "JeeR ", p.Je1R);
-		if (!usingMMB)  getParam(params, "Jeem ", p_edge.Je1m);
+		if (!usingMMB)  getParam(params, "Jeem ", p_edge.Jeem);
 		getParam(params, "JeemL", p.Je1mL);
 		getParam(params, "JeemR", p.Je1mR);
 		getParam(params, "JeeLR", p.Je1LR);
@@ -304,7 +304,7 @@ int main(int argc, char *argv[]) {
 		msd.setMolProto(molProto);
 	else
 		msd.setMolParameters(p_node, p_edge);
-
+	
 	bool customSeed = (argc > SEED && string(argv[SEED]) != string("unique"));
 	if (customSeed) {
 		unsigned long seed;

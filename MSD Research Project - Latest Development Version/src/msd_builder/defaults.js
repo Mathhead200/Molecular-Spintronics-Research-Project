@@ -46,7 +46,7 @@ const PARAM_FIELDS = new Map([
 	["randomize", val(true, checkbox)],
 	
 	["SL", val(1)], ["Sm", val(1)], ["SR", val(1)],
-	["FL", val(1)], ["Fm", val(0)], ["FR", val(0)],
+	["FL", val(0)], ["Fm", val(0)], ["FR", val(0)],
 
 	["JL", val(1)], ["JmL", val(1)], ["Jm", val(1)], ["JmR", val(-1)], ["JR", val(1)], ["JLR", val(0)],
 	["Je0L", val(0)], ["Je0m", val(0)], ["Je0R", val(0)],

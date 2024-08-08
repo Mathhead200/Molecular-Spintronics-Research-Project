@@ -2,7 +2,7 @@
 @rem of each MSD program using "cl" (Visual Studio C/C++ compiler)
 
 @rem Specify install directoy and version of Visual Studio
-@set VS_DIR="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community"
+@set VS_DIR="C:\Program Files\Microsoft Visual Studio\2022\Community"
 
 
 @rem Move to project root
