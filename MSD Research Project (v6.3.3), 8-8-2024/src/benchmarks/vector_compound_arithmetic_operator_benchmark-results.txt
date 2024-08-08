@@ -1,0 +1,13 @@
+C:\Users\mathh\GitHub\Molecular-Spintronics-Research-Project\MSD Research Project (v5.4.3), 5-27-2021\src\benchmarks>vector_compound_arithmetic_operator_benchmark 1000
+(N=1000) Running...
+Algorithm 1: Vector v5.4.2
+Clock time: 0.143 seconds
+sum: <475.884, 63.6462, -550.075>
+diff: <-475.884, -63.6462, 550.075>
+scaled: <0, 0, 0>
+
+Algorithm 2: Vector v5.4.3
+Clock time: 0.107 seconds
+sum: <722.028, -102.745, 108.594>
+diff: <-722.028, 102.745, -108.594>
+scaled: <0, 0, 0>

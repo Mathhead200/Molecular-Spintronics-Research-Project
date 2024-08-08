@@ -1,0 +1,241 @@
+2.1.0:
+(9-18-2014) Major "bug" fix in how random unit vectors are generated. Program output has changed noticeably. Demands recalculation of preliminary results.
+
+2.1.1:
+(9-18-2014) Minor UI changes in user programs. Metropolis now writes XML to file prior to its first thread completion. User programs now output MSD's version number for record keeping.
+
+2.1.2:
+(10-6-2014) Changed magnetize program to start at B_y_max decreasing to B_y_min before increasing back to B_y_max; this is the opposite of how it moved before. This is so the the initial state of 'all up' matches positive B_y saturation.
+
+2.1.3:
+(10-7-2014) Changed magnetize programs to output average magnetizations and energies along with final ones (like heat program already did.) Updated MSD_GUI's magnetize panel to pass "noop" instead of "reinitialize".
+
+2.2.0:
+(12-4-2014) Bug fix in MSD.h on line 578.
+Biquadratic coupling algorithm corrected
+
+3.0.0:
+(12-4-2014) Added our first attempt at spin fluctuation code. This included a major overhaul of the code.
+
+3.1.0:
+(1-23-2015) Changed anisotropy to a vector, effecting energy calculations: -A_x * sum(m_x^2) - A_y * sum(m_y^2) - A_z * sum(m_z^2).
+Added the ability to initialize the magnitude of each sections' atoms' spins: s_L, s_m, s_R.
+Split spin flux F variable into three variables: FL, FR, Fm.
+
+3.2.0:
+(2-4-2015) Fix major bug in energy calculation in MSD::setLocalM. mL, LR and mR, LR sections under "if(x < molPosL)" and "if(x > molPosR)" section were written incorrectly as JL and JR respectively.
+
+3.3.0:
+(2-6-2015) Added new "magnetization2" program, which is given an initial t_eq, then a B_y_rate to slowly, continuously increase or decrease the magnetic field over time.
+Optimize change in magnetic field energy calculations! Useful for the new magnetization2 program.
+Also changed curie temperature approximation to be J * s^2.
+
+3.3.1:
+(2-13-2015) Added new program, "mfm_aggregator" (Magnetic Force Microscope Aggregator). This program takes copied Excel data from the "iterate" program and splits out formatted data for Excel to plot as 3D graphs.
+
+5.0.0:
+(2-24-2020) Added four new parameters: topL, bottomL, frontR, backR. This allows us to change the geometry of the device to a cross shape.
+
+5.1.0:
+(11-1-2020) Added ability to change the magnitude of specific atoms.
+This allows us to turn off some atoms, to turn off 2 "edges" of the molecule, and to potentially make certian molecule sites stronger.
+
+5.1.1:
+(11-3-2020) Fixed major bug where MSD::metropolis() was calling the wrong pow() function!
+Also added fix for T_c approximation in MSD::setParameters().
+
+5.2.0:
+(11-17-2020) Added the ability to set a custom seed in the MSD model, and incorperated this functionality into the iterate program.
+
+5.3.0:
+(12-15-2020) Changed the spin fluxtuation algorithm so that now spin fluxtuations are a uniformaly random vector with a random magnitude betwwen [0, F).
+
+5.3.1:
+(12-15-2020) Updated the magnetization and magnetization2 programs to allow for a change of B along any axis, not just in the y direction.
+
+5.3.2:
+(2-5-2021) Bug fix in MSD::setParameters(). Was accidentally normalizing the flux vectors, when instead they should just be scaled by p.FL / p0.FL.
+Also added a build_all.bat file which compiles all the .cpp program files using "cl".
+Second bug fix. In MSD::setParameters()
+        MSD.h:628    if( y + 1 < bottomL ) {
+       changed to    if( y + 1 <= bottomL ) {
+  also, MSD.h:660    if( z + 1 < backR ) {
+       changed to    if( z + 1 <= backR ) {
+
+5.4.0:
+(1-21-2021) Added Parameters Je0, Je1, Jee (including L, R, mL, mR, m, LR variations where applicable)
+	Added new exchange coupling parameters to connect each electron to (Je0) its local atom, (Je1) its nearest neighbor atoms, and (Jee) its nearest neighbor electrons.
+	Changed Heisenburg exchange coupling constant J so only bond the spin, s, and NOT the local magnetization, m = s + f.
+(2-10-2021) Add support for new J variables in all applicable programs: iterate, heat, magnetize(2), metropolis.
+	kT_inc < 0 now cools in "heat" program.
+	Added B_norm to output of "magnetize" and "magnetize2".
+	Added a check for kT_inc == 0, B_inc == 0, or B_rate == 0 to avoid an infinite loop (in their respective programs).
+(3-2-2021) Added new parameters to MSD::Parameters::operator==
+(3-9-2021) Added missing "throw" keyword on MSD.h:379, MSD::Iterator::operator++()
+
+5.4.1:
+(3-23-2021) Major bug fixes in MSD.h. The Je1 energy term was not being calculated correctly in MSD::setParameters().
+	Fixes a bug in MSD::Iterator::operator++ / += where an exception was thrown when trying to iterate to MSD::end().
+	Added build_tests.bat file and bin/tests directory for tests.
+	Uncommented out the Je0, Je1, and Jee tests in test-setLocalM.
+	Added RADNOMIZE and REINITIALIZE options for metropolis program.
+
+5.4.2:
+(5-25-2021) Added "Label" support to parameters-metropolis.txt input file.
+	Added custom spin support to parameters-metropolis.txt input file.
+	Added snapshot of final configuration (as XML) after each simualtion.
+	Slight optimization in energy calculation: factored out Je1.
+(5-27-2021) Added build_metropolis.bat to only build metropolis program (saves time)
+
+5.4.3:
+(5-27-2021) Changed Vector::I, Vector::J, Vector::K, and Vector::ZERO to "const".
+	Created benchmarks to test optimizations to Vector.h normalize, and compound arithmetic operators. Finished these optimizations.
+	Added Vector.normSq() method.
+	Fixed the calculation error in MSD::magneticSusceptibility methods.
+	Minor optimization in MSD::specificHeat methods.
+	Changed XML version to 1.7.
+	Added "return ERRNO" to fix potential bug in metropolis.cpp when parsing cmd args and argv[3] or argv[4] where missing.
+
+5.5.0:
+(5-28-2021) Removed unused Dipolar coupling parameters.
+	Added Dzyaloshinskii-Moriya interaction (i.e. Skyrmions) parameters: DL, DR, Dm.
+	Modified MSD::setParameters and MSD::setLocalM to account for Dzyaloshinskii-Moriya interaction (i.e. Skyrmions).
+(6-1-2021) In magnetize.cpp:281 changed "if (B_inc == 0) {" to "if (B_inc <= 0) {" for infinite loop error check.
+	In magnetize2.cpp:244 changed "if (B_rate == 0) {" to "if (B_rate <= 0) {" for infinite loop error check (and updated error message).
+(6-10-2021) Updated MSD.h #define UDC_MSD_VERSION 5.5
+	Added D (Dzyaloshinskii-Moriya, i.e. Skyrmions) parameters to all apps: heat.cpp, iterate.cpp, magnetize.cpp, magnetize2.cpp, metropolis.cpp
+	Added msd.getSeed() output to CSV headed for remaining apps: heat.cpp, magnetize.cpp, magnetize2.cpp
+	Added more comments to parameter files: parameters-iterate.txt, parameters-metropolis.txt
+	Added new private fields and getters to MSD for nL, nR, n_m, n_mL, n_mR, nLR, FM_L_exists, FM_R_exists, mol_exists
+	Added checks in MSD::init to avoid potential edge case width, height, or depth == 0
+(6-11-2021) Experimental! Updated the various MSD::magneticSusceptibility and MSD::specificHeat methods to use a modified trapizoidal rule.
+	Also updated MSD::magneticSusceptibility and MSD::specificHeat methods to use new nL, nR, etc. fields instead of always using the global "n" like before.
+
+5.5.1:
+(7-5-2021) Added MS and MF "result" (i.e. output) variables to MSD.h.
+(7-11-2021) Updated tests/test-setLocalM.cpp with new variables: MS, MF
+	Added MS and MF outputs to all applications.
+	Added missing "=" (equals sign) after D (Dzyaloshinskii-Moriya, i.e. Skyrmions) parameters in heat, magnetize, and magnetize2
+	Fixed a bug/typo in metropolis:439 ("DmL_x", "DML_y", "DmL_z",) changed to ("DmL_x", "DmL_y", "DmL_z",)
+
+5.5.2:
+(7-18-2021) Replaced usage of std::map in MSD.h with a much simplier custom built data structure SparseArray.h
+	which is optimized for speed given our program's specific requirments.
+
+6.0.0:
+(Unknown date) Changed MSD::Parameters::sL, sR, sm -> SL, SR, Sm. Capitalized the 'S' to make consitant with MSD::Parameters::FL, FR, Fm. 
+(10-18-2021) Fixed bug in MSD::Parameters::operator== which wasn't checking new Je parameters correctly.
+(10-26-2021) Fixed alignment issue in iterate.csv output files where the "snapshot" was misaligned if the data wasn't long enough.
+	Changed default Jm=1 instead of 0 (zero) in MSD.h.
+(1-24-2022) Added MSD::set_kT() for optimization and used it in the "heat" app.
+(1-24-2022) Added mol_type=CIRCULAR support to all apps.
+
+6.1.0:
+(10-4-2022) Defined .mmt (MSD molecule text) and .mmb (MSD molecule binary) file formats.
+	These formats are used to store mol. prototypes for use in various apps.
+(10-4-2022) Create beta version of "mol-tool": a web app which lets users build custom molecules using a MSD_GUI
+	then outputs the .mmt file.
+(10-4-2022) Created a mmb-compiler to convert .mmt files to .mmb format.
+(10-4-2022) Added support to "iterate" app to use custom MolProto when given a .mmb file.
+(10-4-2022) Added code to MSD::MolProto for saving and loading .mmb files.
+	As well as an mmt.h header to parse .mmt files.
+(11-23-2022) Add MSD-export.cpp (extern "C" interface for MSD.h) and MSD.py (python binding of MSD.h).
+	Also updated build-all.bat to build MSD-export.dll from MSD-export.cpp which is required by MSD.py.
+
+6.2.0:
+(11-29-2022) Added Edge and Node iterators for the Molecule class.
+	Added this functionality to MSD-export.cpp and MSD.py as well.
+	Added Vector math to MSD-export.cpp and MSD.py.
+	Added E and PI global constants (for consistancy) to MSD-export.cpp and MSD.py.
+	Added support for MSD iterator in MSD-export.cpp and MSD.py.
+
+6.2.1:
+(11-30-2022) Fixed bug in MSD.py: MSD.getLocalM.
+	Removed DEBUG tests from MSD.py and moved them to src/tests/MSD-python-test.py
+	Added "lib/python" to .vscode/settings.json
+	Used Doxygen to generate documentation in the new "docs" folder.
+
+6.2.2:
+(12-1-2022) Updated mol-creator.js to better load dynamically changes to MMT saveBtn textarea.
+(12-2-2022) Updated mol-tool: Fixed resetGUI bug. Added clear button. Save button now saves mol to localStorage.
+(12-6-2022) Fixed bug in MSD-export.h where "C" randomize was calling "C++" reinitialize
+(12-7-2022) New documentation draft.
+	Restructured mol-tool, now called "mol-builder": .html file moved to ~, .css and .js files moved to ~/src, mol-tool folder deleted.
+	Created MSD-export.h.
+	Deleted some unused folders: ~/misc, ~/src/unfinished.
+(12-8-2022) Moved mmb_inspector.exe to new ~/dev-tools folder.
+(12-12-2022) Removed man page docs because of long file name issue with github. Can be rebuilt later if needed.
+
+6.2.3:
+(2-8-2023) Fixed bug in mmt_compiler.cpp: used find(".") instead of rfind(".") for automatic file name.
+
+6.2.4:
+(2-16-2023) Fixed potential bug/anti-pattern: MSD::getMolProto now returns a const reference instead of a copy
+	Added MMT output to CSV when using custom molecule
+	Added custom molecule support to heat, magnetize, and magnetize2
+(2-17-2023) Added custom molecule support to metropolis, the last of the apps. They all now support custom molecules via MMB files.
+
+6.2.5:
+(8-7-2023) Fixed bug in MSD::MSD(MolProto) constructor.
+	Also removed debug print() from MSD.py in Molecule._Node.next
+
+6.3.0:
+(2023) Introduced ~/MSD-builder.html (similar to mol-builder)
+(12-31-2023) Merged a fix made by Robert! (His first contribution.)
+	Made the "export" button work in new MSD-builer.html GUI.
+(1-2-2024) Created HTTP server in Java (com.sun.net.httpserver package) with CRUD operations
+	as well as the ability to run simulations, and query the results.
+(1-3-2024) Created JS functions/classes to use the server asynchronous.
+(1-4-2024) Bug fix in MSD.py:985. MSD.setMolParameters() msd_clib signature was set incorrectly
+	causing the method to be unusable.
+
+6.3.1:
+(1-09-2024) Merged a bug fix by Robert! Also included an import GUI feature,
+	and a run button for running a simple iterate simulation.
+(1-10-2024) Minor linting, refactoring, and debugging. Also, fixed bug involving
+	the loading of out-of-sync saved paramters.
+(1-11-2024) All parameters now save and load in the correct data type (hopefully.)
+(1-17-2024) Added /reset request to MSD Server.
+(1-24-2024) Added new MSDRegion views. Now dots and lines!
+(1-29-2024) Merged features from Robert! Included a load parameters file button,
+	and saves as CSV after run.
+(2-1-2024) Added basic realtime animations to the 3D MSD model.
+(2-2-2024) Added a basic timeline to GUI.
+(2-13-2024) Added lens selector to GUI.
+
+6.3.2:
+(5-10-2024) MSD-Builder2.html (GUI v2) is now working consistantly with GUI v1.
+(5-23-2024) Renamed MSD-Builder2 to MSD-Builder. Now have working workspaces!
+(5-24-2024) "Delete" button for workspaces now works.
+
+6.3.3:
+(8-8-2024) Omari identified bug in iterate.exe. Je1m and Jeem not set properly. Fixed.
+	Fixed GUI bug that defaulted FL=1. Changed to FL=0.
+
+TODO: Send C++ MSD version through MSD Server to Javascript.
+TODO: connect mol-builder and MSD-builder (maybe just links?)
+TODO: add bars on Three.js canvas showing current values of non-zero parameters,
+	and hide unused parameters from MSD-builder interface.
+TODO: Store results retrieved from server in JS for efficiency, and so further calculations like
+	magneticSusceptibility, specificHeat, and autocorrelation can be calculated in JS.
+TODO: (maybe?) add custom scripting support for advanced users to process data.
+TODO: Add a way to download data as CSV from the HTML/JS UI after simulation
+	and post-processing is done.
+
+TODO: Fix flux != 0 on mol. that are "turned off"
+TODO: (Potentially Very Hard) Compile-time optimize
+	MSD.setLocalM, MSD.setParameters, and MSD.setMolProto
+	so that they ignore parameters that are not used.
+TODO: MSR (Magnetic Spin Resonance)
+TODO: Consider a way to save the state of an MSD including any PRNG state,
+	so that it can be stored to secondary storage and restored and resumed
+	at a later time.
+TODO: Could you create a meta program which when given an MSD geometry configuration, outputs
+	the ASM code required to implement the MSD interface methods? (MSD programming language?)
+	This way the underlying ASM could be branchless as much as possible.
+	You could use 0-spin bounardy conditions to assure all nodes have the same number of neighbors
+	for latice or periodic configurations. For arbitrary, non-periodic configurations,
+	either 0-padding neighbors, or some other method like chunking like regions into task could
+	be used to eliminate or optimize away some of the need for branching structures like "if" and loops.
+	Remember to leverage persistant registars, caching, and AVX.
+	(Maybe each node could carry around its own custom recalculate total energy function for non-periodic graph systems.)

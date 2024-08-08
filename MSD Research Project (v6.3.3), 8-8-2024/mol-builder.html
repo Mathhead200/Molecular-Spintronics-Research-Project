@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title> MSD Molecual Prototype Creator </title>
+	<link rel="stylesheet" href="src/mol-builder.css">
+	<script src="src/mol-builder.js" defer></script>
+</head>
+<body>
+	<main>
+		<section id="mol-editor">
+			<h1> Molecual Builder </h1>
+			<form action="" onsubmit="event.preventDefault();">
+				Size: <input type="number" value="65" id="svgSize">
+				<input type="button" id="save" value="Save">
+				<input type="button" id="load" value="Load" disabled>
+				<input type="button" id="clear" value="Clear">
+			</form>
+			<svg id="mol-canvas" viewBox="-100 -100 200 200">
+				<rect x="80" y="-100" width="20" height="20" class="trash init"></rect>
+				<text x="83.5" y="-82.65" class="trash-text init">X</text>
+			</svg>
+		</section>
+		<section id="form">
+			(blank)
+		</section>
+	</main>
+	<aside>
+		<h1> Instructions </h1>
+		<p>
+			<u>Create Node</u>:
+			Click on a blank space in the canvas (above) to create a new node.
+			<br><br>
+
+			<u>Create Edge</u>:
+			Drag from source node to destination node to create a edge between them.
+			(For non-communative effects like Dm where direction matters,
+			the direction of the edge is from source to destination.)
+			<br><br>
+			
+			<u>Modify Node or Edge Parameters</u>:
+			Select a node or edge by clicking on it. The current parameters will be displayed aside
+			(or below) the canvas in the "form" section. These parameters can be modified
+			by editing the fields in the form. The new values will be immediately saved and applied.
+			<br><br>
+			
+			<u>Delete Node</u>:
+			Drag node to the red "X", then drop.
+			<br><br>
+			
+			<u>Delete Edge</u>:
+			Ctrl-click on an edge to delete it.
+			Note: edges will automatically be deleted if one of their attached nodes is deleted.
+			<br><br>
+			
+			<u>Move Node</u>:
+			You can move the location of a node, by dragging it to an unoccupied location.
+			Note: moving a node, will also move its edges appropriately.
+			<br><br>
+
+			<u>Save Molecule</u>:
+			Pressing the save button (found above the canvas) saves the current molecule configuration
+			to the browser's local storage. If you refreash, or close and reopen the mol-builder,
+			the last saved configureation will be loaded automatically. Any previously saved molecule
+			in local storage will be overwritten. (This does not include previously downloaded .mmt files.
+			These will still be on your computer.)
+			<br>
+			&emsp;&emsp;Moreover, the MMT (MSD Molecule Text) area will appear aside
+			(or below) the canvas in the "form" section. If the MMT area is modified, the molecule
+			will change dynamically; <i>however</i>, these changes are <i>not</i> saved unless the save button to
+			pressed again.
+			<br><br>
+
+			<u>Download Molecule</u>: You must first save the molecule.
+			After saving, a dowload link will be displayed below the MMT area.
+			Clicking the download line saved the current MMT text to a .mmt file
+			on your computer. Once downloaded, this file is not affected by any changes to the MMT area.
+			<br><br>
+
+			<u>Clear Molecule</u>: Pressing the clear button will clear the molecule.
+			The previously saved molecule will still be saved until overwritten.
+		</p>
+	</aside>
+</body>
+</html>

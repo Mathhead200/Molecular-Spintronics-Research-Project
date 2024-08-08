@@ -1,0 +1,36 @@
+out\metropolis, 12-15-2022, 1.xml
+kT
+JmL
+JmR
+M_x
+M_y
+M_z
+ML_x
+ML_y
+ML_z
+MR_x
+MR_y
+MR_z
+Mm_x
+Mm_y
+Mm_z
+U
+UL
+UR
+UmL
+UmR
+ULR
+c
+cL
+cR
+cmL
+cmR
+cLR
+x
+xL
+xR
+xm
+
+kT = 0.1
+
+out\metropolis, 12-15-2022, 1 - extract_kT=0.1.csv
