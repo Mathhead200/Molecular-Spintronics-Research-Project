@@ -260,6 +260,16 @@ struct {{
 }} result, record[RECORD_LENGTH];
 
 /**
+ * @return A random unsigned 64-bit integer between 0 (inclusive) and limit (exclusive)
+ * 	with a uniform distribution. If limit is 0, any possible uint64 can be returned.
+ */
+size_t randIndex(size_t limit) {{
+	__asm {{
+		movq rax, 0  ; TODO: stub. return 0
+	}}
+}}
+
+/**
  * @param norm - The norm of the random vector.
  * 	This parameter will be stored in the rax register. 
  * @return A random vector in R^3 with the given norm.
@@ -267,29 +277,58 @@ struct {{
  */
 __m256d randVector(double norm) {{
 	__asm {{
-								; -- TODO: generate a random unit vector, ymm0
-		vxops ymm0, ymm0, ymm0   ; (stub) clear (double * 4) ymm1
-		movq rdx, 1              ; (stub) set ymm0 to <1, 0, 0, 0>
-		vmovq ymm0, rdx
-								; -- set ymm1 to <norm, norm, norm, norm>
-		vmovq ymm2, rax          ; set ymm2 to <norm, ?, ?, ?>
-		vbroadcastsd ymm1, ymm2  ; set ymm1 to <norm, norm, norm, norm>
+		; TODO: stub. return <norm, 0, 0, 0>
 
-		vmulpd ymm0, ymm0, ymm1  ; ymm0 = ymm0 * ymm1
+								      ; -- TODO: generate a random unit vector, ymm0
+		vxops ymm1, ymm1, ymm1        ; (stub) clear (double * 4) ymm1
+		movq rax, 0x3FF0000000000000  ; (stub) set rax = 1.0
+		vmovq ymm1, rax               ; (stub) set ymm1 = <1.0, 0, 0, 0>
+
+		vbroadcastsd ymm0, xmm0       ; set ymm0 to <norm, norm, norm, norm>
+		vmulpd ymm0, ymm0, ymm1       ; ymm0 = ymm0 * ymm1
 	}}
 }}
 
 int main() {{
 	__ asm {{
-		movq rcx, {self.programParameters['n']}
+		push rbp
+		mov rbp, rsp
+		and rsp, -32  ; ensure stack pointer is aligned to a 32-byte boundary
+
+		movq r15, {self.programParameters['n']}  ; r15 (non-volatile) = n
 		L:
-		cmp rcx, 0   ; while n (rcx) != 0
+		cmp r15, 0      ; while n (r15) != 0
 		jz END
-		movq rax, 0  ; TODO: pick random uint64 between 0 (inclusive) and len(self.mutableNodes) (exclusive)
-		
-		dec rcx      ; n--
+
+		; get random index and store into rsi
+		movq rcx, {len(self.mutableNodes)}
+		call randIndex  ; pick random uint64 between 0 (inclusive) and len(self.mutableNodes) (exclusive)
+		movq rsi, rax   ; rsi (non-volatile) = randIndex, i
+
+		; pick random vector value, s'[i] and store onto the stack
+"""
+		if "S" in localNodeParameterKeys:
+			src += """
+		; TODO, unimplemented: Need to load double, nodes[i].S from nodes array into xmm0
+		movq rax, 0      ; (stub)
+		vmovq xmm0, rax  ; (stub)
+"""
+		else:
+			src += """
+		movq rax, 0x3FF0000000000000
+		vmovq xmm0, rax
+"""
+		src += f"""
+		call randVector
+		sub rsp, 32  ; space for a 256-bit vector
+		vmovapd [rsp], ymm0
+
+		; TODO: continue here! ...
+
+		add rsp, 32     ; remove 256-bit vector from stack
+		dec r15         ; n--
 		jmp L
-		END:         ; end while
+		END:            ; end while
 		
 		; TODO ...
 	}}
