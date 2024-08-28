@@ -1,4 +1,4 @@
-from typing import Generic, Iterable, Optional, Self, TypedDict, TypeVar
+from typing import Callable, Generic, Iterable, Optional, Self, TypedDict, TypeVar
 from datetime import datetime
 
 # metropolis algorithm:
@@ -93,9 +93,13 @@ class _Model(Generic[Index, Region], TypedDict, total=False):
 
 	programParameters: ProgramParameters
 
+	getNodeIdentifier: Callable[[Node], str]
+
 class Model:
 	def __init__(self, **kw):
 		self.__dict__ = _Model(*kw)
+		if self.getNodeIdentifier is None:
+			self.getNodeIdentifier = lambda node: str(node)
 
 	def __repr__(self) -> str:
 		return str(self.__dict__)
@@ -252,6 +256,16 @@ class Model:
 			localEdgeParameterKeys |= edgeParameters.keys()
 		src += "/* TODO: ... edges[EDGE_COUNT] = ...; */\n\n" # TODO: stub
 		
+		# TODO: U' functions
+		for node in self.mutableNodes:
+			src += f"""double energy_{self.getNodeIdentifier(node)}(__m256d spin) {{
+	__asm {{
+		mov xmm0, 0  ; TODO: stub
+	}}
+}}\n\n"""
+		#TODO: output array of function pointers for each node energy function
+		src += f"""/* TODO: array of energy_* function pointers for each node */\n\n"""
+
 		src += f"""// ---- Results ----
 struct {{
 	uint64_t t;
@@ -315,7 +329,7 @@ int main() {{
 """
 		else:
 			src += """
-		movq rax, 0x3FF0000000000000
+		movq rax, 0x3FF0000000000000  ; rax = (double) 1.0
 		vmovq xmm0, rax
 """
 		src += f"""
@@ -324,6 +338,7 @@ int main() {{
 		vmovapd [rsp], ymm0
 
 		; TODO: continue here! ...
+		; 	Calculate deltaU based on random index, i, and random spin, s[i]
 
 		add rsp, 32     ; remove 256-bit vector from stack
 		dec r15         ; n--
