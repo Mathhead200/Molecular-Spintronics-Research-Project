@@ -1048,6 +1048,9 @@ class MSDView extends Group {
 
 	/**
 	 * @public
+	 * @brief Updates this view's UI to represent the given (or current) state under the given (or current) lens.
+	 * 	(optional) If a new state or lens is provided, the current state or lens property of this view will update.
+	 * 	Otherwise, the current state or lens will be used.
 	 * @param {Object} state Object containing the current MSD record state you wish to view. 
 	 * @param {String?} lens (optional) Which "lens" you want to view state through.
 	 */
