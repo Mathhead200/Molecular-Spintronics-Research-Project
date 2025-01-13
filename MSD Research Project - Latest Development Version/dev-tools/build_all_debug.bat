@@ -16,6 +16,7 @@
 @cl /EHsc /Z7 /Fe"bin/heat.exe" src/heat.cpp
 @cl /EHsc /Z7 /Fe"bin/magnetize.exe" src/magnetize.cpp
 @cl /EHsc /Z7 /Fe"bin/magnetize2.exe" src/magnetize2.cpp
+@cl /EHsc /Z7 /Fe"bin/msr_basic.exe" src/msr_basic.cpp
 @cl /EHsc /Z7 /Fe"bin/metropolis.exe" src/metropolis.cpp
 @cl /EHsc /Z7 /Fe"bin/extract.exe" src/extract.cpp
 @cl /EHsc /Z7 /Fe"bin/mfm_aggregator.exe" src/mfm_aggregator.cpp
@@ -28,13 +29,14 @@
 @cl /EHsc /Z7 /Fe"bin/heat_x86.exe" src/heat.cpp
 @cl /EHsc /Z7 /Fe"bin/magnetize_x86.exe" src/magnetize.cpp
 @cl /EHsc /Z7 /Fe"bin/magnetize2_x86.exe" src/magnetize2.cpp
+@cl /EHsc /Z7 /Fe"bin/msr_basic_x86.exe" src/msr_basic.cpp
 @cl /EHsc /Z7 /Fe"bin/metropolis_x86.exe" src/metropolis.cpp
 @cl /EHsc /Z7 /Fe"bin/extract_x86.exe" src/extract.cpp
 @cl /EHsc /Z7 /Fe"bin/mfm_aggregator_x86.exe" src/mfm_aggregator.cpp
 
 
 @rem Remove .obj file
-@del iterate.obj heat.obj magnetize.obj magnetize2.obj metropolis.obj extract.obj mfm_aggregator.obj
+@del iterate.obj heat.obj magnetize.obj magnetize2.obj msr_basic.obj metropolis.obj extract.obj mfm_aggregator.obj
 
 
 @rem End of file

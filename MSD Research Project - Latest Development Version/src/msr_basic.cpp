@@ -191,9 +191,16 @@ int main(int argc, char *argv[]) {
 	else
 		msd.setMolParameters(p_node, p_edge);
 	
+	if( argc > 3 && string(argv[3]) != string("0") )
+		msd.randomize();
+	
+	bool repeat_dc = (argc > 4 && string(argv[4]) != string("0"));
+	string max_steps = repeat_dc ? "4" : "3";
+	
 	try {
 		//print info/headings
-		file << "B_x,B_y,B_z,B_norm,,"
+		file << "t,,"
+				"B_x,B_y,B_z,B_norm,,"
 				"M_x,M_y,M_z,M_norm,M_theta,M_phi,,"
 				"ML_x,ML_y,ML_z,ML_norm,ML_theta,ML_phi,,"
 				"MR_x,MR_y,MR_z,MR_norm,MR_theta,MR_phi,,"
@@ -274,12 +281,14 @@ int main(int argc, char *argv[]) {
 			 << '\n';
 
 		// define some lambda functions
-		auto recordResults = [&]() {
-			cout << "B_ac = " << B_ac << "; |B_ac| = " << B_ac.norm() << '\n';
+		auto recordResults = [&](const MSD::Results &r) {
+			Vector B = msd.getParameters().B;
+			Vector B1 = msd.getParameters().B - B_dc;
+			cout << "t = " << r.t << "; B_ac = " << B1 << "; |B_ac| = " << B1.norm() << '\n';
 			cout << "Saving data...\n";
 			
-			MSD::Results r = msd.getResults();
-			file << p.B.x  << ',' << p.B.y  << ',' << p.B.z  << ',' << p.B.norm()  << ",,"
+			file << r.t << ",,"
+				 << B.x  << ',' << B.y  << ',' << B.z  << ',' << B.norm()  << ",,"
 				 << r.M.x  << ',' << r.M.y  << ',' << r.M.z  << ',' << r.M.norm()  << ',' << r.M.theta()  << ',' << r.M.phi()  << ",,"
 				 << r.ML.x << ',' << r.ML.y << ',' << r.ML.z << ',' << r.ML.norm() << ',' << r.ML.theta() << ',' << r.ML.phi() << ",,"
 				 << r.MR.x << ',' << r.MR.y << ',' << r.MR.z << ',' << r.MR.norm() << ',' << r.MR.theta() << ',' << r.MR.phi() << ",,"
@@ -295,14 +304,38 @@ int main(int argc, char *argv[]) {
 				 << r.U << ',' << r.UL << ',' << r.UR << ',' << r.Um << ',' << r.UmL << ',' << r.UmR << ',' << r.ULR << '\n';
 		};
 		
-		// run simulation
-		// TODO: 1. run t_eq
-		//       2. run t_dc (ac field off)
-		//       3. run simCount (ac field on)
-		//       4. run t_dc (ac filed off again)
-		// Record results every "freq" except during step 1 (t_eq)
-		
-		
+		// [run simulation]
+		// 1. run t_eq
+		cout << "Starting simulation...\n";
+		cout << "(Step " << "1" << " of " << max_steps << ") Equilibrate...\n";
+		msd.metropolis(t_eq);
+		recordResults(msd.getResults());
+
+		// 2. run t_dc (ac field off)
+		cout << "(Step " << "2" << " of " << max_steps << ") DC field only...\n";
+		msd.metropolis(t_dc, freq);
+		for (auto & r : msd.record)
+			recordResults(r);
+		msd.record.clear();
+
+		// 3. run simCount (ac field on)
+		cout << "(Step " << "3" << " of " << max_steps << ") AC field...\n";
+		for (unsigned long long t = 0; t < simCount; t++) {
+			if (t % freq == 0)
+				recordResults(msd.getResults());
+			msd.setB(B_dc + B_ac * sin(B_ac_freq * t));
+			msd.metropolis(1);
+		}
+		recordResults(msd.getResults());
+
+		// 4. run t_dc (ac filed off again)
+		if (repeat_dc) {
+			cout << "(Step " << "4" << " of " << max_steps << ") DC field only...\n";
+			msd.metropolis(t_dc, freq);
+			for (auto & r : msd.record)
+				recordResults(r);
+		}
+
 	} catch(ios::failure &e) {
 		cerr << "Couldn't write to output file \"" << argv[1] << "\": " << e.what() << '\n';
 		return 3;
