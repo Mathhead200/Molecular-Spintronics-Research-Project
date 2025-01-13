@@ -2,9 +2,9 @@
  * @file msr_basic.cpp
  * @author Christopher D'Angelo
  * @brief App used for simulating magnetic spin resonance with a constant AC field.
- * @date 2024-12-21
+ * @date 2025-01-13
  * 
- * @copyright Copyright (c) 2024
+ * @copyright Copyright (c) 2025
  */
 
 #include <cmath>
@@ -275,7 +275,7 @@ int main(int argc, char *argv[]) {
 
 		// define some lambda functions
 		auto recordResults = [&]() {
-			cout << "B = " << p.B << "; |B| = " << p.B.norm() << '\n';
+			cout << "B_ac = " << B_ac << "; |B_ac| = " << B_ac.norm() << '\n';
 			cout << "Saving data...\n";
 			
 			MSD::Results r = msd.getResults();
@@ -301,6 +301,7 @@ int main(int argc, char *argv[]) {
 		//       3. run simCount (ac field on)
 		//       4. run t_dc (ac filed off again)
 		// Record results every "freq" except during step 1 (t_eq)
+		
 		
 	} catch(ios::failure &e) {
 		cerr << "Couldn't write to output file \"" << argv[1] << "\": " << e.what() << '\n';
