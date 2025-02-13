@@ -16,7 +16,7 @@
 @cl /EHsc /Fe"bin/heat.exe" src/heat.cpp
 @cl /EHsc /Fe"bin/magnetize.exe" src/magnetize.cpp
 @cl /EHsc /Fe"bin/magnetize2.exe" src/magnetize2.cpp
-@cl /EHsc /Fe"bin/msr_basic.exe" src/msr_basic.cpp
+@cl /EHsc /Fe"bin/esr_basic.exe" src/esr_basic.cpp
 @cl /EHsc /Fe"bin/metropolis.exe" src/metropolis.cpp
 @cl /EHsc /Fe"bin/extract.exe" src/extract.cpp
 @cl /EHsc /Fe"bin/mfm_aggregator.exe" src/mfm_aggregator.cpp
@@ -31,7 +31,7 @@
 @cl /EHsc /Fe"bin/heat_x86.exe" src/heat.cpp
 @cl /EHsc /Fe"bin/magnetize_x86.exe" src/magnetize.cpp
 @cl /EHsc /Fe"bin/magnetize2_x86.exe" src/magnetize2.cpp
-@cl /EHsc /Fe"bin/msr_basic_x86.exe" src/msr_basic.cpp
+@cl /EHsc /Fe"bin/esr_basic_x86.exe" src/esr_basic.cpp
 @cl /EHsc /Fe"bin/metropolis_x86.exe" src/metropolis.cpp
 @cl /EHsc /Fe"bin/extract_x86.exe" src/extract.cpp
 @cl /EHsc /Fe"bin/mfm_aggregator_x86.exe" src/mfm_aggregator.cpp
@@ -39,7 +39,7 @@
 
 
 @rem Remove .obj, .exp, and .lib files
-@del iterate.obj heat.obj magnetize.obj magnetize2.obj msr_basic.obj metropolis.obj extract.obj mfm_aggregator.obj MSD-export.obj mmt_compiler.obj mmb_inspector.obj
+@del iterate.obj heat.obj magnetize.obj magnetize2.obj esr_basic.obj metropolis.obj extract.obj mfm_aggregator.obj MSD-export.obj mmt_compiler.obj mmb_inspector.obj
 @del lib\python\MSD-export.exp lib\python\MSD-export.lib lib\python\MSD-export_x86.exp lib\python\MSD-export_x86.lib
 
 

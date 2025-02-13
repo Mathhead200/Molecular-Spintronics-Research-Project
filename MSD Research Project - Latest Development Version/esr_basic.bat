@@ -11,7 +11,7 @@
 @set repeat_dc=1
 @set mol_type=LINEAR
 
-@set out_head=msr_basic
+@set out_head=esr_basic
 
 
 
@@ -37,7 +37,7 @@
 :STAY
 
 @rem -- Find the next open file name
-@set prgm=msr_basic
+@set prgm=esr_basic
 @set id=0
 :INC_ID
 @set /a id=%id%+1
