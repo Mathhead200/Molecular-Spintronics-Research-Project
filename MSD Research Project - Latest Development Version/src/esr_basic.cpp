@@ -1,8 +1,8 @@
 /**
- * @file msr_basic.cpp
+ * @file esr_basic.cpp
  * @author Christopher D'Angelo
- * @brief App used for simulating magnetic spin resonance with a constant AC field.
- * @date 2025-01-13
+ * @brief App used for simulating electron spin resonance with a constant AC field.
+ * @date 2025-02-13
  * 
  * @copyright Copyright (c) 2025
  */
@@ -85,10 +85,11 @@ int main(int argc, char *argv[]) {
 	
 	//get parameters
 	unsigned int width, height, depth, molPosL, molPosR, topL, bottomL, frontR, backR;
-	unsigned long long t_eq, t_dc, simCount, freq; // freq: how often we record a reading
-	Vector B_dc;
-    Vector B_ac;
-	double B_ac_freq;
+	unsigned long long t_eq, record_freq; // record_freq: how often we record a reading
+	Vector B_dc_max;   // linear "sweep" from Vector::ZERO to B_dc_max
+	double B_dc_rate;  // dB_dc/dt (i.e., delta B_dc per iteration)
+    Vector B_ac;       // constant: B_1 = B_ac * sin(2*PI * B_ac_freq * t)
+	double B_ac_freq;  // in cycles per iteration
     // double B_ac_freq_min, B_ac_freq_max, B_ac_freq_rate;
     // double B_ac_theta_init, B_ac_theta_rate;
     // double B_ac_phi_init, B_ac_phi_rate;
@@ -116,14 +117,13 @@ int main(int argc, char *argv[]) {
 		ask("> backR   = ", backR);
 		cout << '\n';
 		ask("> t_eq = ", t_eq);
-        ask("> t_dc = ", t_dc);
-		ask("> simCount = ", simCount);
-		ask("> freq = ", freq);
+		ask("> record_freq = ", record_freq);
 		cout << '\n';
 		ask("> kT = ", p.kT);
 		cout << '\n';
-		ask("> B_dc  = ", B_dc);
-		ask("> B_ac  = ", B_ac);
+		ask("> B_dc_max  = ", B_dc_max);
+		ask("> B_dc_freq = ", B_dc_rate);
+		ask("> B_ac      = ", B_ac);
 		ask("> B_ac_freq = ", B_ac_freq);
 		cout << '\n';
 		ask("> SL = ", p.SL);
@@ -184,7 +184,7 @@ int main(int argc, char *argv[]) {
 	//create MSD model
 	MSD msd(width, height, depth, molType, molPosL, molPosR, topL, bottomL, frontR, backR);
 	msd.flippingAlgorithm = arg2;
-	p.B = B_dc;  // start B_ac=0 at t=0
+	p.B = Vector::ZERO;  // start B_dc=0 and B_ac=0 at t=0
 	msd.setParameters(p);
 	if (usingMMB)
 		msd.setMolProto(molProto);
@@ -194,13 +194,11 @@ int main(int argc, char *argv[]) {
 	if( argc > 3 && string(argv[3]) != string("0") )
 		msd.randomize();
 	
-	bool repeat_dc = (argc > 4 && string(argv[4]) != string("0"));
-	string max_steps = repeat_dc ? "4" : "3";
-	
 	try {
 		//print info/headings
 		file << "t,,"
-				"B_x,B_y,B_z,B_norm,,"
+				"B0_x,B0_y,B0_z,B0_norm,B0_theta,B0_phi,,"
+				"B1_x,B_1y,B1_z,B1_norm,B1_theta,B1_phi,,"
 				"M_x,M_y,M_z,M_norm,M_theta,M_phi,,"
 				"ML_x,ML_y,ML_z,ML_norm,ML_theta,ML_phi,,"
 				"MR_x,MR_y,MR_z,MR_norm,MR_theta,MR_phi,,"
@@ -224,11 +222,10 @@ int main(int argc, char *argv[]) {
 			 << ",frontR = " << msd.getFrontR()
 			 << ",backR = " << msd.getBackR()
 			 << ",t_eq = " << t_eq
-			 << ",t_dc = "<< t_dc
-			 << ",simCount = " << simCount
-			 << ",freq = " << freq
+			 << ",record_freq = " << record_freq
 			 << ",kT = " << p.kT
-			 << ",B_dc = " << B_dc
+			 << ",B_dc_max = " << B_dc_max
+			 << ",B_dc_rate = " << B_dc_rate
 			 << ",B_ac = " << B_ac
 			 << ",B_ac_freq = " << B_ac_freq
 			 << ",SL = " << p.SL
@@ -275,20 +272,19 @@ int main(int argc, char *argv[]) {
 			 << ",\"DLR = " << p.DLR << '"'
 			 << ",molType = " << argv[5]
 			 << ",randomize = " << argv[3]
-			 << ",startWithMaxB = " << argv[4]
 			 << ",seed = " << msd.getSeed()
 			 << ",,msd_version = " << UDC_MSD_VERSION
 			 << '\n';
 
 		// define some lambda functions
-		auto recordResults = [&](const MSD::Results &r) {
-			Vector B = msd.getParameters().B;
-			Vector B1 = msd.getParameters().B - B_dc;
-			cout << "t = " << r.t << "; B_ac = " << B1 << "; |B_ac| = " << B1.norm() << '\n';
+		auto recordResults = [&](double t, const Vector &B0, const Vector &B1) {
+			MSD::Results r = msd.getResults();
+			cout << "t = " << t << "; |B0| = " << B0.norm() << "; B1 = " << B1 << '\n';
 			cout << "Saving data...\n";
 			
-			file << r.t << ",,"
-				 << B.x  << ',' << B.y  << ',' << B.z  << ',' << B.norm()  << ",,"
+			file << t << ",,"
+				 << B0.x << ',' << B0.y << ',' << B0.z << ',' << B0.norm() << B0.theta() << B0.phi() << ",,"
+				 << B1.x << ',' << B1.y << ',' << B1.z << ',' << B1.norm() << B1.theta() << B1.phi() << ",,"
 				 << r.M.x  << ',' << r.M.y  << ',' << r.M.z  << ',' << r.M.norm()  << ',' << r.M.theta()  << ',' << r.M.phi()  << ",,"
 				 << r.ML.x << ',' << r.ML.y << ',' << r.ML.z << ',' << r.ML.norm() << ',' << r.ML.theta() << ',' << r.ML.phi() << ",,"
 				 << r.MR.x << ',' << r.MR.y << ',' << r.MR.z << ',' << r.MR.norm() << ',' << r.MR.theta() << ',' << r.MR.phi() << ",,"
@@ -305,36 +301,34 @@ int main(int argc, char *argv[]) {
 		};
 		
 		// [run simulation]
-		// 1. run t_eq
+		// 1. run t_eq (dc off, ac off)
 		cout << "Starting simulation...\n";
-		cout << "(Step " << "1" << " of " << max_steps << ") Equilibrate...\n";
+		cout << "Equilibrate...\n";
 		msd.metropolis(t_eq);
-		recordResults(msd.getResults());
 
-		// 2. run t_dc (ac field off)
-		cout << "(Step " << "2" << " of " << max_steps << ") DC field only...\n";
-		msd.metropolis(t_dc, freq);
-		for (auto & r : msd.record)
-			recordResults(r);
-		msd.record.clear();
-
-		// 3. run simCount (ac field on)
-		cout << "(Step " << "3" << " of " << max_steps << ") AC field...\n";
-		for (unsigned long long t = 0; t < simCount; t++) {
-			if (t % freq == 0)
-				recordResults(msd.getResults());
-			msd.setB(B_dc + B_ac * sin(B_ac_freq * t));
+		// 2. run dc sweep (ac on)
+		cout << "DC sweep...\n";
+		const double maxSq = B_dc_max.normSq();
+		const Vector dB_dc = B_dc_rate / sqrt(maxSq) * B_dc_max;
+		Vector B0 = Vector::ZERO;
+		Vector B1 = Vector::ZERO;
+		long t = 0;
+		while (B0.normSq() < maxSq) {
+			// record?
+			if (t % record_freq == 0)
+				recordResults(t, B0, B1);
+			
+			// sim
+			msd.setB(B0 + B1);
 			msd.metropolis(1);
+			
+			// iterate 
+			t++;
+			B0 += dB_dc;
+			B1 = B_ac * sin(2*PI * B_ac_freq * t);
 		}
-		recordResults(msd.getResults());
-
-		// 4. run t_dc (ac filed off again)
-		if (repeat_dc) {
-			cout << "(Step " << "4" << " of " << max_steps << ") DC field only...\n";
-			msd.metropolis(t_dc, freq);
-			for (auto & r : msd.record)
-				recordResults(r);
-		}
+		msd.metropolis(1);
+		recordResults(t, B0, B1);
 
 	} catch(ios::failure &e) {
 		cerr << "Couldn't write to output file \"" << argv[1] << "\": " << e.what() << '\n';

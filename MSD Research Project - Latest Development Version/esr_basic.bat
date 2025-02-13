@@ -8,7 +8,6 @@
 @rem // ---- Edit Here ----
 @set model=CONTINUOUS_SPIN_MODEL
 @set randomize=1
-@set repeat_dc=1
 @set mol_type=LINEAR
 
 @set out_head=esr_basic
@@ -49,7 +48,7 @@
 @date /t
 @time /t
 @echo ----------------------------------------
-bin\%prgm% %out_file% %model% %randomize% %repeat_dc% %mol_type%
+bin\%prgm% %out_file% %model% %randomize% 0 %mol_type%
 @echo ----------------------------------------
 @date /t
 @time /t
