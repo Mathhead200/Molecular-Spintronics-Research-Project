@@ -28,7 +28,7 @@ backR   = 6
 
 
 # Tempurature
-kT = 1.0
+kT = 0.1
 
 # External Magnetic Field
 B = 0 0 0

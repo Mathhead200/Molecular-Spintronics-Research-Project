@@ -212,9 +212,14 @@ Second bug fix. In MSD::setParameters()
 (8-8-2024) Omari identified bug in iterate.exe. Je1m and Jeem not set properly. Fixed.
 	Fixed GUI bug that defaulted FL=1. Changed to FL=0.
 
+------------------------------------ TODOs ------------------------------------
+[Apps]
 TODO: Built esr_basic application.
 
+[GUI, Backend]
 TODO: Send C++ MSD version through MSD Server to Javascript.
+
+[GUI, Frontend]
 TODO: connect mol-builder and MSD-builder (maybe just links?)
 TODO: add bars on Three.js canvas showing current values of non-zero parameters,
 	and hide unused parameters from MSD-builder interface.
@@ -224,6 +229,7 @@ TODO: (maybe?) add custom scripting support for advanced users to process data.
 TODO: Add a way to download data as CSV from the HTML/JS UI after simulation
 	and post-processing is done.
 
+[MSD core model]
 TODO: Fix flux != 0 on mol. that are "turned off"
 TODO: (Potentially Very Hard) Compile-time optimize
 	MSD.setLocalM, MSD.setParameters, and MSD.setMolProto
