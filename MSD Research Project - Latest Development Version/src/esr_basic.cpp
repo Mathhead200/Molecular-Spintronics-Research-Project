@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
 		ask("> kT = ", p.kT);
 		cout << '\n';
 		ask("> B_dc_max  = ", B_dc_max);
-		ask("> B_dc_freq = ", B_dc_rate);
+		ask("> B_dc_rate = ", B_dc_rate);
 		ask("> B_ac      = ", B_ac);
 		ask("> B_ac_freq = ", B_ac_freq);
 		cout << '\n';
@@ -283,8 +283,8 @@ int main(int argc, char *argv[]) {
 			cout << "Saving data...\n";
 			
 			file << t << ",,"
-				 << B0.x << ',' << B0.y << ',' << B0.z << ',' << B0.norm() << B0.theta() << B0.phi() << ",,"
-				 << B1.x << ',' << B1.y << ',' << B1.z << ',' << B1.norm() << B1.theta() << B1.phi() << ",,"
+				 << B0.x << ',' << B0.y << ',' << B0.z << ',' << B0.norm() << ',' << B0.theta() << ',' << B0.phi() << ",,"
+				 << B1.x << ',' << B1.y << ',' << B1.z << ',' << B1.norm() << ',' << B1.theta() << ',' << B1.phi() << ",,"
 				 << r.M.x  << ',' << r.M.y  << ',' << r.M.z  << ',' << r.M.norm()  << ',' << r.M.theta()  << ',' << r.M.phi()  << ",,"
 				 << r.ML.x << ',' << r.ML.y << ',' << r.ML.z << ',' << r.ML.norm() << ',' << r.ML.theta() << ',' << r.ML.phi() << ",,"
 				 << r.MR.x << ',' << r.MR.y << ',' << r.MR.z << ',' << r.MR.norm() << ',' << r.MR.theta() << ',' << r.MR.phi() << ",,"

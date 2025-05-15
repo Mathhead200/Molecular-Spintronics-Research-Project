@@ -9,10 +9,11 @@ Mising Features:
 	** Create ability to add post-processing graph that look at the full list of open simulations.
 
 UI/UX fixes:
-* We noticed a problem with the view methods currently being used and the output data.
-	Try to reproduce and fix this issue.
 * Input fields should auto-highlight on focus so they can be easily modifed.
 * Save pane size and camera position on refreash.
-* Change UI for show/hide parameters & timeline.
+
 * File name for "Download CSV" output is wrong.
+* We noticed a problem with the view methods currently being used and the output data.
+	Try to reproduce and fix this issue.
+* Change UI for show/hide parameters & timeline.
 * Custom colors for regions and match them with parameters pane.

@@ -212,9 +212,14 @@ Second bug fix. In MSD::setParameters()
 (8-8-2024) Omari identified bug in iterate.exe. Je1m and Jeem not set properly. Fixed.
 	Fixed GUI bug that defaulted FL=1. Changed to FL=0.
 
+6.3.4:
+(??) Built esr_basic application.
+(4-27-2024) Fixed typo in mol-builder.html.
+
+
 ------------------------------------ TODOs ------------------------------------
 [Apps]
-TODO: Built esr_basic application.
+TODO: Finish esr_basic application.
 
 [GUI, Backend]
 TODO: Send C++ MSD version through MSD Server to Javascript.
