@@ -214,7 +214,8 @@ Second bug fix. In MSD::setParameters()
 
 6.3.4:
 (??) Built esr_basic application.
-(4-27-2024) Fixed typo in mol-builder.html.
+(4-27-2025) Fixed typo in mol-builder.html.
+(5-29-2025) Added B_rf ~ B2 into esr_basic application.
 
 
 ------------------------------------ TODOs ------------------------------------

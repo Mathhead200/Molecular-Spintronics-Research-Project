@@ -88,8 +88,11 @@ int main(int argc, char *argv[]) {
 	unsigned long long t_eq, record_freq; // record_freq: how often we record a reading
 	Vector B_dc_max;   // linear "sweep" from Vector::ZERO to B_dc_max
 	double B_dc_rate;  // dB_dc/dt (i.e., delta B_dc per iteration)
-    Vector B_ac;       // constant: B_1 = B_ac * sin(2*PI * B_ac_freq * t)
+    Vector B_ac;       // variable: B_1 = B_ac * sin(2*PI * B_ac_freq * t)
 	double B_ac_freq;  // in cycles per iteration
+	Vector B_rf;       // variable: B_2 = B_rf * sin(2*PI * (B_rf_frq * t + B_rf_phase))
+	double B_rf_freq;  // in cycles per iteration 
+	double B_rf_phase; // in cycles (e.g., 0.25 would be a quarter cycle out of phase with B_1, or cos instead of sin)
     // double B_ac_freq_min, B_ac_freq_max, B_ac_freq_rate;
     // double B_ac_theta_init, B_ac_theta_rate;
     // double B_ac_phi_init, B_ac_phi_rate;
@@ -125,6 +128,9 @@ int main(int argc, char *argv[]) {
 		ask("> B_dc_rate = ", B_dc_rate);
 		ask("> B_ac      = ", B_ac);
 		ask("> B_ac_freq = ", B_ac_freq);
+		ask("> B_rf      = ", B_rf);
+		ask("> B_rf_freq", B_rf_freq);
+		ask("> B_rf_phase", B_rf_phase);
 		cout << '\n';
 		ask("> SL = ", p.SL);
 		ask("> SR = ", p.SR);
@@ -184,7 +190,7 @@ int main(int argc, char *argv[]) {
 	//create MSD model
 	MSD msd(width, height, depth, molType, molPosL, molPosR, topL, bottomL, frontR, backR);
 	msd.flippingAlgorithm = arg2;
-	p.B = Vector::ZERO;  // start B_dc=0 and B_ac=0 at t=0
+	p.B = B_rf * sin(2*PI * B_rf_phase);  // start B_dc=0 and B_ac=0 at t=0, but B_rf~sin(2*PI*phase)
 	msd.setParameters(p);
 	if (usingMMB)
 		msd.setMolProto(molProto);
@@ -198,7 +204,9 @@ int main(int argc, char *argv[]) {
 		//print info/headings
 		file << "t,,"
 				"B0_x,B0_y,B0_z,B0_norm,B0_theta,B0_phi,,"
-				"B1_x,B_1y,B1_z,B1_norm,B1_theta,B1_phi,,"
+				"B1_x,B1_y,B1_z,B1_norm,B1_theta,B1_phi,,"
+				"B2_x,B2_y,B2_z,B2_norm,B2_theta,B2_phi,"
+				"B_x,B_y,B_z,B_norm,B_theta,B_phi,,"
 				"M_x,M_y,M_z,M_norm,M_theta,M_phi,,"
 				"ML_x,ML_y,ML_z,ML_norm,ML_theta,ML_phi,,"
 				"MR_x,MR_y,MR_z,MR_norm,MR_theta,MR_phi,,"
@@ -228,6 +236,9 @@ int main(int argc, char *argv[]) {
 			 << ",B_dc_rate = " << B_dc_rate
 			 << ",B_ac = " << B_ac
 			 << ",B_ac_freq = " << B_ac_freq
+			 << ",B_rf = " << B_rf
+			 << ",B_rf_freq = " << B_rf_freq
+			 << ",B_rf_phase = " << B_rf_phase
 			 << ",SL = " << p.SL
 			 << ",SR = " << p.SR;
 		if (!usingMMB)  file << ",Sm = " << p_node.Sm;
@@ -277,14 +288,16 @@ int main(int argc, char *argv[]) {
 			 << '\n';
 
 		// define some lambda functions
-		auto recordResults = [&](double t, const Vector &B0, const Vector &B1) {
+		auto recordResults = [&](double t, const Vector &B0, const Vector &B1, const Vector &B2, const Vector &B) {
 			MSD::Results r = msd.getResults();
-			cout << "t = " << t << "; |B0| = " << B0.norm() << "; B1 = " << B1 << '\n';
+			cout << "t = " << t << "; |B0| = " << B0.norm() << "; B1 = " << B1 << "; B2 =" << B2 << '\n';
 			cout << "Saving data...\n";
 			
 			file << t << ",,"
 				 << B0.x << ',' << B0.y << ',' << B0.z << ',' << B0.norm() << ',' << B0.theta() << ',' << B0.phi() << ",,"
 				 << B1.x << ',' << B1.y << ',' << B1.z << ',' << B1.norm() << ',' << B1.theta() << ',' << B1.phi() << ",,"
+				 << B2.x << ',' << B2.y << ',' << B2.z << ',' << B2.norm() << ',' << B2.theta() << ',' << B2.phi() << ",,"
+				 << B.x  << "," << B.y  << ',' << B.z  << ',' << B.norm()  << ',' << B.theta()  << ',' << B.phi()  << ',,'
 				 << r.M.x  << ',' << r.M.y  << ',' << r.M.z  << ',' << r.M.norm()  << ',' << r.M.theta()  << ',' << r.M.phi()  << ",,"
 				 << r.ML.x << ',' << r.ML.y << ',' << r.ML.z << ',' << r.ML.norm() << ',' << r.ML.theta() << ',' << r.ML.phi() << ",,"
 				 << r.MR.x << ',' << r.MR.y << ',' << r.MR.z << ',' << r.MR.norm() << ',' << r.MR.theta() << ',' << r.MR.phi() << ",,"
@@ -312,23 +325,26 @@ int main(int argc, char *argv[]) {
 		const Vector dB_dc = B_dc_rate / sqrt(maxSq) * B_dc_max;
 		Vector B0 = Vector::ZERO;
 		Vector B1 = Vector::ZERO;
+		Vector B2 = B_rf * sin(2*PI * B_rf_phase);
 		long t = 0;
 		while (B0.normSq() < maxSq) {
+			msd.setB(B0 + B1 + B2);
+
 			// record?
 			if (t % record_freq == 0)
-				recordResults(t, B0, B1);
+				recordResults(t, B0, B1, B2, msd.getParameters().B);
 			
 			// sim
-			msd.setB(B0 + B1);
 			msd.metropolis(1);
 			
 			// iterate 
 			t++;
 			B0 += dB_dc;
 			B1 = B_ac * sin(2*PI * B_ac_freq * t);
+			B2 = B_rf * sin(2*PI * (B_rf_freq * t + B_rf_phase));
 		}
 		msd.metropolis(1);
-		recordResults(t, B0, B1);
+		recordResults(t, B0, B1, B2, msd.getParameters().B);
 
 	} catch(ios::failure &e) {
 		cerr << "Couldn't write to output file \"" << argv[1] << "\": " << e.what() << '\n';
