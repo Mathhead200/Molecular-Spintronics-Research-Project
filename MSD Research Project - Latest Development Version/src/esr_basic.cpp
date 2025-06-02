@@ -124,13 +124,13 @@ int main(int argc, char *argv[]) {
 		cout << '\n';
 		ask("> kT = ", p.kT);
 		cout << '\n';
-		ask("> B_dc_max  = ", B_dc_max);
-		ask("> B_dc_rate = ", B_dc_rate);
-		ask("> B_ac      = ", B_ac);
-		ask("> B_ac_freq = ", B_ac_freq);
-		ask("> B_rf      = ", B_rf);
-		ask("> B_rf_freq", B_rf_freq);
-		ask("> B_rf_phase", B_rf_phase);
+		ask("> B_dc_max   = ", B_dc_max);
+		ask("> B_dc_rate  = ", B_dc_rate);
+		ask("> B_ac       = ", B_ac);
+		ask("> B_ac_freq  = ", B_ac_freq);
+		ask("> B_rf       = ", B_rf);
+		ask("> B_rf_freq  = ", B_rf_freq);
+		ask("> B_rf_phase = ", B_rf_phase);
 		cout << '\n';
 		ask("> SL = ", p.SL);
 		ask("> SR = ", p.SR);
@@ -205,7 +205,7 @@ int main(int argc, char *argv[]) {
 		file << "t,,"
 				"B0_x,B0_y,B0_z,B0_norm,B0_theta,B0_phi,,"
 				"B1_x,B1_y,B1_z,B1_norm,B1_theta,B1_phi,,"
-				"B2_x,B2_y,B2_z,B2_norm,B2_theta,B2_phi,"
+				"B2_x,B2_y,B2_z,B2_norm,B2_theta,B2_phi,,"
 				"B_x,B_y,B_z,B_norm,B_theta,B_phi,,"
 				"M_x,M_y,M_z,M_norm,M_theta,M_phi,,"
 				"ML_x,ML_y,ML_z,ML_norm,ML_theta,ML_phi,,"
