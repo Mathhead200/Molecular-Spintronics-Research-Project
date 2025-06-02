@@ -232,11 +232,11 @@ int main(int argc, char *argv[]) {
 			 << ",t_eq = " << t_eq
 			 << ",record_freq = " << record_freq
 			 << ",kT = " << p.kT
-			 << ",B_dc_max = " << B_dc_max
+			 << ",\"B_dc_max = " << B_dc_max << '"'
 			 << ",B_dc_rate = " << B_dc_rate
-			 << ",B_ac = " << B_ac
+			 << ",\"B_ac = " << B_ac << '"'
 			 << ",B_ac_freq = " << B_ac_freq
-			 << ",B_rf = " << B_rf
+			 << ",\"B_rf = " << B_rf << '"'
 			 << ",B_rf_freq = " << B_rf_freq
 			 << ",B_rf_phase = " << B_rf_phase
 			 << ",SL = " << p.SL
@@ -288,7 +288,7 @@ int main(int argc, char *argv[]) {
 			 << '\n';
 
 		// define some lambda functions
-		auto recordResults = [&](double t, const Vector &B0, const Vector &B1, const Vector &B2, const Vector &B) {
+		auto recordResults = [&](unsigned long long t, const Vector &B0, const Vector &B1, const Vector &B2, const Vector &B) {
 			MSD::Results r = msd.getResults();
 			cout << "t = " << t << "; |B0| = " << B0.norm() << "; B1 = " << B1 << "; B2 =" << B2 << '\n';
 			cout << "Saving data...\n";
@@ -297,7 +297,7 @@ int main(int argc, char *argv[]) {
 				 << B0.x << ',' << B0.y << ',' << B0.z << ',' << B0.norm() << ',' << B0.theta() << ',' << B0.phi() << ",,"
 				 << B1.x << ',' << B1.y << ',' << B1.z << ',' << B1.norm() << ',' << B1.theta() << ',' << B1.phi() << ",,"
 				 << B2.x << ',' << B2.y << ',' << B2.z << ',' << B2.norm() << ',' << B2.theta() << ',' << B2.phi() << ",,"
-				 << B.x  << "," << B.y  << ',' << B.z  << ',' << B.norm()  << ',' << B.theta()  << ',' << B.phi()  << ',,'
+				 << B.x  << "," << B.y  << ',' << B.z  << ',' << B.norm()  << ',' << B.theta()  << ',' << B.phi()  << ",,"
 				 << r.M.x  << ',' << r.M.y  << ',' << r.M.z  << ',' << r.M.norm()  << ',' << r.M.theta()  << ',' << r.M.phi()  << ",,"
 				 << r.ML.x << ',' << r.ML.y << ',' << r.ML.z << ',' << r.ML.norm() << ',' << r.ML.theta() << ',' << r.ML.phi() << ",,"
 				 << r.MR.x << ',' << r.MR.y << ',' << r.MR.z << ',' << r.MR.norm() << ',' << r.MR.theta() << ',' << r.MR.phi() << ",,"
@@ -326,7 +326,7 @@ int main(int argc, char *argv[]) {
 		Vector B0 = Vector::ZERO;
 		Vector B1 = Vector::ZERO;
 		Vector B2 = B_rf * sin(2*PI * B_rf_phase);
-		long t = 0;
+		unsigned long long t = 0;
 		while (B0.normSq() < maxSq) {
 			msd.setB(B0 + B1 + B2);
 
