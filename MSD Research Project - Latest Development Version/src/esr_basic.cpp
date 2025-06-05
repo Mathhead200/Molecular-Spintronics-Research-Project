@@ -288,8 +288,10 @@ int main(int argc, char *argv[]) {
 			 << '\n';
 
 		// define some lambda functions
-		auto recordResults = [&](unsigned long long t, const Vector &B0, const Vector &B1, const Vector &B2, const Vector &B) {
+		auto recordResults = [&](unsigned long long t, const Vector &B0, const Vector &B1, const Vector &B2) {
 			MSD::Results r = msd.getResults();
+			Vector B = msd.getParameters().B;
+
 			cout << "t = " << t << "; |B0| = " << B0.norm() << "; B1 = " << B1 << "; B2 =" << B2 << '\n';
 			cout << "Saving data...\n";
 			
@@ -323,17 +325,17 @@ int main(int argc, char *argv[]) {
 		cout << "DC sweep...\n";
 		const double maxSq = B_dc_max.normSq();
 		const Vector dB_dc = B_dc_rate / sqrt(maxSq) * B_dc_max;
+
 		Vector B0 = Vector::ZERO;
 		Vector B1 = Vector::ZERO;
 		Vector B2 = B_rf * sin(2*PI * B_rf_phase);
 		unsigned long long t = 0;
-		while (B0.normSq() < maxSq) {
-			msd.setB(B0 + B1 + B2);
+		
+		msd.setB(B0 + B1 + B2);
+		recordResults(t, B0, B1, B2);  // initial state
 
-			// record?
-			if (t % record_freq == 0)
-				recordResults(t, B0, B1, B2, msd.getParameters().B);
-			
+		bool rec = false;
+		while (B0.normSq() < maxSq) {
 			// sim
 			msd.metropolis(1);
 			
@@ -342,9 +344,14 @@ int main(int argc, char *argv[]) {
 			B0 += dB_dc;
 			B1 = B_ac * sin(2*PI * B_ac_freq * t);
 			B2 = B_rf * sin(2*PI * (B_rf_freq * t + B_rf_phase));
+			msd.setB(B0 + B1 + B2);
+
+			// record?
+			if (rec = (t % record_freq == 0))
+				recordResults(t, B0, B1, B2);
 		}
-		msd.metropolis(1);
-		recordResults(t, B0, B1, B2, msd.getParameters().B);
+		if (!rec)
+			recordResults(t, B0, B1, B2);  // last state
 
 	} catch(ios::failure &e) {
 		cerr << "Couldn't write to output file \"" << argv[1] << "\": " << e.what() << '\n';
