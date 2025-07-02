@@ -1,0 +1,335 @@
+\hypertarget{class_m_s_d_1_1_molecule}{}\doxysection{MSD.\+Molecule Class Reference}
+\label{class_m_s_d_1_1_molecule}\index{MSD.Molecule@{MSD.Molecule}}
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_m_s_d_1_1_molecule_1_1___edge}{\+\_\+\+Edge}}
+\begin{DoxyCompactList}\small\item\em Represents a specific molecule edge. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_m_s_d_1_1_molecule_1_1___edge_iterable}{\+\_\+\+Edge\+Iterable}}
+\begin{DoxyCompactList}\small\item\em Represents an iterable collection of molecule edges. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_m_s_d_1_1_molecule_1_1___node}{\+\_\+\+Node}}
+\begin{DoxyCompactList}\small\item\em Represents a specific molecule node. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_m_s_d_1_1_molecule_1_1___node_iterable}{\+\_\+\+Node\+Iterable}}
+\begin{DoxyCompactList}\small\item\em Represents an iterable collection of molecule nodes. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_m_s_d_1_1_molecule_1_1_edge_parameters}{Edge\+Parameters}}
+\item 
+class \mbox{\hyperlink{class_m_s_d_1_1_molecule_1_1_node_parameters}{Node\+Parameters}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_molecule_afe058d753c9db3cf0d5b68710869c48e}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self, \mbox{\hyperlink{class_m_s_d_1_1_molecule_aa5565c13a8bc8fb1ab4e3190639672c3}{node\+Count}}=None, node\+Params=None, c\+\_\+void\+\_\+p \+\_\+proto=None)
+\begin{DoxyCompactList}\small\item\em Construct a new \mbox{\hyperlink{class_m_s_d_1_1_molecule}{Molecule}} prototype. \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_molecule_a3a265d48e50c085a9c02bc554720f714}{\+\_\+\+\_\+del\+\_\+\+\_\+}} (self)
+\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_molecule_a8b91948a7e11bfb7907f5e4ce1f77942}{\+\_\+\+\_\+repr\+\_\+\+\_\+}} (self)
+\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_molecule_aca495492eb56f4ac07774051d5caa949}{serialize}} (self, bytearray buffer)
+\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_molecule_aef6e000452ee785068374cbc910dc31c}{deserialize}} (self, bytearray buffer)
+\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_molecule_a3f804682262be86400ed91f3c56023e0}{read}} (self, istream)
+\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_molecule_a742353dc64aba048c085f4fef60062da}{write}} (self, ostream)
+\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_molecule_adff64e13149dd50983f3e93b0d39a796}{load}} (istream)
+\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_molecule_aa0470ef8a539cdfca21c9e87e566b34b}{create\+Node}} (self, node\+Params=None)
+\begin{DoxyCompactList}\small\item\em Creates a new node in the molecule prototype, and returns its index. \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_molecule_a9dbce3502ebfffae2b66569da35f6f2d}{connect\+Nodes}} (self, nodeA, nodeB, edge\+Params=None)
+\begin{DoxyCompactList}\small\item\em Connects the two given nodes (by index), and returns an edge index of the newly constructed edge. \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_molecule_add79e5543465e6ed2ad5311e68ca58e6}{edge\+Index}} (self, nodeA, nodeB)
+\begin{DoxyCompactList}\small\item\em Search for and return the index of the edge connecting the given nodes if one exists, or \mbox{\hyperlink{class_m_s_d_1_1_molecule_ac8e2e8dea2f8727b28cbee51c3a101b9}{Molecule.\+NOT\+\_\+\+FOUND}} if one doesn\textquotesingle{}t. \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_molecule_a42fc3d70b1cbc86862d2c46b6df1ad23}{get\+Edge\+Parameters}} (self, index)
+\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_molecule_a22a49ce23970c6f2d947e8286c99e734}{set\+Edge\+Paramters}} (self, index, edge\+Params)
+\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_molecule_a881beff35e23665c6ecc475fa89ce59b}{get\+Node\+Parameters}} (self, index)
+\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_molecule_a7d57d7f96fbfdd62f979b3517f4c625c}{set\+Node\+Paramters}} (self, index, node\+Params)
+\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_molecule_aaa48726f43960f87a3b13f30321dea4b}{set\+All\+Parameters}} (self, node\+Params, edge\+Params)
+\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_molecule_a3a171b9340edf8212a9261b1126770e3}{get\+Adjacency\+List}} (self, node\+Index)
+\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_molecule_ac988912510219e64a5c1268f4c5327d8}{edges\+Unique}} (self)
+\begin{DoxyCompactList}\small\item\em Builds and returns a list of edges which contain uniqie edge\+Indexes. \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_molecule_a3c29c31f46b7c686aaed4e7e490afe16}{mmt}} (self)
+\begin{DoxyCompactList}\small\item\em MMT formated string. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_m_s_d_1_1_molecule_a45afbff05d423defc9129c9592654e00}{HEADER}} = c\+\_\+char\+\_\+p.\+in\+\_\+dll(\mbox{\hyperlink{namespace_m_s_d_a46a9adbfe86657baee2dde058b055f93}{msd\+\_\+clib}}, \char`\"{}HEADER\char`\"{})
+\item 
+\mbox{\hyperlink{class_m_s_d_1_1_molecule_a25db925faa84759a58ebedc6298cd7e4}{HEADER\+\_\+\+SIZE}} = c\+\_\+size\+\_\+t.\+in\+\_\+dll(\mbox{\hyperlink{namespace_m_s_d_a46a9adbfe86657baee2dde058b055f93}{msd\+\_\+clib}}, \char`\"{}HEADER\+\_\+\+SIZE\char`\"{})
+\item 
+\mbox{\hyperlink{class_m_s_d_1_1_molecule_ac8e2e8dea2f8727b28cbee51c3a101b9}{NOT\+\_\+\+FOUND}} = c\+\_\+uint.\+in\+\_\+dll(\mbox{\hyperlink{namespace_m_s_d_a46a9adbfe86657baee2dde058b055f93}{msd\+\_\+clib}}, \char`\"{}NOT\+\_\+\+FOUND\char`\"{})
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_m_s_d_1_1_molecule_ae017b17709a7e64589b710be7d36b927}{serialization\+Size}} = property(fget = lambda self\+: msd\+\_\+clib.\+serialization\+Size(self.\+\_\+proto))
+\item 
+\mbox{\hyperlink{class_m_s_d_1_1_molecule_aa5565c13a8bc8fb1ab4e3190639672c3}{node\+Count}} = property(fget = lambda self\+: msd\+\_\+clib.\+node\+Count(self.\+\_\+proto))
+\item 
+\mbox{\hyperlink{class_m_s_d_1_1_molecule_a3ac4b63ed6ca985618d31cdc9cdb3f00}{left\+Lead}}
+\item 
+\mbox{\hyperlink{class_m_s_d_1_1_molecule_a1f99fe9da8535f85ac7adafbeaf496a7}{right\+Lead}}
+\item 
+\mbox{\hyperlink{class_m_s_d_1_1_molecule_a6b394566de0788819f57564595779fc1}{leads}}
+\item 
+\mbox{\hyperlink{class_m_s_d_1_1_molecule_ac2da6ac139c0eaa0766e362d457be3a6}{nodes}} = property(fget = lambda self\+: \mbox{\hyperlink{class_m_s_d_1_1_molecule_1_1___node_iterable}{Molecule.\+\_\+\+Node\+Iterable}}(msd\+\_\+clib.\+create\+Nodes(self.\+\_\+proto)))
+\item 
+\mbox{\hyperlink{class_m_s_d_1_1_molecule_a9f39385fd994d8ed25c77703263e8a31}{edges}} = property(fget = lambda self\+: \mbox{\hyperlink{class_m_s_d_1_1_molecule_1_1___edge_iterable}{Molecule.\+\_\+\+Edge\+Iterable}}(msd\+\_\+clib.\+create\+Edges(self.\+\_\+proto)))
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{class_m_s_d_1_1_molecule_afe058d753c9db3cf0d5b68710869c48e}\label{class_m_s_d_1_1_molecule_afe058d753c9db3cf0d5b68710869c48e}} 
+\index{MSD.Molecule@{MSD.Molecule}!\_\_init\_\_@{\_\_init\_\_}}
+\index{\_\_init\_\_@{\_\_init\_\_}!MSD.Molecule@{MSD.Molecule}}
+\doxysubsubsection{\texorpdfstring{\_\_init\_\_()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def MSD.\+Molecule.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{node\+Count = {\ttfamily None},  }\item[{}]{node\+Params = {\ttfamily None},  }\item[{c\+\_\+void\+\_\+p }]{\+\_\+proto = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Construct a new \mbox{\hyperlink{class_m_s_d_1_1_molecule}{Molecule}} prototype. 
+
+An Optional node\+Count, and initial \mbox{\hyperlink{class_m_s_d_1_1_molecule_1_1_node_parameters}{Node\+Parameters}} can be given. If node\+Count is None, an empty prototype is created with no nodes, and no edges.
+
+Both the left and right leads are initialized to 0.
+
+Note\+: \+\_\+proto parameter is reserved for internal use only! \mbox{\Hypertarget{class_m_s_d_1_1_molecule_a3a265d48e50c085a9c02bc554720f714}\label{class_m_s_d_1_1_molecule_a3a265d48e50c085a9c02bc554720f714}} 
+\index{MSD.Molecule@{MSD.Molecule}!\_\_del\_\_@{\_\_del\_\_}}
+\index{\_\_del\_\_@{\_\_del\_\_}!MSD.Molecule@{MSD.Molecule}}
+\doxysubsubsection{\texorpdfstring{\_\_del\_\_()}{\_\_del\_\_()}}
+{\footnotesize\ttfamily def MSD.\+Molecule.\+\_\+\+\_\+del\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{class_m_s_d_1_1_molecule_a8b91948a7e11bfb7907f5e4ce1f77942}\label{class_m_s_d_1_1_molecule_a8b91948a7e11bfb7907f5e4ce1f77942}} 
+\index{MSD.Molecule@{MSD.Molecule}!\_\_repr\_\_@{\_\_repr\_\_}}
+\index{\_\_repr\_\_@{\_\_repr\_\_}!MSD.Molecule@{MSD.Molecule}}
+\doxysubsubsection{\texorpdfstring{\_\_repr\_\_()}{\_\_repr\_\_()}}
+{\footnotesize\ttfamily def MSD.\+Molecule.\+\_\+\+\_\+repr\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_molecule_a9dbce3502ebfffae2b66569da35f6f2d}\label{class_m_s_d_1_1_molecule_a9dbce3502ebfffae2b66569da35f6f2d}} 
+\index{MSD.Molecule@{MSD.Molecule}!connectNodes@{connectNodes}}
+\index{connectNodes@{connectNodes}!MSD.Molecule@{MSD.Molecule}}
+\doxysubsubsection{\texorpdfstring{connectNodes()}{connectNodes()}}
+{\footnotesize\ttfamily def MSD.\+Molecule.\+connect\+Nodes (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{nodeA,  }\item[{}]{nodeB,  }\item[{}]{edge\+Params = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Connects the two given nodes (by index), and returns an edge index of the newly constructed edge. 
+
+Optional \mbox{\hyperlink{class_m_s_d_1_1_molecule_1_1_edge_parameters}{Edge\+Parameters}} can be given.
+
+Note\+: this method does not check if the two nodes are already connected. It is possible to creates more then one edge connecting the same two nodes.
+
+If edge\+Param is None, this method the uses C++ defaults for node\+Params. This should have the same effect as using a default-\/constructed Python Node\+Parameter object. \mbox{\Hypertarget{class_m_s_d_1_1_molecule_aa0470ef8a539cdfca21c9e87e566b34b}\label{class_m_s_d_1_1_molecule_aa0470ef8a539cdfca21c9e87e566b34b}} 
+\index{MSD.Molecule@{MSD.Molecule}!createNode@{createNode}}
+\index{createNode@{createNode}!MSD.Molecule@{MSD.Molecule}}
+\doxysubsubsection{\texorpdfstring{createNode()}{createNode()}}
+{\footnotesize\ttfamily def MSD.\+Molecule.\+create\+Node (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{node\+Params = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Creates a new node in the molecule prototype, and returns its index. 
+
+Optional \mbox{\hyperlink{class_m_s_d_1_1_molecule_1_1_node_parameters}{Node\+Parameters}} can be given. Returns the new node\textquotesingle{}s index.
+
+If node\+Param is None, this method uses C++ defaults for node\+Params. This should have the same effect as using a default-\/constructed Python Node\+Parameter object. \mbox{\Hypertarget{class_m_s_d_1_1_molecule_aef6e000452ee785068374cbc910dc31c}\label{class_m_s_d_1_1_molecule_aef6e000452ee785068374cbc910dc31c}} 
+\index{MSD.Molecule@{MSD.Molecule}!deserialize@{deserialize}}
+\index{deserialize@{deserialize}!MSD.Molecule@{MSD.Molecule}}
+\doxysubsubsection{\texorpdfstring{deserialize()}{deserialize()}}
+{\footnotesize\ttfamily def MSD.\+Molecule.\+deserialize (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{bytearray}]{buffer }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_molecule_add79e5543465e6ed2ad5311e68ca58e6}\label{class_m_s_d_1_1_molecule_add79e5543465e6ed2ad5311e68ca58e6}} 
+\index{MSD.Molecule@{MSD.Molecule}!edgeIndex@{edgeIndex}}
+\index{edgeIndex@{edgeIndex}!MSD.Molecule@{MSD.Molecule}}
+\doxysubsubsection{\texorpdfstring{edgeIndex()}{edgeIndex()}}
+{\footnotesize\ttfamily def MSD.\+Molecule.\+edge\+Index (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{nodeA,  }\item[{}]{nodeB }\end{DoxyParamCaption})}
+
+
+
+Search for and return the index of the edge connecting the given nodes if one exists, or \mbox{\hyperlink{class_m_s_d_1_1_molecule_ac8e2e8dea2f8727b28cbee51c3a101b9}{Molecule.\+NOT\+\_\+\+FOUND}} if one doesn\textquotesingle{}t. 
+
+\mbox{\Hypertarget{class_m_s_d_1_1_molecule_ac988912510219e64a5c1268f4c5327d8}\label{class_m_s_d_1_1_molecule_ac988912510219e64a5c1268f4c5327d8}} 
+\index{MSD.Molecule@{MSD.Molecule}!edgesUnique@{edgesUnique}}
+\index{edgesUnique@{edgesUnique}!MSD.Molecule@{MSD.Molecule}}
+\doxysubsubsection{\texorpdfstring{edgesUnique()}{edgesUnique()}}
+{\footnotesize\ttfamily def MSD.\+Molecule.\+edges\+Unique (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Builds and returns a list of edges which contain uniqie edge\+Indexes. 
+
+Useful since edges are directional and edges between two different nodes will be duplicated.
+
+The elements of the list will be \mbox{\hyperlink{class_m_s_d_1_1_molecule_1_1___edge}{Molecule.\+\_\+\+Edge}} objects, which are themselves iterable. But iterating on these objects will return \char`\"{}duplicated\char`\"{} edges (edges with the same edge\+Index) from the underlying \mbox{\hyperlink{class_m_s_d_1_1_molecule_1_1___edge_iterable}{Molecule.\+\_\+\+Edge\+Iterable}}. \mbox{\Hypertarget{class_m_s_d_1_1_molecule_a3a171b9340edf8212a9261b1126770e3}\label{class_m_s_d_1_1_molecule_a3a171b9340edf8212a9261b1126770e3}} 
+\index{MSD.Molecule@{MSD.Molecule}!getAdjacencyList@{getAdjacencyList}}
+\index{getAdjacencyList@{getAdjacencyList}!MSD.Molecule@{MSD.Molecule}}
+\doxysubsubsection{\texorpdfstring{getAdjacencyList()}{getAdjacencyList()}}
+{\footnotesize\ttfamily def MSD.\+Molecule.\+get\+Adjacency\+List (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{node\+Index }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_molecule_a42fc3d70b1cbc86862d2c46b6df1ad23}\label{class_m_s_d_1_1_molecule_a42fc3d70b1cbc86862d2c46b6df1ad23}} 
+\index{MSD.Molecule@{MSD.Molecule}!getEdgeParameters@{getEdgeParameters}}
+\index{getEdgeParameters@{getEdgeParameters}!MSD.Molecule@{MSD.Molecule}}
+\doxysubsubsection{\texorpdfstring{getEdgeParameters()}{getEdgeParameters()}}
+{\footnotesize\ttfamily def MSD.\+Molecule.\+get\+Edge\+Parameters (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{index }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_molecule_a881beff35e23665c6ecc475fa89ce59b}\label{class_m_s_d_1_1_molecule_a881beff35e23665c6ecc475fa89ce59b}} 
+\index{MSD.Molecule@{MSD.Molecule}!getNodeParameters@{getNodeParameters}}
+\index{getNodeParameters@{getNodeParameters}!MSD.Molecule@{MSD.Molecule}}
+\doxysubsubsection{\texorpdfstring{getNodeParameters()}{getNodeParameters()}}
+{\footnotesize\ttfamily def MSD.\+Molecule.\+get\+Node\+Parameters (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{index }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_molecule_adff64e13149dd50983f3e93b0d39a796}\label{class_m_s_d_1_1_molecule_adff64e13149dd50983f3e93b0d39a796}} 
+\index{MSD.Molecule@{MSD.Molecule}!load@{load}}
+\index{load@{load}!MSD.Molecule@{MSD.Molecule}}
+\doxysubsubsection{\texorpdfstring{load()}{load()}}
+{\footnotesize\ttfamily def MSD.\+Molecule.\+load (\begin{DoxyParamCaption}\item[{}]{istream }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_molecule_a3c29c31f46b7c686aaed4e7e490afe16}\label{class_m_s_d_1_1_molecule_a3c29c31f46b7c686aaed4e7e490afe16}} 
+\index{MSD.Molecule@{MSD.Molecule}!mmt@{mmt}}
+\index{mmt@{mmt}!MSD.Molecule@{MSD.Molecule}}
+\doxysubsubsection{\texorpdfstring{mmt()}{mmt()}}
+{\footnotesize\ttfamily def MSD.\+Molecule.\+mmt (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+MMT formated string. 
+
+\mbox{\Hypertarget{class_m_s_d_1_1_molecule_a3f804682262be86400ed91f3c56023e0}\label{class_m_s_d_1_1_molecule_a3f804682262be86400ed91f3c56023e0}} 
+\index{MSD.Molecule@{MSD.Molecule}!read@{read}}
+\index{read@{read}!MSD.Molecule@{MSD.Molecule}}
+\doxysubsubsection{\texorpdfstring{read()}{read()}}
+{\footnotesize\ttfamily def MSD.\+Molecule.\+read (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{istream }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_molecule_aca495492eb56f4ac07774051d5caa949}\label{class_m_s_d_1_1_molecule_aca495492eb56f4ac07774051d5caa949}} 
+\index{MSD.Molecule@{MSD.Molecule}!serialize@{serialize}}
+\index{serialize@{serialize}!MSD.Molecule@{MSD.Molecule}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}}
+{\footnotesize\ttfamily def MSD.\+Molecule.\+serialize (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{bytearray}]{buffer }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_molecule_aaa48726f43960f87a3b13f30321dea4b}\label{class_m_s_d_1_1_molecule_aaa48726f43960f87a3b13f30321dea4b}} 
+\index{MSD.Molecule@{MSD.Molecule}!setAllParameters@{setAllParameters}}
+\index{setAllParameters@{setAllParameters}!MSD.Molecule@{MSD.Molecule}}
+\doxysubsubsection{\texorpdfstring{setAllParameters()}{setAllParameters()}}
+{\footnotesize\ttfamily def MSD.\+Molecule.\+set\+All\+Parameters (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{node\+Params,  }\item[{}]{edge\+Params }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_molecule_a22a49ce23970c6f2d947e8286c99e734}\label{class_m_s_d_1_1_molecule_a22a49ce23970c6f2d947e8286c99e734}} 
+\index{MSD.Molecule@{MSD.Molecule}!setEdgeParamters@{setEdgeParamters}}
+\index{setEdgeParamters@{setEdgeParamters}!MSD.Molecule@{MSD.Molecule}}
+\doxysubsubsection{\texorpdfstring{setEdgeParamters()}{setEdgeParamters()}}
+{\footnotesize\ttfamily def MSD.\+Molecule.\+set\+Edge\+Paramters (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{index,  }\item[{}]{edge\+Params }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_molecule_a7d57d7f96fbfdd62f979b3517f4c625c}\label{class_m_s_d_1_1_molecule_a7d57d7f96fbfdd62f979b3517f4c625c}} 
+\index{MSD.Molecule@{MSD.Molecule}!setNodeParamters@{setNodeParamters}}
+\index{setNodeParamters@{setNodeParamters}!MSD.Molecule@{MSD.Molecule}}
+\doxysubsubsection{\texorpdfstring{setNodeParamters()}{setNodeParamters()}}
+{\footnotesize\ttfamily def MSD.\+Molecule.\+set\+Node\+Paramters (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{index,  }\item[{}]{node\+Params }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_molecule_a742353dc64aba048c085f4fef60062da}\label{class_m_s_d_1_1_molecule_a742353dc64aba048c085f4fef60062da}} 
+\index{MSD.Molecule@{MSD.Molecule}!write@{write}}
+\index{write@{write}!MSD.Molecule@{MSD.Molecule}}
+\doxysubsubsection{\texorpdfstring{write()}{write()}}
+{\footnotesize\ttfamily def MSD.\+Molecule.\+write (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{ostream }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{class_m_s_d_1_1_molecule_a45afbff05d423defc9129c9592654e00}\label{class_m_s_d_1_1_molecule_a45afbff05d423defc9129c9592654e00}} 
+\index{MSD.Molecule@{MSD.Molecule}!HEADER@{HEADER}}
+\index{HEADER@{HEADER}!MSD.Molecule@{MSD.Molecule}}
+\doxysubsubsection{\texorpdfstring{HEADER}{HEADER}}
+{\footnotesize\ttfamily MSD.\+Molecule.\+HEADER = c\+\_\+char\+\_\+p.\+in\+\_\+dll(\mbox{\hyperlink{namespace_m_s_d_a46a9adbfe86657baee2dde058b055f93}{msd\+\_\+clib}}, \char`\"{}HEADER\char`\"{})\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_molecule_a25db925faa84759a58ebedc6298cd7e4}\label{class_m_s_d_1_1_molecule_a25db925faa84759a58ebedc6298cd7e4}} 
+\index{MSD.Molecule@{MSD.Molecule}!HEADER\_SIZE@{HEADER\_SIZE}}
+\index{HEADER\_SIZE@{HEADER\_SIZE}!MSD.Molecule@{MSD.Molecule}}
+\doxysubsubsection{\texorpdfstring{HEADER\_SIZE}{HEADER\_SIZE}}
+{\footnotesize\ttfamily MSD.\+Molecule.\+HEADER\+\_\+\+SIZE = c\+\_\+size\+\_\+t.\+in\+\_\+dll(\mbox{\hyperlink{namespace_m_s_d_a46a9adbfe86657baee2dde058b055f93}{msd\+\_\+clib}}, \char`\"{}HEADER\+\_\+\+SIZE\char`\"{})\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_molecule_ac8e2e8dea2f8727b28cbee51c3a101b9}\label{class_m_s_d_1_1_molecule_ac8e2e8dea2f8727b28cbee51c3a101b9}} 
+\index{MSD.Molecule@{MSD.Molecule}!NOT\_FOUND@{NOT\_FOUND}}
+\index{NOT\_FOUND@{NOT\_FOUND}!MSD.Molecule@{MSD.Molecule}}
+\doxysubsubsection{\texorpdfstring{NOT\_FOUND}{NOT\_FOUND}}
+{\footnotesize\ttfamily MSD.\+Molecule.\+NOT\+\_\+\+FOUND = c\+\_\+uint.\+in\+\_\+dll(\mbox{\hyperlink{namespace_m_s_d_a46a9adbfe86657baee2dde058b055f93}{msd\+\_\+clib}}, \char`\"{}NOT\+\_\+\+FOUND\char`\"{})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+\doxysubsection{Property Documentation}
+\mbox{\Hypertarget{class_m_s_d_1_1_molecule_a9f39385fd994d8ed25c77703263e8a31}\label{class_m_s_d_1_1_molecule_a9f39385fd994d8ed25c77703263e8a31}} 
+\index{MSD.Molecule@{MSD.Molecule}!edges@{edges}}
+\index{edges@{edges}!MSD.Molecule@{MSD.Molecule}}
+\doxysubsubsection{\texorpdfstring{edges}{edges}}
+{\footnotesize\ttfamily MSD.\+Molecule.\+edges = property(fget = lambda self\+: \mbox{\hyperlink{class_m_s_d_1_1_molecule_1_1___edge_iterable}{Molecule.\+\_\+\+Edge\+Iterable}}(msd\+\_\+clib.\+create\+Edges(self.\+\_\+proto)))\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_molecule_a6b394566de0788819f57564595779fc1}\label{class_m_s_d_1_1_molecule_a6b394566de0788819f57564595779fc1}} 
+\index{MSD.Molecule@{MSD.Molecule}!leads@{leads}}
+\index{leads@{leads}!MSD.Molecule@{MSD.Molecule}}
+\doxysubsubsection{\texorpdfstring{leads}{leads}}
+{\footnotesize\ttfamily MSD.\+Molecule.\+leads\hspace{0.3cm}{\ttfamily [static]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=  property(}
+\DoxyCodeLine{        fget = \textcolor{keyword}{lambda} self: \_tupler(msd\_clib.getLeads, self.\_proto, 2 * [c\_uint]),}
+\DoxyCodeLine{        fset = \textcolor{keyword}{lambda} self, leads: msd\_clib.setLeads(self.\_proto, *leads)}
+\DoxyCodeLine{        )}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{class_m_s_d_1_1_molecule_a3ac4b63ed6ca985618d31cdc9cdb3f00}\label{class_m_s_d_1_1_molecule_a3ac4b63ed6ca985618d31cdc9cdb3f00}} 
+\index{MSD.Molecule@{MSD.Molecule}!leftLead@{leftLead}}
+\index{leftLead@{leftLead}!MSD.Molecule@{MSD.Molecule}}
+\doxysubsubsection{\texorpdfstring{leftLead}{leftLead}}
+{\footnotesize\ttfamily MSD.\+Molecule.\+left\+Lead\hspace{0.3cm}{\ttfamily [static]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=  property(}
+\DoxyCodeLine{        fget = \textcolor{keyword}{lambda} self: msd\_clib.getLeftLead(self.\_proto),}
+\DoxyCodeLine{        fset = \textcolor{keyword}{lambda} self, node: msd\_clib.setLeftLead(self.\_proto, node)}
+\DoxyCodeLine{        )}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{class_m_s_d_1_1_molecule_aa5565c13a8bc8fb1ab4e3190639672c3}\label{class_m_s_d_1_1_molecule_aa5565c13a8bc8fb1ab4e3190639672c3}} 
+\index{MSD.Molecule@{MSD.Molecule}!nodeCount@{nodeCount}}
+\index{nodeCount@{nodeCount}!MSD.Molecule@{MSD.Molecule}}
+\doxysubsubsection{\texorpdfstring{nodeCount}{nodeCount}}
+{\footnotesize\ttfamily MSD.\+Molecule.\+node\+Count = property(fget = lambda self\+: msd\+\_\+clib.\+node\+Count(self.\+\_\+proto))\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_molecule_ac2da6ac139c0eaa0766e362d457be3a6}\label{class_m_s_d_1_1_molecule_ac2da6ac139c0eaa0766e362d457be3a6}} 
+\index{MSD.Molecule@{MSD.Molecule}!nodes@{nodes}}
+\index{nodes@{nodes}!MSD.Molecule@{MSD.Molecule}}
+\doxysubsubsection{\texorpdfstring{nodes}{nodes}}
+{\footnotesize\ttfamily MSD.\+Molecule.\+nodes = property(fget = lambda self\+: \mbox{\hyperlink{class_m_s_d_1_1_molecule_1_1___node_iterable}{Molecule.\+\_\+\+Node\+Iterable}}(msd\+\_\+clib.\+create\+Nodes(self.\+\_\+proto)))\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_molecule_a1f99fe9da8535f85ac7adafbeaf496a7}\label{class_m_s_d_1_1_molecule_a1f99fe9da8535f85ac7adafbeaf496a7}} 
+\index{MSD.Molecule@{MSD.Molecule}!rightLead@{rightLead}}
+\index{rightLead@{rightLead}!MSD.Molecule@{MSD.Molecule}}
+\doxysubsubsection{\texorpdfstring{rightLead}{rightLead}}
+{\footnotesize\ttfamily MSD.\+Molecule.\+right\+Lead\hspace{0.3cm}{\ttfamily [static]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=  property(}
+\DoxyCodeLine{        fget = \textcolor{keyword}{lambda} self: msd\_clib.getRightLead(self.\_proto),}
+\DoxyCodeLine{        fset = \textcolor{keyword}{lambda} self, node: msd\_clib.setRightLead(self.\_proto, node)}
+\DoxyCodeLine{        )}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{class_m_s_d_1_1_molecule_ae017b17709a7e64589b710be7d36b927}\label{class_m_s_d_1_1_molecule_ae017b17709a7e64589b710be7d36b927}} 
+\index{MSD.Molecule@{MSD.Molecule}!serializationSize@{serializationSize}}
+\index{serializationSize@{serializationSize}!MSD.Molecule@{MSD.Molecule}}
+\doxysubsubsection{\texorpdfstring{serializationSize}{serializationSize}}
+{\footnotesize\ttfamily MSD.\+Molecule.\+serialization\+Size = property(fget = lambda self\+: msd\+\_\+clib.\+serialization\+Size(self.\+\_\+proto))\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/mathh/\+Git\+Hub/\+Molecular-\/\+Spintronics-\/\+Research-\/\+Project/\+MSD Research Project -\/ Latest Development Version/lib/python/\mbox{\hyperlink{_m_s_d_8py}{MSD.\+py}}\end{DoxyCompactItemize}

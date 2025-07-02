@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_classudc_1_1_molecule_1_1_edge_iterable" xml:lang="en-US">
+<title>udc::Molecule::EdgeIterable Class Reference</title>
+<indexterm><primary>udc::Molecule::EdgeIterable</primary></indexterm>
+<para>
+<computeroutput>#include &lt;MSD.h&gt;</computeroutput>
+</para>
+<simplesect>
+    <title>Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para><link linkend="_classudc_1_1_molecule_1_1_edge_iterator">EdgeIterator</link> <link linkend="_classudc_1_1_molecule_1_1_edge_iterable_1a6ad09c81e1ffd3a9d71ba1db9073e6cc">begin</link> () const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_molecule_1_1_edge_iterator">EdgeIterator</link> <link linkend="_classudc_1_1_molecule_1_1_edge_iterable_1a25744b1ee7e22c419406eed7c40c8e29">end</link> () const</para>
+</listitem>
+            <listitem><para>unsigned int <link linkend="_classudc_1_1_molecule_1_1_edge_iterable_1af058dfb0b3208a64abd7d1c5ace96783">size</link> () const</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Friends    </title>
+        <itemizedlist>
+            <listitem><para>class <link linkend="_classudc_1_1_molecule_1_1_edge_iterable_1ae0d120b8bbafe454abebd374e2402082">Molecule</link></para>
+</listitem>
+            <listitem><para>class <link linkend="_classudc_1_1_molecule_1_1_edge_iterable_1a265a85b438f4a316627f37c1c2d442e8">EdgeIterator</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Member Function Documentation</title>
+<anchor xml:id="_classudc_1_1_molecule_1_1_edge_iterable_1a6ad09c81e1ffd3a9d71ba1db9073e6cc"/><section>
+    <title>begin()</title>
+<indexterm><primary>begin</primary><secondary>udc::Molecule::EdgeIterable</secondary></indexterm>
+<indexterm><primary>udc::Molecule::EdgeIterable</primary><secondary>begin</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_molecule_1_1_edge_iterator">Molecule::EdgeIterator</link> udc::Molecule::EdgeIterable::begin ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1_1_edge_iterable_1a25744b1ee7e22c419406eed7c40c8e29"/><section>
+    <title>end()</title>
+<indexterm><primary>end</primary><secondary>udc::Molecule::EdgeIterable</secondary></indexterm>
+<indexterm><primary>udc::Molecule::EdgeIterable</primary><secondary>end</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_molecule_1_1_edge_iterator">Molecule::EdgeIterator</link> udc::Molecule::EdgeIterable::end ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1_1_edge_iterable_1af058dfb0b3208a64abd7d1c5ace96783"/><section>
+    <title>size()</title>
+<indexterm><primary>size</primary><secondary>udc::Molecule::EdgeIterable</secondary></indexterm>
+<indexterm><primary>udc::Molecule::EdgeIterable</primary><secondary>size</secondary></indexterm>
+<para><computeroutput>unsigned int udc::Molecule::EdgeIterable::size ( ) const</computeroutput></para></section>
+</section>
+<section>
+<title>Friends And Related Function Documentation</title>
+<anchor xml:id="_classudc_1_1_molecule_1_1_edge_iterable_1a265a85b438f4a316627f37c1c2d442e8"/><section>
+    <title>EdgeIterator</title>
+<indexterm><primary>EdgeIterator</primary><secondary>udc::Molecule::EdgeIterable</secondary></indexterm>
+<indexterm><primary>udc::Molecule::EdgeIterable</primary><secondary>EdgeIterator</secondary></indexterm>
+<para><computeroutput>friend class <link linkend="_classudc_1_1_molecule_1_1_edge_iterator">EdgeIterator</link><computeroutput>[friend]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1_1_edge_iterable_1ae0d120b8bbafe454abebd374e2402082"/><section>
+    <title>Molecule</title>
+<indexterm><primary>Molecule</primary><secondary>udc::Molecule::EdgeIterable</secondary></indexterm>
+<indexterm><primary>udc::Molecule::EdgeIterable</primary><secondary>Molecule</secondary></indexterm>
+<para><computeroutput>friend class <link linkend="_classudc_1_1_molecule">Molecule</link><computeroutput>[friend]</computeroutput></computeroutput></para></section>
+<para>
+The documentation for this class was generated from the following file:</para>
+C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/src/<link linkend="__m_s_d_8h">MSD.h</link></section>
+</section>

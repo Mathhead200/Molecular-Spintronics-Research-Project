@@ -1,0 +1,117 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_class_m_s_d_1_1_m_s_d_1_1_parameters" xml:lang="en-US">
+<title>MSD.MSD.Parameters Class Reference</title>
+<indexterm><primary>MSD.MSD.Parameters</primary></indexterm>
+<para>Inheritance diagram for MSD.MSD.Parameters:    <informalfigure>
+        <mediaobject>
+            <imageobject>
+                <imagedata width="50%" align="center" valign="middle" scalefit="0" fileref="../../de/d89/class_m_s_d_1_1_m_s_d_1_1_parameters.png"></imagedata>
+            </imageobject>
+        </mediaobject>
+    </informalfigure>
+</para>
+<simplesect>
+    <title>Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_m_s_d_1_1_parameters_1a447424f6f7d01d8a6f641b9bdd456587">__init__</link> (self, *args, **kw)</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Public Attributes    </title>
+        <itemizedlist>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1_1_parameters_1a485b0173e1b15df0f83a1d526165d0c6">kT</link></para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1_1_parameters_1aa1c5605f67c24acd6bd658e974938143">B</link></para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1_1_parameters_1abf55c020f714f4bdb5c12fbd443d8b51">SR</link></para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1_1_parameters_1a3a9cd67285039964266a739214f593ec">FR</link></para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1_1_parameters_1a14e63b386f3d531eab373cf05bd83c14">JLR</link></para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1_1_parameters_1ab9c6a6749302c638276d6d1df5113cae">Je0R</link></para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1_1_parameters_1a7cdc5e12770bb2577c029188b6d354d4">Je1LR</link></para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1_1_parameters_1a52480af97113b9ea3a46a382293fc031">JeeLR</link></para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1_1_parameters_1aa6ca61018a409046dc270257a94faac8">bLR</link></para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1_1_parameters_1a6eea4a35bb71c0bc4ff677c0c7b7c8d0">AR</link></para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1_1_parameters_1a511959e3601f9f1effa0dea4040d445c">DLR</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Constructor &amp; Destructor Documentation</title>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1_1_parameters_1a447424f6f7d01d8a6f641b9bdd456587"/><section>
+    <title>__init__()</title>
+<indexterm><primary>__init__</primary><secondary>MSD.MSD.Parameters</secondary></indexterm>
+<indexterm><primary>MSD.MSD.Parameters</primary><secondary>__init__</secondary></indexterm>
+<para><computeroutput>def MSD.MSD.Parameters.__init__ ( self, * args, ** kw)</computeroutput></para><para>
+Reimplemented from <link linkend="_class_m_s_d_1_1___struct_with_dict_1a7c5722a237df5039317d31c528d04128">MSD._StructWithDict</link>.</para>
+</section>
+</section>
+<section>
+<title>Member Data Documentation</title>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1_1_parameters_1a6eea4a35bb71c0bc4ff677c0c7b7c8d0"/><section>
+    <title>AR</title>
+<indexterm><primary>AR</primary><secondary>MSD.MSD.Parameters</secondary></indexterm>
+<indexterm><primary>MSD.MSD.Parameters</primary><secondary>AR</secondary></indexterm>
+<para><computeroutput>MSD.MSD.Parameters.AR</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1_1_parameters_1aa1c5605f67c24acd6bd658e974938143"/><section>
+    <title>B</title>
+<indexterm><primary>B</primary><secondary>MSD.MSD.Parameters</secondary></indexterm>
+<indexterm><primary>MSD.MSD.Parameters</primary><secondary>B</secondary></indexterm>
+<para><computeroutput>MSD.MSD.Parameters.B</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1_1_parameters_1aa6ca61018a409046dc270257a94faac8"/><section>
+    <title>bLR</title>
+<indexterm><primary>bLR</primary><secondary>MSD.MSD.Parameters</secondary></indexterm>
+<indexterm><primary>MSD.MSD.Parameters</primary><secondary>bLR</secondary></indexterm>
+<para><computeroutput>MSD.MSD.Parameters.bLR</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1_1_parameters_1a511959e3601f9f1effa0dea4040d445c"/><section>
+    <title>DLR</title>
+<indexterm><primary>DLR</primary><secondary>MSD.MSD.Parameters</secondary></indexterm>
+<indexterm><primary>MSD.MSD.Parameters</primary><secondary>DLR</secondary></indexterm>
+<para><computeroutput>MSD.MSD.Parameters.DLR</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1_1_parameters_1a3a9cd67285039964266a739214f593ec"/><section>
+    <title>FR</title>
+<indexterm><primary>FR</primary><secondary>MSD.MSD.Parameters</secondary></indexterm>
+<indexterm><primary>MSD.MSD.Parameters</primary><secondary>FR</secondary></indexterm>
+<para><computeroutput>MSD.MSD.Parameters.FR</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1_1_parameters_1ab9c6a6749302c638276d6d1df5113cae"/><section>
+    <title>Je0R</title>
+<indexterm><primary>Je0R</primary><secondary>MSD.MSD.Parameters</secondary></indexterm>
+<indexterm><primary>MSD.MSD.Parameters</primary><secondary>Je0R</secondary></indexterm>
+<para><computeroutput>MSD.MSD.Parameters.Je0R</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1_1_parameters_1a7cdc5e12770bb2577c029188b6d354d4"/><section>
+    <title>Je1LR</title>
+<indexterm><primary>Je1LR</primary><secondary>MSD.MSD.Parameters</secondary></indexterm>
+<indexterm><primary>MSD.MSD.Parameters</primary><secondary>Je1LR</secondary></indexterm>
+<para><computeroutput>MSD.MSD.Parameters.Je1LR</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1_1_parameters_1a52480af97113b9ea3a46a382293fc031"/><section>
+    <title>JeeLR</title>
+<indexterm><primary>JeeLR</primary><secondary>MSD.MSD.Parameters</secondary></indexterm>
+<indexterm><primary>MSD.MSD.Parameters</primary><secondary>JeeLR</secondary></indexterm>
+<para><computeroutput>MSD.MSD.Parameters.JeeLR</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1_1_parameters_1a14e63b386f3d531eab373cf05bd83c14"/><section>
+    <title>JLR</title>
+<indexterm><primary>JLR</primary><secondary>MSD.MSD.Parameters</secondary></indexterm>
+<indexterm><primary>MSD.MSD.Parameters</primary><secondary>JLR</secondary></indexterm>
+<para><computeroutput>MSD.MSD.Parameters.JLR</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1_1_parameters_1a485b0173e1b15df0f83a1d526165d0c6"/><section>
+    <title>kT</title>
+<indexterm><primary>kT</primary><secondary>MSD.MSD.Parameters</secondary></indexterm>
+<indexterm><primary>MSD.MSD.Parameters</primary><secondary>kT</secondary></indexterm>
+<para><computeroutput>MSD.MSD.Parameters.kT</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1_1_parameters_1abf55c020f714f4bdb5c12fbd443d8b51"/><section>
+    <title>SR</title>
+<indexterm><primary>SR</primary><secondary>MSD.MSD.Parameters</secondary></indexterm>
+<indexterm><primary>MSD.MSD.Parameters</primary><secondary>SR</secondary></indexterm>
+<para><computeroutput>MSD.MSD.Parameters.SR</computeroutput></para></section>
+<para>
+The documentation for this class was generated from the following file:</para>
+C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/lib/python/<link linkend="__m_s_d_8py">MSD.py</link></section>
+</section>

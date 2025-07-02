@@ -1,0 +1,173 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_classudc_1_1_molecule_1_1_node_iterator" xml:lang="en-US">
+<title>udc::Molecule::NodeIterator Class Reference</title>
+<indexterm><primary>udc::Molecule::NodeIterator</primary></indexterm>
+<para>
+<computeroutput>#include &lt;MSD.h&gt;</computeroutput>
+</para>
+<simplesect>
+    <title>Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para>unsigned int <link linkend="_classudc_1_1_molecule_1_1_node_iterator_1add4653d895f324444b7d295a35e6ca00">getIndex</link> () const</para>
+</listitem>
+            <listitem><para><link linkend="_structudc_1_1_molecule_1_1_node_parameters">NodeParameters</link> <link linkend="_classudc_1_1_molecule_1_1_node_iterator_1a04119ad80998be7ebd7207d360e638c8">getParameters</link> () const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_molecule_1_1_edge_iterable">EdgeIterable</link> <link linkend="_classudc_1_1_molecule_1_1_node_iterator_1a0acdd22957b069b97f55d993aa6e5829">getNeighbors</link> () const</para>
+</listitem>
+            <listitem><para>unsigned int <link linkend="_classudc_1_1_molecule_1_1_node_iterator_1a90229c78c03c1801f453149a9937bde3">operator*</link> () const</para>
+</listitem>
+            <listitem><para>unsigned int <link linkend="_classudc_1_1_molecule_1_1_node_iterator_1ac47692c114579ddc642d0b1c52b52131">operator[]</link> (int) const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_molecule_1_1_node_iterator_1a9179bc2543b97b0b61aac52ae7a79dee">operator unsigned int</link> () const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_molecule_1_1_node_iterator">NodeIterator</link> &amp; <link linkend="_classudc_1_1_molecule_1_1_node_iterator_1a7e91c5498ef57076c1ae1fab987aad5d">operator++</link> ()</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_molecule_1_1_node_iterator">NodeIterator</link> <link linkend="_classudc_1_1_molecule_1_1_node_iterator_1ac17720df13ad639d8a68d5530588970a">operator++</link> (int)</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_molecule_1_1_node_iterator">NodeIterator</link> &amp; <link linkend="_classudc_1_1_molecule_1_1_node_iterator_1a8fa5a9c55ba31ba6764381dccf744d7d">operator--</link> ()</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_molecule_1_1_node_iterator">NodeIterator</link> <link linkend="_classudc_1_1_molecule_1_1_node_iterator_1a7e4d79696d2b34f948a29c20e3871e3d">operator--</link> (int)</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_molecule_1_1_node_iterator">NodeIterator</link> &amp; <link linkend="_classudc_1_1_molecule_1_1_node_iterator_1a207d566d2d8896940834b2f31d9f1d06">operator+=</link> (int)</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_molecule_1_1_node_iterator">NodeIterator</link> &amp; <link linkend="_classudc_1_1_molecule_1_1_node_iterator_1a304236b160397a0acafb9da86f11c35a">operator-=</link> (int)</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_molecule_1_1_node_iterator">NodeIterator</link> <link linkend="_classudc_1_1_molecule_1_1_node_iterator_1a8772bf176b248dc6516aeb05d215b613">operator+</link> (int) const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_molecule_1_1_node_iterator">NodeIterator</link> <link linkend="_classudc_1_1_molecule_1_1_node_iterator_1a9d35b7c2a293de896beb459ef28bec3d">operator-</link> (int) const</para>
+</listitem>
+            <listitem><para>bool <link linkend="_classudc_1_1_molecule_1_1_node_iterator_1acdccb03fb3f35569ef320751b63e325d">operator==</link> (const <link linkend="_classudc_1_1_molecule_1_1_node_iterator">NodeIterator</link> &amp;) const</para>
+</listitem>
+            <listitem><para>bool <link linkend="_classudc_1_1_molecule_1_1_node_iterator_1aaf5e7cd3552fccdb68d144d5a1811875">operator!=</link> (const <link linkend="_classudc_1_1_molecule_1_1_node_iterator">NodeIterator</link> &amp;) const</para>
+</listitem>
+            <listitem><para>bool <link linkend="_classudc_1_1_molecule_1_1_node_iterator_1a963b18b0c35d0d571887387fc7934a51">operator&gt;</link> (const <link linkend="_classudc_1_1_molecule_1_1_node_iterator">NodeIterator</link> &amp;) const</para>
+</listitem>
+            <listitem><para>bool <link linkend="_classudc_1_1_molecule_1_1_node_iterator_1a9005e6f852dde85e408d2c82800dd01e">operator&lt;</link> (const <link linkend="_classudc_1_1_molecule_1_1_node_iterator">NodeIterator</link> &amp;) const</para>
+</listitem>
+            <listitem><para>bool <link linkend="_classudc_1_1_molecule_1_1_node_iterator_1a6188db396027c98c9df61689eaa7b16d">operator&gt;=</link> (const <link linkend="_classudc_1_1_molecule_1_1_node_iterator">NodeIterator</link> &amp;) const</para>
+</listitem>
+            <listitem><para>bool <link linkend="_classudc_1_1_molecule_1_1_node_iterator_1a383142fbdb73230ae1351ebc344c6cc1">operator&lt;=</link> (const <link linkend="_classudc_1_1_molecule_1_1_node_iterator">NodeIterator</link> &amp;) const</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Friends    </title>
+        <itemizedlist>
+            <listitem><para>class <link linkend="_classudc_1_1_molecule_1_1_node_iterator_1a9732a33ce91da70ce956205fc603c31c">NodeIterable</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Member Function Documentation</title>
+<anchor xml:id="_classudc_1_1_molecule_1_1_node_iterator_1add4653d895f324444b7d295a35e6ca00"/><section>
+    <title>getIndex()</title>
+<indexterm><primary>getIndex</primary><secondary>udc::Molecule::NodeIterator</secondary></indexterm>
+<indexterm><primary>udc::Molecule::NodeIterator</primary><secondary>getIndex</secondary></indexterm>
+<para><computeroutput>unsigned int udc::Molecule::NodeIterator::getIndex ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1_1_node_iterator_1a0acdd22957b069b97f55d993aa6e5829"/><section>
+    <title>getNeighbors()</title>
+<indexterm><primary>getNeighbors</primary><secondary>udc::Molecule::NodeIterator</secondary></indexterm>
+<indexterm><primary>udc::Molecule::NodeIterator</primary><secondary>getNeighbors</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_molecule_1_1_edge_iterable">Molecule::EdgeIterable</link> udc::Molecule::NodeIterator::getNeighbors ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1_1_node_iterator_1a04119ad80998be7ebd7207d360e638c8"/><section>
+    <title>getParameters()</title>
+<indexterm><primary>getParameters</primary><secondary>udc::Molecule::NodeIterator</secondary></indexterm>
+<indexterm><primary>udc::Molecule::NodeIterator</primary><secondary>getParameters</secondary></indexterm>
+<para><computeroutput><link linkend="_structudc_1_1_molecule_1_1_node_parameters">Molecule::NodeParameters</link> udc::Molecule::NodeIterator::getParameters ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1_1_node_iterator_1a9179bc2543b97b0b61aac52ae7a79dee"/><section>
+    <title>operator unsigned int()</title>
+<indexterm><primary>operator unsigned int</primary><secondary>udc::Molecule::NodeIterator</secondary></indexterm>
+<indexterm><primary>udc::Molecule::NodeIterator</primary><secondary>operator unsigned int</secondary></indexterm>
+<para><computeroutput>udc::Molecule::NodeIterator::operator unsigned int ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1_1_node_iterator_1aaf5e7cd3552fccdb68d144d5a1811875"/><section>
+    <title>operator!=()</title>
+<indexterm><primary>operator!=</primary><secondary>udc::Molecule::NodeIterator</secondary></indexterm>
+<indexterm><primary>udc::Molecule::NodeIterator</primary><secondary>operator!=</secondary></indexterm>
+<para><computeroutput>bool udc::Molecule::NodeIterator::operator!= (const <link linkend="_classudc_1_1_molecule_1_1_node_iterator">NodeIterator</link> &amp; iter) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1_1_node_iterator_1a90229c78c03c1801f453149a9937bde3"/><section>
+    <title>operator*()</title>
+<indexterm><primary>operator*</primary><secondary>udc::Molecule::NodeIterator</secondary></indexterm>
+<indexterm><primary>udc::Molecule::NodeIterator</primary><secondary>operator*</secondary></indexterm>
+<para><computeroutput>unsigned int udc::Molecule::NodeIterator::operator* ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1_1_node_iterator_1a8772bf176b248dc6516aeb05d215b613"/><section>
+    <title>operator+()</title>
+<indexterm><primary>operator+</primary><secondary>udc::Molecule::NodeIterator</secondary></indexterm>
+<indexterm><primary>udc::Molecule::NodeIterator</primary><secondary>operator+</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_molecule_1_1_node_iterator">Molecule::NodeIterator</link> udc::Molecule::NodeIterator::operator+ (int offset) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1_1_node_iterator_1a7e91c5498ef57076c1ae1fab987aad5d"/><section>
+    <title>operator++()<computeroutput>[1/2]</computeroutput></title>
+<indexterm><primary>operator++</primary><secondary>udc::Molecule::NodeIterator</secondary></indexterm>
+<indexterm><primary>udc::Molecule::NodeIterator</primary><secondary>operator++</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_molecule_1_1_node_iterator">Molecule::NodeIterator</link> &amp; udc::Molecule::NodeIterator::operator++ ( )</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1_1_node_iterator_1ac17720df13ad639d8a68d5530588970a"/><section>
+    <title>operator++()<computeroutput>[2/2]</computeroutput></title>
+<indexterm><primary>operator++</primary><secondary>udc::Molecule::NodeIterator</secondary></indexterm>
+<indexterm><primary>udc::Molecule::NodeIterator</primary><secondary>operator++</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_molecule_1_1_node_iterator">Molecule::NodeIterator</link> udc::Molecule::NodeIterator::operator++ (int )</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1_1_node_iterator_1a207d566d2d8896940834b2f31d9f1d06"/><section>
+    <title>operator+=()</title>
+<indexterm><primary>operator+=</primary><secondary>udc::Molecule::NodeIterator</secondary></indexterm>
+<indexterm><primary>udc::Molecule::NodeIterator</primary><secondary>operator+=</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_molecule_1_1_node_iterator">Molecule::NodeIterator</link> &amp; udc::Molecule::NodeIterator::operator+= (int offset)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1_1_node_iterator_1a9d35b7c2a293de896beb459ef28bec3d"/><section>
+    <title>operator-()</title>
+<indexterm><primary>operator-</primary><secondary>udc::Molecule::NodeIterator</secondary></indexterm>
+<indexterm><primary>udc::Molecule::NodeIterator</primary><secondary>operator-</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_molecule_1_1_node_iterator">Molecule::NodeIterator</link> udc::Molecule::NodeIterator::operator- (int offset) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1_1_node_iterator_1a8fa5a9c55ba31ba6764381dccf744d7d"/><section>
+    <title>operator--()<computeroutput>[1/2]</computeroutput></title>
+<indexterm><primary>operator--</primary><secondary>udc::Molecule::NodeIterator</secondary></indexterm>
+<indexterm><primary>udc::Molecule::NodeIterator</primary><secondary>operator--</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_molecule_1_1_node_iterator">Molecule::NodeIterator</link> &amp; udc::Molecule::NodeIterator::operator-- ( )</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1_1_node_iterator_1a7e4d79696d2b34f948a29c20e3871e3d"/><section>
+    <title>operator--()<computeroutput>[2/2]</computeroutput></title>
+<indexterm><primary>operator--</primary><secondary>udc::Molecule::NodeIterator</secondary></indexterm>
+<indexterm><primary>udc::Molecule::NodeIterator</primary><secondary>operator--</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_molecule_1_1_node_iterator">Molecule::NodeIterator</link> udc::Molecule::NodeIterator::operator-- (int )</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1_1_node_iterator_1a304236b160397a0acafb9da86f11c35a"/><section>
+    <title>operator-=()</title>
+<indexterm><primary>operator-=</primary><secondary>udc::Molecule::NodeIterator</secondary></indexterm>
+<indexterm><primary>udc::Molecule::NodeIterator</primary><secondary>operator-=</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_molecule_1_1_node_iterator">Molecule::NodeIterator</link> &amp; udc::Molecule::NodeIterator::operator-= (int offset)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1_1_node_iterator_1a9005e6f852dde85e408d2c82800dd01e"/><section>
+    <title>operator&lt;()</title>
+<indexterm><primary>operator&lt;</primary><secondary>udc::Molecule::NodeIterator</secondary></indexterm>
+<indexterm><primary>udc::Molecule::NodeIterator</primary><secondary>operator&lt;</secondary></indexterm>
+<para><computeroutput>bool udc::Molecule::NodeIterator::operator&lt; (const <link linkend="_classudc_1_1_molecule_1_1_node_iterator">NodeIterator</link> &amp; iter) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1_1_node_iterator_1a383142fbdb73230ae1351ebc344c6cc1"/><section>
+    <title>operator&lt;=()</title>
+<indexterm><primary>operator&lt;=</primary><secondary>udc::Molecule::NodeIterator</secondary></indexterm>
+<indexterm><primary>udc::Molecule::NodeIterator</primary><secondary>operator&lt;=</secondary></indexterm>
+<para><computeroutput>bool udc::Molecule::NodeIterator::operator&lt;= (const <link linkend="_classudc_1_1_molecule_1_1_node_iterator">NodeIterator</link> &amp; iter) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1_1_node_iterator_1acdccb03fb3f35569ef320751b63e325d"/><section>
+    <title>operator==()</title>
+<indexterm><primary>operator==</primary><secondary>udc::Molecule::NodeIterator</secondary></indexterm>
+<indexterm><primary>udc::Molecule::NodeIterator</primary><secondary>operator==</secondary></indexterm>
+<para><computeroutput>bool udc::Molecule::NodeIterator::operator== (const <link linkend="_classudc_1_1_molecule_1_1_node_iterator">NodeIterator</link> &amp; iter) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1_1_node_iterator_1a963b18b0c35d0d571887387fc7934a51"/><section>
+    <title>operator&gt;()</title>
+<indexterm><primary>operator&gt;</primary><secondary>udc::Molecule::NodeIterator</secondary></indexterm>
+<indexterm><primary>udc::Molecule::NodeIterator</primary><secondary>operator&gt;</secondary></indexterm>
+<para><computeroutput>bool udc::Molecule::NodeIterator::operator&gt; (const <link linkend="_classudc_1_1_molecule_1_1_node_iterator">NodeIterator</link> &amp; iter) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1_1_node_iterator_1a6188db396027c98c9df61689eaa7b16d"/><section>
+    <title>operator&gt;=()</title>
+<indexterm><primary>operator&gt;=</primary><secondary>udc::Molecule::NodeIterator</secondary></indexterm>
+<indexterm><primary>udc::Molecule::NodeIterator</primary><secondary>operator&gt;=</secondary></indexterm>
+<para><computeroutput>bool udc::Molecule::NodeIterator::operator&gt;= (const <link linkend="_classudc_1_1_molecule_1_1_node_iterator">NodeIterator</link> &amp; iter) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1_1_node_iterator_1ac47692c114579ddc642d0b1c52b52131"/><section>
+    <title>operator[]()</title>
+<indexterm><primary>operator[]</primary><secondary>udc::Molecule::NodeIterator</secondary></indexterm>
+<indexterm><primary>udc::Molecule::NodeIterator</primary><secondary>operator[]</secondary></indexterm>
+<para><computeroutput>unsigned int udc::Molecule::NodeIterator::operator[] (int offset) const</computeroutput></para></section>
+</section>
+<section>
+<title>Friends And Related Function Documentation</title>
+<anchor xml:id="_classudc_1_1_molecule_1_1_node_iterator_1a9732a33ce91da70ce956205fc603c31c"/><section>
+    <title>NodeIterable</title>
+<indexterm><primary>NodeIterable</primary><secondary>udc::Molecule::NodeIterator</secondary></indexterm>
+<indexterm><primary>udc::Molecule::NodeIterator</primary><secondary>NodeIterable</secondary></indexterm>
+<para><computeroutput>friend class <link linkend="_classudc_1_1_molecule_1_1_node_iterable">NodeIterable</link><computeroutput>[friend]</computeroutput></computeroutput></para></section>
+<para>
+The documentation for this class was generated from the following file:</para>
+C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/src/<link linkend="__m_s_d_8h">MSD.h</link></section>
+</section>

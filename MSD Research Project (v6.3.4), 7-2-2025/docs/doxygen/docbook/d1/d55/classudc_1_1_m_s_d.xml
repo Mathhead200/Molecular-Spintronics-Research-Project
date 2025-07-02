@@ -1,0 +1,790 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_classudc_1_1_m_s_d" xml:lang="en-US">
+<title>udc::MSD Class Reference</title>
+<indexterm><primary>udc::MSD</primary></indexterm>
+<para>
+
+<para>An abstract Molecular Spintronic Device. </para>
+ 
+</para>
+<para>
+<computeroutput>#include &lt;MSD.h&gt;</computeroutput>
+</para>
+<simplesect>
+    <title>Classes    </title>
+        <itemizedlist>
+            <listitem><para>class <link linkend="_classudc_1_1_m_s_d_1_1_iterator">Iterator</link></para>
+</listitem>
+            <listitem><para>class <link linkend="_classudc_1_1_m_s_d_1_1_molecule_exception">MoleculeException</link></para>
+</listitem>
+            <listitem><para>struct <link linkend="_structudc_1_1_m_s_d_1_1_parameters">Parameters</link></para>
+</listitem>
+            <listitem><para>struct <link linkend="_structudc_1_1_m_s_d_1_1_results">Results</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Public Types    </title>
+        <itemizedlist>
+            <listitem><para>typedef <link linkend="_classudc_1_1_molecule">Molecule</link> <link linkend="_classudc_1_1_m_s_d_1a7266f08d021d5a06960b152c95a9213e">MolProto</link></para>
+</listitem>
+            <listitem><para>typedef Molecule::Instance <link linkend="_classudc_1_1_m_s_d_1ab3c0b3e8474e18cb213f79d66f221b67">Mol</link></para>
+</listitem>
+            <listitem><para>typedef function&lt; <link linkend="_classudc_1_1_m_s_d_1a7266f08d021d5a06960b152c95a9213e">MolProto</link>(unsigned int)&gt; <link linkend="_classudc_1_1_m_s_d_1aa5aef25b88fee8190e1ac32070d06d66">MolProtoFactory</link></para>
+</listitem>
+            <listitem><para>typedef function&lt; <link linkend="_classudc_1_1_vector">Vector</link>(const <link linkend="_classudc_1_1_vector">Vector</link> &amp;, function&lt; double()&gt;)&gt; <link linkend="_classudc_1_1_m_s_d_1a3d235795ecc459cc0c2069c3f05d089d">FlippingAlgorithm</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para><link linkend="_classudc_1_1_m_s_d_1a8bb6667fb7bc003abe0fc6af8793ed12">MSD</link> (unsigned int width, unsigned int height, unsigned int depth, const <link linkend="_classudc_1_1_m_s_d_1a7266f08d021d5a06960b152c95a9213e">MolProto</link> &amp;molProto, unsigned int molPosL, unsigned int topL, unsigned int bottomL, unsigned int frontR, unsigned int backR)</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_m_s_d_1a1d6135b424fccae0e69d8eece84672ea">MSD</link> (unsigned int width, unsigned int height, unsigned int depth, const <link linkend="_classudc_1_1_m_s_d_1aa5aef25b88fee8190e1ac32070d06d66">MolProtoFactory</link> &amp;molType, unsigned int molPosL, unsigned int molPosR, unsigned int topL, unsigned int bottomL, unsigned int frontR, unsigned int backR)</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_m_s_d_1a9f4d8ca0e3bf597898705d6784155f75">MSD</link> (unsigned int width, unsigned int height, unsigned int depth, unsigned int molPosL, unsigned int molPosR, unsigned int topL, unsigned int bottomL, unsigned int frontR, unsigned int backR)</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_m_s_d_1a4014b4eaa8dffbd9799aebccf3fdb842">MSD</link> (unsigned int width, unsigned int height, unsigned int depth, unsigned int heightL, unsigned depthR)</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_m_s_d_1a337868649574cfba54a1d779483a47c8">MSD</link> (unsigned int width, unsigned int height, unsigned int depth)</para>
+</listitem>
+            <listitem><para><link linkend="_structudc_1_1_m_s_d_1_1_parameters">Parameters</link> <link linkend="_classudc_1_1_m_s_d_1abfa4f6883d0b4677ab7b70c1adf06066">getParameters</link> () const</para>
+</listitem>
+            <listitem><para>void <link linkend="_classudc_1_1_m_s_d_1aa1513f639c10ca29773ea287ae104121">setParameters</link> (const <link linkend="_structudc_1_1_m_s_d_1_1_parameters">Parameters</link> &amp;)</para>
+</listitem>
+            <listitem><para><link linkend="_structudc_1_1_m_s_d_1_1_results">Results</link> <link linkend="_classudc_1_1_m_s_d_1ae1bee2a207b40720156243ed19eed671">getResults</link> () const</para>
+</listitem>
+            <listitem><para>void <link linkend="_classudc_1_1_m_s_d_1a5c1d308f90d10072e5288685ba4d58db">set_kT</link> (double kT)</para>
+</listitem>
+            <listitem><para>void <link linkend="_classudc_1_1_m_s_d_1a18aa13537e0deda7d1263c1fd8d8228a">setB</link> (const <link linkend="_classudc_1_1_vector">Vector</link> &amp;B)</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_m_s_d_1a7266f08d021d5a06960b152c95a9213e">MolProto</link> <link linkend="_classudc_1_1_m_s_d_1a77dce5d8c1a874c47acfbc69d5a867ab">getMolProto</link> () const</para>
+</listitem>
+            <listitem><para>void <link linkend="_classudc_1_1_m_s_d_1aa8ed0dab0705b810e4d14215b488fb43">setMolProto</link> (const <link linkend="_classudc_1_1_m_s_d_1a7266f08d021d5a06960b152c95a9213e">MolProto</link> &amp;proto)</para>
+</listitem>
+            <listitem><para>void <link linkend="_classudc_1_1_m_s_d_1aade85204d30f826444572e41f27613aa">setMolParameters</link> (const <link linkend="_structudc_1_1_molecule_1_1_node_parameters">MolProto::NodeParameters</link> &amp;, const <link linkend="_structudc_1_1_molecule_1_1_edge_parameters">MolProto::EdgeParameters</link> &amp;)</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_m_s_d_1a9719db02665a291111d9dd887be6538f">getSpin</link> (unsigned int a) const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_m_s_d_1aea1f8af9db8cc945eb35a809e923051d">getSpin</link> (unsigned int x, unsigned int y, unsigned int z) const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_m_s_d_1a5296876f3e8cc8b963c0daa773f9f3a7">getFlux</link> (unsigned int a) const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_m_s_d_1a230dd5c4101b1bbb5cf5e2fa533d0a3f">getFlux</link> (unsigned int x, unsigned int y, unsigned int z) const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_m_s_d_1af0cad12dfc8de11dfbbb600672b94a53">getLocalM</link> (unsigned int a) const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_m_s_d_1a45ff1def40c97d90ee19e29ae663efcc">getLocalM</link> (unsigned int x, unsigned int y, unsigned int z) const</para>
+</listitem>
+            <listitem><para>void <link linkend="_classudc_1_1_m_s_d_1adfe9f3e16d498e4b9b304a90a1f11498">setSpin</link> (unsigned int a, const <link linkend="_classudc_1_1_vector">Vector</link> &amp;)</para>
+</listitem>
+            <listitem><para>void <link linkend="_classudc_1_1_m_s_d_1aef79f4457c2a5a982a3bc346e32d6c34">setSpin</link> (unsigned int x, unsigned int y, unsigned int z, const <link linkend="_classudc_1_1_vector">Vector</link> &amp;)</para>
+</listitem>
+            <listitem><para>void <link linkend="_classudc_1_1_m_s_d_1a7edb86e5541e98220246fc0e44e2ecea">setFlux</link> (unsigned int a, const <link linkend="_classudc_1_1_vector">Vector</link> &amp;)</para>
+</listitem>
+            <listitem><para>void <link linkend="_classudc_1_1_m_s_d_1ae73524ada6db950bef483d9de3a55dc5">setFlux</link> (unsigned int x, unsigned int y, unsigned int z, const <link linkend="_classudc_1_1_vector">Vector</link> &amp;)</para>
+</listitem>
+            <listitem><para>void <link linkend="_classudc_1_1_m_s_d_1a009217401a76ea2f94d5bab24c978e1c">setLocalM</link> (unsigned int a, const <link linkend="_classudc_1_1_vector">Vector</link> &amp;, const <link linkend="_classudc_1_1_vector">Vector</link> &amp;)</para>
+</listitem>
+            <listitem><para>void <link linkend="_classudc_1_1_m_s_d_1a669c3742346be01d961fff30768e09b4">setLocalM</link> (unsigned int x, unsigned int y, unsigned int z, const <link linkend="_classudc_1_1_vector">Vector</link> &amp;, const <link linkend="_classudc_1_1_vector">Vector</link> &amp;)</para>
+</listitem>
+            <listitem><para>unsigned int <link linkend="_classudc_1_1_m_s_d_1a762738c5f2b8e17f526c6138fcf89872">getN</link> () const</para>
+</listitem>
+            <listitem><para>unsigned int <link linkend="_classudc_1_1_m_s_d_1adc9f743ee13e82becfe0a2c50ee52ec1">getNL</link> () const</para>
+</listitem>
+            <listitem><para>unsigned int <link linkend="_classudc_1_1_m_s_d_1ae18b1502712c3ac5314dbb6130c354ed">getNR</link> () const</para>
+</listitem>
+            <listitem><para>unsigned int <link linkend="_classudc_1_1_m_s_d_1a100e8176f61523c520c546149d9014a6">getNm</link> () const</para>
+</listitem>
+            <listitem><para>unsigned int <link linkend="_classudc_1_1_m_s_d_1a3a90533d4764c960d421ccf254696133">getNmL</link> () const</para>
+</listitem>
+            <listitem><para>unsigned int <link linkend="_classudc_1_1_m_s_d_1ad5c8743bd63fd3cdbb0361233e405c0b">getNmR</link> () const</para>
+</listitem>
+            <listitem><para>unsigned int <link linkend="_classudc_1_1_m_s_d_1a7add4bc60686c62e73343afa6092b017">getNLR</link> () const</para>
+</listitem>
+            <listitem><para>unsigned int <link linkend="_classudc_1_1_m_s_d_1a3ece5c5f34abcc06fef11fc96189895d">getWidth</link> () const</para>
+</listitem>
+            <listitem><para>unsigned int <link linkend="_classudc_1_1_m_s_d_1a536ab447508f890fd16272995c6fae8b">getHeight</link> () const</para>
+</listitem>
+            <listitem><para>unsigned int <link linkend="_classudc_1_1_m_s_d_1aefb9f78944562ded126ec46485319557">getDepth</link> () const</para>
+</listitem>
+            <listitem><para>void <link linkend="_classudc_1_1_m_s_d_1a939846baeed48015266b707a703ef15f">getDimensions</link> (unsigned int &amp;width, unsigned int &amp;height, unsigned int &amp;depth) const</para>
+</listitem>
+            <listitem><para>unsigned int <link linkend="_classudc_1_1_m_s_d_1a2c5e7ed01ae1e5e5e6157e76748f88ab">getMolPosL</link> () const</para>
+</listitem>
+            <listitem><para>unsigned int <link linkend="_classudc_1_1_m_s_d_1a158fcf1df8fc10e66257138df6e4a60e">getMolPosR</link> () const</para>
+</listitem>
+            <listitem><para>void <link linkend="_classudc_1_1_m_s_d_1a52a344961c0464197bc0936e24ec1107">getMolPos</link> (unsigned int &amp;molPosL, unsigned int &amp;molPosR) const</para>
+</listitem>
+            <listitem><para>unsigned int <link linkend="_classudc_1_1_m_s_d_1a9d5727849f685e6cccb5e5a0a3818cb3">getTopL</link> () const</para>
+</listitem>
+            <listitem><para>unsigned int <link linkend="_classudc_1_1_m_s_d_1a66200786b332ed413fa3e29a7ecedad3">getBottomL</link> () const</para>
+</listitem>
+            <listitem><para>unsigned int <link linkend="_classudc_1_1_m_s_d_1a7de138059fe647ec24a50d3b98ecdfe8">getFrontR</link> () const</para>
+</listitem>
+            <listitem><para>unsigned int <link linkend="_classudc_1_1_m_s_d_1a368da5ea0c007b29f0c18a4415b2d1f6">getBackR</link> () const</para>
+</listitem>
+            <listitem><para>void <link linkend="_classudc_1_1_m_s_d_1a54c6db2f1ffe3cb9de31b2e278ae2335">getInnerBounds</link> (unsigned int &amp;topL, unsigned int &amp;bottomL, unsigned int &amp;frontR, unsigned int &amp;backR) const</para>
+</listitem>
+            <listitem><para>bool <link linkend="_classudc_1_1_m_s_d_1af17782522b81ac6827d6874ae6aa5018">getFM_L_exists</link> () const</para>
+</listitem>
+            <listitem><para>bool <link linkend="_classudc_1_1_m_s_d_1ac7b197dca279f02512882dc173a70aaf">getFM_R_exists</link> () const</para>
+</listitem>
+            <listitem><para>bool <link linkend="_classudc_1_1_m_s_d_1a87c3cff4cf2db6a08fa6d7f184500eea">getMol_exists</link> () const</para>
+</listitem>
+            <listitem><para>void <link linkend="_classudc_1_1_m_s_d_1a61db2cb3389641129ce97c0613917ec5">getRegions</link> (bool &amp;FM_L_exists, bool &amp;FM_R_exists, bool &amp;mol_exists) const</para>
+</listitem>
+            <listitem><para>void <link linkend="_classudc_1_1_m_s_d_1a3cb49ad4ca11278ed81998a8efd3ce68">setSeed</link> (unsigned long seed)</para>
+</listitem>
+            <listitem><para>unsigned long <link linkend="_classudc_1_1_m_s_d_1adedd5f97461ea96c685923b45b49d91b">getSeed</link> () const</para>
+</listitem>
+            <listitem><para>void <link linkend="_classudc_1_1_m_s_d_1a82b75829d72149de1992f198ad3c73b6">reinitialize</link> (bool reseed=true)</para>
+</listitem>
+            <listitem><para>void <link linkend="_classudc_1_1_m_s_d_1a9b89ead4fcfc2c0ead59dcb33538a334">randomize</link> (bool reseed=true)</para>
+</listitem>
+            <listitem><para>void <link linkend="_classudc_1_1_m_s_d_1a3da3a656fdd0a10f6bbc819935c9fa1d">metropolis</link> (unsigned long long N)</para>
+</listitem>
+            <listitem><para>void <link linkend="_classudc_1_1_m_s_d_1ad9f8ab6d5766749f3f763f2ebb13ce6d">metropolis</link> (unsigned long long N, unsigned long long freq)</para>
+</listitem>
+            <listitem><para>double <link linkend="_classudc_1_1_m_s_d_1aca1fecf2568de928a441aa031280fc49">specificHeat</link> () const</para>
+</listitem>
+            <listitem><para>double <link linkend="_classudc_1_1_m_s_d_1a0b14f09fe74231e5f9981b1571666ce5">specificHeat_L</link> () const</para>
+</listitem>
+            <listitem><para>double <link linkend="_classudc_1_1_m_s_d_1a8c62ebc53fe5f1d620785ad492b27414">specificHeat_R</link> () const</para>
+</listitem>
+            <listitem><para>double <link linkend="_classudc_1_1_m_s_d_1abb96b180a4960bf101178aa01701b3cc">specificHeat_m</link> () const</para>
+</listitem>
+            <listitem><para>double <link linkend="_classudc_1_1_m_s_d_1a2d9850c33757ced8ae7c7b4b5de5afb2">specificHeat_mL</link> () const</para>
+</listitem>
+            <listitem><para>double <link linkend="_classudc_1_1_m_s_d_1a162b9154b562fb1f70e128eb9f0b9c46">specificHeat_mR</link> () const</para>
+</listitem>
+            <listitem><para>double <link linkend="_classudc_1_1_m_s_d_1ab0205d423d26ab312fe9d612eb6b82e4">specificHeat_LR</link> () const</para>
+</listitem>
+            <listitem><para>double <link linkend="_classudc_1_1_m_s_d_1ac8f8afe5da02b14af09b1b4861a274e1">magneticSusceptibility</link> () const</para>
+</listitem>
+            <listitem><para>double <link linkend="_classudc_1_1_m_s_d_1a3a7e3fa4340af6fe33cf2daceb37f656">magneticSusceptibility_L</link> () const</para>
+</listitem>
+            <listitem><para>double <link linkend="_classudc_1_1_m_s_d_1acb90487ccf1985ac1045c7762fa4f42f">magneticSusceptibility_R</link> () const</para>
+</listitem>
+            <listitem><para>double <link linkend="_classudc_1_1_m_s_d_1a215acad84017f65c72a1abcb504b12ea">magneticSusceptibility_m</link> () const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_m_s_d_1a4b9e7018e4245eaf23d4e01d0b582cc3">meanM</link> () const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_m_s_d_1a8fe5c6f539ba5f128d89f6c32e42a81b">meanML</link> () const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_m_s_d_1a75a2a166c7a100d23729914893024e8b">meanMR</link> () const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_m_s_d_1a7b1361f8f8a4c2782e16f4885860160d">meanMm</link> () const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_m_s_d_1a4c23d2ce55dbe92303a93b0f04247d6a">meanMS</link> () const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_m_s_d_1a6c769149852b83b104041036684cc3b5">meanMSL</link> () const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_m_s_d_1af32676ff5839b6a89cae38003cf392a5">meanMSR</link> () const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_m_s_d_1a0d9c252051a14d75fbfdab2e3ba0f1e5">meanMSm</link> () const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_m_s_d_1a195fcd710a651679837fe247ba037e65">meanMF</link> () const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_m_s_d_1aa996c134623e5f28bb2d599088f4cd56">meanMFL</link> () const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_m_s_d_1ab4b2b0695b3e6143c44b6ab391f9890d">meanMFR</link> () const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_m_s_d_1a9aac2bad16a926cd6ac24e3c4291325f">meanMFm</link> () const</para>
+</listitem>
+            <listitem><para>double <link linkend="_classudc_1_1_m_s_d_1a07edbbd70d154577745c22e5ec7bdee4">meanU</link> () const</para>
+</listitem>
+            <listitem><para>double <link linkend="_classudc_1_1_m_s_d_1aec1081b7cc26892ee7bc9399f1fadbb2">meanUL</link> () const</para>
+</listitem>
+            <listitem><para>double <link linkend="_classudc_1_1_m_s_d_1a250a0059dd38873b6efe85a4f5da8668">meanUR</link> () const</para>
+</listitem>
+            <listitem><para>double <link linkend="_classudc_1_1_m_s_d_1a922653ef103119a00b0c808c62a7f9d3">meanUm</link> () const</para>
+</listitem>
+            <listitem><para>double <link linkend="_classudc_1_1_m_s_d_1a41a86b85c83949242bcc602775ed136d">meanUmL</link> () const</para>
+</listitem>
+            <listitem><para>double <link linkend="_classudc_1_1_m_s_d_1ad5c1cd7334fdd3ea7db7964f2e69a536">meanUmR</link> () const</para>
+</listitem>
+            <listitem><para>double <link linkend="_classudc_1_1_m_s_d_1a215bb03467cc147f837cd3afe89a793a">meanULR</link> () const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_m_s_d_1_1_iterator">Iterator</link> <link linkend="_classudc_1_1_m_s_d_1afb91b037de5315bfde0159ee591267a3">begin</link> () const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_m_s_d_1_1_iterator">Iterator</link> <link linkend="_classudc_1_1_m_s_d_1a917317363ac8e2e78840845d6fc49f91">end</link> () const</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Public Attributes    </title>
+        <itemizedlist>
+            <listitem><para>std::vector&lt; <link linkend="_structudc_1_1_m_s_d_1_1_results">Results</link> &gt; <link linkend="_classudc_1_1_m_s_d_1a6a807356604fd24654d015c41974b526">record</link></para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_m_s_d_1a3d235795ecc459cc0c2069c3f05d089d">FlippingAlgorithm</link> <link linkend="_classudc_1_1_m_s_d_1a2ccd325cf09e82420004de9702894de5">flippingAlgorithm</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Static Public Attributes    </title>
+        <itemizedlist>
+            <listitem><para>static const <link linkend="_classudc_1_1_m_s_d_1a3d235795ecc459cc0c2069c3f05d089d">FlippingAlgorithm</link> <link linkend="_classudc_1_1_m_s_d_1a7010b43c1e96eca520bcefba7aa36ad3">UP_DOWN_MODEL</link></para>
+</listitem>
+            <listitem><para>static const <link linkend="_classudc_1_1_m_s_d_1a3d235795ecc459cc0c2069c3f05d089d">FlippingAlgorithm</link> <link linkend="_classudc_1_1_m_s_d_1a82cedfe873fa654afa32ab3d1b6f3ead">CONTINUOUS_SPIN_MODEL</link></para>
+</listitem>
+            <listitem><para>static const <link linkend="_classudc_1_1_m_s_d_1aa5aef25b88fee8190e1ac32070d06d66">MolProtoFactory</link> <link linkend="_classudc_1_1_m_s_d_1ac578f0076fce752e661058c648d88997">LINEAR_MOL</link></para>
+</listitem>
+            <listitem><para>static const <link linkend="_classudc_1_1_m_s_d_1aa5aef25b88fee8190e1ac32070d06d66">MolProtoFactory</link> <link linkend="_classudc_1_1_m_s_d_1a72708188b46e1ddffb7c6e2fec96c587">CIRCULAR_MOL</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Friends    </title>
+        <itemizedlist>
+            <listitem><para>void <link linkend="_classudc_1_1_m_s_d_1a01c9eff4fc0c233e1aafc04ea6271036">Mol::setLocalM</link> (unsigned int a, const <link linkend="_classudc_1_1_vector">Vector</link> &amp;spin, const <link linkend="_classudc_1_1_vector">Vector</link> &amp;flux)</para>
+</listitem>
+            <listitem><para>void <link linkend="_classudc_1_1_m_s_d_1a4d4a91fd46eec66e753dfa2642c25068">Mol::setSpin</link> (unsigned int a, const <link linkend="_classudc_1_1_vector">Vector</link> &amp;spin)</para>
+</listitem>
+            <listitem><para>void <link linkend="_classudc_1_1_m_s_d_1a0bb8c1e9fef1960578abc46446380dbf">Mol::setFlux</link> (unsigned int a, const <link linkend="_classudc_1_1_vector">Vector</link> &amp;flux)</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Detailed Description</title>
+
+<para>An abstract Molecular Spintronic Device. </para>
+</section>
+<section>
+<title>Member Typedef Documentation</title>
+<anchor xml:id="_classudc_1_1_m_s_d_1a3d235795ecc459cc0c2069c3f05d089d"/><section>
+    <title>FlippingAlgorithm</title>
+<indexterm><primary>FlippingAlgorithm</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>FlippingAlgorithm</secondary></indexterm>
+<para><computeroutput>typedef function&lt;<link linkend="_classudc_1_1_vector">Vector</link> (const <link linkend="_classudc_1_1_vector">Vector</link> &amp;, function&lt;double()&gt;)&gt; <link linkend="_classudc_1_1_m_s_d_1a3d235795ecc459cc0c2069c3f05d089d">udc::MSD::FlippingAlgorithm</link></computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1ab3c0b3e8474e18cb213f79d66f221b67"/><section>
+    <title>Mol</title>
+<indexterm><primary>Mol</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>Mol</secondary></indexterm>
+<para><computeroutput>typedef Molecule::Instance <link linkend="_classudc_1_1_m_s_d_1ab3c0b3e8474e18cb213f79d66f221b67">udc::MSD::Mol</link></computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a7266f08d021d5a06960b152c95a9213e"/><section>
+    <title>MolProto</title>
+<indexterm><primary>MolProto</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>MolProto</secondary></indexterm>
+<para><computeroutput>typedef <link linkend="_classudc_1_1_molecule">Molecule</link> <link linkend="_classudc_1_1_m_s_d_1a7266f08d021d5a06960b152c95a9213e">udc::MSD::MolProto</link></computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1aa5aef25b88fee8190e1ac32070d06d66"/><section>
+    <title>MolProtoFactory</title>
+<indexterm><primary>MolProtoFactory</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>MolProtoFactory</secondary></indexterm>
+<para><computeroutput>typedef function&lt;<link linkend="_classudc_1_1_m_s_d_1a7266f08d021d5a06960b152c95a9213e">MolProto</link> (unsigned int)&gt; <link linkend="_classudc_1_1_m_s_d_1aa5aef25b88fee8190e1ac32070d06d66">udc::MSD::MolProtoFactory</link></computeroutput></para></section>
+</section>
+<section>
+<title>Constructor &amp; Destructor Documentation</title>
+<anchor xml:id="_classudc_1_1_m_s_d_1a8bb6667fb7bc003abe0fc6af8793ed12"/><section>
+    <title>MSD()<computeroutput>[1/5]</computeroutput></title>
+<indexterm><primary>MSD</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>MSD</secondary></indexterm>
+<para><computeroutput>udc::MSD::MSD (unsigned int width, unsigned int height, unsigned int depth, const <link linkend="_classudc_1_1_m_s_d_1a7266f08d021d5a06960b152c95a9213e">MolProto</link> &amp; molProto, unsigned int molPosL, unsigned int topL, unsigned int bottomL, unsigned int frontR, unsigned int backR)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a1d6135b424fccae0e69d8eece84672ea"/><section>
+    <title>MSD()<computeroutput>[2/5]</computeroutput></title>
+<indexterm><primary>MSD</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>MSD</secondary></indexterm>
+<para><computeroutput>udc::MSD::MSD (unsigned int width, unsigned int height, unsigned int depth, const <link linkend="_classudc_1_1_m_s_d_1aa5aef25b88fee8190e1ac32070d06d66">MolProtoFactory</link> &amp; molType, unsigned int molPosL, unsigned int molPosR, unsigned int topL, unsigned int bottomL, unsigned int frontR, unsigned int backR)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a9f4d8ca0e3bf597898705d6784155f75"/><section>
+    <title>MSD()<computeroutput>[3/5]</computeroutput></title>
+<indexterm><primary>MSD</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>MSD</secondary></indexterm>
+<para><computeroutput>udc::MSD::MSD (unsigned int width, unsigned int height, unsigned int depth, unsigned int molPosL, unsigned int molPosR, unsigned int topL, unsigned int bottomL, unsigned int frontR, unsigned int backR)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a4014b4eaa8dffbd9799aebccf3fdb842"/><section>
+    <title>MSD()<computeroutput>[4/5]</computeroutput></title>
+<indexterm><primary>MSD</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>MSD</secondary></indexterm>
+<para><computeroutput>udc::MSD::MSD (unsigned int width, unsigned int height, unsigned int depth, unsigned int heightL, unsigned depthR)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a337868649574cfba54a1d779483a47c8"/><section>
+    <title>MSD()<computeroutput>[5/5]</computeroutput></title>
+<indexterm><primary>MSD</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>MSD</secondary></indexterm>
+<para><computeroutput>udc::MSD::MSD (unsigned int width, unsigned int height, unsigned int depth)</computeroutput></para></section>
+</section>
+<section>
+<title>Member Function Documentation</title>
+<anchor xml:id="_classudc_1_1_m_s_d_1afb91b037de5315bfde0159ee591267a3"/><section>
+    <title>begin()</title>
+<indexterm><primary>begin</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>begin</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_m_s_d_1_1_iterator">MSD::Iterator</link> udc::MSD::begin ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a917317363ac8e2e78840845d6fc49f91"/><section>
+    <title>end()</title>
+<indexterm><primary>end</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>end</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_m_s_d_1_1_iterator">MSD::Iterator</link> udc::MSD::end ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a368da5ea0c007b29f0c18a4415b2d1f6"/><section>
+    <title>getBackR()</title>
+<indexterm><primary>getBackR</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getBackR</secondary></indexterm>
+<para><computeroutput>unsigned int udc::MSD::getBackR ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a66200786b332ed413fa3e29a7ecedad3"/><section>
+    <title>getBottomL()</title>
+<indexterm><primary>getBottomL</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getBottomL</secondary></indexterm>
+<para><computeroutput>unsigned int udc::MSD::getBottomL ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1aefb9f78944562ded126ec46485319557"/><section>
+    <title>getDepth()</title>
+<indexterm><primary>getDepth</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getDepth</secondary></indexterm>
+<para><computeroutput>unsigned int udc::MSD::getDepth ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a939846baeed48015266b707a703ef15f"/><section>
+    <title>getDimensions()</title>
+<indexterm><primary>getDimensions</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getDimensions</secondary></indexterm>
+<para><computeroutput>void udc::MSD::getDimensions (unsigned int &amp; width, unsigned int &amp; height, unsigned int &amp; depth) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a5296876f3e8cc8b963c0daa773f9f3a7"/><section>
+    <title>getFlux()<computeroutput>[1/2]</computeroutput></title>
+<indexterm><primary>getFlux</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getFlux</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::getFlux (unsigned int a) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a230dd5c4101b1bbb5cf5e2fa533d0a3f"/><section>
+    <title>getFlux()<computeroutput>[2/2]</computeroutput></title>
+<indexterm><primary>getFlux</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getFlux</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::getFlux (unsigned int x, unsigned int y, unsigned int z) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1af17782522b81ac6827d6874ae6aa5018"/><section>
+    <title>getFM_L_exists()</title>
+<indexterm><primary>getFM_L_exists</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getFM_L_exists</secondary></indexterm>
+<para><computeroutput>bool udc::MSD::getFM_L_exists ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1ac7b197dca279f02512882dc173a70aaf"/><section>
+    <title>getFM_R_exists()</title>
+<indexterm><primary>getFM_R_exists</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getFM_R_exists</secondary></indexterm>
+<para><computeroutput>bool udc::MSD::getFM_R_exists ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a7de138059fe647ec24a50d3b98ecdfe8"/><section>
+    <title>getFrontR()</title>
+<indexterm><primary>getFrontR</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getFrontR</secondary></indexterm>
+<para><computeroutput>unsigned int udc::MSD::getFrontR ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a536ab447508f890fd16272995c6fae8b"/><section>
+    <title>getHeight()</title>
+<indexterm><primary>getHeight</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getHeight</secondary></indexterm>
+<para><computeroutput>unsigned int udc::MSD::getHeight ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a54c6db2f1ffe3cb9de31b2e278ae2335"/><section>
+    <title>getInnerBounds()</title>
+<indexterm><primary>getInnerBounds</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getInnerBounds</secondary></indexterm>
+<para><computeroutput>void udc::MSD::getInnerBounds (unsigned int &amp; topL, unsigned int &amp; bottomL, unsigned int &amp; frontR, unsigned int &amp; backR) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1af0cad12dfc8de11dfbbb600672b94a53"/><section>
+    <title>getLocalM()<computeroutput>[1/2]</computeroutput></title>
+<indexterm><primary>getLocalM</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getLocalM</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::getLocalM (unsigned int a) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a45ff1def40c97d90ee19e29ae663efcc"/><section>
+    <title>getLocalM()<computeroutput>[2/2]</computeroutput></title>
+<indexterm><primary>getLocalM</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getLocalM</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::getLocalM (unsigned int x, unsigned int y, unsigned int z) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a87c3cff4cf2db6a08fa6d7f184500eea"/><section>
+    <title>getMol_exists()</title>
+<indexterm><primary>getMol_exists</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getMol_exists</secondary></indexterm>
+<para><computeroutput>bool udc::MSD::getMol_exists ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a52a344961c0464197bc0936e24ec1107"/><section>
+    <title>getMolPos()</title>
+<indexterm><primary>getMolPos</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getMolPos</secondary></indexterm>
+<para><computeroutput>void udc::MSD::getMolPos (unsigned int &amp; molPosL, unsigned int &amp; molPosR) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a2c5e7ed01ae1e5e5e6157e76748f88ab"/><section>
+    <title>getMolPosL()</title>
+<indexterm><primary>getMolPosL</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getMolPosL</secondary></indexterm>
+<para><computeroutput>unsigned int udc::MSD::getMolPosL ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a158fcf1df8fc10e66257138df6e4a60e"/><section>
+    <title>getMolPosR()</title>
+<indexterm><primary>getMolPosR</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getMolPosR</secondary></indexterm>
+<para><computeroutput>unsigned int udc::MSD::getMolPosR ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a77dce5d8c1a874c47acfbc69d5a867ab"/><section>
+    <title>getMolProto()</title>
+<indexterm><primary>getMolProto</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getMolProto</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_m_s_d_1a7266f08d021d5a06960b152c95a9213e">MSD::MolProto</link> udc::MSD::getMolProto ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a762738c5f2b8e17f526c6138fcf89872"/><section>
+    <title>getN()</title>
+<indexterm><primary>getN</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getN</secondary></indexterm>
+<para><computeroutput>unsigned int udc::MSD::getN ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1adc9f743ee13e82becfe0a2c50ee52ec1"/><section>
+    <title>getNL()</title>
+<indexterm><primary>getNL</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getNL</secondary></indexterm>
+<para><computeroutput>unsigned int udc::MSD::getNL ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a7add4bc60686c62e73343afa6092b017"/><section>
+    <title>getNLR()</title>
+<indexterm><primary>getNLR</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getNLR</secondary></indexterm>
+<para><computeroutput>unsigned int udc::MSD::getNLR ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a100e8176f61523c520c546149d9014a6"/><section>
+    <title>getNm()</title>
+<indexterm><primary>getNm</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getNm</secondary></indexterm>
+<para><computeroutput>unsigned int udc::MSD::getNm ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a3a90533d4764c960d421ccf254696133"/><section>
+    <title>getNmL()</title>
+<indexterm><primary>getNmL</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getNmL</secondary></indexterm>
+<para><computeroutput>unsigned int udc::MSD::getNmL ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1ad5c8743bd63fd3cdbb0361233e405c0b"/><section>
+    <title>getNmR()</title>
+<indexterm><primary>getNmR</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getNmR</secondary></indexterm>
+<para><computeroutput>unsigned int udc::MSD::getNmR ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1ae18b1502712c3ac5314dbb6130c354ed"/><section>
+    <title>getNR()</title>
+<indexterm><primary>getNR</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getNR</secondary></indexterm>
+<para><computeroutput>unsigned int udc::MSD::getNR ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1abfa4f6883d0b4677ab7b70c1adf06066"/><section>
+    <title>getParameters()</title>
+<indexterm><primary>getParameters</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getParameters</secondary></indexterm>
+<para><computeroutput><link linkend="_structudc_1_1_m_s_d_1_1_parameters">MSD::Parameters</link> udc::MSD::getParameters ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a61db2cb3389641129ce97c0613917ec5"/><section>
+    <title>getRegions()</title>
+<indexterm><primary>getRegions</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getRegions</secondary></indexterm>
+<para><computeroutput>void udc::MSD::getRegions (bool &amp; FM_L_exists, bool &amp; FM_R_exists, bool &amp; mol_exists) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1ae1bee2a207b40720156243ed19eed671"/><section>
+    <title>getResults()</title>
+<indexterm><primary>getResults</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getResults</secondary></indexterm>
+<para><computeroutput><link linkend="_structudc_1_1_m_s_d_1_1_results">MSD::Results</link> udc::MSD::getResults ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1adedd5f97461ea96c685923b45b49d91b"/><section>
+    <title>getSeed()</title>
+<indexterm><primary>getSeed</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getSeed</secondary></indexterm>
+<para><computeroutput>unsigned long udc::MSD::getSeed ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a9719db02665a291111d9dd887be6538f"/><section>
+    <title>getSpin()<computeroutput>[1/2]</computeroutput></title>
+<indexterm><primary>getSpin</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getSpin</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::getSpin (unsigned int a) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1aea1f8af9db8cc945eb35a809e923051d"/><section>
+    <title>getSpin()<computeroutput>[2/2]</computeroutput></title>
+<indexterm><primary>getSpin</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getSpin</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::getSpin (unsigned int x, unsigned int y, unsigned int z) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a9d5727849f685e6cccb5e5a0a3818cb3"/><section>
+    <title>getTopL()</title>
+<indexterm><primary>getTopL</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getTopL</secondary></indexterm>
+<para><computeroutput>unsigned int udc::MSD::getTopL ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a3ece5c5f34abcc06fef11fc96189895d"/><section>
+    <title>getWidth()</title>
+<indexterm><primary>getWidth</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>getWidth</secondary></indexterm>
+<para><computeroutput>unsigned int udc::MSD::getWidth ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1ac8f8afe5da02b14af09b1b4861a274e1"/><section>
+    <title>magneticSusceptibility()</title>
+<indexterm><primary>magneticSusceptibility</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>magneticSusceptibility</secondary></indexterm>
+<para><computeroutput>double udc::MSD::magneticSusceptibility ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a3a7e3fa4340af6fe33cf2daceb37f656"/><section>
+    <title>magneticSusceptibility_L()</title>
+<indexterm><primary>magneticSusceptibility_L</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>magneticSusceptibility_L</secondary></indexterm>
+<para><computeroutput>double udc::MSD::magneticSusceptibility_L ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a215acad84017f65c72a1abcb504b12ea"/><section>
+    <title>magneticSusceptibility_m()</title>
+<indexterm><primary>magneticSusceptibility_m</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>magneticSusceptibility_m</secondary></indexterm>
+<para><computeroutput>double udc::MSD::magneticSusceptibility_m ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1acb90487ccf1985ac1045c7762fa4f42f"/><section>
+    <title>magneticSusceptibility_R()</title>
+<indexterm><primary>magneticSusceptibility_R</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>magneticSusceptibility_R</secondary></indexterm>
+<para><computeroutput>double udc::MSD::magneticSusceptibility_R ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a4b9e7018e4245eaf23d4e01d0b582cc3"/><section>
+    <title>meanM()</title>
+<indexterm><primary>meanM</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>meanM</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::meanM ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a195fcd710a651679837fe247ba037e65"/><section>
+    <title>meanMF()</title>
+<indexterm><primary>meanMF</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>meanMF</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::meanMF ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1aa996c134623e5f28bb2d599088f4cd56"/><section>
+    <title>meanMFL()</title>
+<indexterm><primary>meanMFL</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>meanMFL</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::meanMFL ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a9aac2bad16a926cd6ac24e3c4291325f"/><section>
+    <title>meanMFm()</title>
+<indexterm><primary>meanMFm</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>meanMFm</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::meanMFm ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1ab4b2b0695b3e6143c44b6ab391f9890d"/><section>
+    <title>meanMFR()</title>
+<indexterm><primary>meanMFR</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>meanMFR</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::meanMFR ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a8fe5c6f539ba5f128d89f6c32e42a81b"/><section>
+    <title>meanML()</title>
+<indexterm><primary>meanML</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>meanML</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::meanML ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a7b1361f8f8a4c2782e16f4885860160d"/><section>
+    <title>meanMm()</title>
+<indexterm><primary>meanMm</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>meanMm</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::meanMm ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a75a2a166c7a100d23729914893024e8b"/><section>
+    <title>meanMR()</title>
+<indexterm><primary>meanMR</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>meanMR</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::meanMR ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a4c23d2ce55dbe92303a93b0f04247d6a"/><section>
+    <title>meanMS()</title>
+<indexterm><primary>meanMS</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>meanMS</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::meanMS ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a6c769149852b83b104041036684cc3b5"/><section>
+    <title>meanMSL()</title>
+<indexterm><primary>meanMSL</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>meanMSL</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::meanMSL ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a0d9c252051a14d75fbfdab2e3ba0f1e5"/><section>
+    <title>meanMSm()</title>
+<indexterm><primary>meanMSm</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>meanMSm</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::meanMSm ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1af32676ff5839b6a89cae38003cf392a5"/><section>
+    <title>meanMSR()</title>
+<indexterm><primary>meanMSR</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>meanMSR</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::meanMSR ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a07edbbd70d154577745c22e5ec7bdee4"/><section>
+    <title>meanU()</title>
+<indexterm><primary>meanU</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>meanU</secondary></indexterm>
+<para><computeroutput>double udc::MSD::meanU ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1aec1081b7cc26892ee7bc9399f1fadbb2"/><section>
+    <title>meanUL()</title>
+<indexterm><primary>meanUL</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>meanUL</secondary></indexterm>
+<para><computeroutput>double udc::MSD::meanUL ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a215bb03467cc147f837cd3afe89a793a"/><section>
+    <title>meanULR()</title>
+<indexterm><primary>meanULR</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>meanULR</secondary></indexterm>
+<para><computeroutput>double udc::MSD::meanULR ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a922653ef103119a00b0c808c62a7f9d3"/><section>
+    <title>meanUm()</title>
+<indexterm><primary>meanUm</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>meanUm</secondary></indexterm>
+<para><computeroutput>double udc::MSD::meanUm ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a41a86b85c83949242bcc602775ed136d"/><section>
+    <title>meanUmL()</title>
+<indexterm><primary>meanUmL</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>meanUmL</secondary></indexterm>
+<para><computeroutput>double udc::MSD::meanUmL ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1ad5c1cd7334fdd3ea7db7964f2e69a536"/><section>
+    <title>meanUmR()</title>
+<indexterm><primary>meanUmR</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>meanUmR</secondary></indexterm>
+<para><computeroutput>double udc::MSD::meanUmR ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a250a0059dd38873b6efe85a4f5da8668"/><section>
+    <title>meanUR()</title>
+<indexterm><primary>meanUR</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>meanUR</secondary></indexterm>
+<para><computeroutput>double udc::MSD::meanUR ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a3da3a656fdd0a10f6bbc819935c9fa1d"/><section>
+    <title>metropolis()<computeroutput>[1/2]</computeroutput></title>
+<indexterm><primary>metropolis</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>metropolis</secondary></indexterm>
+<para><computeroutput>void udc::MSD::metropolis (unsigned long long N)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1ad9f8ab6d5766749f3f763f2ebb13ce6d"/><section>
+    <title>metropolis()<computeroutput>[2/2]</computeroutput></title>
+<indexterm><primary>metropolis</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>metropolis</secondary></indexterm>
+<para><computeroutput>void udc::MSD::metropolis (unsigned long long N, unsigned long long freq)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a9b89ead4fcfc2c0ead59dcb33538a334"/><section>
+    <title>randomize()</title>
+<indexterm><primary>randomize</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>randomize</secondary></indexterm>
+<para><computeroutput>void udc::MSD::randomize (bool reseed = <computeroutput>true</computeroutput>
+)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a82b75829d72149de1992f198ad3c73b6"/><section>
+    <title>reinitialize()</title>
+<indexterm><primary>reinitialize</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>reinitialize</secondary></indexterm>
+<para><computeroutput>void udc::MSD::reinitialize (bool reseed = <computeroutput>true</computeroutput>
+)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a5c1d308f90d10072e5288685ba4d58db"/><section>
+    <title>set_kT()</title>
+<indexterm><primary>set_kT</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>set_kT</secondary></indexterm>
+<para><computeroutput>void udc::MSD::set_kT (double kT)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a18aa13537e0deda7d1263c1fd8d8228a"/><section>
+    <title>setB()</title>
+<indexterm><primary>setB</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>setB</secondary></indexterm>
+<para><computeroutput>void udc::MSD::setB (const <link linkend="_classudc_1_1_vector">Vector</link> &amp; B)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a7edb86e5541e98220246fc0e44e2ecea"/><section>
+    <title>setFlux()<computeroutput>[1/2]</computeroutput></title>
+<indexterm><primary>setFlux</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>setFlux</secondary></indexterm>
+<para><computeroutput>void <link linkend="_classudc_1_1_m_s_d_1a0bb8c1e9fef1960578abc46446380dbf">udc::MSD::setFlux</link> (unsigned int a, const <link linkend="_classudc_1_1_vector">Vector</link> &amp; flux)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1ae73524ada6db950bef483d9de3a55dc5"/><section>
+    <title>setFlux()<computeroutput>[2/2]</computeroutput></title>
+<indexterm><primary>setFlux</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>setFlux</secondary></indexterm>
+<para><computeroutput>void <link linkend="_classudc_1_1_m_s_d_1a0bb8c1e9fef1960578abc46446380dbf">udc::MSD::setFlux</link> (unsigned int x, unsigned int y, unsigned int z, const <link linkend="_classudc_1_1_vector">Vector</link> &amp; flux)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a009217401a76ea2f94d5bab24c978e1c"/><section>
+    <title>setLocalM()<computeroutput>[1/2]</computeroutput></title>
+<indexterm><primary>setLocalM</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>setLocalM</secondary></indexterm>
+<para><computeroutput>void <link linkend="_classudc_1_1_m_s_d_1a01c9eff4fc0c233e1aafc04ea6271036">udc::MSD::setLocalM</link> (unsigned int a, const <link linkend="_classudc_1_1_vector">Vector</link> &amp; spin, const <link linkend="_classudc_1_1_vector">Vector</link> &amp; flux)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a669c3742346be01d961fff30768e09b4"/><section>
+    <title>setLocalM()<computeroutput>[2/2]</computeroutput></title>
+<indexterm><primary>setLocalM</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>setLocalM</secondary></indexterm>
+<para><computeroutput>void <link linkend="_classudc_1_1_m_s_d_1a01c9eff4fc0c233e1aafc04ea6271036">udc::MSD::setLocalM</link> (unsigned int x, unsigned int y, unsigned int z, const <link linkend="_classudc_1_1_vector">Vector</link> &amp; spin, const <link linkend="_classudc_1_1_vector">Vector</link> &amp; flux)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1aade85204d30f826444572e41f27613aa"/><section>
+    <title>setMolParameters()</title>
+<indexterm><primary>setMolParameters</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>setMolParameters</secondary></indexterm>
+<para><computeroutput>void udc::MSD::setMolParameters (const <link linkend="_structudc_1_1_molecule_1_1_node_parameters">MolProto::NodeParameters</link> &amp; nodeParams, const <link linkend="_structudc_1_1_molecule_1_1_edge_parameters">MolProto::EdgeParameters</link> &amp; edgeParams)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1aa8ed0dab0705b810e4d14215b488fb43"/><section>
+    <title>setMolProto()</title>
+<indexterm><primary>setMolProto</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>setMolProto</secondary></indexterm>
+<para><computeroutput>void udc::MSD::setMolProto (const <link linkend="_classudc_1_1_m_s_d_1a7266f08d021d5a06960b152c95a9213e">MolProto</link> &amp; proto)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1aa1513f639c10ca29773ea287ae104121"/><section>
+    <title>setParameters()</title>
+<indexterm><primary>setParameters</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>setParameters</secondary></indexterm>
+<para><computeroutput>void udc::MSD::setParameters (const <link linkend="_structudc_1_1_m_s_d_1_1_parameters">Parameters</link> &amp; p)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a3cb49ad4ca11278ed81998a8efd3ce68"/><section>
+    <title>setSeed()</title>
+<indexterm><primary>setSeed</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>setSeed</secondary></indexterm>
+<para><computeroutput>void udc::MSD::setSeed (unsigned long seed)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1adfe9f3e16d498e4b9b304a90a1f11498"/><section>
+    <title>setSpin()<computeroutput>[1/2]</computeroutput></title>
+<indexterm><primary>setSpin</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>setSpin</secondary></indexterm>
+<para><computeroutput>void <link linkend="_classudc_1_1_m_s_d_1a4d4a91fd46eec66e753dfa2642c25068">udc::MSD::setSpin</link> (unsigned int a, const <link linkend="_classudc_1_1_vector">Vector</link> &amp; spin)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1aef79f4457c2a5a982a3bc346e32d6c34"/><section>
+    <title>setSpin()<computeroutput>[2/2]</computeroutput></title>
+<indexterm><primary>setSpin</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>setSpin</secondary></indexterm>
+<para><computeroutput>void <link linkend="_classudc_1_1_m_s_d_1a4d4a91fd46eec66e753dfa2642c25068">udc::MSD::setSpin</link> (unsigned int x, unsigned int y, unsigned int z, const <link linkend="_classudc_1_1_vector">Vector</link> &amp; spin)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1aca1fecf2568de928a441aa031280fc49"/><section>
+    <title>specificHeat()</title>
+<indexterm><primary>specificHeat</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>specificHeat</secondary></indexterm>
+<para><computeroutput>double udc::MSD::specificHeat ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a0b14f09fe74231e5f9981b1571666ce5"/><section>
+    <title>specificHeat_L()</title>
+<indexterm><primary>specificHeat_L</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>specificHeat_L</secondary></indexterm>
+<para><computeroutput>double udc::MSD::specificHeat_L ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1ab0205d423d26ab312fe9d612eb6b82e4"/><section>
+    <title>specificHeat_LR()</title>
+<indexterm><primary>specificHeat_LR</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>specificHeat_LR</secondary></indexterm>
+<para><computeroutput>double udc::MSD::specificHeat_LR ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1abb96b180a4960bf101178aa01701b3cc"/><section>
+    <title>specificHeat_m()</title>
+<indexterm><primary>specificHeat_m</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>specificHeat_m</secondary></indexterm>
+<para><computeroutput>double udc::MSD::specificHeat_m ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a2d9850c33757ced8ae7c7b4b5de5afb2"/><section>
+    <title>specificHeat_mL()</title>
+<indexterm><primary>specificHeat_mL</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>specificHeat_mL</secondary></indexterm>
+<para><computeroutput>double udc::MSD::specificHeat_mL ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a162b9154b562fb1f70e128eb9f0b9c46"/><section>
+    <title>specificHeat_mR()</title>
+<indexterm><primary>specificHeat_mR</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>specificHeat_mR</secondary></indexterm>
+<para><computeroutput>double udc::MSD::specificHeat_mR ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a8c62ebc53fe5f1d620785ad492b27414"/><section>
+    <title>specificHeat_R()</title>
+<indexterm><primary>specificHeat_R</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>specificHeat_R</secondary></indexterm>
+<para><computeroutput>double udc::MSD::specificHeat_R ( ) const</computeroutput></para></section>
+</section>
+<section>
+<title>Friends And Related Function Documentation</title>
+<anchor xml:id="_classudc_1_1_m_s_d_1a0bb8c1e9fef1960578abc46446380dbf"/><section>
+    <title>Mol::setFlux</title>
+<indexterm><primary>Mol::setFlux</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>Mol::setFlux</secondary></indexterm>
+<para><computeroutput>void Mol::setFlux (unsigned int a, const <link linkend="_classudc_1_1_vector">Vector</link> &amp; flux)<computeroutput>[friend]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a01c9eff4fc0c233e1aafc04ea6271036"/><section>
+    <title>Mol::setLocalM</title>
+<indexterm><primary>Mol::setLocalM</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>Mol::setLocalM</secondary></indexterm>
+<para><computeroutput>void Mol::setLocalM (unsigned int a, const <link linkend="_classudc_1_1_vector">Vector</link> &amp; spin, const <link linkend="_classudc_1_1_vector">Vector</link> &amp; flux)<computeroutput>[friend]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a4d4a91fd46eec66e753dfa2642c25068"/><section>
+    <title>Mol::setSpin</title>
+<indexterm><primary>Mol::setSpin</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>Mol::setSpin</secondary></indexterm>
+<para><computeroutput>void Mol::setSpin (unsigned int a, const <link linkend="_classudc_1_1_vector">Vector</link> &amp; spin)<computeroutput>[friend]</computeroutput></computeroutput></para></section>
+</section>
+<section>
+<title>Member Data Documentation</title>
+<anchor xml:id="_classudc_1_1_m_s_d_1a72708188b46e1ddffb7c6e2fec96c587"/><section>
+    <title>CIRCULAR_MOL</title>
+<indexterm><primary>CIRCULAR_MOL</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>CIRCULAR_MOL</secondary></indexterm>
+<para><computeroutput>const <link linkend="_classudc_1_1_m_s_d_1aa5aef25b88fee8190e1ac32070d06d66">MSD::MolProtoFactory</link> udc::MSD::CIRCULAR_MOL<computeroutput>[static]</computeroutput></computeroutput></para><emphasis role="strong">Initial value:</emphasis><programlisting linenumbering="unnumbered">=&#32;[](<emphasis role="keywordtype">unsigned</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="__m_s_d-export_8cpp_1a16c69478280e0f9d6898c700f3b51574">nodeCount</link>)&#32;{
+&#32;&#32;&#32;&#32;<link linkend="__m_s_d-export_8cpp_1aec2cc3918e5933a0bad019dd661cdbef">MolProto</link>&#32;mol(<link linkend="__m_s_d-export_8cpp_1a16c69478280e0f9d6898c700f3b51574">nodeCount</link>);
+&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">unsigned</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;1;&#32;i&#32;&lt;&#32;<link linkend="__m_s_d-export_8cpp_1a16c69478280e0f9d6898c700f3b51574">nodeCount</link>;&#32;i++)
+&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mol.connectNodes(i&#32;-&#32;1,&#32;i);
+&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(<link linkend="__m_s_d-export_8cpp_1a16c69478280e0f9d6898c700f3b51574">nodeCount</link>&#32;&gt;=&#32;2)
+&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mol.connectNodes(<link linkend="__m_s_d-export_8cpp_1a16c69478280e0f9d6898c700f3b51574">nodeCount</link>&#32;-&#32;1,&#32;0);
+&#32;&#32;&#32;&#32;mol.setLeads(0,&#32;<link linkend="__m_s_d-export_8cpp_1a16c69478280e0f9d6898c700f3b51574">nodeCount</link>&#32;/&#32;2);
+&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;mol;
+}
+</programlisting></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a82cedfe873fa654afa32ab3d1b6f3ead"/><section>
+    <title>CONTINUOUS_SPIN_MODEL</title>
+<indexterm><primary>CONTINUOUS_SPIN_MODEL</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>CONTINUOUS_SPIN_MODEL</secondary></indexterm>
+<para><computeroutput>const <link linkend="_classudc_1_1_m_s_d_1a3d235795ecc459cc0c2069c3f05d089d">MSD::FlippingAlgorithm</link> udc::MSD::CONTINUOUS_SPIN_MODEL<computeroutput>[static]</computeroutput></computeroutput></para><emphasis role="strong">Initial value:</emphasis><programlisting linenumbering="unnumbered">=&#32;[](<emphasis role="keyword">const</emphasis>&#32;Vector&#32;&amp;spin,&#32;function&lt;double()&gt;&#32;rand)&#32;{
+&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_classudc_1_1_vector_1a89b43ddd10a372d584a03a5583ad5652">Vector::sphericalForm</link>(&#32;spin.norm(),&#32;2&#32;*&#32;PI&#32;*&#32;rand(),&#32;asin(2&#32;*&#32;rand()&#32;-&#32;1)&#32;);
+}
+</programlisting></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a2ccd325cf09e82420004de9702894de5"/><section>
+    <title>flippingAlgorithm</title>
+<indexterm><primary>flippingAlgorithm</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>flippingAlgorithm</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_m_s_d_1a3d235795ecc459cc0c2069c3f05d089d">FlippingAlgorithm</link> udc::MSD::flippingAlgorithm</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1ac578f0076fce752e661058c648d88997"/><section>
+    <title>LINEAR_MOL</title>
+<indexterm><primary>LINEAR_MOL</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>LINEAR_MOL</secondary></indexterm>
+<para><computeroutput>const <link linkend="_classudc_1_1_m_s_d_1aa5aef25b88fee8190e1ac32070d06d66">MSD::MolProtoFactory</link> udc::MSD::LINEAR_MOL<computeroutput>[static]</computeroutput></computeroutput></para><emphasis role="strong">Initial value:</emphasis><programlisting linenumbering="unnumbered">=&#32;[](<emphasis role="keywordtype">unsigned</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="__m_s_d-export_8cpp_1a16c69478280e0f9d6898c700f3b51574">nodeCount</link>)&#32;{
+&#32;&#32;&#32;&#32;<link linkend="__m_s_d-export_8cpp_1aec2cc3918e5933a0bad019dd661cdbef">MolProto</link>&#32;mol(<link linkend="__m_s_d-export_8cpp_1a16c69478280e0f9d6898c700f3b51574">nodeCount</link>);
+&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">unsigned</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;i&#32;=&#32;1;&#32;i&#32;&lt;&#32;<link linkend="__m_s_d-export_8cpp_1a16c69478280e0f9d6898c700f3b51574">nodeCount</link>;&#32;i++)
+&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;mol.connectNodes(i&#32;-&#32;1,&#32;i);
+&#32;&#32;&#32;&#32;mol.setLeads(0,&#32;<link linkend="__m_s_d-export_8cpp_1a16c69478280e0f9d6898c700f3b51574">nodeCount</link>&#32;-&#32;1);
+&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;mol;
+}
+</programlisting></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a6a807356604fd24654d015c41974b526"/><section>
+    <title>record</title>
+<indexterm><primary>record</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>record</secondary></indexterm>
+<para><computeroutput>std::vector&lt;<link linkend="_structudc_1_1_m_s_d_1_1_results">Results</link>&gt; udc::MSD::record</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1a7010b43c1e96eca520bcefba7aa36ad3"/><section>
+    <title>UP_DOWN_MODEL</title>
+<indexterm><primary>UP_DOWN_MODEL</primary><secondary>udc::MSD</secondary></indexterm>
+<indexterm><primary>udc::MSD</primary><secondary>UP_DOWN_MODEL</secondary></indexterm>
+<para><computeroutput>const <link linkend="_classudc_1_1_m_s_d_1a3d235795ecc459cc0c2069c3f05d089d">MSD::FlippingAlgorithm</link> udc::MSD::UP_DOWN_MODEL<computeroutput>[static]</computeroutput></computeroutput></para><emphasis role="strong">Initial value:</emphasis><programlisting linenumbering="unnumbered">=&#32;[](<emphasis role="keyword">const</emphasis>&#32;Vector&#32;&amp;spin,&#32;function&lt;double()&gt;&#32;rand)&#32;{
+&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;-spin;
+}
+</programlisting></section>
+<para>
+The documentation for this class was generated from the following file:</para>
+C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/src/<link linkend="__m_s_d_8h">MSD.h</link></section>
+</section>
