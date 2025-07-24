@@ -1,34 +1,22 @@
-simCount = 1000000
-freq = 50000
+simCount = 100000000
+freq = 25000
 
 # dimensions of bounding box
-width  = 11
-height = 10
-depth  = 10
+width = 4
+height = 8
+depth = 8
 
 # boundaries which define the exact dimensions of FM_L, FM_R, and mol.
-molPosL = 5
-molPosR = 5
-topL    = 3
-bottomL = 6
-frontR  = 3
-backR   = 6
-
-# turn off front edge of mol.
-# [5 11 10] = 0
-# [5 12 10] = 0
-# [5 13 10] = 0
-# [5 14 10] = 0
-
-# turn off back edge of mol.
-# [5 11 15] = 0
-# [5 12 15] = 0
-# [5 13 15] = 0
-# [5 14 15] = 0
+molPosL = 4
+molPosR = 3
+topL = 0
+bottomL = 7
+frontR = 4
+backR = 3
 
 
 # Tempurature
-kT = 0.1
+kT = 0.01
 
 # External Magnetic Field
 B = 0 0 0
@@ -92,3 +80,4 @@ Dm = 0 0 0
 DmL = 0 0 0
 DmR = 0 0 0
 DLR = 0 0 0
+	
