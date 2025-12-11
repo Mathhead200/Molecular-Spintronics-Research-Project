@@ -1,0 +1,53 @@
+\hypertarget{namespace_m_s_d}{}\doxysection{MSD Namespace Reference}
+\label{namespace_m_s_d}\index{MSD@{MSD}}
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_m_s_d_1_1___m_m_t_struct}{\+\_\+\+MMTStruct}}
+\begin{DoxyCompactList}\small\item\em Adds the MSD-\/\+Molecule-\/\+Text, \mbox{\hyperlink{class_m_s_d_1_1___m_m_t_struct_a3f795dd08944c744bf10060d8e7a74a3}{mmt()}} method for subclasses. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_m_s_d_1_1___struct_with_dict}{\+\_\+\+Struct\+With\+Dict}}
+\begin{DoxyCompactList}\small\item\em Version of ctypes.\+Structure that defines {\bfseries{dict}} and overrides {\bfseries{repr}} \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_m_s_d_1_1_molecule}{Molecule}}
+\item 
+class \mbox{\hyperlink{class_m_s_d_1_1_m_s_d}{MSD}}
+\item 
+class \mbox{\hyperlink{class_m_s_d_1_1_vector}{Vector}}
+\begin{DoxyCompactList}\small\item\em Python version of \mbox{\hyperlink{classudc_1_1_vector}{udc\+::\+Vector}} class in \mbox{\hyperlink{_vector_8h}{Vector.\+h}}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespace_m_s_d_a8893e2ba6d4249cf4262be28c0f089ec}{MSD\+\_\+\+EXPORT\+\_\+\+DLL\+\_\+\+PATH}} = os.\+path.\+join(os.\+path.\+realpath(os.\+path.\+dirname(\+\_\+\+\_\+file\+\_\+\+\_\+)), \char`\"{}MSD-\/export.\+dll\char`\"{})
+\item 
+\mbox{\hyperlink{namespace_m_s_d_a46a9adbfe86657baee2dde058b055f93}{msd\+\_\+clib}} = CDLL(\mbox{\hyperlink{namespace_m_s_d_a8893e2ba6d4249cf4262be28c0f089ec}{MSD\+\_\+\+EXPORT\+\_\+\+DLL\+\_\+\+PATH}})
+\item 
+\mbox{\hyperlink{namespace_m_s_d_af5a4dfeebf5c52e4547773c6203c100d}{PI}} = c\+\_\+double.\+in\+\_\+dll(\mbox{\hyperlink{namespace_m_s_d_a46a9adbfe86657baee2dde058b055f93}{msd\+\_\+clib}}, \char`\"{}PI\char`\"{}).value
+\item 
+\mbox{\hyperlink{namespace_m_s_d_aa565ab8c9a921e88dae806ba8189f862}{E}} = c\+\_\+double.\+in\+\_\+dll(\mbox{\hyperlink{namespace_m_s_d_a46a9adbfe86657baee2dde058b055f93}{msd\+\_\+clib}}, \char`\"{}E\char`\"{}).value
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{namespace_m_s_d_aa565ab8c9a921e88dae806ba8189f862}\label{namespace_m_s_d_aa565ab8c9a921e88dae806ba8189f862}} 
+\index{MSD@{MSD}!E@{E}}
+\index{E@{E}!MSD@{MSD}}
+\doxysubsubsection{\texorpdfstring{E}{E}}
+{\footnotesize\ttfamily MSD.\+E = c\+\_\+double.\+in\+\_\+dll(\mbox{\hyperlink{namespace_m_s_d_a46a9adbfe86657baee2dde058b055f93}{msd\+\_\+clib}}, \char`\"{}E\char`\"{}).value}
+
+\mbox{\Hypertarget{namespace_m_s_d_a46a9adbfe86657baee2dde058b055f93}\label{namespace_m_s_d_a46a9adbfe86657baee2dde058b055f93}} 
+\index{MSD@{MSD}!msd\_clib@{msd\_clib}}
+\index{msd\_clib@{msd\_clib}!MSD@{MSD}}
+\doxysubsubsection{\texorpdfstring{msd\_clib}{msd\_clib}}
+{\footnotesize\ttfamily MSD.\+msd\+\_\+clib = CDLL(\mbox{\hyperlink{namespace_m_s_d_a8893e2ba6d4249cf4262be28c0f089ec}{MSD\+\_\+\+EXPORT\+\_\+\+DLL\+\_\+\+PATH}})}
+
+\mbox{\Hypertarget{namespace_m_s_d_a8893e2ba6d4249cf4262be28c0f089ec}\label{namespace_m_s_d_a8893e2ba6d4249cf4262be28c0f089ec}} 
+\index{MSD@{MSD}!MSD\_EXPORT\_DLL\_PATH@{MSD\_EXPORT\_DLL\_PATH}}
+\index{MSD\_EXPORT\_DLL\_PATH@{MSD\_EXPORT\_DLL\_PATH}!MSD@{MSD}}
+\doxysubsubsection{\texorpdfstring{MSD\_EXPORT\_DLL\_PATH}{MSD\_EXPORT\_DLL\_PATH}}
+{\footnotesize\ttfamily MSD.\+MSD\+\_\+\+EXPORT\+\_\+\+DLL\+\_\+\+PATH = os.\+path.\+join(os.\+path.\+realpath(os.\+path.\+dirname(\+\_\+\+\_\+file\+\_\+\+\_\+)), \char`\"{}MSD-\/export.\+dll\char`\"{})}
+
+\mbox{\Hypertarget{namespace_m_s_d_af5a4dfeebf5c52e4547773c6203c100d}\label{namespace_m_s_d_af5a4dfeebf5c52e4547773c6203c100d}} 
+\index{MSD@{MSD}!PI@{PI}}
+\index{PI@{PI}!MSD@{MSD}}
+\doxysubsubsection{\texorpdfstring{PI}{PI}}
+{\footnotesize\ttfamily MSD.\+PI = c\+\_\+double.\+in\+\_\+dll(\mbox{\hyperlink{namespace_m_s_d_a46a9adbfe86657baee2dde058b055f93}{msd\+\_\+clib}}, \char`\"{}PI\char`\"{}).value}
+

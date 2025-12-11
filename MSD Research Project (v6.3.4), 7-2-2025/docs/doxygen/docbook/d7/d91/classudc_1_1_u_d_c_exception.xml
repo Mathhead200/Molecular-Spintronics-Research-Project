@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_classudc_1_1_u_d_c_exception" xml:lang="en-US">
+<title>udc::UDCException Class Reference</title>
+<indexterm><primary>udc::UDCException</primary></indexterm>
+<para>
+<computeroutput>#include &lt;udc.h&gt;</computeroutput>
+</para>
+<para>Inheritance diagram for udc::UDCException:    <informalfigure>
+        <mediaobject>
+            <imageobject>
+                <imagedata width="50%" align="center" valign="middle" scalefit="0" fileref="../../d7/d91/classudc_1_1_u_d_c_exception.png"></imagedata>
+            </imageobject>
+        </mediaobject>
+    </informalfigure>
+</para>
+<simplesect>
+    <title>Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para><link linkend="_classudc_1_1_u_d_c_exception_1a60f9a75be4d8880a5521dc50d4df05f7">UDCException</link> (const char *message)</para>
+</listitem>
+            <listitem><para>virtual const char * <link linkend="_classudc_1_1_u_d_c_exception_1aed918c48351c4bf4673f438235cd3026">what</link> () const noexcept</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Constructor &amp; Destructor Documentation</title>
+<anchor xml:id="_classudc_1_1_u_d_c_exception_1a60f9a75be4d8880a5521dc50d4df05f7"/><section>
+    <title>UDCException()</title>
+<indexterm><primary>UDCException</primary><secondary>udc::UDCException</secondary></indexterm>
+<indexterm><primary>udc::UDCException</primary><secondary>UDCException</secondary></indexterm>
+<para><computeroutput>udc::UDCException::UDCException (const char * message)<computeroutput>[inline]</computeroutput></computeroutput></para></section>
+</section>
+<section>
+<title>Member Function Documentation</title>
+<anchor xml:id="_classudc_1_1_u_d_c_exception_1aed918c48351c4bf4673f438235cd3026"/><section>
+    <title>what()</title>
+<indexterm><primary>what</primary><secondary>udc::UDCException</secondary></indexterm>
+<indexterm><primary>udc::UDCException</primary><secondary>what</secondary></indexterm>
+<para><computeroutput>virtual const char * udc::UDCException::what ( ) const<computeroutput>[inline]</computeroutput>, <computeroutput>[virtual]</computeroutput>, <computeroutput>[noexcept]</computeroutput></computeroutput></para></section>
+<para>
+The documentation for this class was generated from the following file:</para>
+C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/src/<link linkend="_udc_8h">udc.h</link></section>
+</section>

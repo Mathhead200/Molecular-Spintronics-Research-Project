@@ -1,0 +1,161 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_mmt_8h_source" xml:lang="en-US">
+<title>mmt.h</title>
+<indexterm><primary>C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/src/mmt.h</primary></indexterm>
+Go to the documentation of this file.<programlisting linenumbering="unnumbered">1 
+12 <emphasis role="preprocessor">#ifndef&#32;UDC_MMT</emphasis>
+13 <emphasis role="preprocessor">#define&#32;UDC_MMT</emphasis>
+14 
+15 <emphasis role="preprocessor">#include&#32;&lt;string&gt;</emphasis>
+16 <emphasis role="preprocessor">#include&#32;&lt;vector&gt;</emphasis>
+17 <emphasis role="preprocessor">#include&#32;&lt;iostream&gt;</emphasis>
+18 <emphasis role="preprocessor">#include&#32;&lt;sstream&gt;</emphasis>
+19 <emphasis role="preprocessor">#include&#32;&quot;<link linkend="__m_s_d_8h">MSD.h</link>&quot;</emphasis>
+20 
+21 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespaceudc">udc</link>&#32;{
+22 
+23 <emphasis role="keyword">using&#32;</emphasis>std::string;
+24 <emphasis role="keyword">using&#32;</emphasis>std::vector;
+25 <emphasis role="keyword">using&#32;</emphasis>std::istream;
+26 <emphasis role="keyword">using&#32;</emphasis>std::ostream;
+27 <emphasis role="keyword">using&#32;</emphasis>std::istringstream;
+28 <emphasis role="keyword">using&#32;</emphasis>std::getline;
+29 <emphasis role="keyword">using&#32;</emphasis><link linkend="_classudc_1_1_m_s_d">udc::MSD</link>;
+30 
+31 
+32 <emphasis role="comment">//&#32;getline,&#32;and&#32;parse&#32;using&#32;stringstream&#32;and&#32;extraction&#32;operator&#32;&gt;&gt;</emphasis>
+33 <emphasis role="keyword">template</emphasis>&#32;&lt;<emphasis role="keyword">typename</emphasis>&#32;T&gt;&#32;T&#32;<link linkend="_namespaceudc_1a03752c8f5c571a06fc1c32e823a319a5">parseline</link>(istream&#32;&amp;in)&#32;{
+34 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;line;
+35 &#32;&#32;&#32;&#32;getline(in,&#32;line);
+36 
+37 &#32;&#32;&#32;&#32;T&#32;value;
+38 &#32;&#32;&#32;&#32;istringstream(line)&#32;&gt;&gt;&#32;value;
+39 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;value;
+40 }
+41 
+42 <emphasis role="keyword">template</emphasis>&#32;&lt;&gt;&#32;<emphasis role="keywordtype">string</emphasis>&#32;<link linkend="_namespaceudc_1a03752c8f5c571a06fc1c32e823a319a5">parseline</link>(istream&#32;&amp;in)&#32;{
+43 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;line;
+44 &#32;&#32;&#32;&#32;getline(in,&#32;line);
+45 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;line;
+46 }&#32;
+47 
+48 <emphasis role="keyword">template</emphasis>&#32;&lt;&gt;&#32;istringstream&#32;<link linkend="_namespaceudc_1a03752c8f5c571a06fc1c32e823a319a5">parseline</link>(istream&#32;&amp;in)&#32;{
+49 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;line;
+50 &#32;&#32;&#32;&#32;getline(in,&#32;line);
+51 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;istringstream(line);&#32;
+52 }
+53 
+54 <emphasis role="keyword">template</emphasis>&#32;&lt;&gt;&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_namespaceudc_1a03752c8f5c571a06fc1c32e823a319a5">parseline</link>(istream&#32;&amp;in)&#32;{
+55 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;line;
+56 &#32;&#32;&#32;&#32;getline(in,&#32;line);
+57 }
+58 
+59 <emphasis role="keyword">template</emphasis>&#32;&lt;<emphasis role="keyword">typename</emphasis>&#32;T&gt;&#32;T&#32;<link linkend="_namespaceudc_1a03752c8f5c571a06fc1c32e823a319a5">parseline</link>(<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">string</emphasis>&#32;&amp;str)&#32;{
+60 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;parseline&lt;T&gt;(istringstream(str));
+61 }
+62 
+63 <emphasis role="comment">//&#32;for&#32;reading&#32;JS&#32;arrays&#32;as&#32;udc::Vector&#32;objects&#32;</emphasis>
+64 istream&amp;&#32;<link linkend="_namespaceudc_1a6a73767fbbacbcfa2f4d7db36e6c4230">operator&gt;&gt;</link>(istream&#32;&amp;in,&#32;<link linkend="_classudc_1_1_vector">udc::Vector</link>&#32;&amp;v)&#32;{
+65 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;x,&#32;y,&#32;z;
+66 &#32;&#32;&#32;&#32;getline(in,&#32;x,&#32;<emphasis role="charliteral">&apos;,&apos;</emphasis>);
+67 &#32;&#32;&#32;&#32;getline(in,&#32;y,&#32;<emphasis role="charliteral">&apos;,&apos;</emphasis>);
+68 &#32;&#32;&#32;&#32;getline(in,&#32;z,&#32;<emphasis role="charliteral">&apos;,&apos;</emphasis>);
+69 &#32;&#32;&#32;&#32;v.<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>&#32;=&#32;parseline&lt;double&gt;(x);
+70 &#32;&#32;&#32;&#32;v.<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>&#32;=&#32;parseline&lt;double&gt;(y);
+71 &#32;&#32;&#32;&#32;v.<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>&#32;=&#32;parseline&lt;double&gt;(z);
+72 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;in;
+73 }
+74 
+82 <link linkend="_classudc_1_1_molecule">MSD::MolProto</link>&#32;<link linkend="_namespaceudc_1a2479706554f64b21239dca95b3c1465c">readMMT</link>(istream&#32;&amp;src)&#32;{
+83 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_molecule">MSD::MolProto</link>&#32;mol;
+84 
+85 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;First,&#32;read&#32;nodes&#32;section</emphasis>
+86 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;std::cout&#32;&lt;&lt;&#32;&quot;&#32;--&#32;Node&#32;section.\n&quot;;&#32;&#32;//&#32;DEBUG</emphasis>
+87 &#32;&#32;&#32;&#32;vector&lt;unsigned&#32;int&gt;&#32;nodes;&#32;&#32;<emphasis role="comment">//&#32;stores&#32;all&#32;node&#32;indices&#32;in&#32;the&#32;order&#32;they&#32;appear&#32;in&#32;the&#32;src&#32;file</emphasis>
+88 &#32;&#32;&#32;&#32;{&#32;&#32;&#32;<emphasis role="keywordtype">size_t</emphasis>&#32;node_count&#32;=&#32;parseline&lt;size_t&gt;(src);
+89 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;std::cout&#32;&lt;&lt;&#32;&quot;&#32;--&#32;node_count=&quot;&#32;&lt;&lt;&#32;node_count&#32;&lt;&lt;&#32;&apos;\n&apos;;&#32;&#32;//&#32;DEBUG</emphasis>
+90 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(nodes.size()&#32;&lt;&#32;node_count)&#32;{
+91 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_structudc_1_1_molecule_1_1_node_parameters">MSD::MolProto::NodeParameters</link>&#32;params;
+92 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+93 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;istringstream&#32;line&#32;=&#32;parseline&lt;istringstream&gt;(src);
+94 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">string</emphasis>&#32;param_str;&#32;line&#32;&gt;&gt;&#32;param_str;&#32;)&#32;{
+95 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;std::cout&#32;&lt;&lt;&#32;&quot;&#32;--&#32;param_str=&quot;&#32;&lt;&lt;&#32;param_str&#32;&lt;&lt;&#32;&apos;\n&apos;;&#32;&#32;//&#32;DEBUG</emphasis>
+96 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">size_t</emphasis>&#32;key_end&#32;=&#32;param_str.find(<emphasis role="stringliteral">&quot;=&quot;</emphasis>);
+97 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">size_t</emphasis>&#32;value_start&#32;=&#32;key_end&#32;+&#32;1;
+98 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">size_t</emphasis>&#32;value_end&#32;=&#32;param_str.find(<emphasis role="stringliteral">&quot;;&quot;</emphasis>,&#32;value_start);
+99 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(value_end&#32;==&#32;string::npos)
+100 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;value_end&#32;=&#32;param_str.length();
+101 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+102 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;key&#32;=&#32;param_str.substr(0,&#32;key_end);
+103 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;istringstream&#32;value&#32;=&#32;istringstream(param_str.substr(value_start,&#32;value_end&#32;-&#32;value_start));
+104 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+105 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(key&#32;==&#32;<emphasis role="stringliteral">&quot;Sm&quot;</emphasis>)
+106 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;value&#32;&gt;&gt;&#32;params.<link linkend="_structudc_1_1_molecule_1_1_node_parameters_1aa7b74cbea7b3cba87f57ad48232a3786">Sm</link>;
+107 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(key&#32;==&#32;<emphasis role="stringliteral">&quot;Fm&quot;</emphasis>)
+108 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;value&#32;&gt;&gt;&#32;params.<link linkend="_structudc_1_1_molecule_1_1_node_parameters_1a0a56503fd7eb794ba63f04a1ec25238e">Fm</link>;
+109 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(key&#32;==&#32;<emphasis role="stringliteral">&quot;Je0m&quot;</emphasis>)
+110 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;value&#32;&gt;&gt;&#32;params.<link linkend="_structudc_1_1_molecule_1_1_node_parameters_1a297971abdfd713f536d590ef8feb7fbc">Je0m</link>;
+111 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(key&#32;==&#32;<emphasis role="stringliteral">&quot;Am&quot;</emphasis>)
+112 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;value&#32;&gt;&gt;&#32;params.<link linkend="_structudc_1_1_molecule_1_1_node_parameters_1a821f45a250dc5e42bd03ab91e377605f">Am</link>;
+113 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;TODO:&#32;Add&#32;warnings!&#32;Currently,&#32;silently&#32;ignores&#32;unrecognized/unused&#32;params.</emphasis>
+114 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+115 
+116 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;nodes.push_back(mol.<link linkend="_classudc_1_1_molecule_1ab18585360b5c1577f6be8cc1f565b260">createNode</link>(params));
+117 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+118 &#32;&#32;&#32;&#32;}
+119 &#32;&#32;&#32;&#32;parseline&lt;void&gt;(src);&#32;&#32;<emphasis role="comment">//&#32;skip&#32;blank&#32;line&#32;(TODO:&#32;check&#32;that&#32;line&#32;is&#32;blank)</emphasis>
+120 
+121 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Second,&#32;read&#32;edges&#32;section</emphasis>
+122 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;std::cout&#32;&lt;&lt;&#32;&quot;&#32;--&#32;Edge&#32;section.\n&quot;;&#32;&#32;//&#32;DEBUG</emphasis>
+123 &#32;&#32;&#32;&#32;vector&lt;unsigned&#32;int&gt;&#32;edges;&#32;&#32;<emphasis role="comment">//&#32;stores&#32;all&#32;edge&#32;indices&#32;in&#32;the&#32;order&#32;they&#32;appear&#32;in&#32;the&#32;src&#32;file</emphasis>
+124 &#32;&#32;&#32;&#32;{&#32;&#32;&#32;<emphasis role="keywordtype">size_t</emphasis>&#32;edge_count&#32;=&#32;parseline&lt;size_t&gt;(src);
+125 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">while</emphasis>&#32;(edges.size()&#32;&lt;&#32;edge_count)&#32;{
+126 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<link linkend="_structudc_1_1_molecule_1_1_edge_parameters">MSD::MolProto::EdgeParameters</link>&#32;params;
+127 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">unsigned</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;src_node&#32;=&#32;0,&#32;dest_node&#32;=&#32;0;
+128 
+129 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;istringstream&#32;line&#32;=&#32;parseline&lt;istringstream&gt;(src);
+130 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">for</emphasis>&#32;(<emphasis role="keywordtype">string</emphasis>&#32;param_str;&#32;line&#32;&gt;&gt;&#32;param_str;&#32;)&#32;{
+131 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">size_t</emphasis>&#32;key_end&#32;=&#32;param_str.find(<emphasis role="stringliteral">&quot;=&quot;</emphasis>);
+132 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">size_t</emphasis>&#32;value_start&#32;=&#32;key_end&#32;+&#32;1;
+133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">size_t</emphasis>&#32;value_end&#32;=&#32;param_str.find(<emphasis role="stringliteral">&quot;;&quot;</emphasis>,&#32;value_start);
+134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(value_end&#32;==&#32;string::npos)
+135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;value_end&#32;=&#32;param_str.length();
+136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;
+137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordtype">string</emphasis>&#32;key&#32;=&#32;param_str.substr(0,&#32;key_end);
+138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;istringstream&#32;value&#32;=&#32;istringstream(param_str.substr(value_start,&#32;value_end&#32;-&#32;value_start));
+139 
+140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(key&#32;==&#32;<emphasis role="stringliteral">&quot;Jm&quot;</emphasis>)
+141 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;value&#32;&gt;&gt;&#32;params.<link linkend="_structudc_1_1_molecule_1_1_edge_parameters_1a888be7fafaea5cedfc9f59ce6291a5c8">Jm</link>;
+142 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(key&#32;==&#32;<emphasis role="stringliteral">&quot;Je1m&quot;</emphasis>)
+143 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;value&#32;&gt;&gt;&#32;params.<link linkend="_structudc_1_1_molecule_1_1_edge_parameters_1afe9b27d63588d6f6066137961556274b">Je1m</link>;
+144 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(key&#32;==&#32;<emphasis role="stringliteral">&quot;Jeem&quot;</emphasis>)
+145 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;value&#32;&gt;&gt;&#32;params.<link linkend="_structudc_1_1_molecule_1_1_edge_parameters_1a8e66fedceee8f6cbd949e2e39f68cb38">Jeem</link>;
+146 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(key&#32;==&#32;<emphasis role="stringliteral">&quot;bm&quot;</emphasis>)
+147 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;value&#32;&gt;&gt;&#32;params.<link linkend="_structudc_1_1_molecule_1_1_edge_parameters_1ae10a09e2ff621f6427be2bb5a69ba595">bm</link>;
+148 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(key&#32;==&#32;<emphasis role="stringliteral">&quot;Dm&quot;</emphasis>)
+149 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;value&#32;&gt;&gt;&#32;params.<link linkend="_structudc_1_1_molecule_1_1_edge_parameters_1a7c1edcd9071395e3e894f12c03a2a8b2">Dm</link>;
+150 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(key&#32;==&#32;<emphasis role="stringliteral">&quot;srcNode&quot;</emphasis>)
+151 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;src_node&#32;=&#32;nodes.at(parseline&lt;size_t&gt;(value));
+152 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>&#32;(key&#32;==&#32;<emphasis role="stringliteral">&quot;destNode&quot;</emphasis>)
+153 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;dest_node&#32;=&#32;nodes.at(parseline&lt;size_t&gt;(value));
+154 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;TODO:&#32;Add&#32;warnings!&#32;Currently,&#32;silently&#32;ignores&#32;unrecognized/unused&#32;params.</emphasis>
+155 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+156 
+157 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;edges.push_back(mol.<link linkend="_classudc_1_1_molecule_1ae1411a791a83503073a9dc8a7b1d3b33">connectNodes</link>(src_node,&#32;dest_node,&#32;params));
+158 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;}
+159 &#32;&#32;&#32;&#32;}
+160 &#32;&#32;&#32;&#32;parseline&lt;void&gt;(src);&#32;&#32;<emphasis role="comment">//&#32;skip&#32;blank&#32;line&#32;(TODO:&#32;check&#32;that&#32;line&#32;is&#32;blank)</emphasis>
+161 
+162 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;Last,&#32;read&#32;left&#32;and&#32;right&#32;leads</emphasis>
+163 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;std::cout&#32;&lt;&lt;&#32;&quot;&#32;--&#32;Leads&#32;section.\n&quot;;&#32;&#32;//&#32;DEBUG</emphasis>
+164 &#32;&#32;&#32;&#32;mol.<link linkend="_classudc_1_1_molecule_1a055eb97e7305e44ebb8a0d22a23f6752">setLeftLead</link>(parseline&lt;unsigned&#32;int&gt;(src));
+165 &#32;&#32;&#32;&#32;mol.<link linkend="_classudc_1_1_molecule_1a549536b6815dd4ffcedb3ab3895a064f">setRightLead</link>(parseline&lt;unsigned&#32;int&gt;(src));
+166 
+167 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;mol;
+168 }
+169 
+170 
+171 }&#32;&#32;<emphasis role="comment">//&#32;end&#32;of&#32;namespace&#32;udc</emphasis>
+172 
+173 <emphasis role="preprocessor">#endif</emphasis>
+</programlisting></section>

@@ -1,0 +1,244 @@
+\hypertarget{class_m_s_d_1_1_m_s_d_1_1___iterator}{}\doxysection{MSD.\+MSD.\+\_\+\+Iterator Class Reference}
+\label{class_m_s_d_1_1_m_s_d_1_1___iterator}\index{MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_a576c383b1e498d2113a264c1a45a5bf1}{next}} (self)
+\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_a075ffbdde76b21d9839cd5e4738b53b3}{prev}} (self)
+\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_aa51a92b051ad9cf5771ad0f75a2820c4}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self, msd, start=(None, 0), direction=\mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_a6120b73703f6405c43f3f4e0fd65358f}{FORWARD}})
+\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_af233a32e82cad9929ebfe25ef0e52f00}{\+\_\+\+\_\+del\+\_\+\+\_\+}} (self)
+\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_a6f1cf4d66632a27f4d220565ec8060e6}{clone}} (self)
+\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_a75aeee185fc0d550f9cdd9a1342ad429}{\+\_\+\+\_\+eq\+\_\+\+\_\+}} (self, other)
+\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_a9c0ed74ededda3df2c482089fd4fba45}{\+\_\+\+\_\+ne\+\_\+\+\_\+}} (self, other)
+\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_a82e03cd110bdca096d2a083543c4b7cd}{\+\_\+\+\_\+lt\+\_\+\+\_\+}} (self, other)
+\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_a5ba1eab5a2a7c08218d3dc14e793dbe7}{\+\_\+\+\_\+gt\+\_\+\+\_\+}} (self, other)
+\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_a2744fc00ad75eb6eff4c9473e19e4b19}{\+\_\+\+\_\+le\+\_\+\+\_\+}} (self, other)
+\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_a6e29860a2baacba25a81422a7048db31}{\+\_\+\+\_\+ge\+\_\+\+\_\+}} (self, other)
+\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_aa8d6a915e699f79d7da22063a689cc4d}{\+\_\+\+\_\+next\+\_\+\+\_\+}} (self)
+\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_ad48eec5d5c4da61e644d4da05cfe61a2}{\+\_\+\+\_\+iadd\+\_\+\+\_\+}} (self, offset)
+\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_ad207f504f1cad8b8d5bdcb8cf068713e}{\+\_\+\+\_\+isub\+\_\+\+\_\+}} (self, offset)
+\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_af1110f8a251530b9de2f7e8c3867f74b}{\+\_\+\+\_\+add\+\_\+\+\_\+}} (self, offset)
+\item 
+def \mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_a0ecfe9750c38d87f6de9b2c75f65993a}{\+\_\+\+\_\+sub\+\_\+\+\_\+}} (self, offset)
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+tuple \mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_a6120b73703f6405c43f3f4e0fd65358f}{FORWARD}} = (\mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_a576c383b1e498d2113a264c1a45a5bf1}{next}},)
+\item 
+tuple \mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_aebe6c585864beefd4c282dd9350192df}{BACKWARD}} = (\mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_a075ffbdde76b21d9839cd5e4738b53b3}{prev}},)
+\end{DoxyCompactItemize}
+\doxysubsection*{Properties}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_a2e61d8fd2380b0f23c110c74d8a39c6d}{meta\+Index}} = property(fget = lambda self\+: self.\+\_\+i)
+\item 
+\mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_aa7557272e3ea3c914913cc56c150f32f}{index}} = property(fget = lambda self\+: msd\+\_\+clib.\+msd\+Index(self.\+\_\+iter))
+\item 
+\mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_a90f76b0efb8e66fdd9b5abe67a0166bd}{x}} = property(fget = lambda self\+: msd\+\_\+clib.\+getX(self.\+\_\+iter))
+\item 
+\mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_ac8cdd734f3db4f20d8b05ae53fef770a}{y}} = property(fget = lambda self\+: msd\+\_\+clib.\+getY(self.\+\_\+iter))
+\item 
+\mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_a35c056ed91ca6980a2ca74afcffde64b}{z}} = property(fget = lambda self\+: msd\+\_\+clib.\+getZ(self.\+\_\+iter))
+\item 
+\mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_a7bbe9c4b0b13fabdde37af356c30a25d}{pos}} = property(fget = lambda self\+: (self.\+x, self.\+y, self.\+z))
+\item 
+\mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_abaf0cefe61a5782a10ededd2b653d7a3}{spin}} = property(fget = lambda self\+: msd\+\_\+clib.\+get\+Spin\+\_\+a(self.\+\_\+iter))
+\item 
+\mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_ab768262200f1caa77a9a3c8493f2002e}{flux}} = property(fget = lambda self\+: msd\+\_\+clib.\+get\+Flux\+\_\+a(self.\+\_\+iter))
+\item 
+\mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_afc96949740c0e84a8d54017f27dd3b8b}{localM}} = property(fget = lambda self\+: msd\+\_\+clib.\+get\+Local\+M\+\_\+a(self.\+\_\+iter))
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{class_m_s_d_1_1_m_s_d_1_1___iterator_aa51a92b051ad9cf5771ad0f75a2820c4}\label{class_m_s_d_1_1_m_s_d_1_1___iterator_aa51a92b051ad9cf5771ad0f75a2820c4}} 
+\index{MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}!\_\_init\_\_@{\_\_init\_\_}}
+\index{\_\_init\_\_@{\_\_init\_\_}!MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}}
+\doxysubsubsection{\texorpdfstring{\_\_init\_\_()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def MSD.\+MSD.\+\_\+\+Iterator.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{msd,  }\item[{}]{start = {\ttfamily (None,~0)},  }\item[{}]{direction = {\ttfamily \mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_a6120b73703f6405c43f3f4e0fd65358f}{FORWARD}}} }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_m_s_d_1_1___iterator_af233a32e82cad9929ebfe25ef0e52f00}\label{class_m_s_d_1_1_m_s_d_1_1___iterator_af233a32e82cad9929ebfe25ef0e52f00}} 
+\index{MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}!\_\_del\_\_@{\_\_del\_\_}}
+\index{\_\_del\_\_@{\_\_del\_\_}!MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}}
+\doxysubsubsection{\texorpdfstring{\_\_del\_\_()}{\_\_del\_\_()}}
+{\footnotesize\ttfamily def MSD.\+MSD.\+\_\+\+Iterator.\+\_\+\+\_\+del\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{class_m_s_d_1_1_m_s_d_1_1___iterator_af1110f8a251530b9de2f7e8c3867f74b}\label{class_m_s_d_1_1_m_s_d_1_1___iterator_af1110f8a251530b9de2f7e8c3867f74b}} 
+\index{MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}!\_\_add\_\_@{\_\_add\_\_}}
+\index{\_\_add\_\_@{\_\_add\_\_}!MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}}
+\doxysubsubsection{\texorpdfstring{\_\_add\_\_()}{\_\_add\_\_()}}
+{\footnotesize\ttfamily def MSD.\+MSD.\+\_\+\+Iterator.\+\_\+\+\_\+add\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{offset }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_m_s_d_1_1___iterator_a75aeee185fc0d550f9cdd9a1342ad429}\label{class_m_s_d_1_1_m_s_d_1_1___iterator_a75aeee185fc0d550f9cdd9a1342ad429}} 
+\index{MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}!\_\_eq\_\_@{\_\_eq\_\_}}
+\index{\_\_eq\_\_@{\_\_eq\_\_}!MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}}
+\doxysubsubsection{\texorpdfstring{\_\_eq\_\_()}{\_\_eq\_\_()}}
+{\footnotesize\ttfamily def MSD.\+MSD.\+\_\+\+Iterator.\+\_\+\+\_\+eq\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{other }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_m_s_d_1_1___iterator_a6e29860a2baacba25a81422a7048db31}\label{class_m_s_d_1_1_m_s_d_1_1___iterator_a6e29860a2baacba25a81422a7048db31}} 
+\index{MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}!\_\_ge\_\_@{\_\_ge\_\_}}
+\index{\_\_ge\_\_@{\_\_ge\_\_}!MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}}
+\doxysubsubsection{\texorpdfstring{\_\_ge\_\_()}{\_\_ge\_\_()}}
+{\footnotesize\ttfamily def MSD.\+MSD.\+\_\+\+Iterator.\+\_\+\+\_\+ge\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{other }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_m_s_d_1_1___iterator_a5ba1eab5a2a7c08218d3dc14e793dbe7}\label{class_m_s_d_1_1_m_s_d_1_1___iterator_a5ba1eab5a2a7c08218d3dc14e793dbe7}} 
+\index{MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}!\_\_gt\_\_@{\_\_gt\_\_}}
+\index{\_\_gt\_\_@{\_\_gt\_\_}!MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}}
+\doxysubsubsection{\texorpdfstring{\_\_gt\_\_()}{\_\_gt\_\_()}}
+{\footnotesize\ttfamily def MSD.\+MSD.\+\_\+\+Iterator.\+\_\+\+\_\+gt\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{other }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_m_s_d_1_1___iterator_ad48eec5d5c4da61e644d4da05cfe61a2}\label{class_m_s_d_1_1_m_s_d_1_1___iterator_ad48eec5d5c4da61e644d4da05cfe61a2}} 
+\index{MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}!\_\_iadd\_\_@{\_\_iadd\_\_}}
+\index{\_\_iadd\_\_@{\_\_iadd\_\_}!MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}}
+\doxysubsubsection{\texorpdfstring{\_\_iadd\_\_()}{\_\_iadd\_\_()}}
+{\footnotesize\ttfamily def MSD.\+MSD.\+\_\+\+Iterator.\+\_\+\+\_\+iadd\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{offset }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_m_s_d_1_1___iterator_ad207f504f1cad8b8d5bdcb8cf068713e}\label{class_m_s_d_1_1_m_s_d_1_1___iterator_ad207f504f1cad8b8d5bdcb8cf068713e}} 
+\index{MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}!\_\_isub\_\_@{\_\_isub\_\_}}
+\index{\_\_isub\_\_@{\_\_isub\_\_}!MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}}
+\doxysubsubsection{\texorpdfstring{\_\_isub\_\_()}{\_\_isub\_\_()}}
+{\footnotesize\ttfamily def MSD.\+MSD.\+\_\+\+Iterator.\+\_\+\+\_\+isub\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{offset }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_m_s_d_1_1___iterator_a2744fc00ad75eb6eff4c9473e19e4b19}\label{class_m_s_d_1_1_m_s_d_1_1___iterator_a2744fc00ad75eb6eff4c9473e19e4b19}} 
+\index{MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}!\_\_le\_\_@{\_\_le\_\_}}
+\index{\_\_le\_\_@{\_\_le\_\_}!MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}}
+\doxysubsubsection{\texorpdfstring{\_\_le\_\_()}{\_\_le\_\_()}}
+{\footnotesize\ttfamily def MSD.\+MSD.\+\_\+\+Iterator.\+\_\+\+\_\+le\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{other }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_m_s_d_1_1___iterator_a82e03cd110bdca096d2a083543c4b7cd}\label{class_m_s_d_1_1_m_s_d_1_1___iterator_a82e03cd110bdca096d2a083543c4b7cd}} 
+\index{MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}!\_\_lt\_\_@{\_\_lt\_\_}}
+\index{\_\_lt\_\_@{\_\_lt\_\_}!MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}}
+\doxysubsubsection{\texorpdfstring{\_\_lt\_\_()}{\_\_lt\_\_()}}
+{\footnotesize\ttfamily def MSD.\+MSD.\+\_\+\+Iterator.\+\_\+\+\_\+lt\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{other }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_m_s_d_1_1___iterator_a9c0ed74ededda3df2c482089fd4fba45}\label{class_m_s_d_1_1_m_s_d_1_1___iterator_a9c0ed74ededda3df2c482089fd4fba45}} 
+\index{MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}!\_\_ne\_\_@{\_\_ne\_\_}}
+\index{\_\_ne\_\_@{\_\_ne\_\_}!MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}}
+\doxysubsubsection{\texorpdfstring{\_\_ne\_\_()}{\_\_ne\_\_()}}
+{\footnotesize\ttfamily def MSD.\+MSD.\+\_\+\+Iterator.\+\_\+\+\_\+ne\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{other }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_m_s_d_1_1___iterator_aa8d6a915e699f79d7da22063a689cc4d}\label{class_m_s_d_1_1_m_s_d_1_1___iterator_aa8d6a915e699f79d7da22063a689cc4d}} 
+\index{MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}!\_\_next\_\_@{\_\_next\_\_}}
+\index{\_\_next\_\_@{\_\_next\_\_}!MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}}
+\doxysubsubsection{\texorpdfstring{\_\_next\_\_()}{\_\_next\_\_()}}
+{\footnotesize\ttfamily def MSD.\+MSD.\+\_\+\+Iterator.\+\_\+\+\_\+next\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_m_s_d_1_1___iterator_a0ecfe9750c38d87f6de9b2c75f65993a}\label{class_m_s_d_1_1_m_s_d_1_1___iterator_a0ecfe9750c38d87f6de9b2c75f65993a}} 
+\index{MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}!\_\_sub\_\_@{\_\_sub\_\_}}
+\index{\_\_sub\_\_@{\_\_sub\_\_}!MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}}
+\doxysubsubsection{\texorpdfstring{\_\_sub\_\_()}{\_\_sub\_\_()}}
+{\footnotesize\ttfamily def MSD.\+MSD.\+\_\+\+Iterator.\+\_\+\+\_\+sub\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{offset }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_m_s_d_1_1___iterator_a6f1cf4d66632a27f4d220565ec8060e6}\label{class_m_s_d_1_1_m_s_d_1_1___iterator_a6f1cf4d66632a27f4d220565ec8060e6}} 
+\index{MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}!clone@{clone}}
+\index{clone@{clone}!MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}}
+\doxysubsubsection{\texorpdfstring{clone()}{clone()}}
+{\footnotesize\ttfamily def MSD.\+MSD.\+\_\+\+Iterator.\+clone (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_m_s_d_1_1___iterator_a576c383b1e498d2113a264c1a45a5bf1}\label{class_m_s_d_1_1_m_s_d_1_1___iterator_a576c383b1e498d2113a264c1a45a5bf1}} 
+\index{MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}!next@{next}}
+\index{next@{next}!MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}}
+\doxysubsubsection{\texorpdfstring{next()}{next()}}
+{\footnotesize\ttfamily def MSD.\+MSD.\+\_\+\+Iterator.\+next (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_m_s_d_1_1___iterator_a075ffbdde76b21d9839cd5e4738b53b3}\label{class_m_s_d_1_1_m_s_d_1_1___iterator_a075ffbdde76b21d9839cd5e4738b53b3}} 
+\index{MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}!prev@{prev}}
+\index{prev@{prev}!MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}}
+\doxysubsubsection{\texorpdfstring{prev()}{prev()}}
+{\footnotesize\ttfamily def MSD.\+MSD.\+\_\+\+Iterator.\+prev (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{class_m_s_d_1_1_m_s_d_1_1___iterator_aebe6c585864beefd4c282dd9350192df}\label{class_m_s_d_1_1_m_s_d_1_1___iterator_aebe6c585864beefd4c282dd9350192df}} 
+\index{MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}!BACKWARD@{BACKWARD}}
+\index{BACKWARD@{BACKWARD}!MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}}
+\doxysubsubsection{\texorpdfstring{BACKWARD}{BACKWARD}}
+{\footnotesize\ttfamily tuple MSD.\+MSD.\+\_\+\+Iterator.\+BACKWARD = (\mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_a075ffbdde76b21d9839cd5e4738b53b3}{prev}},)\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_m_s_d_1_1___iterator_a6120b73703f6405c43f3f4e0fd65358f}\label{class_m_s_d_1_1_m_s_d_1_1___iterator_a6120b73703f6405c43f3f4e0fd65358f}} 
+\index{MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}!FORWARD@{FORWARD}}
+\index{FORWARD@{FORWARD}!MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}}
+\doxysubsubsection{\texorpdfstring{FORWARD}{FORWARD}}
+{\footnotesize\ttfamily tuple MSD.\+MSD.\+\_\+\+Iterator.\+FORWARD = (\mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator_a576c383b1e498d2113a264c1a45a5bf1}{next}},)\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+\doxysubsection{Property Documentation}
+\mbox{\Hypertarget{class_m_s_d_1_1_m_s_d_1_1___iterator_ab768262200f1caa77a9a3c8493f2002e}\label{class_m_s_d_1_1_m_s_d_1_1___iterator_ab768262200f1caa77a9a3c8493f2002e}} 
+\index{MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}!flux@{flux}}
+\index{flux@{flux}!MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}}
+\doxysubsubsection{\texorpdfstring{flux}{flux}}
+{\footnotesize\ttfamily MSD.\+MSD.\+\_\+\+Iterator.\+flux = property(fget = lambda self\+: msd\+\_\+clib.\+get\+Flux\+\_\+a(self.\+\_\+iter))\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_m_s_d_1_1___iterator_aa7557272e3ea3c914913cc56c150f32f}\label{class_m_s_d_1_1_m_s_d_1_1___iterator_aa7557272e3ea3c914913cc56c150f32f}} 
+\index{MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}!index@{index}}
+\index{index@{index}!MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}}
+\doxysubsubsection{\texorpdfstring{index}{index}}
+{\footnotesize\ttfamily MSD.\+MSD.\+\_\+\+Iterator.\+index = property(fget = lambda self\+: msd\+\_\+clib.\+msd\+Index(self.\+\_\+iter))\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_m_s_d_1_1___iterator_afc96949740c0e84a8d54017f27dd3b8b}\label{class_m_s_d_1_1_m_s_d_1_1___iterator_afc96949740c0e84a8d54017f27dd3b8b}} 
+\index{MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}!localM@{localM}}
+\index{localM@{localM}!MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}}
+\doxysubsubsection{\texorpdfstring{localM}{localM}}
+{\footnotesize\ttfamily MSD.\+MSD.\+\_\+\+Iterator.\+localM = property(fget = lambda self\+: msd\+\_\+clib.\+get\+Local\+M\+\_\+a(self.\+\_\+iter))\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_m_s_d_1_1___iterator_a2e61d8fd2380b0f23c110c74d8a39c6d}\label{class_m_s_d_1_1_m_s_d_1_1___iterator_a2e61d8fd2380b0f23c110c74d8a39c6d}} 
+\index{MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}!metaIndex@{metaIndex}}
+\index{metaIndex@{metaIndex}!MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}}
+\doxysubsubsection{\texorpdfstring{metaIndex}{metaIndex}}
+{\footnotesize\ttfamily MSD.\+MSD.\+\_\+\+Iterator.\+meta\+Index = property(fget = lambda self\+: self.\+\_\+i)\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_m_s_d_1_1___iterator_a7bbe9c4b0b13fabdde37af356c30a25d}\label{class_m_s_d_1_1_m_s_d_1_1___iterator_a7bbe9c4b0b13fabdde37af356c30a25d}} 
+\index{MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}!pos@{pos}}
+\index{pos@{pos}!MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}}
+\doxysubsubsection{\texorpdfstring{pos}{pos}}
+{\footnotesize\ttfamily MSD.\+MSD.\+\_\+\+Iterator.\+pos = property(fget = lambda self\+: (self.\+x, self.\+y, self.\+z))\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_m_s_d_1_1___iterator_abaf0cefe61a5782a10ededd2b653d7a3}\label{class_m_s_d_1_1_m_s_d_1_1___iterator_abaf0cefe61a5782a10ededd2b653d7a3}} 
+\index{MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}!spin@{spin}}
+\index{spin@{spin}!MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}}
+\doxysubsubsection{\texorpdfstring{spin}{spin}}
+{\footnotesize\ttfamily MSD.\+MSD.\+\_\+\+Iterator.\+spin = property(fget = lambda self\+: msd\+\_\+clib.\+get\+Spin\+\_\+a(self.\+\_\+iter))\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_m_s_d_1_1___iterator_a90f76b0efb8e66fdd9b5abe67a0166bd}\label{class_m_s_d_1_1_m_s_d_1_1___iterator_a90f76b0efb8e66fdd9b5abe67a0166bd}} 
+\index{MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}!x@{x}}
+\index{x@{x}!MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}}
+\doxysubsubsection{\texorpdfstring{x}{x}}
+{\footnotesize\ttfamily MSD.\+MSD.\+\_\+\+Iterator.\+x = property(fget = lambda self\+: msd\+\_\+clib.\+getX(self.\+\_\+iter))\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_m_s_d_1_1___iterator_ac8cdd734f3db4f20d8b05ae53fef770a}\label{class_m_s_d_1_1_m_s_d_1_1___iterator_ac8cdd734f3db4f20d8b05ae53fef770a}} 
+\index{MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}!y@{y}}
+\index{y@{y}!MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}}
+\doxysubsubsection{\texorpdfstring{y}{y}}
+{\footnotesize\ttfamily MSD.\+MSD.\+\_\+\+Iterator.\+y = property(fget = lambda self\+: msd\+\_\+clib.\+getY(self.\+\_\+iter))\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{class_m_s_d_1_1_m_s_d_1_1___iterator_a35c056ed91ca6980a2ca74afcffde64b}\label{class_m_s_d_1_1_m_s_d_1_1___iterator_a35c056ed91ca6980a2ca74afcffde64b}} 
+\index{MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}!z@{z}}
+\index{z@{z}!MSD.MSD.\_Iterator@{MSD.MSD.\_Iterator}}
+\doxysubsubsection{\texorpdfstring{z}{z}}
+{\footnotesize\ttfamily MSD.\+MSD.\+\_\+\+Iterator.\+z = property(fget = lambda self\+: msd\+\_\+clib.\+getZ(self.\+\_\+iter))\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/mathh/\+Git\+Hub/\+Molecular-\/\+Spintronics-\/\+Research-\/\+Project/\+MSD Research Project -\/ Latest Development Version/lib/python/\mbox{\hyperlink{_m_s_d_8py}{MSD.\+py}}\end{DoxyCompactItemize}

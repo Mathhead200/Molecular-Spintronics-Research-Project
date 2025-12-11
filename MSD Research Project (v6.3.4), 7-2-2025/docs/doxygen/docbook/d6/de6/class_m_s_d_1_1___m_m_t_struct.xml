@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_class_m_s_d_1_1___m_m_t_struct" xml:lang="en-US">
+<title>MSD._MMTStruct Class Reference</title>
+<indexterm><primary>MSD._MMTStruct</primary></indexterm>
+<para>
+
+<para>Adds the MSD-Molecule-Text, <link linkend="_class_m_s_d_1_1___m_m_t_struct_1a3f795dd08944c744bf10060d8e7a74a3">mmt()</link> method for subclasses. </para>
+ 
+</para>
+<para>Inheritance diagram for MSD._MMTStruct:    <informalfigure>
+        <mediaobject>
+            <imageobject>
+                <imagedata width="50%" align="center" valign="middle" scalefit="0" fileref="../../d6/de6/class_m_s_d_1_1___m_m_t_struct.png"></imagedata>
+            </imageobject>
+        </mediaobject>
+    </informalfigure>
+</para>
+<simplesect>
+    <title>Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1___m_m_t_struct_1ab6c981d00a7ba900181ec80e644f60ba">__init__</link> (self, *args, **kw)</para>
+</listitem>
+            <listitem><para>str <link linkend="_class_m_s_d_1_1___m_m_t_struct_1a3f795dd08944c744bf10060d8e7a74a3">mmt</link> (self)</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Detailed Description</title>
+
+<para>Adds the MSD-Molecule-Text, <link linkend="_class_m_s_d_1_1___m_m_t_struct_1a3f795dd08944c744bf10060d8e7a74a3">mmt()</link> method for subclasses. </para>
+</section>
+<section>
+<title>Constructor &amp; Destructor Documentation</title>
+<anchor xml:id="_class_m_s_d_1_1___m_m_t_struct_1ab6c981d00a7ba900181ec80e644f60ba"/><section>
+    <title>__init__()</title>
+<indexterm><primary>__init__</primary><secondary>MSD._MMTStruct</secondary></indexterm>
+<indexterm><primary>MSD._MMTStruct</primary><secondary>__init__</secondary></indexterm>
+<para><computeroutput>def MSD._MMTStruct.__init__ ( self, * args, ** kw)</computeroutput></para><para>
+Reimplemented from <link linkend="_class_m_s_d_1_1___struct_with_dict_1a7c5722a237df5039317d31c528d04128">MSD._StructWithDict</link>.</para>
+<para>
+Reimplemented in <link linkend="_class_m_s_d_1_1_molecule_1_1_edge_parameters_1af40c02fe5ac4ccc57e1f9ed90d854d22">MSD.Molecule.EdgeParameters</link>, and <link linkend="_class_m_s_d_1_1_molecule_1_1_node_parameters_1a009d75e5ee73aa7f7538680f9862c38b">MSD.Molecule.NodeParameters</link>.</para>
+</section>
+</section>
+<section>
+<title>Member Function Documentation</title>
+<anchor xml:id="_class_m_s_d_1_1___m_m_t_struct_1a3f795dd08944c744bf10060d8e7a74a3"/><section>
+    <title>mmt()</title>
+<indexterm><primary>mmt</primary><secondary>MSD._MMTStruct</secondary></indexterm>
+<indexterm><primary>MSD._MMTStruct</primary><secondary>mmt</secondary></indexterm>
+<para><computeroutput> str MSD._MMTStruct.mmt ( self)</computeroutput></para></section>
+<para>
+The documentation for this class was generated from the following file:</para>
+C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/lib/python/<link linkend="__m_s_d_8py">MSD.py</link></section>
+</section>

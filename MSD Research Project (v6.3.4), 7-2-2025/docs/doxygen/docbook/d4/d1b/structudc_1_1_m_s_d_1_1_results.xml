@@ -1,0 +1,190 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_structudc_1_1_m_s_d_1_1_results" xml:lang="en-US">
+<title>udc::MSD::Results Struct Reference</title>
+<indexterm><primary>udc::MSD::Results</primary></indexterm>
+<para>
+<computeroutput>#include &lt;MSD.h&gt;</computeroutput>
+</para>
+<simplesect>
+    <title>Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para><link linkend="_structudc_1_1_m_s_d_1_1_results_1acab69dbb27e71f71fd874272e036dcc6">Results</link> ()</para>
+</listitem>
+            <listitem><para>bool <link linkend="_structudc_1_1_m_s_d_1_1_results_1ab6fb2b0afd66ea58ae596c7d34bd42f0">operator==</link> (const <link linkend="_structudc_1_1_m_s_d_1_1_results">Results</link> &amp;) const</para>
+</listitem>
+            <listitem><para>bool <link linkend="_structudc_1_1_m_s_d_1_1_results_1aedd99e890f8609ae49464003794fd263">operator!=</link> (const <link linkend="_structudc_1_1_m_s_d_1_1_results">Results</link> &amp;) const</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Public Attributes    </title>
+        <itemizedlist>
+            <listitem><para>unsigned long long <link linkend="_structudc_1_1_m_s_d_1_1_results_1af3d16fd70f68cea33b5ef33974515f79">t</link></para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_structudc_1_1_m_s_d_1_1_results_1add17a888eb16b943590de93a0b3e91b1">M</link></para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_structudc_1_1_m_s_d_1_1_results_1ab999831d99fdbe251e9b42f285a55de3">ML</link></para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_structudc_1_1_m_s_d_1_1_results_1a02e81e4c6b257f5cdd5cbadcf8c2a932">MR</link></para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_structudc_1_1_m_s_d_1_1_results_1a34c69209bbac659c712c77d8c3e2b579">Mm</link></para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_structudc_1_1_m_s_d_1_1_results_1aeae2f7666be87f8d4499d612567fe71a">MS</link></para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_structudc_1_1_m_s_d_1_1_results_1a020102ea8f3621b4791a75de90624ade">MSL</link></para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_structudc_1_1_m_s_d_1_1_results_1a66823c7a278ea165067eadaf62c976d0">MSR</link></para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_structudc_1_1_m_s_d_1_1_results_1a42f24fd034f5acf41d415093def18fa5">MSm</link></para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_structudc_1_1_m_s_d_1_1_results_1a789b09f14dc037a00b59733ef5e6b8fe">MF</link></para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_structudc_1_1_m_s_d_1_1_results_1a1a6be402d985814748b000dce6b983e9">MFL</link></para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_structudc_1_1_m_s_d_1_1_results_1a66d2b20d7c955c704ce31b355419ee45">MFR</link></para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_structudc_1_1_m_s_d_1_1_results_1ac3c2f0d86900c360181e14073842f9a5">MFm</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_results_1ac2f34ae8ef9e61293384e1df5331d77f">U</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_results_1ab96ad5750fd4adbabc28d6164a3c09e5">UL</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_results_1a497832a1d05ed77c59702f3eeaaba4af">UR</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_results_1accd2d8651433a936fcdc74d8677c8cb2">Um</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_results_1a1826fae2c258ee0eaa78bddbcd83b6e9">UmL</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_results_1a11b8dd99584758f7bd89d50823d788d7">UmR</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_results_1a4b13d0703ce1ed4495f7d68fd6ff0b91">ULR</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Constructor &amp; Destructor Documentation</title>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_results_1acab69dbb27e71f71fd874272e036dcc6"/><section>
+    <title>Results()</title>
+<indexterm><primary>Results</primary><secondary>udc::MSD::Results</secondary></indexterm>
+<indexterm><primary>udc::MSD::Results</primary><secondary>Results</secondary></indexterm>
+<para><computeroutput>udc::MSD::Results::Results ( )</computeroutput></para></section>
+</section>
+<section>
+<title>Member Function Documentation</title>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_results_1aedd99e890f8609ae49464003794fd263"/><section>
+    <title>operator!=()</title>
+<indexterm><primary>operator!=</primary><secondary>udc::MSD::Results</secondary></indexterm>
+<indexterm><primary>udc::MSD::Results</primary><secondary>operator!=</secondary></indexterm>
+<para><computeroutput>bool udc::MSD::Results::operator!= (const <link linkend="_structudc_1_1_m_s_d_1_1_results">Results</link> &amp; r) const</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_results_1ab6fb2b0afd66ea58ae596c7d34bd42f0"/><section>
+    <title>operator==()</title>
+<indexterm><primary>operator==</primary><secondary>udc::MSD::Results</secondary></indexterm>
+<indexterm><primary>udc::MSD::Results</primary><secondary>operator==</secondary></indexterm>
+<para><computeroutput>bool udc::MSD::Results::operator== (const <link linkend="_structudc_1_1_m_s_d_1_1_results">Results</link> &amp; r) const</computeroutput></para></section>
+</section>
+<section>
+<title>Member Data Documentation</title>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_results_1add17a888eb16b943590de93a0b3e91b1"/><section>
+    <title>M</title>
+<indexterm><primary>M</primary><secondary>udc::MSD::Results</secondary></indexterm>
+<indexterm><primary>udc::MSD::Results</primary><secondary>M</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::Results::M</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_results_1a789b09f14dc037a00b59733ef5e6b8fe"/><section>
+    <title>MF</title>
+<indexterm><primary>MF</primary><secondary>udc::MSD::Results</secondary></indexterm>
+<indexterm><primary>udc::MSD::Results</primary><secondary>MF</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::Results::MF</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_results_1a1a6be402d985814748b000dce6b983e9"/><section>
+    <title>MFL</title>
+<indexterm><primary>MFL</primary><secondary>udc::MSD::Results</secondary></indexterm>
+<indexterm><primary>udc::MSD::Results</primary><secondary>MFL</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::Results::MFL</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_results_1ac3c2f0d86900c360181e14073842f9a5"/><section>
+    <title>MFm</title>
+<indexterm><primary>MFm</primary><secondary>udc::MSD::Results</secondary></indexterm>
+<indexterm><primary>udc::MSD::Results</primary><secondary>MFm</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::Results::MFm</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_results_1a66d2b20d7c955c704ce31b355419ee45"/><section>
+    <title>MFR</title>
+<indexterm><primary>MFR</primary><secondary>udc::MSD::Results</secondary></indexterm>
+<indexterm><primary>udc::MSD::Results</primary><secondary>MFR</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::Results::MFR</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_results_1ab999831d99fdbe251e9b42f285a55de3"/><section>
+    <title>ML</title>
+<indexterm><primary>ML</primary><secondary>udc::MSD::Results</secondary></indexterm>
+<indexterm><primary>udc::MSD::Results</primary><secondary>ML</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::Results::ML</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_results_1a34c69209bbac659c712c77d8c3e2b579"/><section>
+    <title>Mm</title>
+<indexterm><primary>Mm</primary><secondary>udc::MSD::Results</secondary></indexterm>
+<indexterm><primary>udc::MSD::Results</primary><secondary>Mm</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::Results::Mm</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_results_1a02e81e4c6b257f5cdd5cbadcf8c2a932"/><section>
+    <title>MR</title>
+<indexterm><primary>MR</primary><secondary>udc::MSD::Results</secondary></indexterm>
+<indexterm><primary>udc::MSD::Results</primary><secondary>MR</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::Results::MR</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_results_1aeae2f7666be87f8d4499d612567fe71a"/><section>
+    <title>MS</title>
+<indexterm><primary>MS</primary><secondary>udc::MSD::Results</secondary></indexterm>
+<indexterm><primary>udc::MSD::Results</primary><secondary>MS</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::Results::MS</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_results_1a020102ea8f3621b4791a75de90624ade"/><section>
+    <title>MSL</title>
+<indexterm><primary>MSL</primary><secondary>udc::MSD::Results</secondary></indexterm>
+<indexterm><primary>udc::MSD::Results</primary><secondary>MSL</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::Results::MSL</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_results_1a42f24fd034f5acf41d415093def18fa5"/><section>
+    <title>MSm</title>
+<indexterm><primary>MSm</primary><secondary>udc::MSD::Results</secondary></indexterm>
+<indexterm><primary>udc::MSD::Results</primary><secondary>MSm</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::Results::MSm</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_results_1a66823c7a278ea165067eadaf62c976d0"/><section>
+    <title>MSR</title>
+<indexterm><primary>MSR</primary><secondary>udc::MSD::Results</secondary></indexterm>
+<indexterm><primary>udc::MSD::Results</primary><secondary>MSR</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::Results::MSR</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_results_1af3d16fd70f68cea33b5ef33974515f79"/><section>
+    <title>t</title>
+<indexterm><primary>t</primary><secondary>udc::MSD::Results</secondary></indexterm>
+<indexterm><primary>udc::MSD::Results</primary><secondary>t</secondary></indexterm>
+<para><computeroutput>unsigned long long udc::MSD::Results::t</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_results_1ac2f34ae8ef9e61293384e1df5331d77f"/><section>
+    <title>U</title>
+<indexterm><primary>U</primary><secondary>udc::MSD::Results</secondary></indexterm>
+<indexterm><primary>udc::MSD::Results</primary><secondary>U</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Results::U</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_results_1ab96ad5750fd4adbabc28d6164a3c09e5"/><section>
+    <title>UL</title>
+<indexterm><primary>UL</primary><secondary>udc::MSD::Results</secondary></indexterm>
+<indexterm><primary>udc::MSD::Results</primary><secondary>UL</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Results::UL</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_results_1a4b13d0703ce1ed4495f7d68fd6ff0b91"/><section>
+    <title>ULR</title>
+<indexterm><primary>ULR</primary><secondary>udc::MSD::Results</secondary></indexterm>
+<indexterm><primary>udc::MSD::Results</primary><secondary>ULR</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Results::ULR</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_results_1accd2d8651433a936fcdc74d8677c8cb2"/><section>
+    <title>Um</title>
+<indexterm><primary>Um</primary><secondary>udc::MSD::Results</secondary></indexterm>
+<indexterm><primary>udc::MSD::Results</primary><secondary>Um</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Results::Um</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_results_1a1826fae2c258ee0eaa78bddbcd83b6e9"/><section>
+    <title>UmL</title>
+<indexterm><primary>UmL</primary><secondary>udc::MSD::Results</secondary></indexterm>
+<indexterm><primary>udc::MSD::Results</primary><secondary>UmL</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Results::UmL</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_results_1a11b8dd99584758f7bd89d50823d788d7"/><section>
+    <title>UmR</title>
+<indexterm><primary>UmR</primary><secondary>udc::MSD::Results</secondary></indexterm>
+<indexterm><primary>udc::MSD::Results</primary><secondary>UmR</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Results::UmR</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_results_1a497832a1d05ed77c59702f3eeaaba4af"/><section>
+    <title>UR</title>
+<indexterm><primary>UR</primary><secondary>udc::MSD::Results</secondary></indexterm>
+<indexterm><primary>udc::MSD::Results</primary><secondary>UR</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Results::UR</computeroutput></para></section>
+<para>
+The documentation for this struct was generated from the following file:</para>
+C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/src/<link linkend="__m_s_d_8h">MSD.h</link></section>
+</section>
