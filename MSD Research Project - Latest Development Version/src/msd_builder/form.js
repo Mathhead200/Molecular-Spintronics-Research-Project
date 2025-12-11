@@ -670,6 +670,9 @@ const initForm = ({ camera, msdView, timeline }) => {
 			currentTarget.classList.add("set");
 			if (section.classList.contains("vector"))
 				parent.classList.add("set");
+			
+			// Ellie's contribution: .select() each input onclick (changed to onfocus)
+			currentTarget.select();
 		});
 
 		input.addEventListener("blur", ({currentTarget}) => {

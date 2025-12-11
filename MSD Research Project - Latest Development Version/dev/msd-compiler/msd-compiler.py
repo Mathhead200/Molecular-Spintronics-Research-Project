@@ -411,7 +411,7 @@ if __name__ == "__main__":
 			if y == topL or y == bottomL or z == frontR or z == backR:
 				msd.edges.append(((molPosL - 1, y, z), (molPosR + 1, y, z)))
 
-	msd.regions = { "FML": fml, "mol": mol, "FMR": fmr }	
+	msd.regions = { "FML": fml, "mol": mol, "FMR": fmr }
 	msd.nodes = fml + mol + fmr
 	msd.mutableNodes = msd.nodes
 
