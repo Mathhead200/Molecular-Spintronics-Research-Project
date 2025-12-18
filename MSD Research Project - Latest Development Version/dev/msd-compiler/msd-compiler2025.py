@@ -54,7 +54,8 @@ class _Model(Generic[Index, Region], TypedDict, total=False):
 
 	programParameters: ProgramParameters
 
-	nodeId: Callable[[Node], str]  # returned str must conform to C++ identifier spec.
+	nodeId: Callable[[Node], str]      # returned str must conform to C identifier spec.
+	regionId: Callable[[Region], str]  # returned str must conform to C identifier spec.
 
 def floats(values: Iterable) -> tuple[float]:
 	return (float(x) for x in values)
@@ -62,34 +63,66 @@ def floats(values: Iterable) -> tuple[float]:
 class Model:
 	def __init__(self, **kw):
 		self.__dict__ = _Model(*kw)
-		if "getNodeIdentifier" not in self.__dict__:
-			self.getNodeIdentifier = lambda node: str(node)
+		if "nodeId" not in self.__dict__:
+			self.nodeId = lambda node: str(node)
+		if "regionId" not in self.__dict__:
+			self.regionId = lambda region: str(region)
 		# fields set durring compilation 
-		self.localKeys: set[str] = None   # set[str]: which localNodeParameters are being used?
+		self.localNodeKeys: set[str] = None    # set[str]: which localNodeParameters are being used?
+		self.localEdgeKeys: set[str] = None    # set[str]: which localEdgeParameters are being used?
+		self.regionNodeKeys: set[str] = None   # set[str]: which regionNodeParameters are being used?
+		self.regionEdgeKeys: set[str] = None   # set[str]: which regionEdgeParameters are being used?
+		self.globalKeys: set[str] = None       # set[str]: which globalParameters are being used?
 		self.immutableNodes: list = None  # list[Node]: disjoint of self.nodes - self.mutableNodes
 		self.nodeIndex: dict = None       # map: (Node) -> (int) index in nodes array
 
 	def __repr__(self) -> str:
 		return str(self.__dict__)
 	
-	def calcLocalKeys(self) -> set[str]:
+	@staticmethod
+	def innerKeys(parameters: dict) -> set[str]:
 		"""
-		Computes a set of all the local parameter keys used at least once across
-		all nodes in the system. e.g.
+		Computes a set of all the local/region parameter keys used at least
+		once across all nodes/edges/regions in the system. e.g.
 		<pre>
-			msd = MSD()
+			msd = Model()
 			# ...
 			msd.localNodeParameters = {
 				node1 : {kT: 0.1},
-				node2 : {B: (0, 0.1, 0), F = 1}
+				node2 : {B: (0, 0.1, 0), F: 1}
 			}
-			print(msd.localNodeParameterKeys())  # {kT, B, F}
+			msd.regionNodeParameters = {
+				regionA : {kT: 0.2},
+				regionB : {A: (0, 0, 0.1), S: 0.5}
+			}
+			msd.regionEdgeParameters = {
+				edge1 : {J: -0.5},
+				edge2 : {b: 0.25}
+			}
+			print(Model.innerKeys(self.localNodeParameters))   # {kT, B, F}
+			print(Model.innerKeys(self.regionNodeParameters))  # {kT, A, S}
+			print(Model.innerKeys(sele.regionEdgeParameters))  # {J, b}
 		</pre>
 		"""
-		localNodeParameterKeys = set()
-		for nodeParameters in self.localNodeParameters.values():
-			localNodeParameterKeys |= nodeParameters.keys()
-		return localNodeParameterKeys
+		keys = set()
+		for innerDict in parameters.values():
+			keys |= innerDict.keys()
+		return keys
+
+	def calcRegionNodeKeys(self) -> set[str]:
+		"""
+		Compute a set of all the region paramaters used at least once across
+		all regions in the system. e.g.
+		<pre>
+			msd = Model()
+			# ...
+			
+			print(msd.calcRegionNodeKeys())  # {kT, B, F}
+		</pre>
+		"""
+		regionNodeKeys = set()
+		for regionParameters in self.regionNodeParameters.values():
+			regionNodeKeys |= regionParameters
 
 	def calcImmutableNodes(self) -> Iterable:
 		"""
@@ -107,65 +140,66 @@ class Model:
 
 	def compile(self, out_path: str):
 		# Check for and fix missing required attributes;
-		if "nodes"               not in self.__dict__:  self.nodes = {}
-		if "mutableNodes"        not in self.__dict__:  self.mutableNodes = self.nodes
-		if "edges"               not in self.__dict__:  self.edges = {}
-		if "regions"             not in self.__dict__:  self.regions = {}
-		if "localNodeParameters" not in self.__dict__:  self.localNodeParameters = {}
-		if "localEdgeParameters" not in self.__dict__:  self.localEdgeParameters = {}
+		if "nodes"                not in self.__dict__:  self.nodes = {}
+		if "mutableNodes"         not in self.__dict__:  self.mutableNodes = self.nodes
+		if "edges"                not in self.__dict__:  self.edges = {}
+		if "regions"              not in self.__dict__:  self.regions = {}
+		if "localNodeParameters"  not in self.__dict__:  self.localNodeParameters = {}
+		if "localEdgeParameters"  not in self.__dict__:  self.localEdgeParameters = {}
+		if "regionNodeParameters" not in self.__dict__:  self.regionNodeParameters = {}
+		if "regionEdgeParameters" not in self.__dict__:  self.regionEdgeParameters = {}
+		if "globalParameters"     not in self.__dict__:  self.globalParameters = {}
 		# TODO: add more checks?
 
 		# other (dependant) variables
-		self.localKeys = self.calcLocalKeys()            # set[str]
+		self.localNodeKeys = Model.innerKeys(self.localNodeParameters)    # set[str]
+		self.localEdgeKeys = Model.innerKeys(self.localEdgeParameters)    # set[str]
+		self.regionNodeKeys = Model.innerKeys(self.regionNodeParameters)  # set[str]
+		self.regionEdgeKeys = Model.innerKeys(self.regionEdgeParameters)  # set[str]
+		self.globalKeys = self.globalParameters.keys()                    # set[str]
 		self.immutableNodes = self.calcImmutableNodes()  # list[Node]
 		self.nodeIndex = {}                              # dict[Node, int]
 
 		src = f"; Generated by {__name__} (python) at {datetime.now()}\n"
 		# options
 		src += "OPTION CASEMAP:NONE\n\n"
-		# defines
-		src += f"MUTABLE_NODE_COUNT   EQU {len(self.mutableNodes)}\n"
-		src += f"IMMUTABLE_NODE_COUNT EQU {len(self.immutableNodes)}\n"
-		src += f"NODE_COUNT           EQU {len(self.nodes)}\n"
-		src += f"EDGE_COUNT           EQU {len(self.edges)}\n"
-		src += "\n"
-
+		# includes
+		src += "include vec.inc  ; _vdotp, etc.\n\n"
 		
+		# ---------------------------------------------------------------------
 		src += ".data\n"
-		# globals
-		src += "VEC SEGMENT ALIGN(32)\n"
-		src += "VEC_I\t dq 1.0, 0.0, 0.0, 0.0\n"
-		src += "VEC_J\t dq 0.0, 1.0, 0.0, 0.0\n"
-		src += "VEC_K\t dq 0.0, 0.0, 1.0, 0.0\n"
-
+		# nodes:
 		# allocate memory for "nodes" as an array of structures
 		# generate a comment explaining nodes' memory structure
 		src += "; struct node {\n"
 		src += ";\tdouble spin[4];  // 32-bytes. last element is ignored.\n"
 		src += ";\tdouble flux[4];  // 32-bytes. last element is ignored.\n"
-		if "B" in self.localKeys:
+		if "B" in self.localNodeKeys:
 			src += ";\tdouble B[4];     // 32-bytes. last element is ignored.\n"
-		if "A" in self.localKeys:
+		if "A" in self.localNodeKeys:
 			src += ";\tdouble A[4];     // 32-bytes. last element is ignored.\n"
-		if any(p in self.localKeys for p in {"S", "F", "kT", "Je0"}):
+		if any(p in self.localNodeKeys for p in {"S", "F", "kT", "Je0"}):
 			src += ";\tdouble S, F, kT, Je0;  // 32-bytes. unused parameters are ignored.\n"
 		src += "; }\n"
 		# symbolic constants related to nodes' memory structure
 		offset32 = 0  # tracks current position as we iterate through struct in 32-byte chunks
 		src += f"OFFSETOF_SPIN EQU 32*({offset32})\n";  offset32 += 1
 		src += f"OFFSETOF_FLUX EQU 32*({offset32})\n";  offset32 += 1
-		if "B" in self.localKeys:
+		if "B" in self.localNodeKeys:
 			src += f"OFFSETOF_B    EQU 32*({offset32})\n";  offset32 += 1
-		if "A" in self.localKeys:
+		if "A" in self.localNodeKeys:
 			src += f"OFFSETOF_A    EQU 32*({offset32})\n";  offset32 += 1
-		if any(p in self.localKeys for p in {"S", "F", "kT", "Je0"}):
-			if "S" in self.localKeys:    src += f"OFFSETOF_S    EQU 32*({offset32}) + 8*(0)\n"
-			if "F" in self.localKeys:    src += f"OFFSETOF_F    EQU 32*({offset32}) + 8*(1)\n"
-			if "kT" in self.localKeys:   src += f"OFFSETOF_kT   EQU 32*({offset32}) + 8*(2)\n"
-			if "Je0" in self.localKeys:  src += f"OFFSETOF_Je0  EQU 32*({offset32}) + 8*(3)\n"
+		if any(p in self.localNodeKeys for p in {"S", "F", "kT", "Je0"}):
+			if "S" in self.localNodeKeys:    src += f"OFFSETOF_S    EQU 32*({offset32}) + 8*(0)\n"
+			if "F" in self.localNodeKeys:    src += f"OFFSETOF_F    EQU 32*({offset32}) + 8*(1)\n"
+			if "kT" in self.localNodeKeys:   src += f"OFFSETOF_kT   EQU 32*({offset32}) + 8*(2)\n"
+			if "Je0" in self.localNodeKeys:  src += f"OFFSETOF_Je0  EQU 32*({offset32}) + 8*(3)\n"
 			offset32 += 1
-		src += f"SIZEOF_NODE   EQU 32*({offset32})\n\n"
-		# define memeory for nodes'
+		src += f"SIZEOF_NODE   EQU 32*({offset32})\n"
+		src += f"MUTABLE_NODE_COUNT   EQU {len(self.mutableNodes)}\n"
+		src += f"IMMUTABLE_NODE_COUNT EQU {len(self.immutableNodes)}\n"
+		src += f"NODE_COUNT           EQU {len(self.nodes)}\n\n"
+		# define memeory for nodes
 		src += "NODES SEGMENT ALIGN(32)  ; AVX-256 (i.e. 32-byte) alignment\n"
 		src += "nodes\t"
 		for i, node in enumerate([*self.mutableNodes, *self.immutableNodes]):
@@ -174,13 +208,13 @@ class Model:
 			params = self.localNodeParameters.get(node, {})  # dict
 			src += "dq 0.0, 1.0, 0.0, 0.0"  # init spin <0, 1, 0>
 			src += ", \t0.0, 0.0, 0.0, 0.0"  # init flux <0, 0, 0>
-			if "B" in self.localKeys:
-				B = floats(params.get("B", (0.0, 0.0, 0.0)))
-				src += f", \t{B[0]}, {B[1]}, {B[2]}, 0.0"
-			if "A" in self.localKeys:
-				A = floats(params.get("A", (0.0, 0.0, 0.0)))
-				src += f", \t{A[0]}, {A[1]}, {A[2]}, 0.0"
-			if any(p in self.localKeys for p in {"S", "F", "kT", "Je0"}):
+			if "B" in self.localNodeKeys:
+				Bx, By, Bz = floats(params.get("B", (0.0, 0.0, 0.0)))  # unpack generator
+				src += f", \t{Bx}, {By}, {Bz}, 0.0"
+			if "A" in self.localNodeKeys:
+				Ax, Ay, Az = floats(params.get("A", (0.0, 0.0, 0.0)))  # unpack generator
+				src += f", \t{Ax}, {Ay}, {Az}, 0.0"
+			if any(p in self.localNodeKeys for p in {"S", "F", "kT", "Je0"}):
 				S = float(params.get("S", 0.0))
 				F = float(params.get("F", 0.0))
 				kT = float(params.get("kT", 0.0))
@@ -191,7 +225,94 @@ class Model:
 			regions = f" in {regions}" if len(regions) != 0 else ""
 			src += f"  ; {const}nodes[{i}]: id=\"{self.nodeId(node)}\"{regions}\n"
 		src += "NODES ENDS\n\n"
+
+		# regions:
+		# generate a comment explaining nodes' memory structure
+		src += "; struct region {\n"
+		if "B" in self.regionNodeKeys:
+			src += ";\tdouble B[4];     // 32-bytes. last element is ignored.\n"
+		if "A" in self.regionNodeKeys:
+			src += ";\tdouble A[4];     // 32-bytes. last element is ignored.\n"
+		if any(p in self.regionNodeKeys for p in {"S", "F", "kT", "Je0"}):
+			src += ";\tdouble S, F, kT, Je0;  // 32-bytes. unused parameters are ignored.\n"
+		src += "; }\n"
+		# symbolic constants related to regions' memory structure
+		offset32 = 0  # tracks current position as we iterate through struct in 32-byte chunks
+		if "B" in self.regionNodeKeys:
+			src += f"OFFSETOF_REGION_B   EQU 32*({offset32})\n";  offset32 += 1
+		if "A" in self.localNodeKeys:
+			src += f"OFFSETOF_REGION_A   EQU 32*({offset32})\n";  offset32 += 1
+		if any(p in self.localNodeKeys for p in {"S", "F", "kT", "Je0"}):
+			if "S" in self.localNodeKeys:    src += f"OFFSETOF_REGION_S   EQU 32*({offset32}) + 8*(0)\n"
+			if "F" in self.localNodeKeys:    src += f"OFFSETOF_REGION_F   EQU 32*({offset32}) + 8*(1)\n"
+			if "kT" in self.localNodeKeys:   src += f"OFFSETOF_REGION_kT  EQU 32*({offset32}) + 8*(2)\n"
+			if "Je0" in self.localNodeKeys:  src += f"OFFSETOF_REGION_Je0 EQU 32*({offset32}) + 8*(3)\n"
+			offset32 += 1
+		src += f"SIZEOF_REGION EQU 32*({offset32})\n"
+		src += f"REGION_COUNT  EQU {len(self.regionNodeParameters.keys())}\n\n"
+		# define memeory for regions
+		src += "REGIONS SEGMENT ALIGN(32)  ; AVX-256 (i.e. 32-byte) alignment\n"
+		for region in self.regions:
+			if region not in self.regionNodeParameters:
+				continue  # skip defining this region. it has no special parameters.
+			src += f"{self.regionId(region)}\tdq "
+			params = self.regionNodeParameters[region]  # dict
+			if "B" in self.regionNodeKeys:
+				Bx, By, Bz = floats(params.get("B", (0.0, 0.0, 0.0)))  # unpack generator
+				src += f"{Bx}, {By}, {Bz}, 0.0,\t"
+			if "A" in self.regionNodeKeys:
+				Ax, Ay, Az = floats(params.get("A", (0.0, 0.0, 0.0)))  # unpack generator
+				src += f"{Ax}, {Ay}, {Az}, 0.0,\t"
+			if any(p in self.regionNodeKeys for p in {"S", "F", "kT", "Je0"}):
+				S = float(params.get("S", 0.0))
+				F = float(params.get("F", 0.0))
+				kT = float(params.get("kT", 0.0))
+				Je0 = float(params.get("Je0", 0.0))
+				src += f"{S}, {F}, {kT}, {Je0},\t"
+			src = src[0:-2]  # remove last ,\t delimeter
+			src += "\n"
+		src += "REGIONS ENDS\n\n"
 		
+		# global parameters (node only):
+		src += "GLOBAL_NODE SEGMENT ALIGN(32)\n"
+		params = self.globalParameters
+		if "B" in self.globalKeys:
+			Bx, By, Bz = floats(params.get("B", (0.0, 0.0, 0.0)))  # unpack generator
+			src += f"B   dq {Bx}, {By}, {Bz}, 0.0\n"
+		if "A" in self.globalKeys:
+			Ax, Ay, Az = floats(params.get("A", (0.0, 0.0, 0.0)))  # unpack generator
+			src += f"A   dq {Ax}, {Ay}, {Az}, 0.0\n"
+		if any(p in self.globalKeys for p in ["S", "F", "kT", "Je0"]):
+			S = float(params.get("S", 0.0))
+			F = float(params.get("F", 0.0))
+			kT = float(params.get("kT", 0.0))
+			Je0 = float(params.get("Je0", 0.0))
+			src += f"S   dq {S}\n"
+			src += f"F   dq {F}\n"
+			src += f"kT  dq {kT}\n"
+			src += f"Je0 dq {Je0}\n"
+		src += "GLOBAL_NODE ENDS\n\n"
+
+		# edges:
+		# TODO ...
+		src += f"EDGE_COUNT EQU {len(self.edges)}\n\n"
+		# TODO ...
+
+		# edge_regions:
+		# TODO ...
+
+		# global parameters (edge only):
+		# TODO ...
+
+		# dU array (function pointers):
+		# TODO ...
+
+		# ---------------------------------------------------------------------
+		src += ".code\n"
+		# dU PROCs:
+		# TODO ...
+
+
 		src += "END"  # absolute end of ASM file
 
 		with open(out_path, "w", encoding="utf-8") as file:
@@ -201,8 +322,8 @@ class Model:
 		# TODO: dynamically link to python??
 
 
-# Example:
-if __name__ == "__main__":
+# Examples:
+def example_3d():
 	width = 11
 	height = 10
 	depth = 10
@@ -305,7 +426,7 @@ if __name__ == "__main__":
 		(0, y, 0): { "F": 1 } for y in range(topL, bottomL + 1)
 	})
 
-	msd.compile("msd-compiler2025-output.asm")
+	return msd
 
 	# TODO: (though) Currently, msd.nodes mst be defined, and msd.mutableNodes
 	#	is optional, then self.immutableNodes gets computed. Is this the best
@@ -313,3 +434,45 @@ if __name__ == "__main__":
 	#	self.nodes and self.immutableNodes; or
 	#	self.mutabelNodes and self.immutableNodes: forcing them to specify?
 	#	(idk)
+
+def example_1d():
+	# 1D model with the classic 3 sections.
+	#
+	#   |  FML  |mol|  FMR  |
+	# 0*--1---2---3---4---5---6*
+	# ^        \     /        ^ {0,6} are leads and immutable
+	#           \---/ Direct coupling (2,4) (e.g. JLR)
+
+	msd = Model()
+	msd.nodes = [0, 1, 2, 3, 4, 5, 6]
+	msd.mutableNodes = [1, 2, 3, 4, 5]  # excluding 0, 6
+	msd.edges = [(i, i+1) for i in range(len(msd.nodes) - 1)]
+	msd.edges += [(2, 4)]
+	msd.globalParameters = {
+		"S": 1.0,
+		"kT": 0.1,
+		"B": (0.1, 0, 0),
+		"J": 1.0
+	}
+	msd.regions = {
+		"FML": [1, 2],
+		"mol": [3],
+		"FMR": [4, 5]
+	}
+	msd.regionEdgeParameters = {
+		("mol", "FMR"): { "J": -1.0 },
+		("FML", "FMR"): { "J": 0.1 }
+	}
+	msd.localNodeParameters = {
+		0: { "S": 10.0 },
+		6: { "S": 10.0 }
+	}
+	return msd
+
+# tests
+if __name__ == "__main__":
+	msd = example_1d()
+	msd.compile("msd-example_1d.asm")
+
+	msd = example_3d()
+	msd.compile("msd-example_3d.asm")
