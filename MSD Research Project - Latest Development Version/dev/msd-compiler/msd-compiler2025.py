@@ -254,8 +254,9 @@ class Model:
 		src += "REGIONS SEGMENT ALIGN(32)  ; AVX-256 (i.e. 32-byte) alignment\n"
 		for region in self.regions:
 			if region not in self.regionNodeParameters:
+				src += f"; {self.regionId(region)}\n"
 				continue  # skip defining this region. it has no special parameters.
-			src += f"{self.regionId(region)}\tdq "
+			src += f"  {self.regionId(region)}\tdq "
 			params = self.regionNodeParameters[region]  # dict
 			if "B" in self.regionNodeKeys:
 				Bx, By, Bz = floats(params.get("B", (0.0, 0.0, 0.0)))  # unpack generator
