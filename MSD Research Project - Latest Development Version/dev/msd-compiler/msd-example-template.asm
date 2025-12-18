@@ -75,6 +75,10 @@ ENDM
 ; Preconditions:
 ;	1. temp can NOT overlap with dest.
 ;	2. tempX is XMMn version of tempY.
+; Postconditions:
+;	1. dest is modified.
+;	2. src1 and src2 are not modifed unless they overlap with dest or temp.
+;	1. temp is clobbered!
 ; Notes:
 ;	* temp can overlap src1 or src2 since they are only used once at the top.
 ;	* dest can be the same as one or both of src1 and src2.
@@ -169,6 +173,36 @@ edges	dq 1.0, 0.0, 0.0, 0.0, 	0.0, 0.0, 0.0, 0.0  ; edges[0]: "0" -> "1", region
 		dq 1.0, 0.0, 0.0, 0.0, 	0.0, 0.0, 0.0, 0.0  ; edges[6]: "2" -> "4", regions=[("FML", "FMR")]
 EDGES ENDS
 
+; struct edge_region {
+;	double J, Je1, Jee, b;  // (optional) 32-bytes. unused fields ignored.
+;	double D[4];            // (optional) 32-bytes. last element ignored.
+; }
+OFFSETOF_REGION_J	EQU 32*(0) + 8*(0)
+OFFSETOF_REGION_Je1 EQU 32*(0) + 8*(1)
+OFFSETOF_REGION_Jee EQU 32*(0) + 8*(2)
+OFFSETOF_REGION_b   EQU 32*(0) + 8*(3)
+OFFSETOF_REGION_D   EQU 32*(1)
+SIZEOF_EDGE_REGION  EQU 32*(2)
+
+EDGE_REGION_COUNT EQU 7
+
+EDGE_REGIONS SEGMENT ALIGN(32)
+None_FML	dq 1.0, 0.0, 0.0, 0.0, 	0.0, 0.0, 0.0, 0.0
+FMR_None	dq 1.0, 0.0, 0.0, 0.0, 	0.0, 0.0, 0.0, 0.0
+FML_FML		dq 1.0, 0.0, 0.0, 0.0, 	0.0, 0.0, 0.0, 0.0
+FMR_FMR		dq 1.0, 0.0, 0.0, 0.0, 	0.0, 0.0, 0.0, 0.0
+FML_mol		dq 0.5, 0.0, 0.0, 0.0, 	0.0, 0.0, 0.0, 0.0
+mol_FMR		dq -0.5, 0.0, 0.0, 0.0, 	0.0, 0.0, 0.0, 0.0
+EDGE_REGIONS ENDS
+
+GLOBAL_EDGE SEGMENT ALIGN(32)
+J   dq 1.0
+Je1 dq 0.0
+Jee dq 0.0
+b   dq 0.0
+D   dq 0.0, 0.0, 0.0, 0.0
+GLOBAL_EDGE ENDS
+
 ; array (paralell to nodes) of function pointers
 dU	dq dU_1
 	dq dU_2
@@ -190,38 +224,70 @@ dU_0 PROC
 	ret
 dU_0 ENDP
 
-; node[2]
+; node[i=0]
 dU_1 PROC
 	; (param) ymm0: s' (new)
 	; (param) ymm1: f' (new)
 	vaddpd ymm2, ymm0, ymm1  ; m' (new)
-
-; TODO: FIX ERROR!
-;	vmovpd ymm3, ymmword ptr [nodes + 2*SIZEOF_NODE + OFFSET_SPIN]  ; s (current)
-;	vmovpd ymm4, ymmword ptr [nodes + 2*SIZEOF_NODE + OFFSET_FLUX]  ; f (current)
-	vaddpd ymm5, ymm3, ymm4                                         ; m (current)
-	
+	vmovapd ymm3, ymmword ptr [nodes + 0*SIZEOF_NODE + OFFSETOF_SPIN]  ; s (current)
+	vmovapd ymm4, ymmword ptr [nodes + 0*SIZEOF_NODE + OFFSETOF_FLUX]  ; f (current)
+	vaddpd ymm5, ymm3, ymm4  ; m (current)
 	vsubpd ymm6, ymm0, ymm3  ; \Delta s
 	vsubpd ymm7, ymm1, ymm4  ; \Delta f
 	vsubpd ymm8, ymm2, ymm5  ; \Delta m
-
 	; (return) xmm15: -dU
 
 	; compute -dU_B
-	vmovapd ymm9, ymmword ptr [nodes + 2*SIZEOF_NODE + OFFSETOF_B]  ; CASE local: B_1
+	vmovapd ymm9, ymmword ptr [nodes + 0*SIZEOF_NODE + OFFSETOF_B]  ; CASE local: B_1
 	vmovapd ymm9, ymmword ptr [FML + OFFSETOF_REGION_B]             ; CASE region: B_FML (Must not have region conflicts!)
 	vmovapd ymm9, ymmword ptr B                                     ; CASE global: B
-	_vdotp xmm15, ymm9, ymm6, xmm9, ymm9  ; clobbers ymm9!
+	_vdotp xmm15, ymm9, ymm8, xmm9, ymm9  ; clobbers ymm9! -dU = -dU_B
 
-	; TODO: compute -dU_A
-	; TODO: compute -dU_Je0
-	
+	; compute -dU_A
+	vmulpd ymm10, ymm2, ymm2    ; m' Hadamard squared: m'2
+	vmulpd ymm9, ymm5, ymm5    ; m  Hadamard squared: m2
+	vsubpd ymm10, ymm10, ymm9  ; m'2 - m2
+	vmovapd ymm9, ymmword ptr [nodes + 0*SIZEOF_NODE + OFFSETOF_A]  ; CASE local: A_1
+	vmovapd ymm9, ymmword ptr [FML + OFFSETOF_REGION_A]             ; CASE region: A_FML (Must not have region conflicts!)
+	vmovapd ymm9, ymmword ptr A                                     ; CASE global: A
+	_vdotp xmm10, ymm9, ymm10, xmm9, ymm9  ; clobbers ymm9!
+	vaddpd xmm15, xmm15, xmm10  ; -dU += -dU_A. Note: using vaddpd and not addsd to avoid pipline stalls (i.e. false dependacy on upper bits)
+
+	; compute -dU_Je0
+	_vdotp xmm10, ymm0, ymm1, xmm11, ymm11  ; s'f'
+	_vdotp xmm9, ymm3, ymm4, xmm11, ymm11  ; sf
+	vsubpd xmm10, xmm10, xmm9            ; s'f' - sf
+	vmovsd xmm9, qword ptr [nodes + 0*SIZEOF_NODE + OFFSETOF_Je0]  ; CASE local: Je0_1
+	vmovsd xmm9, qword ptr [FML + OFFSETOF_REGION_Je0]             ; CASE region: Je0_FML
+	vmovsd xmm9, qword ptr Je0                                     ; CASE global: Je0
+	vmulpd xmm10, xmm9, xmm10  ; Je0_i * (s'f' - sf)
+	vaddpd xmm15, xmm15, xmm10  ; -dU += -dU_Je0
+
 	; compute -dU_J
-	
+	; NOTE: if multiple edges use edge parameter (e.g. J) from the same region/global, don't reload
+	; edges[0]: 0 -> 1
+	vmovapd ymm10, ymmword ptr [nodes + 5*SIZEOF_NODE + OFFSETOF_SPIN]  ; s_0
+	_vdotp xmm10, ymm6, ymm10, xmm11, ymm11  ; (\Delta s_1)s_0
+	; TODO: consider a potential optimization here. If J_ij == 1.0 is const (e.g. JL, JR, ... = 1.0) then this load and mul are unnesesary.
+	vmovsd xmm9, qword ptr [edges + 0*SIZEOF_EDGE + OFFSETOF_J]  ; CASE local: J_0_1
+	vmovsd xmm9, qword ptr [None_FML + OFFSETOF_REGION_J]        ; CASE region: J_None_FML
+	vmovsd xmm9, qword ptr J                                     ; CASE global: J
+	vmulpd xmm10, xmm9, xmm10   ; J * (\Delta s_1)s_0
+	vaddpd xmm15, xmm15, xmm10  ; -dU += dU_J[j=0]
+	; edges[1]: 1 -> 2
+	vmovapd ymm10, ymmword ptr [nodes + 1*SIZEOF_NODE + OFFSETOF_SPIN]  ; s_2
+	_vdotp xmm10, ymm6, ymm10, xmm11, ymm11  ; (\Delta s_1)s_2
+	; Same J? Is J=1.0 (const)?
+	vmovsd xmm9, qword ptr [edges + 1*SIZEOF_EDGE + OFFSETOF_J]  ; CASE local: J_1_2
+	vmovsd xmm9, qword ptr [FML_FML + OFFSETOF_REGION_J]           ; CASE region: J_FML_FML
+	vmovsd xmm9, qword ptr J                                     ; CASE global: J
+	vmulpd xmm10, xmm9, xmm10   ; J * (\Delta s_1)s_2
+	vaddpd xmm15, xmm15, xmm10  ; -dU += dU_J[j=2]
+
 	; TODO: compute -dU_Je1
 	; TODO: compute -dU_Jee
 	; TODO: compute -dU_b
-	; TODO: compute -dU_D
+	; TODO: compute -dU_D (_vcrossp is anti-communative)
 
 	ret
 dU_1 ENDP
@@ -281,7 +347,7 @@ LOOP_START:
 	mov rax, [rax + rsi*8]  ; dU[rsi], dereferenced to get the actual function pointer stored in dU
 	call rax  ; args: (ymm0, ymm1) -> return xmm0
 	_dumpreg
-	
+
 	; compute p = e^(-dU/kT)
 	; TODO: ...
 
