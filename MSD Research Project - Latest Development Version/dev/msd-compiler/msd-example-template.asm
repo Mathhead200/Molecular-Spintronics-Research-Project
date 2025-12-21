@@ -76,7 +76,6 @@ OFFSETOF_Jee EQU 32*(0) + 8*(2)  ; (optional)
 OFFSETOF_b   EQU 32*(0) + 8*(3)  ; (optional)
 OFFSETOF_D   EQU 32*(1)          ; (optional)
 SIZEOF_EDGE  EQU 32*(2)          ; (optional)
-
 EDGE_COUNT EQU 7
 
 EDGES SEGMENT ALIGN(32)
@@ -99,7 +98,6 @@ OFFSETOF_REGION_Jee EQU 32*(0) + 8*(2)
 OFFSETOF_REGION_b   EQU 32*(0) + 8*(3)
 OFFSETOF_REGION_D   EQU 32*(1)
 SIZEOF_EDGE_REGION  EQU 32*(2)
-
 EDGE_REGION_COUNT EQU 7
 
 EDGE_REGIONS SEGMENT ALIGN(32)
@@ -119,14 +117,12 @@ b   dq 0.0
 D   dq 0.0, 0.0, 0.0, 0.0
 GLOBAL_EDGE ENDS
 
-; array (paralell to nodes) of function pointers
+; array (paralell to (mutable) nodes) of function pointers
 dU	dq dU_1
 	dq dU_2
 	dq dU_3
 	dq dU_4
 	dq dU_5
-	dq dU_0
-	dq dU_6
 
 ; TODO: more paralell arrays as needed for other node methods
 
@@ -135,10 +131,6 @@ dU	dq dU_1
 ; @param ymm0 \Delta spin
 ; @param ymm1 \Delta flux (optional)
 ; @return xmm15 -\Detla U (It's negated for Boltzman distribution.)
-dU_0 PROC
-	xorpd xmm0, xmm0  ; TODO: (stub: return 0.0)
-	ret
-dU_0 ENDP
 
 ; node[i=0]
 dU_1 PROC
@@ -154,7 +146,7 @@ dU_1 PROC
 	; (return) xmm15: -dU
 
 	; compute -dU_B
-	vmovapd ymm9, ymmword ptr [nodes + 0*SIZEOF_NODE + OFFSETOF_B]  ; CASE local: B_1
+	vmovapd ymm9, ymmword ptr [nodes + (0)*SIZEOF_NODE + OFFSETOF_B]  ; CASE local: B_1
 	vmovapd ymm9, ymmword ptr [FML + OFFSETOF_REGION_B]             ; CASE region: B_FML (Must not have region conflicts!)
 	vmovapd ymm9, ymmword ptr B                                     ; CASE global: B
 	_vdotp xmm15, ymm9, ymm8, xmm9, ymm9  ; clobbers ymm9! -dU = -dU_B
@@ -163,17 +155,17 @@ dU_1 PROC
 	vmulpd ymm10, ymm2, ymm2    ; m' Hadamard squared: m'2
 	vmulpd ymm9, ymm5, ymm5    ; m  Hadamard squared: m2
 	vsubpd ymm10, ymm10, ymm9  ; m'2 - m2
-	vmovapd ymm9, ymmword ptr [nodes + 0*SIZEOF_NODE + OFFSETOF_A]  ; CASE local: A_1
+	vmovapd ymm9, ymmword ptr [nodes + (0)*SIZEOF_NODE + OFFSETOF_A]  ; CASE local: A_1
 	vmovapd ymm9, ymmword ptr [FML + OFFSETOF_REGION_A]             ; CASE region: A_FML (Must not have region conflicts!)
 	vmovapd ymm9, ymmword ptr A                                     ; CASE global: A
-	_vdotp xmm10, ymm9, ymm10, xmm9, ymm9  ; clobbers ymm9!
+	_vdotp xmm10, ymm10, ymm9, xmm9, ymm9  ; clobbers ymm9!
 	vaddsd xmm15, xmm15, xmm10  ; -dU += -dU_A. Note: using vaddsd and not addsd to avoid pipline stalls (i.e. false dependacy on upper bits)
 
 	; compute -dU_Je0
 	_vdotp xmm10, ymm0, ymm1, xmm11, ymm11  ; s'f'
 	_vdotp xmm9, ymm3, ymm4, xmm11, ymm11  ; sf
 	vsubsd xmm10, xmm10, xmm9            ; s'f' - sf
-	vmovsd xmm9, qword ptr [nodes + 0*SIZEOF_NODE + OFFSETOF_Je0]  ; CASE local: Je0_1
+	vmovsd xmm9, qword ptr [nodes + (0)*SIZEOF_NODE + OFFSETOF_Je0]  ; CASE local: Je0_1
 	vmovsd xmm9, qword ptr [FML + OFFSETOF_REGION_Je0]             ; CASE region: Je0_FML
 	vmovsd xmm9, qword ptr Je0                                     ; CASE global: Je0
 	vmulsd xmm10, xmm10, xmm9  ; (s'f' - sf) * Je0_i
@@ -227,11 +219,6 @@ dU_5 PROC
 	xorpd xmm0, xmm0  ; TODO: (stub: return 0.0)
 	ret
 dU_5 ENDP
-
-dU_6 PROC
-	xorpd xmm0, xmm0  ; TODO: (stub: return 0.0)
-	ret
-dU_6 ENDP
 
 ; Runs the standard metropolis algorithm
 ; @param RCX (uint64) - number of iterations
