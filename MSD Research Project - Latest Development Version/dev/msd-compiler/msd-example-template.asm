@@ -174,16 +174,16 @@ dU_1 PROC
 	; compute -dU_J
 	; NOTE: if multiple edges use edge parameter (e.g. J) from the same region/global, don't reload
 	; edges[0]: 0 -> 1
-	vmovapd ymm10, ymmword ptr [nodes + 5*SIZEOF_NODE + OFFSETOF_SPIN]  ; s_0
+	vmovapd ymm10, ymmword ptr [nodes + (5)*SIZEOF_NODE + OFFSETOF_SPIN]  ; s_0
 	_vdotp xmm10, ymm10, ymm6, xmm11, ymm11  ; s_0(\Delta s_1)
 	; TODO: consider a potential optimization here. If J_ij == 1.0 is const (e.g. JL, JR, ... = 1.0) then this load and mul are unnesesary.
-	vmovsd xmm9, qword ptr [edges + 0*SIZEOF_EDGE + OFFSETOF_J]  ; CASE local: J_0_1
+	vmovsd xmm9, qword ptr [edges + (0)*SIZEOF_EDGE + OFFSETOF_J]  ; CASE local: J_0_1
 	vmovsd xmm9, qword ptr [None_FML + OFFSETOF_REGION_J]        ; CASE region: J_None_FML
 	vmovsd xmm9, qword ptr J                                     ; CASE global: J
 	vmulsd xmm10, xmm10, xmm9   ; s_0(\Delta s_1) * J_i
 	vaddsd xmm15, xmm15, xmm10  ; -dU += dU_J[j=0]
 	; edges[1]: 1 -> 2
-	vmovapd ymm10, ymmword ptr [nodes + 1*SIZEOF_NODE + OFFSETOF_SPIN]  ; s_2
+	vmovapd ymm10, ymmword ptr [nodes + (1)*SIZEOF_NODE + OFFSETOF_SPIN]  ; s_2
 	_vdotp xmm10, ymm10, ymm6, xmm11, ymm11  ; s_2(\Delta s_1)
 	; Same J? Is J=1.0 (const)?
 	vmovsd xmm9, qword ptr [edges + 1*SIZEOF_EDGE + OFFSETOF_J]  ; CASE local: J_1_2

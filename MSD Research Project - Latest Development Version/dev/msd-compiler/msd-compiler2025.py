@@ -1,5 +1,6 @@
 from typing import Callable, Generic, Iterable, Optional, Self, TypedDict, TypeVar
 from datetime import datetime
+from collections import defaultdict
 
 type vec = tuple[float, float, float]
 
@@ -54,6 +55,11 @@ class _Model(Generic[Index, Region], TypedDict, total=False):
 
 	programParameters: ProgramParameters
 
+	# TODO: specify which parameters may change durring execution.
+	#	Use this information to allow for optimization on constant parameters.
+	#	e.g. 0: remove;  1: skip load and mul
+	variableParamters: NodeAndEdgeParameters  # set
+
 	nodeId: Callable[[Node], str]      # returned str must conform to C identifier spec.
 	regionId: Callable[[Region], str]  # returned str must conform to C identifier spec. Must be able to handle None as input.
 
@@ -78,6 +84,7 @@ class Model:
 		self.nodeIndex: dict = None       # map: (Node) -> (int) index in ASM nodes array
 		self.edgeIndex: dict = None       # map: (Edge) -> (int) index in ASM edges array
 		self.regionCombos: list[tuple] = None  # list[Edge] containing all region combos of 1 or 2 regions. Counter-part to self.regions, but for edges.
+		self.constParameters: set[str] = None  # set[str in NodeAndEdgeParameters.keys()] which will not change durring runtime leading to optimizations
 
 	def __repr__(self) -> str:
 		return str(self.__dict__)
@@ -201,6 +208,18 @@ class Model:
 			if param in regionParams:
 				values.append((regionParams[param], region))
 		return values
+	
+	def getAllRegionEdgeParameterValues(self, edge, param) -> list[tuple]:
+		""" 
+		Similar to getAllRegionNodeParameterValues, but returned tuples contain
+		[(value, combo), ...] where combo = tuple(region0, region1).
+		"""
+		values = []
+		for combo in self.getRegionCombos(edge):
+			regionParams = self.regionEdgeParameters.get(combo, {})
+			if param in regionParams:
+				values.append((regionParams[param], combo))
+		return values
 
 	def getUnambiguousRegionNodeParameter(self, node, param):
 		"""
@@ -220,14 +239,73 @@ class Model:
 				collisions.append((v, r))
 		if len(collisions) != 0:
 			raise ValueError(
-				f"For node {self.nodeId(node)}, {param} is ambiguously defined in multiple regions: {[r for _, r in values]}.\n" + \
-				f"{param} is defined as {value} in {region}, but also defined as {[f"{v} in {r}" for v, r in collisions]}.\n" )
+				f"For node {self.nodeId(node)}, {param} is ambiguously defined in multiple regions: {[r for _, r in values]}." + \
+				f"{param} is defined as {value} in {region}, but also defined as {[f"{v} in {r}" for v, r in collisions]}." )
 		return value, region
 	
-	def hasFlux(self, node) -> bool:
-		return "F" in self.globalKeys or \
-			"F" in self.localNodeParameters.get(node, {}) or \
-			len(self.getAllRegionNodeParameterValues(node, "F")) != 0
+	def getUnambiguousRegionEdgeParameter(self, edge, param):
+		""" 
+		Similar to getUnambiguousRegionNodeParameter, but returned tuple contains
+		(value, combo) where combo = tuple(region0, region1), or (None, None).
+		"""
+		values = self.getAllRegionEdgeParameterValues(edge, param)
+		if len(values) == 0:
+			return (None, None)
+		# all the values should be equal to the first value (transative property of equality)
+		value, combo = values[0]
+		collisions = []
+		for v, c in values:
+			if v != value:
+				collisions.append((v, c))
+		if len(collisions) != 0:
+			raise ValueError(
+				f"For edge {self.nodeId(edge[0])} -> {self.nodeId(edge[1])}, {param} is ambiguously defined in multiple edge-regions: {[c for _, c in values]}." + \
+				f"{param} is defined as {value} in {combo}, but also dedfined as {[f"{v} in {c}" for v, c in collisions]}." )
+		return value, combo
+	
+	def hasNodeParameter(self, node, param) -> bool:
+		"""
+		Return True if this node has a definiton for the parameter at some level
+		(local, region, or global). Otherwise, False.
+		"""
+		return param in self.globalKeys or \
+			param in self.localNodeParameters.get(node, {}) or \
+			len(self.getAllRegionNodeParameterValues(node, param)) != 0
+	
+	def hasEdgeParameter(self, node, param) -> bool:
+		"""
+		Return True if an edge connected to this node has a definiton for the
+		parameter at some level (local, region, or global). Otherwise, False.
+		"""
+		edges = [edge for edge in self.edges if node in edge]
+		combos = [combo for edge in edges for combo in self.getRegionCombos(edge)]
+		return param in self.globalKeys \
+			or any(param in self.localEdgeParameters.get(edge, {}) for edge in edges) \
+			or any(param in self.regionEdgeParameters.get(combo, {}) for combo in combos)
+	
+	def hasFlux(self, node):  return self.hasNodeParameter(node, "F")
+	def hasJe0(self, node):   return self.hasNodeParameter(node, "Je0")
+	def hasJe1(self, node):   return self.hasEdgeParameter(node, "Je1")
+	def hasJee(self, node):   return self.hasEdgeParameter(node, "Jee")
+
+	def connections(self, node) -> list:
+		""" List of edges containing (i.e. connected to) a node. """
+		return [edge for edge in self.edges if node in edge]
+	
+	@staticmethod
+	def neighbor(node, edge) -> tuple:
+		"""
+		Return (neighbor, direction):
+			direction = 1: forward edge (node -> neighbor)
+			direction = -1: backward edge (neightbor -> node)
+			direction = 0: self-loop (node -> node)
+		or (None, None) if edge isn't connected to node.
+		"""
+		if node == edge[0]:
+			return (edge[1], 1 if node != edge[1] else 0)
+		if node == edge[1]:
+			return (edge[0], -1)
+		return (None, None)
 	
 	def compile(self, out_path: str):
 		# Check for and fix missing required attributes;
@@ -240,6 +318,15 @@ class Model:
 		if "regionNodeParameters" not in self.__dict__:  self.regionNodeParameters = {}
 		if "regionEdgeParameters" not in self.__dict__:  self.regionEdgeParameters = {}
 		if "globalParameters"     not in self.__dict__:  self.globalParameters = {}
+		if "variableParameters"   not in self.__dict__:  self.variableParameters = set()
+
+		# Do all nodes referenced in self.edges actually exist in self.nodes?
+		for edge in self.edges:
+			if len(edge) != 2:
+				raise ValueError(f"All edges must have exactly 2 nodes: len={len(edge)} for edge {edge}")
+			for node in edge:
+				if node not in self.nodes:
+					raise KeyError(f"All nodes referenced in model.edges must exist in model.nodes: Couldn't find node {node} referenced in edge {edge}")
 
 		# other (dependant) variables
 		self.localNodeKeys = Model.innerKeys(self.localNodeParameters)    # set[str]
@@ -248,6 +335,7 @@ class Model:
 		self.regionEdgeKeys = Model.innerKeys(self.regionEdgeParameters)  # set[str]
 		self.globalKeys = self.globalParameters.keys()                    # set[str]
 		self.allKeys = self.localNodeKeys | self.localEdgeKeys | self.regionNodeKeys | self.regionEdgeKeys | self.globalKeys
+		self.constParameters = self.allKeys - self.variableParameters  # set[str]
 		self.immutableNodes = self.calcImmutableNodes()  # list[Node]
 		self.regionCombos = self.calcAllRegionCombos()  # list[Edge]
 		self.nodeIndex = {}  # dict[Node, int]
@@ -525,7 +613,8 @@ class Model:
 				nid = self.nodeId(node)
 				proc_id = f"deltaU_{nid}"
 				index = self.nodeIndex[node]
-				flux_mode: bool = self.hasFlux(node)  # TODO: (OPTIMIZATION) Also check if has Je0, Je1, or Jee!
+				hasFlux: bool = self.hasFlux(node)
+				flux_mode: bool = hasFlux and (self.hasJe0(node) or self.hasJe1(node) or self.hasJee(node))
 
 				src += f"; node[{index}]\n"
 				src += f"{proc_id} PROC\n"
@@ -580,11 +669,6 @@ class Model:
 							load_insn = f"\tvmovapd ymm9, ymmword ptr [{rid} + OFFSETOF_REGION_B]  ; load B_{rid} (region)\n"
 						elif "B" in self.globalKeys:
 							load_insn = "\tvmovapd ymm9, ymmword ptr B  ; load B (global)\n"
-						else:
-							# raise KeyError(
-							# 	f"For node {self.nodeId(node)}, B is not defined at any level (local, region, nor global).\n" + \
-							# 	"Potential fix: model.globalParameters[B] = (0.0, 0.0, 0.0)\n" )
-							pass
 					if load_insn is None:
 						src += f"\t; skip. For this node, B is not defined at any level (local, region, nor global).\n\n"
 					else:
@@ -611,11 +695,6 @@ class Model:
 							load_insn = f"\tvmovapd ymm9, ymmword ptr [{rid} + OFFSETOF_REGION_A]  ; load A_{rid} (region)\n"
 						elif "A" in self.globalKeys:
 							load_insn = "\tvmovapd ymm9, ymmword ptr A  ; load A (global)\n"
-						else:
-							# raise KeyError(
-							# 	f"For node {self.nodeId(node)}, A is not defined at any level (local, region, nor global).\n" + \
-							# 	"Potential fix: model.globalParameters[A] = (0.0, 0.0, 0.0)\n" )
-							pass
 					if load_insn is None:
 						src += f"\t; skip. For this node, A is not defined at any level (local, region, nor global).\n\n"
 					else:
@@ -648,8 +727,8 @@ class Model:
 							load_insn = f"\tvmovsd xmm9, qword ptr Je0  ; load Je0 (global)\n"
 					if load_insn is None:
 						src += "\t; skip. For this node, Je0 is not defined at any level (local, region, nor global).\n\n"
-					elif not flux_mode:
-						raise KeyError(f"For node {nid}, Je0 is defined, but F is not.\nPotential fix: model.globalParameters[F] = 0.0\n")
+					elif not hasFlux:
+						raise KeyError(f"For node {nid}, Je0 is defined, but F is not. Potential fix: model.globalParameters[F] = 0.0")
 					else:
 						# compute s'·f' - s·f (difference between new and current dot products for local spin·flux)
 						src += "\t_vdotp xmm10, ymm0, ymm1, xmm11, ymm11  ; s'f'\n"
@@ -665,7 +744,53 @@ class Model:
 				# compute -ΔU_J:
 				if "J" in self.allKeys:
 					src += "\t; -deltaU_J calculation\n"
-					src += "\t; TODO ...\n\n" # TODO (stub)
+					# figure out where all neighboring edges load J from, and group the common load instructions
+					load_groups: dict[str, list] = defaultdict(list)  # dict: str load_insn -> list[Edge]
+					for edge in self.connections(node):
+						if "J" in self.localEdgeParameters.get(edge, {}):
+							eindex = self.edgeIndex[edge]
+							nid0 = self.nodeId(edge[0])
+							nid1 = self.nodeId(edge[1])
+							load_insn = f"\tvmovsd xmm9, qword ptr [edges + ({eindex})*SIZEOF_EDGE + OFFSETOF_J]  ; load J_{nid0}_{nid1}\n"
+						else:
+							_, combo = self.getUnambiguousRegionEdgeParameter(edge, "J")  # don't need value, only region
+							if combo is not None:
+								rid0, rid1 = self.regionId(combo[0]), self.regionId(combo[1])
+								load_insn = f"\tvmovsd xmm9, qword ptr [{rid0}_{rid1} + OFFSETOF_REGION_J]  ; load J_{rid0}_{rid1} (region)\n"
+							elif "J" in self.globalKeys:
+								load_insn = "\tvmovsd xmm9, qword ptr J  ; load J (global)\n"
+							else:
+								load_insn = None
+						load_groups[load_insn].append(edge)
+					for i, load_group in enumerate(load_groups.items(), 1):
+						load_insn, edges = load_group
+						optimization_remove_scalar = False  # TODO: implement optimization. if scalar is const and exactly 1.0
+						src += f"\t; load group {i}\n"
+						if optimization_remove_scalar:
+							src += "\t; optimization (J*=1): skip load\n"
+						else:
+							src += load_insn
+						for edge in edges:
+							# Note: edge in self.edgeIndex may be false if ASM edge array is empty or missing local variables for this edge. This is fine.
+							edgelbl = f"edges[{self.edgeIndex[edge]}]" if edge in self.edgeIndex else "edge"
+							nid0 = self.nodeId(edge[0])
+							nid1 = self.nodeId(edge[1])
+							neighbor, _ = Model.neighbor(node, edge)  # just need neighbor. communative operation: doesn't care about direction.
+							nindex = self.nodeIndex[neighbor]
+							nnid = self.nodeId(neighbor)  # neighbor's node id
+							src += f"\t; {edgelbl}: {nid0} -> {nid1}\n"
+							src += f"\tvmovapd ymm10, ymmword ptr [nodes + ({nindex})*SIZEOF_NODE + OFFSETOF_SPIN]  ; load s_{nnid} (neighbor)\n"
+							src += f"\t_vdotp xmm10, ymm10, ymm6, xmm11, ymm11  ; s_{nnid}(\\Delta s_{nid})\n"
+							if optimization_remove_scalar:
+								src += "\t; optimization (J*=1): skip mul\n"
+							elif not out_init:
+								src += f"\tvmulsd xmm15, xmm10, xmm9  ; s_{nnid}(\\Delta s_{nid})(J)\n"
+								out_init = True
+							else:
+								src += f"\tvmulsd xmm10, xmm10, xmm9  ; s_{nnid}(\\Delta s_{nid})(J)\n"
+								src += "\tvaddsd xmm15, xmm15, xmm10\n"
+					src += "\n"
+
 				# compute -ΔU_Je1:
 				if "Je1" in self.allKeys:
 					src += "\t; -deltaU_Je1 calculation\n"
@@ -683,6 +808,8 @@ class Model:
 					src += "\t; -deltaU_D calculation\n"
 					src += "\t; TODO ...\n\n" # TODO (stub)
 				# return:
+				if not out_init:
+					src += "\tvxorpd xmm15, xmm15, xmm15  ; return 0.0\n"  # fall back in case there are no parameters set for this node
 				src += "\tret\n"
 				src += f"{proc_id} ENDP\n\n"
 
@@ -716,12 +843,13 @@ def example_3d():
 		for y in range(topL, bottomL + 1):
 			for z in range(0, depth):
 				fml.append((x, y, z))
+				# internal FML_FML edges:
 				if x + 1 < molPosL:
 					msd.edges.append(((x, y, z), (x + 1, y, z)))
 				if y + 1 <= bottomL:
 					msd.edges.append(((x, y, z), (x, y + 1, z)))
 				if z + 1 < depth:
-					msd.edges.append(((x, y, z), (z, y, z + 1)))
+					msd.edges.append(((x, y, z), (x, y, z + 1)))
 	
 	mol = []
 	for x in range(molPosL, molPosR + 1):
@@ -729,14 +857,22 @@ def example_3d():
 			for z in range(frontR, backR + 1):
 				if y == topL or y == bottomL or z == frontR or z == backR:
 					mol.append((x, y, z))
+					# internal mol_mol edges:
 					if x + 1 <= molPosR:
 						msd.edges.append(((x, y, z), (x + 1, y, z)))
+					# FML_mol edges:
+					if molPosL - 1 >= 0:
+						msd.edges.append(((molPosL - 1, y, z), (molPosL, y, z)))
+					# mol_FMR edges:
+					if molPosR + 1 < width:
+						msd.edges.append(((molPosR, y, z), (molPosR + 1, y, z)))
 	
 	fmr = []
 	for x in range(molPosR + 1, width):
 		for y in range(0, height):
 			for z in range(frontR, backR + 1):
 				fmr.append((x, y, z))
+				# internal FMR_FMR edges
 				if x + 1 < width:
 					msd.edges.append(((x, y, z), (x + 1, y, z)))
 				if y + 1 < height:
@@ -748,7 +884,9 @@ def example_3d():
 	for y in range(topL, bottomL + 1):
 		for z in range(frontR, backR + 1):
 			if y == topL or y == bottomL or z == frontR or z == backR:
-				msd.edges.append(((molPosL - 1, y, z), (molPosR + 1, y, z)))
+				# FML_FMR edges:
+				if molPosL - 1 >= 0 and molPosR + 1 < width:
+					msd.edges.append(((molPosL - 1, y, z), (molPosR + 1, y, z)))
 
 	msd.regions = { "FML": fml, "mol": mol, "FMR": fmr }
 	msd.nodes = fml + mol + fmr
@@ -855,4 +993,5 @@ if __name__ == "__main__":
 	msd.compile("msd-example_1d.asm")
 
 	msd = example_3d()
+	print(msd.edges)
 	msd.compile("msd-example_3d.asm")
