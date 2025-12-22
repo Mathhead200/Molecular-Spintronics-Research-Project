@@ -158,9 +158,10 @@ dU_1 PROC
 	vmovapd ymm9, ymmword ptr [nodes + (0)*SIZEOF_NODE + OFFSETOF_A]  ; CASE local: A_1
 	vmovapd ymm9, ymmword ptr [FML + OFFSETOF_REGION_A]             ; CASE region: A_FML (Must not have region conflicts!)
 	vmovapd ymm9, ymmword ptr A                                     ; CASE global: A
-	_vdotp xmm10, ymm10, ymm9, xmm9, ymm9  ; clobbers ymm9!
-	vaddsd xmm15, xmm15, xmm10  ; -dU += -dU_A. Note: using vaddsd and not addsd to avoid pipline stalls (i.e. false dependacy on upper bits)
-
+	; _vdotp xmm10, ymm10, ymm9, xmm9, ymm9  ; clobbers ymm9!
+	; vaddsd xmm15, xmm15, xmm10  ; -dU += -dU_A. Note: using vaddsd and not addsd to avoid pipline stalls (i.e. false dependacy on upper bits)
+	_vdotadd xmm15, ymm15, ymm10, ymm9, xmm9  ; fused mul-add
+	
 	; compute -dU_Je0
 	_vdotp xmm10, ymm0, ymm1, xmm11, ymm11  ; s'f'
 	_vdotp xmm9, ymm3, ymm4, xmm11, ymm11  ; sf
@@ -225,44 +226,44 @@ dU_5 ENDP
 ; @return (void)
 PUBLIC metropolis
 metropolis PROC
-; preamble. needed if using local variables (i.e. stack memory)
-push rbp  ; since non-volitle
-mov rbp, rsp
+	; preamble. needed if using local variables (i.e. stack memory)
+	push rbp  ; since non-volitle
+	mov rbp, rsp
 
-mov rbx, rcx  ; non-volitile loop counter
-cmp rbx, 0
-LOOP_START:
-	jz LOOP_END
+	mov rbx, rcx  ; non-volitile loop counter
+	cmp rbx, 0
+	LOOP_START:
+		jz LOOP_END
 
-	; TODO (maybe): parameter modification(s); e.g. global.B -= dB
+		; TODO (maybe): parameter modification(s); e.g. global.B -= dB
 
-	; select random node
-	mov rsi, 0  ; TODO: (stub: random node is nodes[rsi=0])
-	_dumpregg  ; DEBUG
+		; select random node
+		mov rsi, 0  ; TODO: (stub: random node is nodes[rsi=0])
+		_dumpregg  ; DEBUG
 
-	; pick uniformally random new state for this node
-	_vputj ymm0       ; TODO: (stub: new spin, s'=-J)
-	_vneg ymm0, ymm1
-	_vput0 ymm1       ; TODO: (stub: new flux, f'=0)
+		; pick uniformally random new state for this node
+		_vputj ymm0       ; TODO: (stub: new spin, s'=-J)
+		_vneg ymm0, ymm0, ymm1
+		_vput0 ymm1       ; TODO: (stub: new flux, f'=0)
 
-	; compute -dU if we change to new state
-	lea rax, dU             ; pointer to array of function pointers, dU
-	mov rax, [rax + rsi*8]  ; dU[rsi], dereferenced to get the actual function pointer stored in dU
-	call rax  ; args: (ymm0, ymm1) -> return xmm0
-	_dumpreg
+		; compute -dU if we change to new state
+		lea rax, dU             ; pointer to array of function pointers, dU
+		mov rax, [rax + rsi*8]  ; dU[rsi], dereferenced to get the actual function pointer stored in dU
+		call rax  ; args: (ymm0, ymm1) -> return xmm15
+		_dumpreg
 
-	; compute p = e^(-dU/kT)
-	; TODO: ...
+		; compute p = e^(-dU/kT)
+		; TODO: ...
 
-	; (maybe) change the node's actual state
-	; TODO ...
+		; (maybe) change the node's actual state
+		; TODO ...
 
-	dec rbx
-	jmp LOOP_START
-LOOP_END:
+		dec rbx
+		jmp LOOP_START
+	LOOP_END:
 
-pop rbp
-ret
+	pop rbp
+	ret
 metropolis ENDP
 
 ; DEBUG

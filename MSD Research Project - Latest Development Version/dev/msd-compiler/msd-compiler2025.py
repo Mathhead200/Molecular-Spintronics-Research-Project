@@ -57,7 +57,7 @@ class _Model(Generic[Index, Region], TypedDict, total=False):
 
 	# TODO: specify which parameters may change durring execution.
 	#	Use this information to allow for optimization on constant parameters.
-	#	e.g. 0: remove;  1: skip load and mul
+	#	e.g. 0: remove;  1: skip load and mul;  -1: _vneg
 	variableParamters: NodeAndEdgeParameters  # set
 
 	nodeId: Callable[[Node], str]      # returned str must conform to C identifier spec.
@@ -655,7 +655,7 @@ class Model:
 				if "D"   not in self.allKeys:  s += "\t; skipping -deltaU_D\n"
 				src += s
 				if len(s) != 0:  src += "\n"
-				# compute -ΔU_B = B \cdot Δm_i:
+				# compute -ΔU_B = B ⋅ Δm_i:
 				if "B" in self.allKeys:
 					src += "\t; compute -delta_U_B\n"
 					# where is B defined?
@@ -672,16 +672,13 @@ class Model:
 					if load_insn is None:
 						src += f"\t; skip. For this node, B is not defined at any level (local, region, nor global).\n\n"
 					else:
-						# load B
-						src += load_insn
-						# do math (B)
+						src += load_insn  # load B into ymm9
 						if not out_init:
-							src += f"\t_vdotp xmm15, ymm9, {reg_dm}, xmm9, ymm9  ; clobbers ymm9!\n\n"
+							src += f"\t_vdotp xmm15, ymm9, {reg_dm}, xmm9, ymm9  ; (ymm9, {reg_dm})\n\n"
 							out_init = True
 						else:
-							src += f"\t_vdotp xmm10, ymm9, {reg_dm}, xmm9, ymm9  ; cobbers ymm9!\n"
-							src += "\tvaddsd xmm15, xmm15, xmm10\n\n"
-				# compute -ΔU_A:
+							src += f"\t_vdotadd xmm15, ymm15, ymm9, {reg_dm}, xmm9  ; (ymm9, {reg_dm})\n\n"
+				# compute -ΔU_A: A ⋅ (m'_i^{⊙2} - m_i^{⊙2})
 				if "A" in self.allKeys:
 					src += "\t; -deltaU_A calculation\n"
 					# where is A defined?
@@ -698,20 +695,15 @@ class Model:
 					if load_insn is None:
 						src += f"\t; skip. For this node, A is not defined at any level (local, region, nor global).\n\n"
 					else:
-						# Hadamard squared diff first so we can reuse a register
-						src += f"\tvmulpd ymm9, {reg_m}, {reg_m}  ; m Hadamard squared: m2\n"
+						src += load_insn  # load A into ymm9
 						src += f"\tvmulpd ymm10, {reg_m1}, {reg_m1}  ; m' Hadamard squared: m'2\n"
-						src += "\tvsubpd ymm10, ymm10, ymm9  ; m'2 - m2\n"
-						# load A
-						src += load_insn
-						# do math (A)
+						src += f"\tvfnmaddpd ymm10, {reg_m}, {reg_m}, ymm10  ; m'2 - m2\n"
 						if not out_init:
-							src += f"\t_vdotp xmm15, ymm10, ymm9, xmm9, ymm9  ; clobbers ymm9!\n\n"
+							src += f"\t_vdotp xmm15, ymm9, ymm10, xmm9, ymm9  ; (ymm9, ymm10)\n\n"
 							out_init = True
 						else:
-							src += f"\t_vdotp xmm10, ymm10, ymm9, xmm9, ymm9  ; clobbers ymm9!\n"
-							src += "\tvaddsd xmm15, xmm15, xmm10\n\n"
-				# compute -ΔU_Je0:
+							src += f"\t_vdotadd xmm15, ymm15, ymm9, ymm10, xmm9  ; (ymm9, ymm10)\n\n"
+				# compute -ΔU_Je0 = Je0 (s'⋅f' - s⋅f):
 				if "Je0" in self.allKeys:
 					src += "\t; -deltaU_Je0 calculation\n"
 					# where is Jeo defined?
@@ -725,23 +717,23 @@ class Model:
 							load_insn = f"\tvmovsd xmm9, qword ptr [{rid} + OFFSETOF_REGION_Je0]  ; load Je0_{rid} (region)\n"
 						elif "Je0" in self.globalKeys:
 							load_insn = f"\tvmovsd xmm9, qword ptr Je0  ; load Je0 (global)\n"
+					# TODO: add optimization_remove_scalar
+					# TODO: add optimization_neg_scalar
 					if load_insn is None:
 						src += "\t; skip. For this node, Je0 is not defined at any level (local, region, nor global).\n\n"
 					elif not hasFlux:
 						raise KeyError(f"For node {nid}, Je0 is defined, but F is not. Potential fix: model.globalParameters[F] = 0.0")
 					else:
-						# compute s'·f' - s·f (difference between new and current dot products for local spin·flux)
-						src += "\t_vdotp xmm10, ymm0, ymm1, xmm11, ymm11  ; s'f'\n"
-						src += "\t_vdotp xmm9, ymm3, ymm4, xmm11, ymm11   ; sf\n"
-						src += "\tvsubsd xmm10, xmm10, xmm9               ; s'f - sf\n"
-						src += load_insn  # load Je0
+						# compute s_i'·f_i' - s_i·f_i (difference between new and current dot products for local spin·flux)
+						src += "\t_vdotp xmm10, ymm0, ymm1, xmm9, ymm9       ; (ymm0, ymm1) = (s'f)\n"
+						src += "\t_vndotadd xmm10, ymm10, ymm3, ymm4, xmm9   ; (ymm3, ymm4) = (s'f' - sf)\n"
+						src += load_insn  # load Je0 into xmm9
 						if not out_init:
-							src += f"\tvmulsd xmm15, xmm10, xmm9  ; (s'f' - sf)(Je0)\n\n"
+							src += f"\tvmulsd xmm15, xmm9, xmm10\n\n"
 							out_init = True
 						else:
-							src += f"\tvmulsd xmm10, xmm10, xmm9  ; (s'f' - sf)(Je0)\n"
-							src += f"\tvaddsd xmm15, xmm15, xmm10\n\n"
-				# compute -ΔU_J:
+							src += f"\tvfmaddsd xmm15, xmm9, xmm10, xmm15\n\n"
+				# compute -ΔU_J = Σ_j{J Δs_i·s_j}:
 				if "J" in self.allKeys:
 					src += "\t; -deltaU_J calculation\n"
 					# figure out where all neighboring edges load J from, and group the common load instructions
@@ -765,11 +757,12 @@ class Model:
 					for i, load_group in enumerate(load_groups.items(), 1):
 						load_insn, edges = load_group
 						optimization_remove_scalar = False  # TODO: implement optimization. if scalar is const and exactly 1.0
-						src += f"\t; load group {i}\n"
-						if optimization_remove_scalar:
-							src += "\t; optimization (J*=1): skip load\n"
+						optimization_neg_scalar = False     # TODO: implement optimization. if scalar is const and exactly -1.0
+						src += f"\t; [load group {i}]\n"
+						if optimization_remove_scalar or optimization_neg_scalar:
+							src += "\t; optimization (J*=1,-1): skip load\n"
 						else:
-							src += load_insn
+							src += load_insn  # load J into xmm9
 						for edge in edges:
 							# Note: edge in self.edgeIndex may be false if ASM edge array is empty or missing local variables for this edge. This is fine.
 							edgelbl = f"edges[{self.edgeIndex[edge]}]" if edge in self.edgeIndex else "edge"
@@ -780,15 +773,24 @@ class Model:
 							nnid = self.nodeId(neighbor)  # neighbor's node id
 							src += f"\t; {edgelbl}: {nid0} -> {nid1}\n"
 							src += f"\tvmovapd ymm10, ymmword ptr [nodes + ({nindex})*SIZEOF_NODE + OFFSETOF_SPIN]  ; load s_{nnid} (neighbor)\n"
-							src += f"\t_vdotp xmm10, ymm10, ymm6, xmm11, ymm11  ; s_{nnid}(\\Delta s_{nid})\n"
 							if optimization_remove_scalar:
-								src += "\t; optimization (J*=1): skip mul\n"
-							elif not out_init:
-								src += f"\tvmulsd xmm15, xmm10, xmm9  ; s_{nnid}(\\Delta s_{nid})(J)\n"
-								out_init = True
+								if not out_init:
+									src += "\t_vdotp xmm15, ymm6, ymm10, xmm9, ymm9  ; optimization (J*=1), (ymm6, ymm10)\n"
+									out_init = True
+								else:
+									src += "\t_vdotadd xmm15, ymm15, ymm6, ymm10, xmm9  ; optimization (J*=1), (ymm6, ymm10)\n"
+							elif optimization_neg_scalar:
+								if not out_init:
+									src += "\tvxorsd xmm15, xmm15, xmm15   ; init. xmm15 = 0\n"
+									out_init = True
+								src += "\t_vndotadd xmm15, ymm15, ymm6, ymm10, xmm9  ; optimization (J*=-1), (ymm6, ymm10)\n"
 							else:
-								src += f"\tvmulsd xmm10, xmm10, xmm9  ; s_{nnid}(\\Delta s_{nid})(J)\n"
-								src += "\tvaddsd xmm15, xmm15, xmm10\n"
+								src += f"\t_vdotp xmm10, ymm6, ymm10, xmm11, ymm11  ; (ymm6, ymm10)\n"
+								if not out_init:
+									src += f"\tvmulsd xmm15, xmm9, xmm10\n"
+									out_init = True
+								else:
+									src += f"\tvfmaddsd xmm15, xmm9, xmm10, xmm15\n"
 					src += "\n"
 
 				# compute -ΔU_Je1:
@@ -812,6 +814,47 @@ class Model:
 					src += "\tvxorpd xmm15, xmm15, xmm15  ; return 0.0\n"  # fall back in case there are no parameters set for this node
 				src += "\tret\n"
 				src += f"{proc_id} ENDP\n\n"
+		
+		# metropolis PROC
+		src += "; Runs the standard metropolis algorithm\n"
+		src += "; @param RCX (uint64) - number of iterations\n"
+		src += "; @return (void)\n"
+		src += "PUBLIC metropolis\n"
+		src += "metropolis PROC\n"
+		# src += "\t; preamble. needed if using local variables (i.e. stack meory)\n"
+		# src += "\tpush rbp\n"
+		# src += "\tmov rbp, rsp\n\n"
+		src += "\tmov rbx, rcx  ; non-volitile loop counter\n"  # TODO: do we actaully call any functions in metropolis that need RCX (1st arg)?
+		src += "\tcmp rbx, 0\n"
+		src += "\tLOOP_START:\n"
+		src += "\t\tjz LOOP_END\n\n"
+		# TODO: (stub) select random node
+		src += "\t\t; select random node\n"
+		src += "\t\tmov rsi, 0  ; TODO: (stub) random node is nodes[rsi=0]\n\n"
+		# TODO: (stub) pick uniformally random new state for the node
+		src += "\t\t; pick uniformally random new state for the node\n"
+		src += "\t\t_vputj ymm0  ; TODO: (stub) new spin, s'=-J\n"
+		src += "\t\t_vneg ymm0, ymm0, ymm1\n"
+		src += "\t\t_vput0 ymm1  ; TODO: (stub) new flux, f'=0\n\n"
+		# compute -deltaU for the  state change
+		src += "\t\t; compute -deltaU for the proposed state change\n"
+		src += "\t\tlea rax, deltaU         ; pointer to array of function pointers\n"
+		src += "\t\tmov rax, [rax + rsi*8]  ; deltaU[rsi], dereferenced to get the actual functino pointer\n"
+		src += "\t\tcall rax  ; args: (ymm0, ymm1?) -> return xmm15\n\n"
+		# TODO: (stub) compute probability, p = e^{-deltaU/kT}
+		src += "\t\t; compute probability, p = e^(-deltaU/kT)\n"
+		src += "\t\t; TODO: (stub)\n\n"
+		# TODO: (stub) (maybe) change the node's state
+		src += "\t\t; (maybe) change the node's state\n"
+		src += "\t\t; TODO: (stub)\n\n"
+		# TODO?: parameter modification(s); e.g. global.B -= dB
+		# ...
+		src += "\t\tdec rbx\n"
+		src += "\t\tjmp LOOP_START\n"
+		src += "\tLOOP_END:\n\n"
+		# src += "pop rbp\n"
+		src += "\tret\n"
+		src += "metropolis ENDP\n\n"
 
 		# ---------------------------------------------------------------------
 		src += "END"  # absolute end of ASM file
@@ -993,5 +1036,4 @@ if __name__ == "__main__":
 	msd.compile("msd-example_1d.asm")
 
 	msd = example_3d()
-	print(msd.edges)
 	msd.compile("msd-example_3d.asm")

@@ -53,7 +53,7 @@ _vputk MACRO dest
 	_vpermk dest, dest
 ENDM
 
-_vneg MACRO dest, temp
+_vneg MACRO dest, src, temp
 	; (vpcmpeqq) Vector Packed Compare Equal Quadword (ints):
 	;	Compares the 64-bit packed ints for equality, i.e. src0[i] == src1[i].
 	;	If equal, dest[i] = -1 = 1111...1111b, else dest[i] = 0 = 0000....0000b
@@ -62,16 +62,16 @@ _vneg MACRO dest, temp
 	;	Vectorized long left-shift operation
 	vpsllq temp, temp, 63  ; now only highest ("sign") bit (in each quadword) is 1: 1000...0000b = -0.0
 
-	vxorpd dest, dest, temp  ; XOR: dest ^ (-0.0, ...) = -dest
+	vxorpd dest, src, temp  ; XOR: dest ^ (-0.0, ...) = -dest
 ENDM
 
-; Computes the dot product of  
+; Computes the dot product of src1 and scr2, and stores in (scalar) dest.
 ; Types: XMMn, YMMn, YMMn, XMMn, YMMn
 ; Preconditions:
 ;	1. temp can NOT overlap with dest.
 ;	2. tempX is XMMn version of tempY.
 ; Postconditions:
-;	1. dest is modified.
+;	1. dest is modified and scalar, i.e. dest = (result, 0, 0, 0).
 ;	2. src1 and src2 are not modifed unless they overlap with dest or temp.
 ;	1. temp is clobbered!
 ; Notes:
@@ -86,6 +86,41 @@ _vdotp MACRO destX, src1Y, src2Y, tempX, tempY
 	;	A version using _vperk could compute 4 dot products and would only require YMMn registers.
 	;	This may make a programatically cleaner macro.
 	; See: _vdotp4
+ENDM
+
+; Computes the dot product of scr1 and scr2, and adds it to (scalar) dest.
+; Types: XMMn, YMMn, YMMn, YMMn, XMMn
+; Preconditions:
+;	1. temp can NOT overlap with dest.
+;	2. destY is YMMn version of destX.
+; Postconditions:
+;	1. dest is modified and scalar, i.e. dest = (result, 0, 0, 0).
+;	2. src1 and src2 are not modified unless they overlap with dest or temp.
+;	3. temp is clobbered!
+; Notes:
+;	* temp can overlap with src1 or src2 since they are only used once at the top.
+;	* dest can be the same as one or both of src1 and src2.
+_vdotadd MACRO destX, destY, src1Y, src2Y, tempX
+	; Inputs:	destY = (s, 0, 0, 0)
+	;			src1  = (a, b, c, d)
+	;			src2  = (x, y, z, w)
+	vfmaddpd destY, src1Y, src2Y, destY  ; destY = (s + ax, by, cz, dw)
+	vhaddpd destY, destY, destY          ; destY = (s + ax + by, ..., cz + dw, ...)
+	vextractf128 tempX, destY, 1         ; tempX = (cz + dw, ...)
+	vaddsd destX, destX, tempX           ; destX = (s + ax + by + cz + dw, 0, 0, 0)
+ENDM
+
+; Computes the negative dot product of src1 and src2, and add it to (scalar) dest.
+; i.e. Subtracts the dot product of src1 and src2 from (scalar) dest.
+; See: _vdotadd
+_vndotadd MACRO destX, destY, src1Y, src2Y, tempX
+	; Inputs:	destY = (s, 0, 0, 0)
+	;			src1  = (a, b, c, d)
+	;			src2  = (x, y, z, w)
+	vfnmaddpd destY, src1Y, src2Y, destY  ; destY = (s - ax, -by, -cz, -dw)
+	vhaddpd destY, destY, destY           ; destY = (s - ax - by, ..., -cz - dw, ...)
+	vextractf128 tempX, destY, 1          ; tempX = (-cz - dw, ...)
+	vaddsd destX, destX, tempX            ; destX = (s - ax - by - cz - dw, 0, 0, 0)
 ENDM
 
 _vdotp4 MACRO dest, src1, src2, temp
