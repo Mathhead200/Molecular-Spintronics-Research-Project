@@ -150,7 +150,8 @@ _dumpreg MACRO
 	vmovapd ymmword ptr [regv + 32*(14)], ymm14
 	vmovapd ymmword ptr [regv + 32*(15)], ymm15
 
-	sub rsp, 40  ; push shadow space (16-byte aligned)
+	sub rsp, 32  ; push shadow space
+	and rsp, -16  ; force 16-bit alignment of stack
 	_print_and_inc_count
 	_printregg fmt_rax, 0
 	_printregg fmt_rcx, 1
@@ -185,7 +186,6 @@ _dumpreg MACRO
 	_printregv1 '4', 14
 	_printregv1 '5', 15
 	_endl
-	add rsp, 40  ; pop shadow space
 
 	; restore register values since printf may mutable volitile registers
 	mov rax, qword ptr [regg + 8*(0)]
@@ -241,7 +241,8 @@ _dumpregg MACRO
 	mov qword ptr [regg + 8*(14)], r14
 	mov qword ptr [regg + 8*(15)], r15
 
-	sub rsp, 40  ; push shadow space (16-byte aligned)
+	sub rsp, 32  ; push shadow space
+	and rsp, -16  ; force 16-bit alignment of stack
 	_print_and_inc_count
 	_printregg fmt_rax, 0
 	_printregg fmt_rcx, 1
@@ -260,7 +261,6 @@ _dumpregg MACRO
 	_printregg fmt_r14, 14
 	_printregg fmt_r15, 15
 	_endl
-	add rsp, 40  ; pop shadow space
 
 	; restore register values since printf may mutable volitile registers
 	mov rax, qword ptr [regg + 8*(0)]
@@ -299,7 +299,8 @@ _dumpregv MACRO
 	vmovapd ymmword ptr [regv + 32*(14)], ymm14
 	vmovapd ymmword ptr [regv + 32*(15)], ymm15
 
-	sub rsp, 40  ; push shadow space (16-byte aligned)
+	sub rsp, 32  ; push shadow space
+	and rsp, -16  ; force 16-bit alignment of stack
 	_printregv '0', 0
 	_printregv '1', 1
 	_printregv '2', 2
@@ -317,7 +318,6 @@ _dumpregv MACRO
 	_printregv1 '4', 14
 	_printregv1 '5', 15
 	_endl
-	add rsp, 40  ; pop shadow space
 
 	; restore register values since printf may mutable volitile registers
 	vmovapd ymm0,  ymmword ptr [regv + 32*(0)]

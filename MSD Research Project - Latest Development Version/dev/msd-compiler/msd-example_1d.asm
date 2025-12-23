@@ -355,15 +355,12 @@ metropolis PROC
 		jmp LOOP_START
 	LOOP_END:
 	
-	pop rbp
 	ret
 metropolis ENDP
 
 PUBLIC main
 main PROC
-	_dumpregg
 	mov rcx, 1  ; number of iterations
-	_dumpregg
 	call metropolis
 	_dumpreg
 

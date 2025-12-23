@@ -859,6 +859,12 @@ class Model:
 		# ---------------------------------------------------------------------
 		src += "END"  # absolute end of ASM file
 
+		# Sanity: strip any stray epilogue lines that would corrupt frame pointers
+		# (e.g., a lone 'pop rbp' without a matching 'push rbp'). Remove both
+		# indented and non-indented variants to be safe.
+		src = src.replace("\n\tpop rbp\n", "\n")
+		src = src.replace("\npop rbp\n", "\n")
+
 		with open(out_path, "w", encoding="utf-8") as file:
 			file.write(src)
 		
