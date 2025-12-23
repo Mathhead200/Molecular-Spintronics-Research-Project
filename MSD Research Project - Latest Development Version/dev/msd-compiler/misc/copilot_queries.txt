@@ -1,0 +1,4 @@
+
+What alternative assemblers are available for Windows that would help us verify that being the issue?
+
+How do I run Prime 95 small fft for CPU stability testing?

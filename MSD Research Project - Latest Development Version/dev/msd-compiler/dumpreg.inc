@@ -178,7 +178,7 @@ _dumpreg MACRO
 	_printregv '6', 6
 	_printregv '7', 7
 	_printregv '8', 8
-	_printregv1 '9', 9
+	_printregv '9', 9
 	_printregv1 '0', 10
 	_printregv1 '1', 11
 	_printregv1 '2', 12
@@ -310,7 +310,7 @@ _dumpregv MACRO
 	_printregv '6', 6
 	_printregv '7', 7
 	_printregv '8', 8
-	_printregv1 '9', 9
+	_printregv '9', 9
 	_printregv1 '0', 10
 	_printregv1 '1', 11
 	_printregv1 '2', 12

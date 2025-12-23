@@ -697,7 +697,7 @@ class Model:
 					else:
 						src += load_insn  # load A into ymm9
 						src += f"\tvmulpd ymm10, {reg_m1}, {reg_m1}  ; m' Hadamard squared: m'2\n"
-						src += f"\tvfnmaddpd ymm10, {reg_m}, {reg_m}, ymm10  ; m'2 - m2\n"
+						src += f"\tvfnmadd213pd ymm10, {reg_m}, {reg_m}  ; ymm10 -= {reg_m} * {reg_m} -> m'2 - m2\n"
 						if not out_init:
 							src += f"\t_vdotp xmm15, ymm9, ymm10, xmm9, ymm9  ; (ymm9, ymm10)\n\n"
 							out_init = True
@@ -732,7 +732,7 @@ class Model:
 							src += f"\tvmulsd xmm15, xmm9, xmm10\n\n"
 							out_init = True
 						else:
-							src += f"\tvfmaddsd xmm15, xmm9, xmm10, xmm15\n\n"
+							src += f"\tvfmadd213sd xmm15, xmm9, xmm10  ; xmm15 += xmm9 * xmm10\n\n"
 				# compute -ΔU_J = Σ_j{J Δs_i·s_j}:
 				if "J" in self.allKeys:
 					src += "\t; -deltaU_J calculation\n"
@@ -790,7 +790,7 @@ class Model:
 									src += f"\tvmulsd xmm15, xmm9, xmm10\n"
 									out_init = True
 								else:
-									src += f"\tvfmaddsd xmm15, xmm9, xmm10, xmm15\n"
+									src += f"\tvfmadd213sd xmm15, xmm9, xmm10  ; xmm15 += xmm9 * xmm10\n"
 					src += "\n"
 
 				# compute -ΔU_Je1:
@@ -858,12 +858,6 @@ class Model:
 
 		# ---------------------------------------------------------------------
 		src += "END"  # absolute end of ASM file
-
-		# Sanity: strip any stray epilogue lines that would corrupt frame pointers
-		# (e.g., a lone 'pop rbp' without a matching 'push rbp'). Remove both
-		# indented and non-indented variants to be safe.
-		src = src.replace("\n\tpop rbp\n", "\n")
-		src = src.replace("\npop rbp\n", "\n")
 
 		with open(out_path, "w", encoding="utf-8") as file:
 			file.write(src)

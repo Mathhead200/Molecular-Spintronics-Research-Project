@@ -1,0 +1,48 @@
+0:000> uf test2_fma!try_fma
+test2_fma!try_fma:
+00007ff7`3b037430 4055            push    rbp
+00007ff7`3b037432 4881ec00010000  sub     rsp,100h
+00007ff7`3b037439 488d6c2450      lea     rbp,[rsp+50h]
+00007ff7`3b03743e 4883e5e0        and     rbp,0FFFFFFFFFFFFFFE0h
+00007ff7`3b037442 488b05774d0900  mov     rax,qword ptr [test2_fma!__security_cookie (00007ff7`3b0cc1c0)]
+00007ff7`3b037449 4833c4          xor     rax,rsp
+00007ff7`3b03744c 488985a0000000  mov     qword ptr [rbp+0A0h],rax
+00007ff7`3b037453 488d0dbe4c0900  lea     rcx,[test2_fma!CT??_R0?AVexceptionstd <PERF> (test2_fma+0x9c118) (00007ff7`3b0cc118)]
+00007ff7`3b03745a e822b1ffff      call    test2_fma!ILT+5500(printf) (00007ff7`3b032581)
+00007ff7`3b03745f c5fd1005b9ea0700 vmovupd ymm0,ymmword ptr [test2_fma!_ymm (00007ff7`3b0b5f20)]
+00007ff7`3b037467 c5fd114520      vmovupd ymmword ptr [rbp+20h],ymm0
+00007ff7`3b03746c c5fd1005ecea0700 vmovupd ymm0,ymmword ptr [test2_fma!_ymm (00007ff7`3b0b5f60)]
+00007ff7`3b037474 c5fd114540      vmovupd ymmword ptr [rbp+40h],ymm0
+00007ff7`3b037479 c5fd104520      vmovupd ymm0,ymmword ptr [rbp+20h]
+00007ff7`3b03747e c5fd104d40      vmovupd ymm1,ymmword ptr [rbp+40h]
+00007ff7`3b037483 c4e2f5a84520    vfmadd213pd ymm0,ymm1,ymmword ptr [rbp+20h]
+00007ff7`3b037489 c5fd114560      vmovupd ymmword ptr [rbp+60h],ymm0
+00007ff7`3b03748e c5fd104560      vmovupd ymm0,ymmword ptr [rbp+60h]
+00007ff7`3b037493 c5fd118580000000 vmovupd ymmword ptr [rbp+80h],ymm0
+00007ff7`3b03749b b808000000      mov     eax,8
+00007ff7`3b0374a0 486bc003        imul    rax,rax,3
+00007ff7`3b0374a4 b908000000      mov     ecx,8
+00007ff7`3b0374a9 486bc902        imul    rcx,rcx,2
+00007ff7`3b0374ad ba08000000      mov     edx,8
+00007ff7`3b0374b2 486bd201        imul    rdx,rdx,1
+00007ff7`3b0374b6 41b808000000    mov     r8d,8
+00007ff7`3b0374bc 4d6bc000        imul    r8,r8,0
+00007ff7`3b0374c0 4c894500        mov     qword ptr [rbp],r8
+00007ff7`3b0374c4 c5fb10840580000000 vmovsd xmm0,qword ptr [rbp+rax+80h]
+00007ff7`3b0374cd c5fb11442420    vmovsd  qword ptr [rsp+20h],xmm0
+00007ff7`3b0374d3 c5fb109c0d80000000 vmovsd xmm3,qword ptr [rbp+rcx+80h]
+00007ff7`3b0374dc c4c1f97ed9      vmovq   r9,xmm3
+00007ff7`3b0374e1 c5fb10941580000000 vmovsd xmm2,qword ptr [rbp+rdx+80h]
+00007ff7`3b0374ea c4c1f97ed0      vmovq   r8,xmm2
+00007ff7`3b0374ef 488b4500        mov     rax,qword ptr [rbp]
+00007ff7`3b0374f3 c5fb108c0580000000 vmovsd xmm1,qword ptr [rbp+rax+80h]
+00007ff7`3b0374fc c4e1f97eca      vmovq   rdx,xmm1
+00007ff7`3b037501 488d0d284c0900  lea     rcx,[test2_fma!CT??_R0?AVexceptionstd <PERF> (test2_fma+0x9c130) (00007ff7`3b0cc130)]
+00007ff7`3b037508 e874b0ffff      call    test2_fma!ILT+5500(printf) (00007ff7`3b032581)
+00007ff7`3b03750d 90              nop
+00007ff7`3b03750e 488b8da0000000  mov     rcx,qword ptr [rbp+0A0h]
+00007ff7`3b037515 4833cc          xor     rcx,rsp
+00007ff7`3b037518 e8d7b0ffff      call    test2_fma!ILT+5615(__security_check_cookie) (00007ff7`3b0325f4)
+00007ff7`3b03751d 4881c400010000  add     rsp,100h
+00007ff7`3b037524 5d              pop     rbp
+00007ff7`3b037525 c3              ret
