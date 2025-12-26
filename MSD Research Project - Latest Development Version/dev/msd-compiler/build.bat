@@ -1,4 +1,10 @@
-@set name=msd-example_1d
-ml64 /c %name%.asm
-link %name%.obj ucrt.lib legacy_stdio_definitions.lib /entry:main
-%name%
+@if "%1"=="" (
+	echo "Build which output?"
+	exit /b
+)
+
+@set name=%1
+ml64 /c /I "src" "out/%name%.asm" || exit /b
+move "%name%.obj" bin || exit /b
+link "bin/%name%.obj" ucrt.lib legacy_stdio_definitions.lib /entry:main /OUT:"bin/%name%.exe" || exit /b
+"bin/%name%.exe" || exit /b

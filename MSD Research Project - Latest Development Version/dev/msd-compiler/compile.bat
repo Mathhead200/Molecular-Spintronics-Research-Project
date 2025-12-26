@@ -1,0 +1,1 @@
+python "src/msd-compiler2025.py"

@@ -1,0 +1,14 @@
+
+C:\Users\mathh\github\Molecular-Spintronics-Research-Project\MSD Research Project - Latest Development Version\dev\msd-compiler\tests>"bin\xoshiro256p_binstream" BIN 0   | RNG_test stdin64 -tlmax 64TB 
+RNG_test using PractRand version 0.94
+RNG = RNG_stdin64, seed = unknown
+test set = core, folding = standard (64 bit)
+
+rng=RNG_stdin64, seed=unknown
+length= 512 megabytes (2^29 bytes), time= 4.4 seconds
+  Test Name                         Raw       Processed     Evaluation
+  [Low1/64]BRank(12):384(1)         R= +2650  p~=  9.8e-799   FAIL !!!!!!!   
+  [Low1/64]BRank(12):512(1)         R= +5405  p~=  3e-1628    FAIL !!!!!!!!  
+  ...and 224 test result(s) without anomalies
+
+Terminate batch job (Y/N)? Terminate batch job (Y/N)? 
