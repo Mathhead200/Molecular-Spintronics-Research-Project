@@ -55,3 +55,11 @@ rng=RNG_stdin64, seed=unknown
 length= 1 terabyte (2^40 bytes), time= 10839 seconds
   no anomalies in 397 test result(s)
 
+rng=RNG_stdin64, seed=unknown
+length= 2 terabytes (2^41 bytes), time= 20422 seconds
+  no anomalies in 409 test result(s)
+
+rng=RNG_stdin64, seed=unknown
+length= 4 terabytes (2^42 bytes), time= 39672 seconds
+  no anomalies in 422 test result(s)
+

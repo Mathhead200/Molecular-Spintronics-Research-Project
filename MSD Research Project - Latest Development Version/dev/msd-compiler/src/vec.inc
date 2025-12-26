@@ -1,10 +1,6 @@
 ; Vector macros for working with AVX-256 vectors
 
 .data
-VEC SEGMENT ALIGN(32)
-VEC_I		dq 1.0, 0.0, 0.0, 0.0
-VEC ENDS
-
 ; Change VEC_I=(1.0, 0.0, 0.0, 0.0) at src
 ;	into VEC_J=(0.0, 1.0, 0.0, 0.0) at dest
 _vpermj MACRO dest, src
@@ -39,18 +35,21 @@ _vput0 MACRO dest
 	vxorpd dest, dest, dest
 ENDM
 
-_vputi MACRO dest
-	vmovapd dest, ymmword ptr [VEC_I]
+; dest (XMMn), temp (general purpose reg.)
+_vputi MACRO dest, temp
+	mov temp, 03FF0000000000000h  ; (double) 1.0
+	movq dest, temp
 ENDM
 
-_vputj MACRO dest
-	_vputi dest
+_vputj MACRO dest, temp
+	_vputi dest, temp
 	_vpermj dest, dest
 ENDM
 
-_vputk MACRO dest
-	_vputi dest
-	_vpermk dest, dest
+; Precondition: destY and destX are the same AVX reg.
+_vputk MACRO destY, destX, temp
+	_vputi destX, temp
+	_vpermk destY, destY
 ENDM
 
 _vneg MACRO dest, src, temp

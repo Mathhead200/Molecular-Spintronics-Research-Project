@@ -850,18 +850,23 @@ class Model:
 		# src += "\tpush rbp\n"
 		# src += "\tmov rbp, rsp\n\n"
 		if prng.startswith("xoshiro256"):  # TODO: support other PRNGs
-			src += "\t; load PRNG ({prng}) state\n"
+			src += f"\t; load PRNG ({prng}) state\n"
 			src += "\tmov r8, qword ptr [seed + (0)*8]\n"
 			src += "\tmov r9, qword ptr [seed + (1)*8]\n"
 			src += "\tmov r10, qword ptr [seed + (2)*8]\n"
-			src += "\tmov r11, qword ptr [seed + (3)*8]\n\n"
+			src += "\tmov r11, qword ptr [seed + (3)*8]\n"
+		src += "\t; load mutable nodes array size\n"
+		src += "\tmov rdi, NODE_COUNT\n\n"
 		src += "\tmov rbx, rcx  ; non-volitile loop counter\n"  # TODO: do we actaully call any functions in metropolis that need RCX (1st arg)?
 		src += "\tcmp rbx, 0\n"
 		src += "\tLOOP_START:\n"
 		src += "\t\tjz LOOP_END\n\n"
-		# TODO: (stub) select random node
-		src += "\t\t; select random node\n"
-		src += "\t\tmov rsi, 0  ; TODO: (stub) random node is nodes[rsi=0]\n\n"
+		# select random node
+		src += "\t\t; select random index, rdx, of a (mutable) node\n"
+		if prng.startswith("xoshiro256"):  # TODO: support other PRNGs
+			macro = prng.replace("*", "s").replace("+", "p")
+			src += f"\t\t_{macro} rax, r8, r9, r10, r11, rdx\n"
+			src += "\t\tmul rdi  ; rdx:rax = rax * rdi = random * NODE_COUNT\n\n"
 		# TODO: (stub) pick uniformally random new state for the node
 		src += "\t\t; pick uniformally random new state for the node\n"
 		src += "\t\t_vputj ymm0  ; TODO: (stub) new spin, s'=-J\n"

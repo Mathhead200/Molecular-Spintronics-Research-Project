@@ -20,8 +20,11 @@ void stream() {
 }
 
 void text(size_t N) {
-	while(N-- > 0)
-		printf("%llu\n", splitmix64_next());
+	printf("Seed (x): %llu\n", x);
+	for (size_t i = 0; i < N; i++) {
+		uint64_t z = splitmix64_next();
+		printf("[%2u.] %20llu == 0x %016llx (x=%016llx)\n", i, z, z, x);
+	}
 }
 
 int main(int argc, char* argv[]) {

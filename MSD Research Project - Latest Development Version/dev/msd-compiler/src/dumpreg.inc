@@ -18,28 +18,30 @@ REGV SEGMENT ALIGN(32)
 regv	dq 16 DUP(0.0, 0.0, 0.0, 0.0)
 REGV ENDS
 
-fmt_count db "[count=%d]", ASCII_LF, 0
-fmt_rax	db "RAX=%016llx", ASCII_TAB, 0
-fmt_rcx	db "RCX=%016llx", ASCII_TAB, 0
-fmt_rdx	db "RDX=%016llx", ASCII_TAB, 0
-fmt_rbx	db "RBX=%016llx", ASCII_LF, 0
-fmt_rsp	db "RSP=%016llx", ASCII_TAB, 0
-fmt_rbp	db "RBP=%016llx", ASCII_TAB, 0
-fmt_rsi	db "RSI=%016llx", ASCII_TAB, 0
-fmt_rdi	db "RDI=%016llx", ASCII_LF, 0
-fmt_r8	db "R8 =%016llx", ASCII_TAB, 0
-fmt_r9	db "R9 =%016llx", ASCII_TAB, 0
-fmt_r10	db "R10=%016llx", ASCII_TAB, 0
-fmt_r11	db "R11=%016llx", ASCII_LF, 0
-fmt_r12	db "R12=%016llx", ASCII_TAB, 0
-fmt_r13	db "R13=%016llx", ASCII_TAB, 0
-fmt_r14	db "R14=%016llx", ASCII_TAB, 0
-fmt_r15	db "R15=%016llx", ASCII_LF, 0
+fmt_count	db "[count=%d]", ASCII_LF, 0
+fmt_rax		db "RAX=%016llx", ASCII_TAB, 0
+fmt_rcx		db "RCX=%016llx", ASCII_TAB, 0
+fmt_rdx		db "RDX=%016llx", ASCII_TAB, 0
+fmt_rbx		db "RBX=%016llx", ASCII_LF, 0
+fmt_rsp		db "RSP=%016llx", ASCII_TAB, 0
+fmt_rbp		db "RBP=%016llx", ASCII_TAB, 0
+fmt_rsi		db "RSI=%016llx", ASCII_TAB, 0
+fmt_rdi		db "RDI=%016llx", ASCII_LF, 0
+fmt_r8		db "R8 =%016llx", ASCII_TAB, 0
+fmt_r9		db "R9 =%016llx", ASCII_TAB, 0
+fmt_r10		db "R10=%016llx", ASCII_TAB, 0
+fmt_r11		db "R11=%016llx", ASCII_LF, 0
+fmt_r12		db "R12=%016llx", ASCII_TAB, 0
+fmt_r13		db "R13=%016llx", ASCII_TAB, 0
+fmt_r14		db "R14=%016llx", ASCII_TAB, 0
+fmt_r15		db "R15=%016llx", ASCII_LF, 0
 fmt_ymmnlbl		db "YMM%c:  ", 0
 fmt_ymmnlbl1	db "YMM1%c: ", 0
-fmt_fs		db "%f, ", 0
-fmt_f		db "%f", 0
-fmt_endl	db ASCII_LF, 0
+fmt_xs			db "%016llx, ", 0
+fmt_x			db "%016llx | ", 0
+fmt_fs			db "%g, ", 0
+fmt_f			db "%g", 0
+fmt_endl		db ASCII_LF, 0
 
 _print_and_inc_count MACRO
 	lea rcx, fmt_count
@@ -55,52 +57,61 @@ _printregg MACRO fmt, offset
 	call printf
 ENDM
 
+_printregv_vals MACRO offset
+	mov r12,  qword ptr [regv + 32*offset + 8*(0)]  ; load YMMn[0]
+	mov r13,  qword ptr [regv + 32*offset + 8*(1)]  ; load YMMn[1]
+	mov r14, qword ptr [regv + 32*offset + 8*(2)]  ; load YMMn[2]
+	mov r15, qword ptr [regv + 32*offset + 8*(3)]  ; load YMMn[3]
+
+	; as (hex) uint64
+	lea rcx, fmt_xs       ; 1st arg: format string
+	mov rdx, r12          ; 2nd arg: YMMn[0]
+	call printf
+
+	lea rcx, fmt_xs       ; 1st arg: format string
+	mov rdx, r13          ; 2nd arg: YMMn[1]
+	call printf
+	
+	lea rcx, fmt_xs       ; 1st arg: format string
+	mov rdx, r14          ; 2nd arg: YMMn[2]
+	call printf
+
+	lea rcx, fmt_x        ; 1st arg: format string
+	mov rdx, r15          ; 2nd arg: YMMn[3]
+	call printf
+
+	; as doubles
+	lea rcx, fmt_fs        ; 1st arg: format string
+	mov rdx, r12           ; 2nd arg: YMMn[0]
+	call printf
+	
+	lea rcx, fmt_fs        ; 1st arg: format string
+	mov rdx, r13           ; 2nd arg: YMMn[1]
+	call printf
+
+	lea rcx, fmt_fs        ; 1st arg: format string
+	mov rdx, r14           ; 2nd arg: YMMn[2]
+	call printf
+
+	lea rcx, fmt_f         ; 1st arg: format string
+	mov rdx, r15           ; 2nd arg: YMMn[3]
+	call printf
+
+	_endl
+ENDM
+
 _printregv MACRO char, offset
 	lea rcx, fmt_ymmnlbl  ; 1st arg: format string
 	mov rdx, char         ; 2nd arg: %c
 	call printf
-	
-	lea rcx, fmt_fs        ; 1st arg: format string
-	mov rdx, qword ptr [regv + 32*offset + 8*(0)]  ; 2nd arg: YMMn[0]
-	call printf
-	
-	lea rcx, fmt_fs        ; 1st arg: format string
-	mov rdx, qword ptr [regv + 32*offset + 8*(1)] ; 2nd arg: YMMn[0]
-	call printf
-
-	lea rcx, fmt_fs        ; 1st arg: format string
-	mov rdx, qword ptr [regv + 32*offset + 8*(2)]  ; 2nd arg: YMMn[0]
-	call printf
-
-	lea rcx, fmt_f        ; 1st arg: format string
-	mov rdx, qword ptr [regv + 32*offset + 8*(3)]  ; 2nd arg: YMMn[0]
-	call printf
-
-	_endl
+	_printregv_vals offset
 ENDM
 
 _printregv1 MACRO char, offset
 	lea rcx, fmt_ymmnlbl1  ; 1st arg: format string
 	mov rdx, char          ; 2nd arg: %c (one's place)
 	call printf
-	
-	lea rcx, fmt_fs        ; 1st arg: format string
-	mov rdx, qword ptr [regv + 32*offset + 8*(0)]  ; 2nd arg: YMMn[0]
-	call printf
-	
-	lea rcx, fmt_fs        ; 1st arg: format string
-	mov rdx, qword ptr [regv + 32*offset + 8*(1)] ; 2nd arg: YMMn[0]
-	call printf
-
-	lea rcx, fmt_fs        ; 1st arg: format string
-	mov rdx, qword ptr [regv + 32*offset + 8*(2)]  ; 2nd arg: YMMn[0]
-	call printf
-
-	lea rcx, fmt_f        ; 1st arg: format string
-	mov rdx, qword ptr [regv + 32*offset + 8*(3)]  ; 2nd arg: YMMn[0]
-	call printf
-
-	_endl
+	_printregv_vals offset
 ENDM
 
 _flush MACRO
@@ -301,6 +312,7 @@ _dumpregv MACRO
 
 	sub rsp, 32  ; push shadow space
 	and rsp, -16  ; force 16-bit alignment of stack
+	_print_and_inc_count
 	_printregv '0', 0
 	_printregv '1', 1
 	_printregv '2', 2
