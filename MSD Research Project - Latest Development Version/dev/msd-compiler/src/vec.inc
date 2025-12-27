@@ -36,14 +36,14 @@ _vput0 MACRO dest
 ENDM
 
 ; dest (XMMn), temp (general purpose reg.)
-_vputi MACRO dest, temp
+_vputi MACRO destX, temp
 	mov temp, 03FF0000000000000h  ; (double) 1.0
-	movq dest, temp
+	vmovq destX, temp
 ENDM
 
-_vputj MACRO dest, temp
-	_vputi dest, temp
-	_vpermj dest, dest
+_vputj MACRO destX, temp
+	_vputi destX, temp
+	_vpermj destX, destX
 ENDM
 
 ; Precondition: destY and destX are the same AVX reg.

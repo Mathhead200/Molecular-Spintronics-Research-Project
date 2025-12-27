@@ -3,6 +3,7 @@ from datetime import datetime
 from collections import defaultdict
 import os
 from math import log2, ceil
+from prng import SplitMix64  # local lib
 
 type vec = tuple[float, float, float]
 
@@ -604,10 +605,6 @@ class Model:
 			src += f"D   dq {Dx}, {Dy}, {Dz}, 0.0\n"
 		src += "GLOBAL_EDGE ENDS\n\n"
 
-		if prng.startswith("xoshiro256"):  # TODO: support other PRNGs
-			src += f"seed\tdq 0, 0, 0, 0  ; for {prng}\n"
-		src += "\n"
-
 		# deltaU array (function pointers):
 		src += "; array of function pointers paralell to (mutable) nodes\n"
 		src += "deltaU\t"
@@ -617,11 +614,47 @@ class Model:
 			for i, node in enumerate(self.mutableNodes):
 				if i != 0:  # loop index, not node index.
 					src += "\t\t"  # ASM formating: first struct must be on same line as symbol (i.e. "dU")
-				src += f"dq deltaU_{self.nodeId(node)}\n"
+				src += f"dq deltaU_{self.nodeId(node)}  ; nodes[{self.nodeIndex[node]}]\n"
 		src += "\n"
 
 		# TODO: Place more paralell array of function pointers here as needed.
 		
+		# ---------------------------------------------------------------------
+		if prng.startswith("xoshiro256"):  # TODO: support other PRNGs
+			if seed is None or len(seed) == 0:
+				src += ".data?"
+				src += "PRNG SEGMENT ALIGN(32)\n"
+				src += f"; Vectorized {prng}\n"
+				src += "prng_state dq 4 dup (?, ?, ?, ?)  ; initialized at runtime\n"
+				src += "PRNG ENDS\n\n"
+			else:
+				src + ".data\n"
+				src += "PRNG SEGMENT ALIGN(32)\n"
+				# use given seed, plus SplitMix64 if len < 16
+				prng_state = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
+				for n, s in enumerate(seed):
+					prng_state[n // 4][n % 4] = int(s)
+				if len(seed) < 16:
+					sm64: SplitMix64 = None  # initialized in loop
+					for j_offset in range(4):
+						n = len(seed) - 1 - j_offset  # final 4 seeds (if they exist)
+						j = n % 4
+						i = n // 4
+						if n >= 0:  # true for at least offset==0 since len(seed) != 0
+							sm64 = SplitMix64(int(seed[n]))
+						for i_offset in range(i + 1, 4):
+							prng_state[i_offset][j] = sm64.next()
+				src += "prng_state dq\t"
+				for i, row in enumerate(prng_state):
+					if i != 0:
+						src += "\t\t\t\t"
+					for j, value in enumerate(row):
+						src += f"0{value:016x}h"
+						if   j != 3:  src += ",\t"
+						elif i != 3:  src += ","
+					src += "\n"
+				src += "PRNG ENDS\n\n"
+
 		# ---------------------------------------------------------------------
 		src += ".code\n"
 		# deltaU PROCs:
@@ -846,37 +879,80 @@ class Model:
 		src += "; @return (void)\n"
 		src += "PUBLIC metropolis\n"
 		src += "metropolis PROC\n"
+		src += "\t; *rax - scratch reg.; *rax - scratch reg.\n"
+		src += "\t;  rcx - loop counter\n"
+		src += "\t;  rdx - index[3]\n"
+		src += "\t;  rbx - constant (double) 2^-53\n"
+		src += "\t;  rsp - \n"
+		src += "\t;  rbp - \n"
+		src += "\t;  rsi - index[0]\n"
+		src += "\t;  rdi - MUTABLE_NODE_COUNT\n"
+		src += "\t;  r8  - index[1]\n"
+		src += "\t;  r9  - index[2]\n"
+		src += "\t;  r10 - p[0]\n"
+		src += "\t;  r11 - p[1]\n"
+		src += "\t;  r12 - p[2]\n"
+		src += "\t;  r13 - p[3]\n"
+		src += "\t;  r14 - \n"
+		src += "\t;  r15 - \n"
+		src += "\t;  ymm0  - new spin, s'\n"
+		src += "\t;  ymm1  - new flux, f'\n"
+		src += "\t;  ...\n"
+		src += "\t;  ymm12 - vectorized PNRG state[0]\n"
+		src += "\t;  ymm13 - vectorized PRNG state[1]\n"
+		src += "\t;  ymm14 - vectorized PRNG state[2]\n"
+		src += "\t;  ymm15 - vectorized PRNG state[3]\n"
 		# src += "\t; preamble. needed if using local variables (i.e. stack meory)\n"
 		# src += "\tpush rbp\n"
 		# src += "\tmov rbp, rsp\n\n"
 		if prng.startswith("xoshiro256"):  # TODO: support other PRNGs
-			src += f"\t; load PRNG ({prng}) state\n"
-			src += "\tmov r8, qword ptr [seed + (0)*8]\n"
-			src += "\tmov r9, qword ptr [seed + (1)*8]\n"
-			src += "\tmov r10, qword ptr [seed + (2)*8]\n"
-			src += "\tmov r11, qword ptr [seed + (3)*8]\n"
-		src += "\t; load mutable nodes array size\n"
-		src += "\tmov rdi, NODE_COUNT\n\n"
-		src += "\tmov rbx, rcx  ; non-volitile loop counter\n"  # TODO: do we actaully call any functions in metropolis that need RCX (1st arg)?
-		src += "\tcmp rbx, 0\n"
+			src += f"\t; load vectorized PRNG ({prng}) state into YMM12, YMM13, YMM14, YMM15\n"
+			src += "\tvmovdqa ymm12, ymmword ptr [prng_state + (0)*32]\n"
+			src += "\tvmovdqa ymm13, ymmword ptr [prng_state + (1)*32]\n"
+			src += "\tvmovdqa ymm14, ymmword ptr [prng_state + (2)*32]\n"
+			src += "\tvmovdqa ymm15, ymmword ptr [prng_state + (3)*32]\n"
+		src += "\tmov rdi, MUTABLE_NODE_COUNT ; load mutable nodes array size\n"
+		src += "\tmov rbx, 3CB0000000000000h  ; load constant (double) 2^-53\n"
+		src += "\tcmp rcx, 0\n"
 		src += "\tLOOP_START:\n"
 		src += "\t\tjz LOOP_END\n\n"
-		# select random node
-		src += "\t\t; select random index, rdx, of a (mutable) node\n"
+		# TODO: select random node
+		src += "\t\t; select 4 random indices for mutable nodes (rsi, r8, r9, rdx)\n"
 		if prng.startswith("xoshiro256"):  # TODO: support other PRNGs
 			macro = prng.replace("*", "s").replace("+", "p")
-			src += f"\t\t_{macro} rax, r8, r9, r10, r11, rdx\n"
-			src += "\t\tmul rdi  ; rdx:rax = rax * rdi = random * NODE_COUNT\n\n"
+			src += f"\t\t_v{macro} ymm0, ymm12, ymm13, ymm14, ymm15, ymm11  ; [a, b, c, d]\n"
+			src += "\t\tvmovq rax, xmm0     ; extract a\n"
+			src += "\t\tmul rdi             ; rdx:rax = rax * rdi = random * NODE_COUNT\n"
+			src += "\t\tmov rsi, rdx        ; save 1st future random index (rsi)\n"
+			src += "\t\t_vpermj xmm0, xmm0  ; [b, a, c, d]\n"
+			src += "\t\tvmovq rax, xmm0     ; extract b\n"
+			src += "\t\tmul rdi\n"
+			src += "\t\tmov r8, rdx         ; save 2nd future random index (r8)\n"
+			src += "\t\t_vpermk ymm0, ymm0  ; [c, d, b, a]\n"
+			src += "\t\tvmovq rax, xmm0     ; extract c\n"
+			src += "\t\tmul rdi\n"
+			src += "\t\tmov r9, rdx         ; save 3rd future random index (r9)\n"
+			src += "\t\t_vpermj xmm0, xmm0  ; [d, c, b, a]\n"
+			src += "\t\tvmovq rax, xmm0     ; extract d\n"
+			src += "\t\tmul rdi             ; save 4th future random index (rdx)\n\n"
+		# TODO: (stub) generate 4 ω ∈ [0, 1) for probabilistic branching (r10, r11, r12, r13)
+		src += "\t\t; generate 4 \\omega \\in [0, 1) for probabilistic branching (r10, r11, r12, r13)\n"
+		src += "\t\txor r10, r10  ; TODO: (stub) p[0]=0\n"
+		src += "\t\txor r11, r11  ; TODO: (stub) p[1]=0\n"
+		src += "\t\txor r12, r12  ; TODO: (stub) p[2]=0\n"
+		src += "\t\txor r13, r13  ; TODO: (stub) p[3]=0\n\n"
 		# TODO: (stub) pick uniformally random new state for the node
 		src += "\t\t; pick uniformally random new state for the node\n"
-		src += "\t\t_vputj ymm0  ; TODO: (stub) new spin, s'=-J\n"
+		src += "\t\t_vputj xmm0, rax  ; TODO: (stub) new spin, s'=-J\n"
 		src += "\t\t_vneg ymm0, ymm0, ymm1\n"
 		src += "\t\t_vput0 ymm1  ; TODO: (stub) new flux, f'=0\n\n"
 		# compute -deltaU for the  state change
 		src += "\t\t; compute -deltaU for the proposed state change\n"
 		src += "\t\tlea rax, deltaU         ; pointer to array of function pointers\n"
-		src += "\t\tmov rax, [rax + rsi*8]  ; deltaU[rsi], dereferenced to get the actual functino pointer\n"
+		src += "\t\tmov rax, [rax + rsi*8]  ; deltaU[rsi], dereferenced to get the actual function pointer\n"
+		src += "\t\t_dumpreg\n"  # DEBUG
 		src += "\t\tcall rax  ; args: (ymm0, ymm1?) -> return xmm15\n\n"
+		src += "\t\t_dumpreg\n"  # DEBUG
 		# TODO: (stub) compute probability, p = e^{-deltaU/kT}
 		src += "\t\t; compute probability, p = e^(-deltaU/kT)\n"
 		src += "\t\t; TODO: (stub)\n\n"
@@ -885,9 +961,14 @@ class Model:
 		src += "\t\t; TODO: (stub)\n\n"
 		# TODO?: parameter modification(s); e.g. global.B -= dB
 		# ...
-		src += "\t\tdec rbx\n"
+		src += "\t\tdec rcx\n"
 		src += "\t\tjmp LOOP_START\n"
 		src += "\tLOOP_END:\n\n"
+		src += "\t; save PRNG state\n"
+		src += "\tvmovdqa ymmword ptr [prng_state + (0)*32], ymm12\n"
+		src += "\tvmovdqa ymmword ptr [prng_state + (1)*32], ymm13\n"
+		src += "\tvmovdqa ymmword ptr [prng_state + (2)*32], ymm14\n"
+		src += "\tvmovdqa ymmword ptr [prng_state + (3)*32], ymm15\n"
 		# src += "pop rbp\n"
 		src += "\tret\n"
 		src += "metropolis ENDP\n\n"
@@ -895,7 +976,7 @@ class Model:
 		# TODO: (DEBUG) test main
 		src += "PUBLIC main\n"
 		src += "main PROC\n"
-		src += f"\t;seed PRNG ({prng})\n"
+		src += f"\t; seed PRNG ({prng})\n"
 		if prng.startswith("xoshiro256"):  # TODO: support other PRNGs
 			if seed is None or len(seed) == 0:
 				# use hardware entropy for initial seed
@@ -908,26 +989,18 @@ class Model:
 				src += "\tor rax, rdx\n"
 				if rot % 64 == 0:
 					src += ";"  # skip rotate right if it would have no effect
-				src += f"\tror rcx, {rot}    ; rotate small number to highest order bits (CPU cores = {cores})\n"
+				src += f"\tror rcx, {rot}   ; rotate small number to highest order bits (CPU cores = {cores})\n"
 				src += "\txor rcx, rax\n"
-				src += "\tTSC_END:       ; initial seed is now in rcx. Now SplitMix64.\n"
-				for i in range(4):
-					src += "\t_splitmix64 rax, rcx, rdx\n"
-					src += f"\tmov qword ptr [seed + ({i})*8], rax\n"
+				src += "\tTSC_END:     ; initial seed is now in rcx. Now SplitMix64.\n"
+				for j in range(4):  # column-major b.c. each column represents an independent PRNG channel
+					for i in range(4):
+						src += "\t_splitmix64 rax, rcx, rdx\n"
+						src += f"\tmov qword ptr [prng_state + ({i})*32 + ({j})*8], rax\n"
+				src += "\n"
 			else:
-				# use given seed, plus SplitMix64 if len < 4
-				for i, s in enumerate(seed):
-					src += f"\tmov qword [seed + ({i})*8], {int(s)}\n"
-				if len(seed) < 4:
-					src += f"\tmov rcx, {int(seed[-1])}\n"
-					for i in range(len(seed), 4):
-						src +="\t_splitmix64 rax, rcx, rdx\n"
-						src += f"\tmov qword ptr [sedd + ({i})*8], rax\n"
-			src += "\n"
-		src += "\tmov rcx, 1  ; number of iterations\n"
-		src += "\t _dumpreg\n"
-		src += "\tcall metropolis\n"
-		src += "\t _dumpreg\n\n"
+				src += "\t; (skip) seed was given and was expanded at compile time.\n\n"
+		src += "\tmov rcx, 1     ; number of iterations\n"
+		src += "\tcall metropolis\n\n"
 		src += "\txor rax, rax  ; return 0\n"
 		src += "\tret\n"
 		src += "main ENDP\n\n"
@@ -1103,6 +1176,9 @@ def example_1d():
 	msd.localNodeParameters = {
 		0: { "S": 10.0 },
 		6: { "S": 10.0 }
+	}
+	msd.programParameters = {
+		"seed": [0, 42, 1234567, 200]
 	}
 	return msd
 
