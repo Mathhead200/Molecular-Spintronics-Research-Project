@@ -628,7 +628,7 @@ class Model:
 				src += "prng_state dq 4 dup (?, ?, ?, ?)  ; initialized at runtime\n"
 				src += "PRNG ENDS\n\n"
 			else:
-				src + ".data\n"
+				src += ".data\n"
 				src += "PRNG SEGMENT ALIGN(32)\n"
 				# use given seed, plus SplitMix64 if len < 16
 				prng_state = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
@@ -659,10 +659,18 @@ class Model:
 		src += ".code\n"
 		# deltaU PROCs:
 		# documentation for deltaU_{nodeId} PROCs
-		src += "; @param ymm0:  \\Delta spin\n"
+		src +=  "; @return ymm0: -\\Delta U (Negated for Boltzmann distribution.)\n"
+		src +=  "; @param  ymm1: s'_i\n"
 		flux: str = " (unused)" if "F" not in self.allKeys else ""
-		src += f"; @param ymm1:  \\Delta flux{flux}\n"
-		src += "; @retun xmm15: -\\Delta U (Negated for Boltzmann distribution.)\n\n"
+		src += f"; @param  ymm2: f'_i{flux}\n"
+		src +=  ";         ymm3: Parameter (Je0; A, J, Je1, Jee, b; B, then D)\n"
+		src +=  ";         ymm4: s_i, m_i, then (unused)\n"
+		src +=  ";         ymm5: f_i, m'_i, then (unused)\n"
+		src +=  ";         ymm6: (unused), \\Delta s_i, then \\Delta m_i\n"
+		src +=  ";         ymm7: (unused), \\Delta f_i, then (unused)\n"
+		src +=  ";         ymm8: s_j, f_j, or m_j\n"
+		src +=  ";         ymm9: temp/scratch reg.\n"
+		src +=  ";         ymm10: TODO: (remove) temp/scratch reg.\n"  # TODO: remove
 		# code for deltaU_{nodeId} PROCs
 		if len(self.mutableNodes) == 0:
 			src += "; deltaU_{nodeId} PROCs missing. No mutable nodes!\n\n"
@@ -674,126 +682,112 @@ class Model:
 				hasFlux: bool = self.hasFlux(node)
 				flux_mode: bool = hasFlux and (self.hasJe0(node) or self.hasJe1(node) or self.hasJee(node))
 
-				src += f"; node[{index}]\n"
-				src += f"{proc_id} PROC\n"
-				# No preable: no local vars. so no stack space needed.
-				# Set up some initial vars for calculations:
-				#	(Inputs) ymm0-2: s', f', m';  ymm3-5: s, f, m;  ymm6-8: Δs, Δf, Δm;
-				#	(Output) xmm15: -ΔU = -ΔU_B - ΔU_A - ΔU_Je0 - ΔU_J - ΔU_Je1 - ΔU_Jee - ΔU_b - ΔU_D
-				reg_m1 = "ymm2"  # or ymm0 if m' == s'
-				reg_m  = "ymm5"  # or ymm3 if m  == s
-				reg_dm = "ymm8"  # or ymm6 if Δm == Δs
+				# registers:
+				resx, resy = "xmm0", "ymm0"   # result (return: -ΔU = -ΔU_Je0 - ΔU_A - ΔU_J - ΔU_Je1 - ΔU_Jee - ΔU_b - ΔU_B - ΔU_D)
+				s1i = "ymm1"                  # s'_i (param: new spin)
+				f1i = "ymm2"                  # f'_i (param: new flux)
+				prmx, prmy = "xmm3", "ymm3"  # scalar parameter (Je0, J, Je1, Jee, b), or vector parameter (A, B, D)
+				smi = "ymm4"                  # s_i, m_i, then (unused)
+				fm1 = "ymm5"                  # f_i, m'_i, then (unused)
+				dsm = "ymm6"                  # (unused), Δs_i, then Δm_i
+				dfi = "ymm7"                  # (unused), Δf_i, then (unused)
+				sfmj = "ymm8"                 # s_j, f_j, or m_j
+				tmpx, tmpy = "xmm9", "ymm9"   # temp/scratch reg. (scalar/vector)
+				tmp2x, tmp2y = "xmm10", "ymm10"  # TODO: (stub) REMOVE! Used by ΔU_J. We can (likely) reorder computations in phase 2 to use smi, fm1, or dfi as temp2
+
+				# state
 				out_init: bool = False  # track if output register has been initialized yet
-				src += "\t; (param) ymm0: s' (new)\n"
-				if flux_mode:
-					src += "\t; (param) ymm1: f' (new)\n"
-					src += "\tvaddpd ymm2, ymm0, ymm1  ; m' (new)\n"
-				else:                # Not in flux mode:
-					reg_m1 = "ymm0"  # m' == s'; just use the same register for both symbols
-					reg_m  = "ymm3"  # m  == s ; just use the same register for both symbols
-					reg_dm = "ymm6"  # Δm == Δs; just use the same register for both symbols
-				src += f"\tvmovapd ymm3, ymmword ptr [nodes + ({index})*SIZEOF_NODE + OFFSETOF_SPIN]  ; s (current)\n"
-				if flux_mode:
-					src += f"\tvmovapd ymm4, ymmword ptr [nodes + ({index})*SIZEOF_NODE + OFFSETOF_FLUX]  ; f (current)\n"
-					src += "\tvaddpd ymm5, ymm3, ymm4  ; m (current)\n"
-				src += "\tvsubpd ymm6, ymm0, ymm3  ; \\Delta s\n"
-				if flux_mode:
-					src += "\tvsubpd ymm7, ymm1, ymm4  ; \\Delta f\n"
-					src += "\tvsubpd ymm8, ymm2, ymm5  ; \\Delta m\n"
-				src += "\n"
-				# comments about what is being skipped
+				
+				src += f"{proc_id} PROC  ; node[{index}]\n"
+				# No preable: no local vars. so no stack space needed.
+				# comments about what is being skipped:
 				s = ""
-				if "B"   not in self.allKeys:  s += "\t; skipping -deltaU_B\n"
-				if "A"   not in self.allKeys:  s += "\t; skipping -deltaU_A\n"
 				if "Je0" not in self.allKeys:  s += "\t; skipping -deltaU_Je0\n"
+				if "A"   not in self.allKeys:  s += "\t; skipping -deltaU_A\n"
 				if "J"   not in self.allKeys:  s += "\t; skipping -deltaU_J\n"
 				if "Je1" not in self.allKeys:  s += "\t; skipping -deltaU_Je1\n"
 				if "Jee" not in self.allKeys:  s += "\t; skipping -deltaU_Jee\n"
 				if "b"   not in self.allKeys:  s += "\t; skipping -deltaU_b\n"
+				if "B"   not in self.allKeys:  s += "\t; skipping -deltaU_B\n"
 				if "D"   not in self.allKeys:  s += "\t; skipping -deltaU_D\n"
 				src += s
 				if len(s) != 0:  src += "\n"
-				# compute -ΔU_B = B ⋅ Δm_i:
-				if "B" in self.allKeys:
-					src += "\t; compute -delta_U_B\n"
-					# where is B defined?
-					load_insn = None  # How should this node be loaded?
-					if "B" in self.localNodeParameters.get(node, {}):
-						load_insn = f"\tvmovapd ymm9, ymmword ptr [nodes + ({index})*SIZEOF_NODE + OFFSETOF_B]  ; load B_{nid} (local)\n"
-					else:
-						_, region = self.getUnambiguousRegionNodeParameter(node, "B")  # don't need value, only region
-						if region is not None:
-							rid = self.regionId(region)
-							load_insn = f"\tvmovapd ymm9, ymmword ptr [{rid} + OFFSETOF_REGION_B]  ; load B_{rid} (region)\n"
-						elif "B" in self.globalKeys:
-							load_insn = "\tvmovapd ymm9, ymmword ptr B  ; load B (global)\n"
-					if load_insn is None:
-						src += f"\t; skip. For this node, B is not defined at any level (local, region, nor global).\n\n"
-					else:
-						src += load_insn  # load B into ymm9
-						if not out_init:
-							src += f"\t_vdotp xmm15, ymm9, {reg_dm}, xmm9, ymm9  ; (ymm9, {reg_dm})\n\n"
-							out_init = True
-						else:
-							src += f"\t_vdotadd xmm15, ymm15, ymm9, {reg_dm}, xmm9  ; (ymm9, {reg_dm})\n\n"
-				# compute -ΔU_A: A ⋅ (m'_i^{⊙2} - m_i^{⊙2})
-				if "A" in self.allKeys:
-					src += "\t; -deltaU_A calculation\n"
-					# where is A defined?
-					load_insn = None
-					if "A" in self.localNodeParameters.get(node, {}):
-						load_insn = f"\tvmovapd ymm9, ymmword ptr [nodes + ({index})*SIZEOF_NODE + OFFSETOF_A]  ; load A_{nid} (local)\n"
-					else:
-						_, region = self.getUnambiguousRegionNodeParameter(node, "A")  # don't need value, only region
-						if region is not None:
-							rid = self.regionId(region)
-							load_insn = f"\tvmovapd ymm9, ymmword ptr [{rid} + OFFSETOF_REGION_A]  ; load A_{rid} (region)\n"
-						elif "A" in self.globalKeys:
-							load_insn = "\tvmovapd ymm9, ymmword ptr A  ; load A (global)\n"
-					if load_insn is None:
-						src += f"\t; skip. For this node, A is not defined at any level (local, region, nor global).\n\n"
-					else:
-						src += load_insn  # load A into ymm9
-						src += f"\tvmulpd ymm10, {reg_m1}, {reg_m1}  ; m' Hadamard squared: m'2\n"
-						src += f"\tvfnmadd213pd ymm10, {reg_m}, {reg_m}  ; ymm10 -= {reg_m} * {reg_m} -> m'2 - m2\n"
-						if not out_init:
-							src += f"\t_vdotp xmm15, ymm9, ymm10, xmm9, ymm9  ; (ymm9, ymm10)\n\n"
-							out_init = True
-						else:
-							src += f"\t_vdotadd xmm15, ymm15, ymm9, ymm10, xmm9  ; (ymm9, ymm10)\n\n"
-				# compute -ΔU_Je0 = Je0 (s'⋅f' - s⋅f):
+				# Phase 1: load (s_i, f_i) -> -ΔU_(Je0):
+				phase1: bool = False  # does phase 1 contain any code?
+				src1 = ""             # buffer phase 1 src to emit after load
+				# try to compute -ΔU_Je0 = Je0 (s'⋅f' - s⋅f):
 				if "Je0" in self.allKeys:
-					src += "\t; -deltaU_Je0 calculation\n"
+					src1 += "\t; -deltaU_Je0 calculation\n"
 					# where is Jeo defined?
 					load_insn = None
 					if "Je0" in self.localNodeParameters.get(node, {}):
-						load_insn = f"\tvmovsd xmm9, qword ptr [nodes + ({index})*SIZEOF_NODE + OFFSETOF_Je0]  ; load Je0_{nid} (local)\n"
+						load_insn = f"\tvmovsd {prmx}, qword ptr [nodes + ({index})*SIZEOF_NODE + OFFSETOF_Je0]  ; load Je0_{nid} (local)\n"
 					else:
 						_, region = self.getUnambiguousRegionNodeParameter(node, "Je0")  # we don't need value, only region
 						if region is not None:
 							rid = self.regionId(region)
-							load_insn = f"\tvmovsd xmm9, qword ptr [{rid} + OFFSETOF_REGION_Je0]  ; load Je0_{rid} (region)\n"
+							load_insn = f"\tvmovsd {prmx}, qword ptr [{rid} + OFFSETOF_REGION_Je0]  ; load Je0_{rid} (region)\n"
 						elif "Je0" in self.globalKeys:
-							load_insn = f"\tvmovsd xmm9, qword ptr Je0  ; load Je0 (global)\n"
+							load_insn = f"\tvmovsd {prmx}, qword ptr Je0  ; load Je0 (global)\n"
 					# TODO: add optimization_remove_scalar
 					# TODO: add optimization_neg_scalar
 					if load_insn is None:
-						src += "\t; skip. For this node, Je0 is not defined at any level (local, region, nor global).\n\n"
+						src1 += "\t; skip. For this node, Je0 is not defined at any level (local, region, nor global).\n\n"
 					elif not hasFlux:
 						raise KeyError(f"For node {nid}, Je0 is defined, but F is not. Potential fix: model.globalParameters[F] = 0.0")
 					else:
+						phase1 = True
 						# compute s_i'·f_i' - s_i·f_i (difference between new and current dot products for local spin·flux)
-						src += "\t_vdotp xmm10, ymm0, ymm1, xmm9, ymm9       ; (ymm0, ymm1) = (s'f)\n"
-						src += "\t_vndotadd xmm10, ymm10, ymm3, ymm4, xmm9   ; (ymm3, ymm4) = (s'f' - sf)\n"
-						src += load_insn  # load Je0 into xmm9
+						src1 += f"\t_vdotp {tmpx}, {tmpy}, {s1i}, {f1i}, {prmx}      ; ({s1i}, {f1i}) = (s'f')\n"
+						src1 += f"\t_vndotadd {tmpx}, {tmpy}, {smi}, {fm1}, {prmx}   ; ({smi}, {fm1}) = (s'f' - sf)\n"
+						src1 += load_insn  # load Je0 into prmx
 						if not out_init:
-							src += f"\tvmulsd xmm15, xmm9, xmm10\n\n"
+							src1 += f"\tvmulsd {resx}, {prmx}, {tmpx}\n\n"
 							out_init = True
 						else:
-							src += f"\tvfmadd213sd xmm15, xmm9, xmm10  ; xmm15 += xmm9 * xmm10\n\n"
+							src1 += f"\tvfmadd231sd {resx}, {prmx}, {tmpx}  ; {resx} += {prmx} * {tmpx}\n\n"
+				# commit phase 1
+				if phase1:
+					src += "\t; Phase 1:\n"
+					src += f"\tvmovapd {smi}, ymmword ptr [nodes + ({index})*SIZEOF_NODE + OFFSETOF_SPIN]  ; load s_i\n"
+					if flux_mode:
+						src += f"\tvmovapd {fm1}, ymmword ptr [nodes + ({index})*SIZEOF_NODE + OFFSETOF_FLUX]  ; load f_i\n"
+				else:
+					src += "\t; Phase 1: (skip)\n"
+				src += "\n" + src1  # actual ASM (or comments)
+				# Phase 2: compute (m_i, m'_i, Δs_i, Δf_i) -> -ΔU_(A, J, Je1, Jee, b):
+				phase2: bool = False  # does phase 2 contain any code?
+				src2 = ""             # buffer phase 2 src to emit after load
+				m1i = fm1 if flux_mode else s1i
+				# compute -ΔU_A: A ⋅ (m'_i^{⊙2} - m_i^{⊙2})
+				if "A" in self.allKeys:
+					src2 += "\t; -deltaU_A calculation\n"
+					# where is A defined?
+					load_insn = None
+					if "A" in self.localNodeParameters.get(node, {}):
+						load_insn = f"\tvmovapd {prmy}, ymmword ptr [nodes + ({index})*SIZEOF_NODE + OFFSETOF_A]  ; load A_{nid} (local)\n"
+					else:
+						_, region = self.getUnambiguousRegionNodeParameter(node, "A")  # don't need value, only region
+						if region is not None:
+							rid = self.regionId(region)
+							load_insn = f"\tvmovapd {prmy}, ymmword ptr [{rid} + OFFSETOF_REGION_A]  ; load A_{rid} (region)\n"
+						elif "A" in self.globalKeys:
+							load_insn = f"\tvmovapd {prmy}, ymmword ptr A  ; load A (global)\n"
+					if load_insn is None:
+						src2 += f"\t; skip. For this node, A is not defined at any level (local, region, nor global).\n\n"
+					else:
+						phase2 = True
+						src2 += load_insn  # load A into prmy
+						src2 += f"\tvmulpd {tmpy}, {m1i}, {m1i}  ; m' Hadamard squared: m'2\n"
+						src2 += f"\tvfnmadd231pd {tmpy}, {smi}, {smi}  ; {tmpy} -= {smi} * {smi} -> m'2 - m2\n"
+						if not out_init:
+							src2 += f"\t_vdotp {resx}, {resy}, {prmy}, {tmpy}, {prmx}  ; ({prmy}, {tmpy})\n\n"
+							out_init = True
+						else:
+							src2 += f"\t_vdotadd {resx}, {resy}, {prmy}, {tmpy}, {prmy}  ; ({prmy}, {tmpy})\n\n"
 				# compute -ΔU_J = Σ_j{J Δs_i·s_j}:
 				if "J" in self.allKeys:
-					src += "\t; -deltaU_J calculation\n"
+					src2 += "\t; -deltaU_J calculation\n"
 					# figure out where all neighboring edges load J from, and group the common load instructions
 					load_groups: dict[str, list] = defaultdict(list)  # dict: str load_insn -> list[Edge]
 					for edge in self.connections(node):
@@ -801,14 +795,14 @@ class Model:
 							eindex = self.edgeIndex[edge]
 							nid0 = self.nodeId(edge[0])
 							nid1 = self.nodeId(edge[1])
-							load_insn = f"\tvmovsd xmm9, qword ptr [edges + ({eindex})*SIZEOF_EDGE + OFFSETOF_J]  ; load J_{nid0}_{nid1}\n"
+							load_insn = f"\tvmovsd {prmx}, qword ptr [edges + ({eindex})*SIZEOF_EDGE + OFFSETOF_J]  ; load J_{nid0}_{nid1}\n"
 						else:
 							_, combo = self.getUnambiguousRegionEdgeParameter(edge, "J")  # don't need value, only region
 							if combo is not None:
 								rid0, rid1 = self.regionId(combo[0]), self.regionId(combo[1])
-								load_insn = f"\tvmovsd xmm9, qword ptr [{rid0}_{rid1} + OFFSETOF_REGION_J]  ; load J_{rid0}_{rid1} (region)\n"
+								load_insn = f"\tvmovsd {prmx}, qword ptr [{rid0}_{rid1} + OFFSETOF_REGION_J]  ; load J_{rid0}_{rid1} (region)\n"
 							elif "J" in self.globalKeys:
-								load_insn = "\tvmovsd xmm9, qword ptr J  ; load J (global)\n"
+								load_insn = f"\tvmovsd {prmx}, qword ptr J  ; load J (global)\n"
 							else:
 								load_insn = None
 						load_groups[load_insn].append(edge)
@@ -816,60 +810,111 @@ class Model:
 						load_insn, edges = load_group
 						optimization_remove_scalar = False  # TODO: implement optimization. if scalar is const and exactly 1.0
 						optimization_neg_scalar = False     # TODO: implement optimization. if scalar is const and exactly -1.0
-						src += f"\t; [load group {i}]\n"
+						src2 += f"\t; [load group {i}]\n"
 						if optimization_remove_scalar or optimization_neg_scalar:
-							src += "\t; optimization (J*=1,-1): skip load\n"
+							src2 += "\t; optimization (J*=1,-1): skip load\n"
 						else:
-							src += load_insn  # load J into xmm9
+							src2 += load_insn  # load J into prmx
 						for edge in edges:
 							# Note: edge in self.edgeIndex may be false if ASM edge array is empty or missing local variables for this edge. This is fine.
 							edgelbl = f"edges[{self.edgeIndex[edge]}]" if edge in self.edgeIndex else "edge"
-							nid0 = self.nodeId(edge[0])
-							nid1 = self.nodeId(edge[1])
-							neighbor, _ = Model.neighbor(node, edge)  # just need neighbor. communative operation: doesn't care about direction.
-							nindex = self.nodeIndex[neighbor]
-							nnid = self.nodeId(neighbor)  # neighbor's node id
-							src += f"\t; {edgelbl}: {nid0} -> {nid1}\n"
-							src += f"\tvmovapd ymm10, ymmword ptr [nodes + ({nindex})*SIZEOF_NODE + OFFSETOF_SPIN]  ; load s_{nnid} (neighbor)\n"
-							if optimization_remove_scalar:
-								if not out_init:
-									src += "\t_vdotp xmm15, ymm6, ymm10, xmm9, ymm9  ; optimization (J*=1), (ymm6, ymm10)\n"
-									out_init = True
-								else:
-									src += "\t_vdotadd xmm15, ymm15, ymm6, ymm10, xmm9  ; optimization (J*=1), (ymm6, ymm10)\n"
-							elif optimization_neg_scalar:
-								if not out_init:
-									src += "\tvxorsd xmm15, xmm15, xmm15   ; init. xmm15 = 0\n"
-									out_init = True
-								src += "\t_vndotadd xmm15, ymm15, ymm6, ymm10, xmm9  ; optimization (J*=-1), (ymm6, ymm10)\n"
+							if load_insn is None:
+								src += "; skip. For the edge, J is not defined at any level (local, region, nor global).\n"
 							else:
-								src += f"\t_vdotp xmm10, ymm6, ymm10, xmm11, ymm11  ; (ymm6, ymm10)\n"
-								if not out_init:
-									src += f"\tvmulsd xmm15, xmm9, xmm10\n"
-									out_init = True
+								phase2 = True
+								nid0 = self.nodeId(edge[0])
+								nid1 = self.nodeId(edge[1])
+								neighbor, _ = Model.neighbor(node, edge)  # just need neighbor. communative operation: doesn't care about direction.
+								nindex = self.nodeIndex[neighbor]
+								nnid = self.nodeId(neighbor)  # neighbor's node id
+								src2 += f"\t; {edgelbl}: {nid0} -> {nid1}\n"
+								src2 += f"\tvmovapd {sfmj}, ymmword ptr [nodes + ({nindex})*SIZEOF_NODE + OFFSETOF_SPIN]  ; load s_{nnid} (neighbor)\n"
+								if optimization_remove_scalar:
+									if not out_init:
+										src2 += f"\t_vdotp {resx}, {resy}, {dsm}, {sfmj}, {prmx}  ; optimization (J*=1), ({dsm}, {sfmj})\n"
+										out_init = True
+									else:
+										src2 += f"\t_vdotadd {resx}, {resy}, {dsm}, {sfmj}, {prmx}  ; optimization (J*=1), ({dsm}, {sfmj})\n"
+								elif optimization_neg_scalar:
+									if not out_init:
+										src2 += f"\t_vput0 {resx}\n"
+										out_init = True
+									src2 += f"\t_vndotadds {resx}, {resy}, {dsm}, {sfmj}, {prmx}  ; optimization (J*=-1), ({dsm}, {sfmj})\n"
 								else:
-									src += f"\tvfmadd213sd xmm15, xmm9, xmm10  ; xmm15 += xmm9 * xmm10\n"
-					src += "\n"
-
+									src2 += f"\t_vdotp {tmpx}, {tmpy}, {dsm}, {sfmj}, {tmp2x}  ; ({dsm}, {sfmj})\n"
+									if not out_init:
+										src2 += f"\tvmulsd {resx}, {prmx}, {tmpx}\n"
+										out_init = True
+									else:
+										src2 += f"\tvfmadd231sd {resx}, {prmx}, {tmpx}  ; {resx} += {prmx} * {tmpx}\n"
+					src2 += "\n"
 				# compute -ΔU_Je1:
 				if "Je1" in self.allKeys:
-					src += "\t; -deltaU_Je1 calculation\n"
-					src += "\t; TODO ...\n\n" # TODO (stub)
+					src2 += "\t; -deltaU_Je1 calculation\n"
+					src2 += "\t; TODO ...\n\n" # TODO (stub)
 				# compute -ΔU_Jee:
 				if "Jee" in self.allKeys:
-					src += "\t; -deltaU_Jee calculation\n"
-					src += "\t; TODO ...\n\n" # TODO (stub)
+					src2 += "\t; -deltaU_Jee calculation\n"
+					src2 += "\t; TODO ...\n\n" # TODO (stub)
 				# compute -ΔU_b:
 				if "b" in self.allKeys:
-					src += "\t; -deltaU_b calculation\n"
-					src += "\t; TODO ...\n\n" # TODO (stub)
+					src2 += "\t; -deltaU_b calculation\n"
+					src2 += "\t; TODO ...\n\n" # TODO (stub)
+				# commit phase 2
+				if phase2:
+					src += "\t; Phase 2:\n"
+					src += f"\tvsubpd {dsm}, {s1i}, {smi}  ; \\Delta s_i = s'_i - s_i\n"
+					if flux_mode:
+						src += f"\tvsubpd {dfi}, {f1i}, {fm1}  ; \\Detla f = f'_i - f_i\n"
+						src += f"\tvaddpd {smi}, {smi}, {fm1}  ; m_i = s_i + f_i\n"
+						src += f"\tvaddpd {fm1}, {s1i}, {f1i}  ; m'_i = s'_i + f'_i\n"
+					else:
+						src += f"\t; ({smi}) m_i = s_i since f_i = 0\n"
+						src += f"\t; ({m1i}) m'_i = s'_i since f'_i = 0\n"
+				else:
+					src += "\t; Phase 2: (skip)\n"
+				src += "\n" + src2
+				# Phase 3 compute (Δm_i) -> -ΔU_(B, D):
+				phase3: bool = False  # does phase 3 contain any code?
+				src3 = ""             # buffer phase 3 src to emit after load
+				# compute -ΔU_B = B ⋅ Δm_i:
+				if "B" in self.allKeys:
+					src3 += "\t; compute -delta_U_B\n"
+					# where is B defined?
+					load_insn = None  # How should this node be loaded?
+					if "B" in self.localNodeParameters.get(node, {}):
+						load_insn = f"\tvmovapd {prmy}, ymmword ptr [nodes + ({index})*SIZEOF_NODE + OFFSETOF_B]  ; load B_{nid} (local)\n"
+					else:
+						_, region = self.getUnambiguousRegionNodeParameter(node, "B")  # don't need value, only region
+						if region is not None:
+							rid = self.regionId(region)
+							load_insn = f"\tvmovapd {prmy}, ymmword ptr [{rid} + OFFSETOF_REGION_B]  ; load B_{rid} (region)\n"
+						elif "B" in self.globalKeys:
+							load_insn = f"\tvmovapd {prmy}, ymmword ptr B  ; load B (global)\n"
+					if load_insn is None:
+						src3 += f"\t; skip. For this node, B is not defined at any level (local, region, nor global).\n\n"
+					else:
+						phase3 = True
+						src3 += load_insn  # load B into ymm9
+						if not out_init:
+							src3 += f"\t_vdotp {resx}, {prmy}, {dsm}, {prmx}, {prmy}  ; ({prmy}, {dsm})\n\n"
+							out_init = True
+						else:
+							src3 += f"\t_vdotadd {resx}, {resy}, {prmy}, {dsm}, {prmx}  ; ({prmy}, {dsm})\n\n"
 				# compute -ΔU_D:
 				if "D" in self.allKeys:
-					src += "\t; -deltaU_D calculation\n"
-					src += "\t; TODO ...\n\n" # TODO (stub)
+					src3 += "\t; -deltaU_D calculation\n"
+					src3 += "\t; TODO ...\n\n" # TODO (stub)
+				if phase3:
+					src += "\t; Phase 3:\n"
+					if flux_mode:
+						src += f"\tvsubpd {dsm}, {m1i}, {smi}  ; \\Delta m_i = m'_i - m_i\n\n"
+					else:
+						src += f"\t; ({dsm}) \\Delta m_i = \\Delta s_i since \\Delta f_i = 0\n\n"
+				src += src3
 				# return:
 				if not out_init:
-					src += "\tvxorpd xmm15, xmm15, xmm15  ; return 0.0\n"  # fall back in case there are no parameters set for this node
+					src += f"\tvxorpd {resx}, {resx}, {resx}  ; return 0.0\n"  # fall back in case there are no parameters set for this node
 				src += "\tret\n"
 				src += f"{proc_id} ENDP\n\n"
 		
