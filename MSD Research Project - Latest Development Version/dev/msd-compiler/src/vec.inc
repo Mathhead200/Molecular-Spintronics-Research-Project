@@ -52,24 +52,20 @@ _vputk MACRO destY, destX, temp
 	_vpermk destY, destY
 ENDM
 
-;; negate the given vector
-;_vneg MACRO dest, src, temp
-;	; This method is faster if the mask, temp, is already in memory.
-;
-;	; (vpcmpeqq) Vector Packed Compare Equal Quadword (ints):
-;	;	Compares the 64-bit packed ints for equality, i.e. src0[i] == src1[i].
-;	;	If equal, dest[i] = -1 = 1111...1111b, else dest[i] = 0 = 0000....0000b
-;	vpcmpeqq temp, temp, temp  ; temp = (1111...1111b, 1111...1111b, ...)
-;	; (psllq) Packed Shift-left (Logical) Quadword (ints):
-;	;	Vectorized long left-shift operation
-;	vpsllq temp, temp, 63  ; now only highest ("sign") bit (in each quadword) is 1: 1000...0000b = -0.0
-;
-;	vxorpd dest, src, temp  ; XOR: dest ^ (-0.0, ...) = -dest
-;ENDM
+; negate the given vector
+_vneg MACRO dest, src, temp
+	; This method is faster if the mask, temp, is already in memory.
+	; Could also do _vput0 + vsubpd if dest != src
 
-_vneg MACRO dest, src
-	_vput0 dest
-	vsubpd dest, dest, src  ; dest = 0 - src = -src
+	; (vpcmpeqq) Vector Packed Compare Equal Quadword (ints):
+	;	Compares the 64-bit packed ints for equality, i.e. src0[i] == src1[i].
+	;	If equal, dest[i] = -1 = 1111...1111b, else dest[i] = 0 = 0000....0000b
+	vpcmpeqq temp, temp, temp  ; temp = (1111...1111b, 1111...1111b, ...)
+	; (psllq) Packed Shift-left (Logical) Quadword (ints):
+	;	Vectorized long left-shift operation
+	vpsllq temp, temp, 63  ; now only highest ("sign") bit (in each quadword) is 1: 1000...0000b = -0.0
+
+	vxorpd dest, src, temp  ; XOR: dest ^ (-0.0, ...) = -dest
 ENDM
 
 ; clears dest[1:3] = 0

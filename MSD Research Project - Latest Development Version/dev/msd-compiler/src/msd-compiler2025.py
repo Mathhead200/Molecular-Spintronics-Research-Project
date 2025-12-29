@@ -961,7 +961,7 @@ class Model:
 		src += "\tcmp rcx, 0\n"
 		src += "\tLOOP_START:\n"
 		src += "\t\tjz LOOP_END\n\n"
-		# TODO: select random node
+		# select 4 random nodes
 		src += "\t\t; select 4 random indices for mutable nodes (rsi, r8, r9, rdx)\n"
 		if prng.startswith("xoshiro256"):  # TODO: support other PRNGs
 			macro = prng.replace("*", "s").replace("+", "p")
@@ -988,9 +988,9 @@ class Model:
 		src += "\t\txor r13, r13  ; TODO: (stub) p[3]=0\n\n"
 		# TODO: (stub) pick uniformally random new state for the node
 		src += "\t\t; pick uniformally random new state for the node\n"
-		src += "\t\t_vputj xmm0, rax  ; TODO: (stub) new spin, s'=-J\n"
-		src += "\t\t_vneg ymm0, ymm0, ymm1\n"
-		src += "\t\t_vput0 ymm1  ; TODO: (stub) new flux, f'=0\n\n"
+		src += "\t\t_vputj xmm1, rax  ; TODO: (stub) new spin, s'=-J\n"
+		src += "\t\t_vneg ymm1, ymm1, ymm2\n"
+		src += "\t\t_vput0 ymm2  ; TODO: (stub) new flux, f'=0\n\n"
 		# compute -deltaU for the  state change
 		src += "\t\t; compute -deltaU for the proposed state change\n"
 		src += "\t\tlea rax, deltaU         ; pointer to array of function pointers\n"
