@@ -3,7 +3,7 @@ from time import time
 from remez import remez
 from struct import pack
 
-M_TRUNC = 13
+M_TRUNC = 10
 MINIMAX_DEG = 3
 
 class StrJoiner:
@@ -30,11 +30,18 @@ def minimax_coefs(delta = 1 / 2**(M_TRUNC + 1), deg = MINIMAX_DEG):
 	print("px:", px)
 	px = px.split(" ") # ["1.0001", "x**2", "-15.2", "x", "+1.002e-3"]
 	coefs = [0.0 for _ in range(deg + 1)]
-	for i in range(0, len(px), 2):
-		c = float(px[i])  # monomial coeficient
-		k = px[i+1] if i+1 < len(px) else "x**0"  # monomial degree
+	i = 0
+	while i < len(px):
+		try:
+			c = float(px[i])  # monomial coeficient
+			k = px[i+1] if i+1 < len(px) else "x**0"  # monomial degree
+		except ValueError:
+			c = 1.0
+			px.insert(i+1, None)
+			k = px[i]
 		k = int(k[3:]) if len(k) >= 3 else 1
 		coefs[k] = c
+		i += 2
 	coefs.reverse()
 	print("coefs:", coefs)
 

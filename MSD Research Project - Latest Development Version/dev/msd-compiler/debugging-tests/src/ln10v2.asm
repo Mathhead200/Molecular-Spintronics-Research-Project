@@ -1077,4 +1077,41 @@ ln PROC
 	vaddsd xmm0, xmm0, xmm3
 	ret
 ln ENDP
+
+PUBLIC lns
+lns PROC
+	L:
+	; Assume xmm0[i] in [1,2) -> 0|111 1111 1111|mmmm mmmm mmmm ...
+	;                   sign bit ^|^^ exponent ^|^^ mantissa ^^ ...
+	vmovq rax, xmm0
+	shl rax, 12  ; remove sign (1 bit) + exponent (11 bits)
+	shr rax, 64 - M_TRUNC  ; most significant bits of mantissa -> index in table
+	shl rax, 5  ; mul 32 (sizeof ymmword ptr)
+	lea rcx, log_table
+	vmovapd ymm1, ymmword ptr [rcx + rax]  ; [a, 1/a, ln(a), 0.0]
+
+	; xmm2: calculate residual, r = x/a - 1.0 = (x - a)/a
+	vsubsd xmm2, xmm0, xmm1  ; x - a
+	_vpermj ymm1, ymm1  ; [1/a, a, ln(a), 0.0]
+	vmulsd xmm2, xmm2, xmm1  ; xmm0 *= 1/a
+
+	; xmm0: ln(a)
+	_vpermk ymm0, ymm1  ; [ln(a), 0.0, 1/a, a]
+
+	; xmm3: P(r) ~= ln(1 + r);
+	;	Horner's method: degree 5 minimax polynomial
+	vmovapd ymm3, ymmword ptr [coefs + (0)*32]
+	_vpermj ymm1, ymm3
+	vfmadd132sd xmm3, xmm1, xmm2
+	_vpermk ymm1, ymm1
+	vfmadd132sd xmm3, xmm1, xmm2
+	_vpermj ymm1, ymm1
+	vfmadd132sd xmm3, xmm1, xmm2
+
+	; return ln(a) + P(r) ~= ln(x)
+	vaddsd xmm0, xmm0, xmm3
+	dec rdx
+	jnz L
+	ret
+lns ENDP
 END

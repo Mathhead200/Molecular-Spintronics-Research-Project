@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
 
 	time(&t1);
 	for (uint64_t i = 0; i < n; i++)
-		sink = log(x + (double) i / n);
+		sink = log(x);
 	time(&t2);
 	printf("C time: %llu s\n", t2 - t1);
 

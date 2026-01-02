@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
 			printf(" !! Warning: out of range [0, 1)\n");
 		double y = log(w);
 		double y1 = ln(w);
-		double y2 = ln2(w);
+		// double y2 = ln2(w);
 		printf("\tC:    %.17g\n", y);
 		printf("\tASM:  %.17g, error: %.17g\n", y1, (y - y1));
 		// printf("\tASM2: %.17g, error: %.17g\n", y2, (y - y2));
