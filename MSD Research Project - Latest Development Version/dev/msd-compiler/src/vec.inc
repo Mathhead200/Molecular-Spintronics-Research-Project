@@ -4,7 +4,7 @@
 ; Change VEC_I=(1.0, 0.0, 0.0, 0.0) at src
 ;	into VEC_J=(0.0, 1.0, 0.0, 0.0) at dest
 _vpermj MACRO dest, src
-	vpermilpd dest, src, 01h  ; swap doubles in low 128-bit lane
+	vpermilpd dest, src, 09h  ; swap doubles in low 128-bit lane
 ENDM
 
 ; Change VEC_I=(1.0, 0.0, 0.0, 0.0) at src
