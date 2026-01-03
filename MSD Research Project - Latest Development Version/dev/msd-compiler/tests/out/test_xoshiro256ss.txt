@@ -74,3 +74,8 @@ rng=RNG_stdin64, seed=unknown
 length= 32 terabytes (2^45 bytes), time= 319560 seconds
   no anomalies in 455 test result(s)
 
+rng=RNG_stdin64, seed=unknown
+length= 64 terabytes (2^46 bytes), time= 637879 seconds
+  no anomalies in 464 test result(s)
+
+Terminate batch job (Y/N)? 
