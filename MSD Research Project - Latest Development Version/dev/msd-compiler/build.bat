@@ -7,4 +7,3 @@
 ml64 /c /I "src" "out/%name%.asm" || exit /b
 move "%name%.obj" bin || exit /b
 link "bin/%name%.obj" ucrt.lib legacy_stdio_definitions.lib /entry:main /OUT:"bin/%name%.exe" || exit /b
-"bin/%name%.exe" || exit /b

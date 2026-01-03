@@ -367,6 +367,7 @@ class Model:
 		# includes
 		src += "include vec.inc  ; _vdotp, etc.\n"
 		src += "include prng.inc  ; splitmix64, xoshiro256ss, etc. \n"
+		src += "include ln.inc  ; _vln\n"
 		src += "include dumpreg.inc  ; DEBUG\n\n"  # TODO: (DEBUG)
 		
 		# ---------------------------------------------------------------------
@@ -622,7 +623,7 @@ class Model:
 		# ---------------------------------------------------------------------
 		if prng.startswith("xoshiro256"):  # TODO: support other PRNGs
 			if seed is None or len(seed) == 0:
-				src += ".data?"
+				src += ".data?\n"
 				src += "PRNG SEGMENT ALIGN(32)\n"
 				src += f"; Vectorized {prng}\n"
 				src += "prng_state dq 4 dup (?, ?, ?, ?)  ; initialized at runtime\n"
