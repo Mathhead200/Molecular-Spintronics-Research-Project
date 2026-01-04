@@ -621,7 +621,7 @@ class Model:
 		# TODO: Place more paralell array of function pointers here as needed.
 		
 		# misc. constants
-		src += "; misc. constants"
+		src += "; misc. constants\n"
 		src += "ONE dq 1.0\n\n"
 
 		# ---------------------------------------------------------------------
@@ -990,10 +990,10 @@ class Model:
 		# TODO: (stub) generate 4 ω ∈ [0, 1) for probabilistic branching (r10, r11, r12, r13)
 		src += "\t\t; generate 4 \\omega \\in [0, 1) for probabilistic branching (ymm11)\n"
 		src += "\t\t_vxoshiro256ss ymm11, ymm12, ymm13, ymm14, ymm15, ymm10  ; (vectorized) uint64\n"
-		src += "\t\tvpsrlq ymm11, ymm1, 12                                   ; (vectorized) \omega + 1 \in [1, 2) \n"
-		src += "\t\tvbroadcast ymm10, qword ptr ONE\n"
-		src += "\t\tvsubpd ymm11, ymm11, ymm10                               ; (vectorized) \omega \in [0, 1)\n"
-		src += "\t\t_vln ymm11, ymm11, ymm7, ymm8, ymm9, ymm10, rax          ; (vectorized) ln(\omega) \in [-inf, 0)\n\n"
+		src += "\t\tvpsrlq ymm11, ymm1, 12                                   ; (vectorized) \\omega + 1 \\in [1, 2) \n"
+		src += "\t\tvbroadcastsd ymm10, qword ptr ONE\n"
+		src += "\t\tvsubpd ymm11, ymm11, ymm10                               ; (vectorized) \\omega \\in [0, 1)\n"
+		src += "\t\t_vln ymm11, ymm11, ymm7, ymm8, ymm9, ymm10, xmm10, rax   ; (vectorized) ln(\\omega) \\in [-inf, 0)\n\n"
 		# TODO: (stub) pick uniformally random new state for the node
 		src += "\t\t; pick uniformally random new state for the node\n"
 		src += "\t\t_vputj xmm1, rax  ; TODO: (stub) new spin, s'=-J\n"

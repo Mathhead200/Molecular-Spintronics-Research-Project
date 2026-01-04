@@ -3083,30 +3083,57 @@ coefs	dq -0.24999638129125829  ; c_4
 		dq 0.9999999999999961  ; c_1
 		dq 1.0842021724855044e-19  ; c_0
 
-; src (YMMn): four packed doubles in [1, 2)
+EXP_BIAS dq -1023
+LN_2 dq 0.69314718055994530942
+EXP_0 dq 3FF0000000000000h  ; boased exp. 2^0 for doubles in [1, 2)
+
+SLN1 SEGMENT ALIGN(32)
+VPERMD_INDICES dd 0,2, 4,6, 0,0, 0,0
+SLN1 ENDS
+
+; src (YMMn): four packed doubles
 ; dest (YMMn)
 ; temp1, temp2, temp3 (YMMn)
 ; tempG (general purpose register, e.g. rax)
 ; PRECONDITIONS:
-;	1. temp1, temp2, temp3 must not overlap with each other, dest, nor src.
-;	2. dest and src can overlap.
+;	1. All doubles in src are not negative, dednormalized, infinite, nor NaN
+;	2. temp1, temp2, temp3, temp4 must not overlap with each other, dest, nor src.
+;	3. dest and src can overlap.
 ; POSTCONDITIONS:
 ;	1. All temps cobbered!
-_vln MACRO dest, src, temp1, temp2, temp3, tempG
-	; Assume src[i] in [1,2) -> 0|111 1111 1111|mmmm mmmm mmmm ...
-	;                   sign bit ^|^^ exponent ^|^^ mantissa ^^ ...
-	vpsllq temp1, src, 12  ; remove sign (1 bit) + exponent (11 bits)
-	vpsrlq temp1, temp1, 64 - M_TRUNC  ; most significant bits of mantissa -> indices in (paralell) tables
+_vln MACRO dest, src, temp1, temp2, temp3, temp4Y, temp4X, tempG
+	; src[i] -> 0|xxx xxxx xxxx|mmmm mmmm mmmm ...
+	;  sign bit ^|^^ exponent ^|^^ mantissa ^^ ...
+	; ln(m*2^x) = ln(m) + x*ln(2)
 
-	; temp2: calculate residual, r = x/a - 1.0 = (x - a)/a
+	; temp4Y: calculate x*ln(2)
+	vpsrlq temp4Y, src, 52  ; (biased) exponent, (uint64) x
+	vpbroadcastq temp1, qword ptr EXP_BIAS
+	vpaddq temp4Y, temp4Y, temp1  ; (unbiased) exponent, (sint64) x - 1023
+	vmovdqa temp1, ymmword ptr VPERMD_INDICES
+	vpermd temp4Y, temp1, temp4Y  ; cast (sint64) temp4Y to (sint32) temp4X
+	vcvtdq2pd temp4Y, temp4X  ; cast (sint32) temp4X to (double) temp4Y
+	vbroadcastsd temp1, LN_2
+	vmulpd temp4Y, temp4Y, temp1  ; x*ln(2)
+
+	; temp1: (parallel) table indices
+	vpsllq dest, src, 12  ; remove sign (1 bit) + exponent (11 bits)
+	vpsrlq temp1, dest, 64 - M_TRUNC  ; most significant bits of mantissa -> indices in (paralell) tables
+
+	; dest: m \in [1, 2)
+	vpsrlq dest, dest, 12  ; move mantissa back in place
+	vbroadcastsd temp3, EXP_0
+	vpor dest, dest, temp3  ; set exponent to 2^0
+
+	; temp2: calculate residual, r = m/a - 1.0 = (m - a)/a
 	lea rax, a_table
 	vpcmpeqq temp3, temp3, temp3  ; load mask (all 1's)
 	vgatherqpd temp2, [rax + temp1*8], temp3
-	vsubpd dest, src, temp2  ; x - a
+	vsubpd dest, src, temp2  ; m - a
 	lea rax, a_inv_table
 	vpcmpeqq temp3, temp3, temp3  ; load mask (all 1's)
 	vgatherqpd temp2, [rax + temp1*8], temp3
-	vmulpd temp2, temp2, dest  ; 1/a * (x - a)
+	vmulpd temp2, temp2, dest  ; 1/a * (m - a)
 
 	; dest: ln(a)
 	lea rax, ln_a_table
@@ -3125,6 +3152,7 @@ _vln MACRO dest, src, temp1, temp2, temp3, tempG
 	vbroadcastsd temp1, [coefs + (4)*8]  ; c_0
 	vfmadd132pd temp3, temp1, temp2  ; temp3 * r + c_0 -> temp3
 
-	; return ln(a) + P(r) ~= ln(x)
-	vaddpd dest, dest, temp3
+	; return ln(...)
+	vaddpd dest, dest, temp3  ; ln(a) + P(r) ~= ln(m)
+	vaddpd dest, dest, temp4Y  ; ln(m) + x*ln(2)
 ENDM
