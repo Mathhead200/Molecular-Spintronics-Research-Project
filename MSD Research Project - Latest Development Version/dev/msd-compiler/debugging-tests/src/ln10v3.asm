@@ -3087,25 +3087,53 @@ coefs	dq -0.24999638129125829  ; c_4
 		dq 0.9999999999999961  ; c_1
 		dq 1.0842021724855044e-19  ; c_0
 
+EXP_BIAS dq -1023
+LN_2 dq 0.69314718055994530942
+EXP_0 dq 3FF0000000000000h  ; boased exp. 2^0 for doubles in [1, 2)
+
+SLN1 SEGMENT ALIGN(32)
+VPERMD_INDICES dd 0,2, 4,6, 0,0, 0,0
+SLN1 ENDS
+
 .code
-; @param (ymm0) - four packed doubles in [1, 2)
+; @param (ymm0) - four packed doubles
 ; @return (ymm0)
+; Preconditions:
+;	1. ymm0 is not negative, denormalized, infinite, nor NaN
 PUBLIC ln
 ln PROC
-	; Assume ymm0[i] in [1,2) -> 0|111 1111 1111|mmmm mmmm mmmm ...
-	;                   sign bit ^|^^ exponent ^|^^ mantissa ^^ ...
-	vpsllq ymm1, ymm0, 12  ; remove sign (1 bit) + exponent (11 bits)
-	vpsrlq ymm1, ymm1, 64 - M_TRUNC  ; most significant bits of mantissa -> indices in (paralell) tables
+	; ymm0[i] -> 0|xxx xxxx xxxx|mmmm mmmm mmmm ...
+	;   sign bit ^|^^ exponent ^|^^ mantissa ^^ ...
+	; ln(m*2^x) = ln(m) + x*ln(2)
 
-	; ymm2: calculate residual, r = x/a - 1.0 = (x - a)/a
+	; ymm4: calculate x*ln(2)
+	vpsrlq ymm4, ymm0, 52  ; (biased) exponent, (uint64) x
+	vpbroadcastq ymm1, qword ptr EXP_BIAS
+	vpaddq ymm4, ymm4, ymm1  ; (unbiased) exponent, (sint64) x - 1023
+	vmovdqa ymm1, ymmword ptr VPERMD_INDICES
+	vpermd ymm4, ymm1, ymm4  ; cast (sint64) ymm4 to (sint32) xmm4
+	vcvtdq2pd ymm4, xmm4  ; cast (sint32) xmm4 to (double)
+	vbroadcastsd ymm1, LN_2
+	vmulpd ymm4, ymm4, ymm1  ; x*ln(2)
+
+	; ymm1: (parallel) table indices
+	vpsllq ymm0, ymm0, 12  ; remove sign (1 bit) + exponent (11 bits)
+	vpsrlq ymm1, ymm0, 64 - M_TRUNC  ; most significant bits of mantissa -> indices in (paralell) tables
+
+	; ymm0: m \in [1, 2)
+	vpsrlq ymm0, ymm0, 12  ; move mantissa back in place
+	vbroadcastsd ymm3, EXP_0
+	vpor ymm0, ymm0, ymm3  ; set exponent to 2^0
+
+	; ymm2: calculate residual, r = m/a - 1.0 = (m - a)/a
 	lea rax, a_table
 	vpcmpeqq ymm3, ymm3, ymm3  ; load mask (all 1's)
 	vgatherqpd ymm2, [rax + ymm1*8], ymm3
-	vsubpd ymm0, ymm0, ymm2  ; x - a
+	vsubpd ymm0, ymm0, ymm2  ; m - a
 	lea rax, a_inv_table
 	vpcmpeqq ymm3, ymm3, ymm3  ; load mask (all 1's)
 	vgatherqpd ymm2, [rax + ymm1*8], ymm3
-	vmulpd ymm2, ymm2, ymm0  ; 1/a * (x - a)
+	vmulpd ymm2, ymm2, ymm0  ; 1/a * (m - a)
 
 	; ymm0: ln(a)
 	lea rax, ln_a_table
@@ -3124,8 +3152,9 @@ ln PROC
 	vbroadcastsd ymm1, [coefs + (4)*8]  ; c_0
 	vfmadd132pd ymm3, ymm1, ymm2  ; ymm3 * r + c_0 -> ymm3
 
-	; return ln(a) + P(r) ~= ln(x)
-	vaddpd ymm0, ymm0, ymm3
+	; return ln(...)
+	vaddpd ymm0, ymm0, ymm3  ; ln(a) + P(r) != ln(m)
+	vaddpd ymm0, ymm0, ymm4  ; ln(m) + x*ln(2)
 	ret
 ln ENDP
 END

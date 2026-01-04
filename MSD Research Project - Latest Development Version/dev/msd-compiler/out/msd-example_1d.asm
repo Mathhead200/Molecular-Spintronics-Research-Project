@@ -100,6 +100,9 @@ deltaU	dq deltaU_1  ; nodes[0]
 		dq deltaU_4  ; nodes[3]
 		dq deltaU_5  ; nodes[4]
 
+; misc. constants
+ONE	dq 1.0
+
 .data
 PRNG SEGMENT ALIGN(32)
 prng_state dq	00000000000000000h,	0000000000000002ah,	0000000000012d687h,	000000000000000c8h,
@@ -423,10 +426,6 @@ metropolis PROC
 		vsubpd ymm11, ymm11, ymm1  ; p
 		; TODO: update _vln to handle range outside [1, 2) with ln(m * 2^x) = ln(m) + (double) x * ln(2)
 		_vln ymm11, ymm11, ymm1, ymm2, ymm3, ymm4, rax  ; ln(p)
-;		xor r10, r10  ; TODO: (stub) p[0]=0
-;		xor r11, r11  ; TODO: (stub) p[1]=0
-;		xor r12, r12  ; TODO: (stub) p[2]=0
-;		xor r13, r13  ; TODO: (stub) p[3]=0
 				
 
 		; pick uniformally random new state for the node
