@@ -183,6 +183,15 @@ ENDM
 ; _splitmix64, movq, and _vpermj/_vpremk three/four times.
 ; * See: https://uops.info/html-instr/VPMULLQ_ZMM_ZMM_M512.html
 
+; Maps a uniform random uint64 into a double, \omega ~ Uniform[0, 1)
+; dest and src can overlap.
+; ones must be YMMn initialized to exactly [1.0, 1.0, 1.0, 1.0]
+_vomega MACRO dest, src, ones
+	vpsrlq dest, src, 12
+	vpor dest, dest, ones
+	vsubpd dest, dest, ones
+ENDM
+
 ; **References**
 ; Blackman, D., & Vigna, S. (2022, March 28). Scrambled linear pseudorandom number generators (v3). arXiv.
 ; Vigna, S. (2015). SplitMix64. https://prng.di.unimi.it/splitmix64.c

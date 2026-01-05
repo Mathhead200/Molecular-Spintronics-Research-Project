@@ -3085,7 +3085,6 @@ coefs	dq -0.24999638129125829  ; c_4
 
 EXP_BIAS dq -1023
 LN_2 dq 0.69314718055994530942
-EXP_0 dq 3FF0000000000000h  ; boased exp. 2^0 for doubles in [1, 2)
 
 SLN1 SEGMENT ALIGN(32)
 VPERMD_INDICES dd 0,2, 4,6, 0,0, 0,0
@@ -3099,9 +3098,11 @@ SLN1 ENDS
 ;	1. All doubles in src are not negative, dednormalized, infinite, nor NaN
 ;	2. temp1, temp2, temp3, temp4 must not overlap with each other, dest, nor src.
 ;	3. dest and src can overlap.
+;	4. ones is exactly (YMMn) [1.0, 1.0, 1.0, 1.0]
+;	5. ones can overlap with temp2 or temp3, but NOT temp1 nor temp4.
 ; POSTCONDITIONS:
 ;	1. All temps cobbered!
-_vln MACRO dest, src, temp1, temp2, temp3, temp4Y, temp4X, tempG
+_vln MACRO dest, src, ones, temp1, temp2, temp3, temp4Y, temp4X, tempG
 	; src[i] -> 0|xxx xxxx xxxx|mmmm mmmm mmmm ...
 	;  sign bit ^|^^ exponent ^|^^ mantissa ^^ ...
 	; ln(m*2^x) = ln(m) + x*ln(2)
@@ -3122,8 +3123,7 @@ _vln MACRO dest, src, temp1, temp2, temp3, temp4Y, temp4X, tempG
 
 	; dest: m \in [1, 2)
 	vpsrlq dest, dest, 12  ; move mantissa back in place
-	vbroadcastsd temp3, EXP_0
-	vpor dest, dest, temp3  ; set exponent to 2^0
+	vpor dest, dest, ones  ; set exponent to 2^0
 
 	; temp2: calculate residual, r = m/a - 1.0 = (m - a)/a
 	lea rax, a_table

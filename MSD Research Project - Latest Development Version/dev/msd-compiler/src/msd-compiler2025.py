@@ -607,19 +607,38 @@ class Model:
 		src += "GLOBAL_EDGE ENDS\n\n"
 
 		# deltaU array (function pointers):
-		src += "; array of function pointers paralell to (mutable) nodes\n"
+		src += "; array of function pointers parallel to (mutable) nodes\n"
 		src += "deltaU\t"
 		if len(self.mutableNodes) == 0:
 			src += "; 0 byte empty array. no multable nodes.\n"
-		else:
-			for i, node in enumerate(self.mutableNodes):
-				if i != 0:  # loop index, not node index.
-					src += "\t\t"  # ASM formating: first struct must be on same line as symbol (i.e. "dU")
-				src += f"dq deltaU_{self.nodeId(node)}  ; nodes[{self.nodeIndex[node]}]\n"
+		for i, node in enumerate(self.mutableNodes):
+			if i != 0:  # loop index, not node index.
+				src += "\t\t"  # ASM formating: first struct must be on same line as symbol (i.e. "dU")
+			src += f"dq deltaU_{self.nodeId(node)}  ; nodes[{self.nodeIndex[node]}]\n"
 		src += "\n"
 
-		# TODO: Place more paralell array of function pointers here as needed.
-		
+		# getkT array (function pointers):
+		src += "; array of kT pointers (double *) parallel to (mutable) nodes\n"
+		src += "kTref\t"
+		if len(self.mutableNodes) == 0:
+			src += "; 0 byte array. no mutable nodes.\n"
+		for i, node in enumerate(self.mutableNodes):
+			if i != 0:  # loop index, not node index.
+				src += "\t\t"  # ASM formating: first struct must be on same line as symbol (i.e. "dU")
+			idx = self.nodeIndex[node]
+			if "kT" in self.localNodeParameters.get(node, {}):
+				src += f"dq nodes + SIZEOF_NODE*{idx} + OFFSETOF_kT  ; nodes[{idx}] -> &nodes[{idx}].kT (local)\n"
+			else:
+				_, region = self.getUnambiguousRegionNodeParameter(node, "kT")  # we don't need value, only region
+				if region is not None:
+					rid = self.regionId(region)
+					src += f"dq {rid} + OFFSETOF_kT  ; nodes[{idx}] -> &{rid}.kT (region)\n"
+				elif "kT" in self.globalKeys:
+					src += f"dq kT  ; nodes[{idx}] -> &kT (global)\n"
+				else:
+					raise ValueError(f"For mutable node {self.nodeId(node)}, kT is not defined at any level. Potential fix: model.globalParameters[\"kT\"] = 0.1")
+		src += "\n"
+
 		# misc. constants
 		src += "; misc. constants\n"
 		src += "ONE dq 1.0\n\n"
@@ -976,7 +995,7 @@ class Model:
 			src += "\t\tvmovq rax, xmm0     ; extract a\n"
 			src += "\t\tmul rdi             ; rdx:rax = rax * rdi = random * NODE_COUNT\n"
 			src += "\t\tmov rsi, rdx        ; save 1st future random index (rsi)\n"
-			src += "\t\t_vpermj xmm0, xmm0  ; [b, a, c, d]\n"
+			src += "\t\t_vpermj ymm0, ymm0  ; [b, a, c, d]\n"
 			src += "\t\tvmovq rax, xmm0     ; extract b\n"
 			src += "\t\tmul rdi\n"
 			src += "\t\tmov r8, rdx         ; save 2nd future random index (r8)\n"
@@ -984,16 +1003,15 @@ class Model:
 			src += "\t\tvmovq rax, xmm0     ; extract c\n"
 			src += "\t\tmul rdi\n"
 			src += "\t\tmov r9, rdx         ; save 3rd future random index (r9)\n"
-			src += "\t\t_vpermj xmm0, xmm0  ; [d, c, b, a]\n"
+			src += "\t\t_vpermj ymm0, ymm0  ; [d, c, b, a]\n"
 			src += "\t\tvmovq rax, xmm0     ; extract d\n"
 			src += "\t\tmul rdi             ; save 4th future random index (rdx)\n\n"
 		# TODO: (stub) generate 4 ω ∈ [0, 1) for probabilistic branching (r10, r11, r12, r13)
 		src += "\t\t; generate 4 \\omega \\in [0, 1) for probabilistic branching (ymm11)\n"
-		src += "\t\t_vxoshiro256ss ymm11, ymm12, ymm13, ymm14, ymm15, ymm10  ; (vectorized) uint64\n"
-		src += "\t\tvpsrlq ymm11, ymm1, 12                                   ; (vectorized) \\omega + 1 \\in [1, 2) \n"
-		src += "\t\tvbroadcastsd ymm10, qword ptr ONE\n"
-		src += "\t\tvsubpd ymm11, ymm11, ymm10                               ; (vectorized) \\omega \\in [0, 1)\n"
-		src += "\t\t_vln ymm11, ymm11, ymm7, ymm8, ymm9, ymm10, xmm10, rax   ; (vectorized) ln(\\omega) \\in [-inf, 0)\n\n"
+		src += "\t\t_vxoshiro256ss ymm11, ymm12, ymm13, ymm14, ymm15, ymm10       ; (vectorized) uint64\n"
+		src += "\t\tvbroadcastsd ymm9, qword ptr ONE\n"
+		src += "\t\t_vomega ymm11, ymm11, ymm9                                    ; (vectorized) \\omega \\in [0, 1)\n"
+		src += "\t\t_vln ymm11, ymm11, ymm9, ymm7, ymm8, ymm9, ymm10, xmm10, rax  ; (vectorized) ln(\\omega) \\in [-inf, 0)\n\n"
 		# TODO: (stub) pick uniformally random new state for the node
 		src += "\t\t; pick uniformally random new state for the node\n"
 		src += "\t\t_vputj xmm1, rax  ; TODO: (stub) new spin, s'=-J\n"

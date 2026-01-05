@@ -100,8 +100,7 @@ if __name__ == "__main__":
 	src += "\n"
 
 	src += "EXP_BIAS dq -1023\n"
-	src += "LN_2 dq 0.69314718055994530942\n"
-	src += "EXP_0 dq 3FF0000000000000h  ; boased exp. 2^0 for doubles in [1, 2)\n\n"
+	src += "LN_2 dq 0.69314718055994530942\n\n"
 	src += "SLN1 SEGMENT ALIGN(32)\n"
 	src += "VPERMD_INDICES dd 0,2, 4,6, 0,0, 0,0\n"
 	src += "SLN1 ENDS\n\n"
@@ -114,9 +113,11 @@ if __name__ == "__main__":
 	src += ";\t1. All doubles in src are not negative, dednormalized, infinite, nor NaN\n"
 	src += ";\t2. temp1, temp2, temp3, temp4 must not overlap with each other, dest, nor src.\n"
 	src += ";\t3. dest and src can overlap.\n"
+	src += ";\t4. ones is exactly (YMMn) [1.0, 1.0, 1.0, 1.0]\n"
+	src += ";\t5. ones can overlap with temp2 or temp3, but NOT temp1 nor temp4.\n"
 	src += "; POSTCONDITIONS:\n"
 	src += ";\t1. All temps cobbered!\n"
-	src += "_vln MACRO dest, src, temp1, temp2, temp3, temp4Y, temp4X, tempG\n"
+	src += "_vln MACRO dest, src, ones, temp1, temp2, temp3, temp4Y, temp4X, tempG\n"
 
 	src += "\t; src[i] -> 0|xxx xxxx xxxx|mmmm mmmm mmmm ...\n"
 	src += "\t;  sign bit ^|^^ exponent ^|^^ mantissa ^^ ...\n"
@@ -138,8 +139,7 @@ if __name__ == "__main__":
 
 	src += "\t; dest: m \\in [1, 2)\n"
 	src += "\tvpsrlq dest, dest, 12  ; move mantissa back in place\n"
-	src += "\tvbroadcastsd temp3, EXP_0\n"
-	src += "\tvpor dest, dest, temp3  ; set exponent to 2^0\n\n"
+	src += "\tvpor dest, dest, ones  ; set exponent to 2^0\n\n"
 
 	src += "\t; temp2: calculate residual, r = m/a - 1.0 = (m - a)/a\n"
 	src += "\tlea rax, a_table\n"
