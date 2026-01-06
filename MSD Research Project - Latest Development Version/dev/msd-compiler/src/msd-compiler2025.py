@@ -617,7 +617,7 @@ class Model:
 			src += f"dq deltaU_{self.nodeId(node)}  ; nodes[{self.nodeIndex[node]}]\n"
 		src += "\n"
 
-		# getkT array (function pointers):
+		# kTref array (kT pointers, i.e. double *):
 		src += "; array of kT pointers (double *) parallel to (mutable) nodes\n"
 		src += "kTref\t"
 		if len(self.mutableNodes) == 0:
@@ -1006,28 +1006,45 @@ class Model:
 			src += "\t\t_vpermj ymm0, ymm0  ; [d, c, b, a]\n"
 			src += "\t\tvmovq rax, xmm0     ; extract d\n"
 			src += "\t\tmul rdi             ; save 4th future random index (rdx)\n\n"
-		# TODO: (stub) generate 4 ω ∈ [0, 1) for probabilistic branching (r10, r11, r12, r13)
+		# generate 4 ω ∈ [0, 1) for probabilistic branching (ymm11)
 		src += "\t\t; generate 4 \\omega \\in [0, 1) for probabilistic branching (ymm11)\n"
 		src += "\t\t_vxoshiro256ss ymm11, ymm12, ymm13, ymm14, ymm15, ymm10       ; (vectorized) uint64\n"
 		src += "\t\tvbroadcastsd ymm6, qword ptr ONE\n"
 		src += "\t\t_vomega ymm11, ymm11, ymm6                                    ; (vectorized) \\omega \\in [0, 1)\n"
 		src += "\t\t_vln ymm11, ymm11, ymm6, ymm7, ymm8, ymm9, ymm10, xmm10, rax  ; (vectorized) ln(\\omega) \\in [-inf, 0)\n\n"
-		# TODO: (stub) pick uniformally random new state for the node
-		src += "\t\t; pick uniformally random new state for the node\n"
+		# pick uniformally random new state for the node
+		src += "\t\t; pick uniformally random new state for the node (Marsaglia's method)\n"
+		src += "\t\tMARSAGIA_START:\n"
 		if prng.startswith("xoshiro256"):  # TODO: support other PRNGs
 			macro = prng.replace("*", "s").replace("+", "p")
-			src += f"\t\t_v{macro} ymm0, ymm12, ymm13, ymm14, ymm15, ymm10\n"
-			src += "\t\t; assert ymm6 == [1.0, 1.0, 1.0, 1.0]\n"
-			src += "\t\t_vomega ymm0, ymm0, ymm6  ; [0, 1)\n"
-			src += "\t\tvaddpd ymm0, ymm0, ymm0   ; mul by 2 -> [0, 2)\n"
-			src += "\t\tvsubpd ymm0, ymm0, ymm6   ; sub by 1 -> [-1, 1); w = [u_1, v_1, u_2, v_2]\n"
-			src += "\t\t; TODO: compute s = [s_1, s_1, s_2, s_2]             where s_i = (u_i)^2 + (v_i)^2\n"
-			src += "\t\t; TODO: compute     [x_1, y_1, x_2, y_2] = 2w sqrt{1-s} -> x_i = 2u_i sqrt{1-s_i}\n"
-			src += "\t\t; TODO: compute z = [z_1, z_1, z_2, z_2] = 1 - 2s       -> z_i = 1-2s_i\n"
-			src += "\t\t; TODO: permute so ymm0 = [x_1, y_1, z_1, 0] and ymm1 = [x_2, y_2, z_2, 0]\n\n"
-		src += "\t\t_vputj xmm1, rax  ; TODO: (stub) new spin, s'=-J\n"
-		src += "\t\t_vneg ymm1, ymm1, ymm2\n"
-		src += "\t\t_vput0 ymm2  ; TODO: (stub) new flux, f'=0\n\n"
+			src += f"\t\t\t_v{macro} ymm0, ymm12, ymm13, ymm14, ymm15, ymm10\n"
+			src += "\t\t\t; assert ymm6 == [1.0, 1.0, 1.0, 1.0]\n"
+			src += "\t\t\t_vomega ymm0, ymm0, ymm6  ; [0, 1)\n"
+		src += "\t\t\tvaddpd ymm0, ymm0, ymm0   ; mul by 2 -> [0, 2)\n"
+		src += "\t\t\tvsubpd ymm0, ymm0, ymm6   ; sub by 1 -> [-1, 1); w = [u_1, v_1, u_2, v_2]\n"
+		src += "\t\t\tvmulpd ymm1, ymm0, ymm0   ; Hadamard product: [u_1^2, v_1^2, ...]\n"
+		src += "\t\t\tvhaddpd ymm1, ymm1, ymm1  ; Radius squared: [s_1, s_1, s_2, s_2] where s_i = u_i^2 + v_i^2\n"
+		src += "\t\t\tvcmppd ymm3, ymm1, ymm6, 11h  ; ymm1 < ymm6\n"
+		src += "\t\t\tvaddpd ymm0, ymm0, ymm0   ; 2w\n"
+		src += "\t\t\tvsubpd ymm2, ymm6, ymm1   ; 1 - s\n"
+		src += "\t\t\t_vsqrt ymm2 ; TODO: stub\n"
+		src += "\t\t\tvmulpd ymm0, ymm0, ymm2   ; 2w * sqrt(1 - s) = [x_1, y_1, x_2, y_2] -> x_i = 2u_i * sqrt(1-s_i) and y_i = 2v_i * sqrt(1-s)\n"
+		src += "\t\t\tvaddpd ymm2, ymm1, ymm1   ; 2s\n"
+		src += "\t\t\tvsubpd ymm2, ymm6, ymm1   ; 1 - 2s = [z_1, z_1, z_2, z_2] -> z_i = 1 - 2s_i\n"
+		src += "\t\t\tvpox ymm1, ymm1, ymm1     ; [0, 0, 0, 0]\n"
+		src += "\t\t\tvblendpd ymm2, ymm2, ymm1, 1010b  ; [z_1, 0, z_2, 0]\n"
+		if "F" in self.allKeys:
+			pass  # TODO
+		else:  # no flux. only need s'
+			src += "\t\t\tvmovmskpd rax, ymm3  ; rax = 0...bbaa where a = (s_1 < 1.0) and b = (s_2 < 1.0)\n"
+			src += "\t\t\tS1:\ttest rax, 0001b                   ; test bit (a)\n"
+			src += "\t\t\t\tjz S2                             ; !a -> s_1 >= 1.0\n"
+			src += "\t\t\t\tvperm2f128 ymm0, ymm0, ymm2, 20h  ; [x_1, y_1, z_1, 0] = s'\n"
+			src += "\t\t\t\tjmp MARSAGLIA_END\n"
+			src += "\t\t\tS2:\ttest rax, 0100b                   ; test bit (b)\n"
+			src += "\t\t\t\tjz MARSAGLIA_START                ; !b -> s_2 >= 1.0\n"
+			src += "\t\t\t\tvperm2f128 ymm0, ymm0, ymm2, 31h  ; [x_2, y_2, z_2, 0] = s'\n"
+		src += "\t\tMARSAGLIA_END:\n\n"
 		# compute -deltaU for the  state change
 		src += "\t\t; compute -deltaU for the proposed state change\n"
 		src += "\t\tlea rax, deltaU         ; pointer to array of function pointers\n"
@@ -1236,7 +1253,7 @@ def example_1d():
 	msd.edges += [(2, 4)]
 	msd.globalParameters = {
 		"S": 1.0,
-		"F": 0.5,
+		# "F": 0.5,
 		"kT": 0.1,
 		"B": (0.1, 0, 0),
 		"J": 1.0
@@ -1248,7 +1265,7 @@ def example_1d():
 	}
 	msd.regionNodeParameters = {
 		"FML": { "A": (0.0, 0.0, 0.2) },
-		"mol": { "Je0": 3.0 },
+		# "mol": { "Je0": 3.0 },
 		"FMR": { "A": (0.0, 0.0, -0.2) }
 	}
 	msd.regionEdgeParameters = {

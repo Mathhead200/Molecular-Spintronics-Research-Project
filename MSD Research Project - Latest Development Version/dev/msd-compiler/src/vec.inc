@@ -12,12 +12,12 @@ ENDM
 _vpermk MACRO dest, src
 	; vperm2f128 dest, src0, src1, (imm8) ctrl
 	; Explaination of 4th arg., "ctrl": 0b00HH00LL
-	;	Think of the source as having 4 128-bit possabilities:
+	;	Think of the (combined) source as having 4 128-bit possibilities:
 	;		[src0.low, src0.high, src1.low, src1.high]
 	;	"HH" selects one of these sources to be copied into dest.high, and
 	;	"LL" selects one of these sources to be copied into dest.low 
 	; e.g.
-	;	vperm2f128 ymm0, ymm1 = (a,b,c,d), ymm2 = (x,y,z,w), 0x12
+	;	vperm2f128 ymm0, ymm1 = (a,b,c,d), ymm2 = (x,y,z,w), 12h
 	;	sources = [
 	;		ymm1.low = (a,b),
 	;		ymm1.high = (c,d),
