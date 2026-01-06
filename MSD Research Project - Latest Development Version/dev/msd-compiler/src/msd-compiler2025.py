@@ -991,7 +991,7 @@ class Model:
 		src += "\t\t; select 4 random indices for mutable nodes (rsi, r8, r9, rdx)\n"
 		if prng.startswith("xoshiro256"):  # TODO: support other PRNGs
 			macro = prng.replace("*", "s").replace("+", "p")
-			src += f"\t\t_v{macro} ymm0, ymm12, ymm13, ymm14, ymm15, ymm11  ; [a, b, c, d]\n"
+			src += f"\t\t_v{macro} ymm0, ymm12, ymm13, ymm14, ymm15, ymm10  ; [a, b, c, d]\n"
 			src += "\t\tvmovq rax, xmm0     ; extract a\n"
 			src += "\t\tmul rdi             ; rdx:rax = rax * rdi = random * NODE_COUNT\n"
 			src += "\t\tmov rsi, rdx        ; save 1st future random index (rsi)\n"
@@ -1009,11 +1009,22 @@ class Model:
 		# TODO: (stub) generate 4 ω ∈ [0, 1) for probabilistic branching (r10, r11, r12, r13)
 		src += "\t\t; generate 4 \\omega \\in [0, 1) for probabilistic branching (ymm11)\n"
 		src += "\t\t_vxoshiro256ss ymm11, ymm12, ymm13, ymm14, ymm15, ymm10       ; (vectorized) uint64\n"
-		src += "\t\tvbroadcastsd ymm9, qword ptr ONE\n"
-		src += "\t\t_vomega ymm11, ymm11, ymm9                                    ; (vectorized) \\omega \\in [0, 1)\n"
-		src += "\t\t_vln ymm11, ymm11, ymm9, ymm7, ymm8, ymm9, ymm10, xmm10, rax  ; (vectorized) ln(\\omega) \\in [-inf, 0)\n\n"
+		src += "\t\tvbroadcastsd ymm6, qword ptr ONE\n"
+		src += "\t\t_vomega ymm11, ymm11, ymm6                                    ; (vectorized) \\omega \\in [0, 1)\n"
+		src += "\t\t_vln ymm11, ymm11, ymm6, ymm7, ymm8, ymm9, ymm10, xmm10, rax  ; (vectorized) ln(\\omega) \\in [-inf, 0)\n\n"
 		# TODO: (stub) pick uniformally random new state for the node
 		src += "\t\t; pick uniformally random new state for the node\n"
+		if prng.startswith("xoshiro256"):  # TODO: support other PRNGs
+			macro = prng.replace("*", "s").replace("+", "p")
+			src += f"\t\t_v{macro} ymm0, ymm12, ymm13, ymm14, ymm15, ymm10\n"
+			src += "\t\t; assert ymm6 == [1.0, 1.0, 1.0, 1.0]\n"
+			src += "\t\t_vomega ymm0, ymm0, ymm6  ; [0, 1)\n"
+			src += "\t\tvaddpd ymm0, ymm0, ymm0   ; mul by 2 -> [0, 2)\n"
+			src += "\t\tvsubpd ymm0, ymm0, ymm6   ; sub by 1 -> [-1, 1); w = [u_1, v_1, u_2, v_2]\n"
+			src += "\t\t; TODO: compute s = [s_1, s_1, s_2, s_2]             where s_i = (u_i)^2 + (v_i)^2\n"
+			src += "\t\t; TODO: compute     [x_1, y_1, x_2, y_2] = 2w sqrt{1-s} -> x_i = 2u_i sqrt{1-s_i}\n"
+			src += "\t\t; TODO: compute z = [z_1, z_1, z_2, z_2] = 1 - 2s       -> z_i = 1-2s_i\n"
+			src += "\t\t; TODO: permute so ymm0 = [x_1, y_1, z_1, 0] and ymm1 = [x_2, y_2, z_2, 0]\n\n"
 		src += "\t\t_vputj xmm1, rax  ; TODO: (stub) new spin, s'=-J\n"
 		src += "\t\t_vneg ymm1, ymm1, ymm2\n"
 		src += "\t\t_vput0 ymm2  ; TODO: (stub) new flux, f'=0\n\n"
