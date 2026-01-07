@@ -310,6 +310,34 @@ class Model:
 		if node == edge[1]:
 			return (edge[0], -1)
 		return (None, None)
+
+	def getNodeConst(self, node, k: str) -> float:
+		"""	If parameter k is a const, return its value for the given node.
+			Returns None if k isn't defined or if k isn't constant.
+		"""
+		if k not in self.constParameters:
+			return None
+		v = self.localNodeParameters[node].get(k, None)
+		if v is not None:
+			return v
+		v, _ = self.getUnambiguousRegionNodeParameter(node, k)
+		if v is not None:
+			return v
+		return self.globalParameters.get(k, None)
+
+	def getEdgeConst(self, edge, k: str) -> float:
+		"""	If parameter k is a const, return its value for the given edge.
+			Returns None if k isn't defined or if k isn't constant.
+		"""
+		if k not in self.constParameters:
+			return None
+		v = self.localEdgeParameters[edge].get(k, None)
+		if v is not None:
+			return v
+		v, _ = self.getUnambiguousRegionEdgeParameter(edge, k)
+		if v is not None:
+			return v
+		return self.globalParameters.get(k, None)
 	
 	def compile(self, out_path: str):
 		# Check for and fix missing required attributes;
@@ -324,6 +352,7 @@ class Model:
 		if "globalParameters"     not in self.__dict__:  self.globalParameters = {}
 		if "variableParameters"   not in self.__dict__:  self.variableParameters = set()
 		if "programParameters"    not in self.__dict__:  self.programParameters = {}
+		if "constParameters"      not in self.__dict__:  self.constParameters = set()
 
 		if "prng" not in self.programParameters:
 			self.programParameters["prng"] = "xoshiro256**"
@@ -616,6 +645,34 @@ class Model:
 				src += "\t\t"  # ASM formating: first struct must be on same line as symbol (i.e. "dU")
 			src += f"dq deltaU_{self.nodeId(node)}  ; nodes[{self.nodeIndex[node]}]\n"
 		src += "\n"
+
+		def node_ref_array(k, v=1.0):
+			""" Generate .data array of pointers to some node field, k, for each mutable node. """
+			src += f"; array of {k} pointers (double *) parallel to (mutable) nodes\n"
+			src += f"{k}ref\t"
+			if len(self.mutableNodes) == 0:
+				src += "; 0 byte array. no mutable nodes.\n"
+			for i, node in enumerate(self.mutableNodes):
+				if i != 0:  # loop index, not node index.
+					src += "\t\t"  # ASM formating: first struct must be on same line as symbol (i.e. "dU")
+				idx = self.nodeIndex[node]
+				if k in self.localNodeParameters.get(node, {}):
+					src += f"dq nodes + SIZEOF_NODE*{idx} + OFFSETOF_{k}  ; nodes[{idx}] -> &nodes[{idx}].{k} (local)\n"
+				else:
+					_, region = self.getUnambiguousRegionNodeParameter(node, k)  # we don't need value, only region
+					if region is not None:
+						rid = self.regionId(region)
+						src += f"dq {rid} + OFFSETOF_{k}  ; nodes[{idx}] -> &{rid}.{k} (region)\n"
+					elif k in self.globalKeys:
+						src += f"dq {k}  ; nodes[{idx}] -> &{k} (global)\n"
+					else:
+						raise ValueError(f"For mutable node {self.nodeId(node)}, {k} is not defined at any level. Potential fix: model.globalParameters[\"{k}\"] = {v}")
+			src += "\n"
+		
+		node_ref_array("kT", 0.1)
+		node_ref_array("S")
+		if "F" in self.allKeys:
+			node_ref_array("F")
 
 		# kTref array (kT pointers, i.e. double *):
 		src += "; array of kT pointers (double *) parallel to (mutable) nodes\n"
@@ -1069,7 +1126,9 @@ class Model:
 		src += f"\t\t\t\tvperm2f128 {wxys}, {wxys}, {zmsk}, 31h  ; [x_2, y_2, z_2, 0] = s'\n"
 		src += "\t\tMARSAGLIA_END:\n"
 		# scale by S and F
-		src += "\t\t; TODO: scale vectors by S and F?\n\n"  # TODO ...
+		# TODO: (optimization) skip for S=1.0 and/or F=1.0 (Note: S, F >= 0)
+		# TODO: load Sref -> broadcast S -> vmulpd
+		# TODO: load Fref -> broadcast F -> vmulpd
 		# compute -deltaU for the  state change
 		src += "\t\t; compute -deltaU for the proposed state change\n"
 		src += "\t\tlea rax, deltaU         ; pointer to array of function pointers\n"
