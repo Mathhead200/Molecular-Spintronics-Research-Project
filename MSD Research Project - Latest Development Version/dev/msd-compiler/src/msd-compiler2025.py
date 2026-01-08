@@ -441,6 +441,7 @@ class Model:
 		src += f"NODE_COUNT           EQU {len(self.nodes)}\n\n"
 		# define memeory for nodes
 		src += "NODES SEGMENT ALIGN(32)  ; AVX-256 (i.e. 32-byte) alignment\n"
+		src += "PUBLIC nodes\n"
 		src += "nodes\t"
 		for i, node in enumerate([*self.mutableNodes, *self.immutableNodes]):
 			self.nodeIndex[node] = i  # store map: node -> array index
@@ -1232,40 +1233,70 @@ class Model:
 		src += "\tret\n"
 		src += "metropolis ENDP\n\n"
 
-		# TODO: (DEBUG) test main
-		src += "PUBLIC main\n"
-		src += "main PROC\n"
-		src += f"\t; seed PRNG ({prng})\n"
+		# seed PROC
+		src += "; Seeds (or reseeds) the PRNG using rdseed if availbe, otherwise rdtscp."
+		src += "; @param (void)\n"
+		src += "; @return (void)\n"
+		src += "PUBLIC seed\n"
+		src += "seed PROC\n"
+		if prng.startswith("xoshiro256"):  # TODO: support other PRNGs
+			# use hardware entropy for initial seed
+			cores = os.cpu_count()
+			rot = ceil(log2(cores))
+			src += "\trdseed rcx   ; try hardware entropy\n"
+			src += "\tjc TSC_END   ; skip timestamp counter (TSC) method on success\n"
+			src += "\trdtscp       ; sets edx:eax (TSC) and ecx (processor core). high bits 0ed.\n"
+			src += "\tshl rdx, 32  ; reconstruct 64-bit TSC in rax\n"
+			src += "\tor rax, rdx\n"
+			if rot % 64 == 0:
+				src += ";"  # skip rotate right if it would have no effect
+			src += f"\tror rcx, {rot}   ; rotate small number to highest order bits (CPU cores = {cores})\n"
+			src += "\txor rcx, rax\n"
+			src += "\tTSC_END:     ; initial seed is now in rcx. Now SplitMix64.\n"
+			for j in range(4):  # column-major b.c. each column represents an independent PRNG channel
+				for i in range(4):
+					src += "\t_splitmix64 rax, rcx, rdx\n"
+					src += f"\tmov qword ptr [prng_state + ({i})*32 + ({j})*8], rax\n"
+		src += "\tret\n"
+		src += "seed ENDP\n\n"
+
+		# DLL main (for (un)initialization) -- bypass CRT
+		src += "; Windows DLL main (for (un)initialization)\n"
+		src += "; @param (rcx) hinstDLL\n"
+		src += "; @param (rdx) fwdReason: enum 1, 2, 3, or 4\n"
+		src += "; @param (r8) lpvReserved\n"
+		src += "; @return (rax) bool: success or failure\n"
+		src += "PUBLIC DllMain\n"
+		src += "DllMain PROC\n"
+		src += "\tcmp rdx, 1\n"
+		src += "\tje DLL_PROCESS_ATTACH\n"
+		src += "\tcmp rdx, 2\n"
+		src += "\tje DLL_THREAD_ATTACH\n"
+		src += "\tcmp rdx, 3\n"
+		src += "\tje DLL_THREAD_DETACH\n"
+		src += "\tcmp rdx, 4\n"
+		src += "\tje DLL_PROCESS_DETACH\n"
+		src += "\txor rax, rax  ; return false (This should never happen!)\n"
+		src += "\tret\n\n"
+		src += "\tDLL_PROCESS_ATTACH:\n"
+		src += f"\t\t; seed PRNG ({prng})\n"
 		if prng.startswith("xoshiro256"):  # TODO: support other PRNGs
 			if seed is None or len(seed) == 0:
-				# use hardware entropy for initial seed
-				cores = os.cpu_count()
-				rot = ceil(log2(cores))
-				src += "\trdseed rcx   ; try hardware entropy\n"
-				src += "\tjc TSC_END   ; skip timestamp counter (TSC) method on success\n"
-				src += "\trdtscp       ; sets edx:eax (TSC) and ecx (processor core). high bits 0ed.\n"
-				src += "\tshl rdx, 32  ; reconstruct 64-bit TSC in rax\n"
-				src += "\tor rax, rdx\n"
-				if rot % 64 == 0:
-					src += ";"  # skip rotate right if it would have no effect
-				src += f"\tror rcx, {rot}   ; rotate small number to highest order bits (CPU cores = {cores})\n"
-				src += "\txor rcx, rax\n"
-				src += "\tTSC_END:     ; initial seed is now in rcx. Now SplitMix64.\n"
-				for j in range(4):  # column-major b.c. each column represents an independent PRNG channel
-					for i in range(4):
-						src += "\t_splitmix64 rax, rcx, rdx\n"
-						src += f"\tmov qword ptr [prng_state + ({i})*32 + ({j})*8], rax\n"
-				src += "\n"
+				src += "\t\tcall seed\n\n"
 			else:
-				src += "\t; (skip) seed was given and was expanded at compile time.\n\n"
-		src += "\tmov rcx, 7   ; number of iterations\n"
-		src += "\tsub rsp, 40  ; reserve shadow space\n"
-		src += "\tcall metropolis\n"
-		src += "\tadd rsp, 40  ; free shadow space\n"
-		src += "\t_dumpreg\n\n"  # DEBUG
-		src += "\txor rax, rax  ; return 0\n"
+				src += "\t\t; (skip) seed was given and was expanded at compile time.\n\n"
+		# src += "\tmov rcx, 7   ; number of iterations\n"
+		# src += "\tsub rsp, 40  ; reserve shadow space\n"
+		# src += "\tcall metropolis\n"
+		# src += "\tadd rsp, 40  ; free shadow space\n"
+		# src += "\t_dumpreg\n\n"  # DEBUG
+		# src += "\txor rax, rax  ; return 0\n"
+		src += "\tDLL_THREAD_ATTACH:   ; do nothing\n"
+		src += "\tDLL_THREAD_DETACH:   ; do nothing\n"
+		src += "\tDLL_PROCESS_DETACH:  ; do nothing\n\n"
+		src += "\tmov rax, 1  ; return true\n"
 		src += "\tret\n"
-		src += "main ENDP\n\n"
+		src += "DllMain ENDP\n\n"
 
 		# ---------------------------------------------------------------------
 		src += "END"  # absolute end of ASM file
