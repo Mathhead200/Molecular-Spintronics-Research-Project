@@ -70,6 +70,9 @@ class _Model(Generic[Index, Region], TypedDict, total=False):
 def floats(values: Iterable) -> tuple[float]:
 	return (float(x) for x in values)
 
+def is_pow2(n: int) -> bool:
+	return n > 0 and (n & (n - 1)) == 0
+
 class Model:
 	def __init__(self, **kw):
 		self.__dict__ = _Model(*kw)
@@ -89,6 +92,7 @@ class Model:
 		self.edgeIndex: dict = None       # map: (Edge) -> (int) index in ASM edges array
 		self.regionCombos: list[tuple] = None  # list[Edge] containing all region combos of 1 or 2 regions. Counter-part to self.regions, but for edges.
 		self.constParameters: set[str] = None  # set[str in NodeAndEdgeParameters.keys()] which will not change durring runtime leading to optimizations
+		self.SIZEOF_NODE = None
 
 	def __repr__(self) -> str:
 		return str(self.__dict__)
@@ -430,6 +434,7 @@ class Model:
 			if "kT" in self.localNodeKeys:   src += f"OFFSETOF_kT   EQU 32*({offset32}) + 8*(2)\n"
 			if "Je0" in self.localNodeKeys:  src += f"OFFSETOF_Je0  EQU 32*({offset32}) + 8*(3)\n"
 			offset32 += 1
+		self.SIZEOF_NODE = 32 * offset32  # save
 		src += f"SIZEOF_NODE   EQU 32*({offset32})\n"
 		src += f"MUTABLE_NODE_COUNT   EQU {len(self.mutableNodes)}\n"
 		src += f"IMMUTABLE_NODE_COUNT EQU {len(self.immutableNodes)}\n"
@@ -1009,14 +1014,16 @@ class Model:
 		src += "metropolis PROC\n"
 		src += "\t; *rax: scratch reg.; *rax - scratch reg.\n"
 		src += "\t;  rcx: loop counter\n"
-		src += "\t;  rdx: index[3]\n"
-		src += "\t;  rbx: constant (double) 2^-53\n"
-		src += "\t;  rsp: \n"
-		src += "\t;  rbp: \n"
-		src += "\t;  rsi: index[0]\n"
-		src += "\t;  rdi: MUTABLE_NODE_COUNT\n"
-		src += "\t;  r8:  index[1]\n"
-		src += "\t;  r9:  index[2]\n"
+		src += "\t;  rdx: index[3] (or index[2] in TAIL)\n"
+		src += "\t;  rbx: \n"
+		src += "\t;  rsp: (stack pointer)\n"
+		src += "\t;  rbp: (base pointer)\n"
+		src += "\t;  rsi: \n"
+		src += "\t;  rdi: \n"
+		src += "\t;  r8:  index[0]\n"
+		src += "\t;  r9:  index[1]\n"
+		src += "\t;  r10: index[2]\n"
+		src += "\t;  r11: MUTABLE_NODE_COUNT\n"
 		src += "\t;  ... \n"
 		src += "\t;  ymm0: -\\DeltaU\n"
 		src += "\t;  ymm1: new spin, s'\n"
@@ -1026,26 +1033,31 @@ class Model:
 		src += "\t;  ymm12: vectorized PNRG state[0]\n"
 		src += "\t;  ymm13: vectorized PRNG state[1]\n"
 		src += "\t;  ymm14: vectorized PRNG state[2]\n"
-		src += "\t;  ymm15: vectorized PRNG state[3]\n"
-		# src += "\t; preamble. needed if using local variables (i.e. stack meory)\n"
-		# src += "\tpush rbp\n"
-		# src += "\tmov rbp, rsp\n\n"
+		src += "\t;  ymm15: vectorized PRNG state[3]\n\n"
+		# preamble
+		src += "\t;preamble: save non-volitile registers\n"
+		src += "\tpush rbp\n"
+		src += "\tmov rbp, rsp\n"
+		src += "\tsub rsp, (10)*16 + 8  ; space for the 10 non-volitile XMM6-15 reg. +8 for alignment\n"
+		for i in range(10):  # XMM6-15
+			src += f"\tvmovdqu xmmword ptr [rbp - ({i+1})*16], xmm{6+i}\n"
+		src += "\n"
+		# load PRNG state, and other constants
 		if prng.startswith("xoshiro256"):  # TODO: support other PRNGs
-			src += f"\t; load vectorized PRNG ({prng}) state into YMM12, YMM13, YMM14, YMM15\n"
+			src += f"\t; load vectorized PRNG ({prng}) state into YMM12, YMM13, YMM14, YMM15; and load other constants\n"
 			src += "\tvmovdqa ymm12, ymmword ptr [prng_state + (0)*32]\n"
 			src += "\tvmovdqa ymm13, ymmword ptr [prng_state + (1)*32]\n"
 			src += "\tvmovdqa ymm14, ymmword ptr [prng_state + (2)*32]\n"
 			src += "\tvmovdqa ymm15, ymmword ptr [prng_state + (3)*32]\n"
-		src += "\tmov rdi, MUTABLE_NODE_COUNT ; load mutable nodes array size\n"
-		src += "\tmov rbx, 3CB0000000000000h  ; load constant (double) 2^-53\n"
+		src += "\tmov r11, MUTABLE_NODE_COUNT ; load mutable nodes array size\n"
 		for batch4 in [True, False]:
 			if batch4:
-				regis = ["rsi", "r8", "r9", "rdx"]
+				regis = ["r8", "r9", "r10", "rdx"]
 				src += "\tLOOP_START:  ; process nodes in batchs of 4\n"
 				src += "\t\tcmp rcx, 4\n"
 				src += "\t\tjb LOOP_END  ; while ((unsigned) rcx >= 4)\n\n"
 			else:
-				regis = ["rsi", "r8", "rdx"]
+				regis = ["r8", "r9", "rdx"]
 				src += "\tTAIL_START:  ; Last 0-3 nodes\n"
 				src += "\t\tcmp rcx, 0\n"
 				src += "\t\tje TAIL_END\n\n"
@@ -1055,21 +1067,21 @@ class Model:
 				macro = prng.replace("*", "s").replace("+", "p")
 				src += f"\t\t_v{macro} ymm0, ymm12, ymm13, ymm14, ymm15, ymm10  ; [a, b, c, d]\n"
 				src += "\t\tvmovq rax, xmm0     ; extract a\n"
-				src += "\t\tmul rdi             ; rdx:rax = rax * rdi = random * NODE_COUNT\n"
-				src += "\t\tmov rsi, rdx        ; save 1st future random index (rsi)\n"
+				src += "\t\tmul r11             ; rdx:rax = rax * r11 = random * NODE_COUNT\n"
+				src += "\t\tmov r8, rdx         ; save 1st future random index (r8)\n"
 				src += "\t\t_vpermj ymm0, ymm0  ; [b, a, c, d]\n"
 				src += "\t\tvmovq rax, xmm0     ; extract b\n"
-				src += "\t\tmul rdi\n"
-				src += "\t\tmov r8, rdx         ; save 2nd future random index (r8)\n"
+				src += "\t\tmul r11\n"
+				src += "\t\tmov r9, rdx         ; save 2nd future random index (r9)\n"
 				src += "\t\t_vpermk ymm0, ymm0  ; [c, d, b, a]\n"
 				src += "\t\tvmovq rax, xmm0     ; extract c\n"
-				src += "\t\tmul rdi"
+				src += "\t\tmul r11"
 				if batch4:
 					src += "\n"
-					src += "\t\tmov r9, rdx         ; save 3rd future random index (r9)\n"
+					src += "\t\tmov r10, rdx        ; save 3rd future random index (r10)\n"
 					src += "\t\t_vpermj ymm0, ymm0  ; [d, c, b, a]\n"
 					src += "\t\tvmovq rax, xmm0     ; extract d\n"
-					src += "\t\tmul rdi             ; save 4th future random index (rdx)\n\n"
+					src += "\t\tmul r11             ; save 4th future random index (rdx)\n\n"
 				else:
 					src += "             ; save 3rd future random index (rdx)\n\n"
 			# generate 4 ω ∈ [0, 1) for probabilistic branching (ymm11)
@@ -1087,6 +1099,7 @@ class Model:
 				zmsk = "ymm3"  # comparision bit-mask -> [z_1, 0, z_2, 0]
 				s = "ymm4"  # [s_1, s_1, s_2, s_2] where s_i = (u_i)^2 + (v_i)^2
 				lbl_suffix = f"{regi.upper()}_{["TAIL", "BATCH4"][int(batch4)]}"
+				padl = " " * (len(regi) + 1 + 6 - len(lbl_suffix))
 				MARSAGLIA_START_2 = f"MARSAGLIA_START_2_{lbl_suffix}"
 				MARSAGLIA_START_1 = f"MARSAGLIA_START_1_{lbl_suffix}"
 				MARSAGLIA_END = f"MARSAGLIA_END_{lbl_suffix}"
@@ -1098,12 +1111,12 @@ class Model:
 				S1 = f"{S}{2*num+1}"
 				S2 = f"{S}{2*num+2}"
 				src += f"\t\t; pick uniformally random new state for node [{regi}] (Marsaglia's method)\n"
-				if regi == "rsi":
+				if regis.index(regi) == 0:
 					src += "\t\t                                          ; assert ymm6 == [1.0, 1.0, 1.0, 1.0]\n"
 				else:
 					src += "\t\t_vones ymm6                               ; [1.0, 1.0, 1.0, 1.0]\n"
 				if "F" in self.allKeys:
-					src += f"\t\t{MARSAGLIA_START_2}:             {pad}; 2 vectors, f' -> {flux}, s' -> {wxys}\n"
+					src += f"\t\t{MARSAGLIA_START_2}:             {pad}{padl}; 2 vectors, f' -> {flux}, s' -> {wxys}\n"
 					src += f"\t\t\t_gen_ws {wxys}, {s}, {one}, ymm10\n"
 					src += f"\t\t\tvcmppd {zmsk}, {s}, {one}, 11h          ; {s} < {one}\n"
 					src += f"\t\t\tvmovmskpd rax, {zmsk}                   ; rax = 0...bbaa where a = (s_1 < 1.0) and b = (s_2 < 1.0)\n"
@@ -1112,16 +1125,16 @@ class Model:
 					src += f"\t\t\t\t_calc_xyz {wxys}, {zmsk}, {s}, ymm6\n"
 					src += f"\t\t\t\tvperm2f128 {flux}, {wxys}, {zmsk}, 31h  ; [x_2, y_2, z_2, 0] = f'\n"
 					src += "\t\t\t\ttest rax, 0001b                   ; test bit (a)\n"
-					src += f"\t\t\t\tjz {MARSAGLIA_START_1}   {pad}; !a -> s_1 >= 1.0\n"
+					src += f"\t\t\t\tjz {MARSAGLIA_START_1}   {pad}{padl}; !a -> s_1 >= 1.0\n"
 					src += f"\t\t\t\tvperm2f128 {wxys}, {wxys}, {zmsk}, 20h  ; [x_1, y_1, z_1, 0] = s'\n"
 					src += f"\t\t\t\tjmp {MARSAGLIA_END}\n"
 					src += f"\t\t\t{F2}:\ttest rax, 0001b                   ; test bit (a)\n"
-					src += f"\t\t\t\tjz {MARSAGLIA_START_2}   {pad}; !a -> s_1 >= 1.0\n"
+					src += f"\t\t\t\tjz {MARSAGLIA_START_2}   {pad}{padl}; !a -> s_1 >= 1.0\n"
 					src += f"\t\t\t\t_calc_xyz {wxys}, {zmsk}, {s}, ymm6\n"
 					src += f"\t\t\t\tvperm2f128 {flux}, {wxys}, {zmsk}, 20h  ; [x_1, y_1, z_1, 0] -> f'\n"
 					src += f"\t\t\t\t; jmp {MARSAGLIA_START_1}\n"
 				# either no flux. or already haveflux. only need s'
-				src += f"\t\t{MARSAGLIA_START_1}:             {pad}; only 1 vector, s' -> {wxys}\n"
+				src += f"\t\t{MARSAGLIA_START_1}:             {pad}{padl}; only 1 vector, s' -> {wxys}\n"
 				src += f"\t\t\t_gen_ws {wxys}, {s}, ymm6, ymm10\n"
 				src += f"\t\t\tvcmppd {zmsk}, {s}, ymm6, 11h          ; {s} < ymm6\n"
 				src += f"\t\t\tvmovmskpd rax, {zmsk}                   ; rax = 0...bbaa where a = (s_1 < 1.0) and b = (s_2 < 1.0)\n"
@@ -1131,7 +1144,7 @@ class Model:
 				src += f"\t\t\t\tvperm2f128 {wxys}, {wxys}, {zmsk}, 20h  ; [x_1, y_1, z_1, 0] = s'\n"
 				src += f"\t\t\t\tjmp {MARSAGLIA_END}\n"
 				src += f"\t\t\t{S2}:\ttest rax, 0100b                   ; test bit (b)\n"
-				src += f"\t\t\t\tjz {MARSAGLIA_START_1}   {pad}; !b -> s_2 >= 1.0\n"
+				src += f"\t\t\t\tjz {MARSAGLIA_START_1}   {pad}{padl}; !b -> s_2 >= 1.0\n"
 				src += f"\t\t\t\t_calc_xyz {wxys}, {zmsk}, {s}, ymm6\n"
 				src += f"\t\t\t\tvperm2f128 {wxys}, {wxys}, {zmsk}, 31h  ; [x_2, y_2, z_2, 0] = s'\n"
 				src += f"\t\t{MARSAGLIA_END}:\n"
@@ -1155,35 +1168,45 @@ class Model:
 				src += "\t\tlea rax, deltaU         ; pointer to array of function pointers\n"
 				src += f"\t\tmov rax, [rax + {regi}*8]  {pad}; deltaU[{regi}], dereferenced to get the actual function pointer\n"
 				src += f"\t\tcall rax                ; args: ({wxys}, {flux}?) -> return xmm0\n\n"
-				# TODO: (stub) compute probability factor, ω < p = e^{-ΔU/kT} -> kT*ln(ω) < -ΔU
+				# compute probability factor, ω < p = e^{-ΔU/kT} -> kT*ln(ω) < -ΔU
 				ln_omegaX, ln_omegaY = "xmm11", "ymm11"
 				kT = s.replace("y", "x")
 				fact = coef.replace("y", "x")  # stores probability factor, kT*ln(ω)
 				src += f"\t\t; compute probability factor ({fact}), \\omega < p = e^(-deltaU/kT) -> kT*ln(\\omega) < -deltaU\n"
-				src += "\t\tlea rax, kTref                    ; double* -> rax\n"
+				src += "\t\tlea rax, kTref\n"
 				src += f"\t\tmov rax, qword ptr [rax + {regi}*8]  {pad}; double* -> rax\n"
 				src += f"\t\tvmovq {kT}, qword ptr [rax]       ; {kT} = [kT, ?, 0, 0]\n"
 				if regis.index(regi) == 0:
 					src += f"\t\tvmulsd {fact}, {ln_omegaX}, {kT}          ; kT * (scalar) [(a), b, c, d] = kT * a\n\n"
 				else:
 					if regis.index(regi) == 1:
-						src += f"\t\t_vpermj {ln_omegaY}                     ; [b, a, c, d]\n"
+						src += f"\t\t_vpermj {ln_omegaY}, {ln_omegaY}              ; [b, a, c, d]\n"
 						src += f"\t\tvmulsd {fact}, {ln_omegaX}, {kT}          ; kT * b\n\n"
 					elif regis.index(regi) == 2:
-						src += f"\t\t_vpermk {ln_omegaY}                     ; [c, d, b, a]\n"
+						src += f"\t\t_vpermk {ln_omegaY}, {ln_omegaY}              ; [c, d, b, a]\n"
 						src += f"\t\tvmulsd {fact}, {ln_omegaX}, {kT}          ; kT * c\n\n"
 					elif regis.index(regi) == 3:
-						src += f"\t\t_vpermj {ln_omegaY}                     ; [d, c, b, a]\n"
+						src += f"\t\t_vpermj {ln_omegaY}, {ln_omegaY}              ; [d, c, b, a]\n"
 						src += f"\t\tvmulsd {fact}, {ln_omegaX}, {kT}          ; kT * d\n\n"
-				# TODO: (stub) (maybe) change the node's state
+				# (maybe) change the node's state
+				spin = spin
+				flux = flux
 				SKIP = f"SKIP_{regi.upper()}_{["TAIL", "BATCH4"][int(batch4)]}"
 				src += "\t\t; (maybe) change the node's state\n"
 				src += f"\t\tvucomisd {fact}, xmm0  ; compare {fact} - xmm0\n"
-				src += f"\t\tjnb SKIP_{SKIP}        {pad}; kT * ln(\\omega) >= -deltaU\n"
-				src += "\t\t; TODO: ...\n"  # TODO: do node update
-				src += f"\t\t{SKIP}:\n"
+				src += f"\t\tjae {SKIP}  {pad}; kT * ln(\\omega) >= -deltaU\n"
+				src += "\t\tlea rax, nodes\n"
+				if is_pow2(self.SIZEOF_NODE):
+					src += f"\t\tshl {regi}, {self.SIZEOF_NODE.bit_length() - 1}  ; mul SIZEOF_NODE ({self.SIZEOF_NODE})\n"
+				else:
+					src += f"\t\timul {regi}, SIZEOF_NODE\n"
+				src += f"\t\tvmovapd [rax + {regi} + OFFSETOF_SPIN], {spin} {pad}; update s' -> spin\n"
+				if "F" in self.allKeys:
+					src += f"\t\tvmovapd [rax + {regi} + OFFSETOF_FLUX], {flux}  {pad}; update f' -> flux\n"
+				src += f"\t\t{SKIP}:\n\n"
 				# TODO?: parameter modification(s); e.g. global.B -= dB
 				# ...
+				src += "\t\t_dumpreg\n"  # DEBUG
 				if not batch4 and regi != "rdx":
 					src += "\t\t; done?\n"
 					src += "\t\tdec rcx\n"
@@ -1194,12 +1217,18 @@ class Model:
 				src += "\tLOOP_END:\n\n"
 			else:
 				src += "\tTAIL_END:\n\n"
+		# save PRNG state
 		src += "\t; save PRNG state\n"
 		src += "\tvmovdqa ymmword ptr [prng_state + (0)*32], ymm12\n"
 		src += "\tvmovdqa ymmword ptr [prng_state + (1)*32], ymm13\n"
 		src += "\tvmovdqa ymmword ptr [prng_state + (2)*32], ymm14\n"
-		src += "\tvmovdqa ymmword ptr [prng_state + (3)*32], ymm15\n"
-		# src += "pop rbp\n"
+		src += "\tvmovdqa ymmword ptr [prng_state + (3)*32], ymm15\n\n"
+		# epilogue
+		src += "\t; epilogue: restore non-volitile registers\n"
+		for i in range(10):  # XMM6-15
+			src += f"\tvmovdqu xmm{6+i}, xmmword ptr [rbp - ({i+1})*16]\n"
+		src += "\tadd rsp, (10)*16 + 8  ; space for the 10 non-volitile XMM6-15 reg. +8 for alignment\n"
+		src += "\tpop rbp\n"
 		src += "\tret\n"
 		src += "metropolis ENDP\n\n"
 
@@ -1229,8 +1258,11 @@ class Model:
 				src += "\n"
 			else:
 				src += "\t; (skip) seed was given and was expanded at compile time.\n\n"
-		src += "\tmov rcx, 1     ; number of iterations\n"
-		src += "\tcall metropolis\n\n"
+		src += "\tmov rcx, 7   ; number of iterations\n"
+		src += "\tsub rsp, 40  ; reserve shadow space\n"
+		src += "\tcall metropolis\n"
+		src += "\tadd rsp, 40  ; free shadow space\n"
+		src += "\t_dumpreg\n\n"  # DEBUG
 		src += "\txor rax, rax  ; return 0\n"
 		src += "\tret\n"
 		src += "main ENDP\n\n"
