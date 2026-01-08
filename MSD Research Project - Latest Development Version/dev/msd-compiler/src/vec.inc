@@ -68,6 +68,14 @@ _vneg MACRO dest, src, temp
 	vxorpd dest, src, temp  ; XOR: dest ^ (-0.0, ...) = -dest
 ENDM
 
+; Build (1.0, 1.0, 1.0, 1.0) -> dest
+; in-place without memory access.
+_vones MACRO dest
+	vpcmpeqq dest, dest, dest  ; dest = (1111...1111b, 1111...1111b, ...)
+	vpsrlq dest, dest, 54      ; dest = (0...11 1111 1111b, ...)
+	vpsllq dest, dest, 52      ; dest = (0011 1111 1111 0..., ...) = (1.0, ...)
+ENDM
+
 ; clears dest[1:3] = 0
 ; input:       XMMn src  = (s, ?, ?, ?)
 ; output:      XMMn dest = (s, 0, 0, 0)
