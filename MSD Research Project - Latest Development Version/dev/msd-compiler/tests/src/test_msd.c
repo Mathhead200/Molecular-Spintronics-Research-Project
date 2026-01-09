@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
 	printf("Nodes:\n");
 	for (size_t n = 0; n < NODE_COUNT; n++) {
 		size_t i = (n * SIZEOF_NODE + OFFSETOF_SPIN) / sizeof(double);
-		printf("%4d: %f, %f, %f\n", n, nodes[i+0], nodes[i+1], nodes[i+2]);
+		printf("%4llu: %f, %f, %f\n", n, nodes[i+0], nodes[i+1], nodes[i+2]);
 	}
 	return 0;
 }

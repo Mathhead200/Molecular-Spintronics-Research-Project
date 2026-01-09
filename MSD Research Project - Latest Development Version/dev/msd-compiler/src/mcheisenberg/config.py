@@ -1,9 +1,10 @@
 from typing import Callable, Generic, Iterable, Optional, Self, TypedDict, TypeVar
 from datetime import datetime
 from collections import defaultdict
-import os
 from math import log2, ceil
-from prng import SplitMix64  # local lib
+from .prng import SplitMix64  # local lib
+import os
+from tempfile import mkstemp
 
 type vec = tuple[float, float, float]
 
@@ -37,7 +38,7 @@ class ProgramParameters(TypedDict):
 Index = TypeVar("Index")    # type of node indicies; e.g., int, or tuple[int]
 Region = TypeVar("Region")  # type of region names; e.g. str
 
-class _Model(Generic[Index, Region], TypedDict, total=False):
+class _Config(Generic[Index, Region], TypedDict, total=False):
 	type Node = Index
 	type Edge = tuple[Node, Node]
 
@@ -73,9 +74,9 @@ def floats(values: Iterable) -> tuple[float]:
 def is_pow2(n: int) -> bool:
 	return n > 0 and (n & (n - 1)) == 0
 
-class Model:
+class Config:
 	def __init__(self, **kw):
-		self.__dict__ = _Model(*kw)
+		self.__dict__ = _Config(*kw)
 		if "nodeId" not in self.__dict__:
 			self.nodeId = lambda node: str(node)
 		if "regionId" not in self.__dict__:
@@ -103,7 +104,7 @@ class Model:
 		Computes a set of all the local/region parameter keys used at least
 		once across all nodes/edges/regions in the system. e.g.
 		<pre>
-			msd = Model()
+			msd = Config()
 			# ...
 			msd.localNodeParameters = {
 				node1 : {kT: 0.1},
@@ -117,9 +118,9 @@ class Model:
 				edge1 : {J: -0.5},
 				edge2 : {b: 0.25}
 			}
-			print(Model.innerKeys(self.localNodeParameters))   # {kT, B, F}
-			print(Model.innerKeys(self.regionNodeParameters))  # {kT, A, S}
-			print(Model.innerKeys(sele.regionEdgeParameters))  # {J, b}
+			print(Config.innerKeys(self.localNodeParameters))   # {kT, B, F}
+			print(Config.innerKeys(self.regionNodeParameters))  # {kT, A, S}
+			print(Config.innerKeys(sele.regionEdgeParameters))  # {J, b}
 		</pre>
 		"""
 		keys = set()
@@ -141,7 +142,7 @@ class Model:
 		"""
 		Computes all possible 1 or 2 region combinations. e.g.
 		<pre>
-		msd = Model()
+		msd = Config()
 		# ...
 		msd.regions = {
 			A:  # [... nodes ...],
@@ -343,7 +344,7 @@ class Model:
 			return v
 		return self.globalParameters.get(k, None)
 	
-	def compile(self, out_path: str):
+	def compile(self, asm: str=None, _def: str=None, obj: str=None, dll: str=None):
 		# Check for and fix missing required attributes;
 		if "nodes"                not in self.__dict__:  self.nodes = {}
 		if "mutableNodes"         not in self.__dict__:  self.mutableNodes = self.nodes
@@ -382,10 +383,10 @@ class Model:
 					raise ValueError(f"Seed value {s} is out-of-range [0, 2**64)")
 
 		# other (dependant) variables
-		self.localNodeKeys = Model.innerKeys(self.localNodeParameters)    # set[str]
-		self.localEdgeKeys = Model.innerKeys(self.localEdgeParameters)    # set[str]
-		self.regionNodeKeys = Model.innerKeys(self.regionNodeParameters)  # set[str]
-		self.regionEdgeKeys = Model.innerKeys(self.regionEdgeParameters)  # set[str]
+		self.localNodeKeys = Config.innerKeys(self.localNodeParameters)    # set[str]
+		self.localEdgeKeys = Config.innerKeys(self.localEdgeParameters)    # set[str]
+		self.regionNodeKeys = Config.innerKeys(self.regionNodeParameters)  # set[str]
+		self.regionEdgeKeys = Config.innerKeys(self.regionEdgeParameters)  # set[str]
 		self.globalKeys = self.globalParameters.keys()                    # set[str]
 		self.allKeys = self.localNodeKeys | self.localEdgeKeys | self.regionNodeKeys | self.regionEdgeKeys | self.globalKeys
 		self.constParameters = self.allKeys - self.variableParameters  # set[str]
@@ -905,7 +906,7 @@ class Model:
 								phase2 = True
 								nid0 = self.nodeId(edge[0])
 								nid1 = self.nodeId(edge[1])
-								neighbor, _ = Model.neighbor(node, edge)  # just need neighbor. communative operation: doesn't care about direction.
+								neighbor, _ = Config.neighbor(node, edge)  # just need neighbor. communative operation: doesn't care about direction.
 								nindex = self.nodeIndex[neighbor]
 								nnid = self.nodeId(neighbor)  # neighbor's node id
 								src2 += f"\t; {edgelbl}: {nid0} -> {nid1}\n"
@@ -1169,23 +1170,24 @@ class Model:
 				# scale by S and F
 				spin = wxys
 				flux = flux
-				coef = zmsk                   # scalar S or F broadcast
-				msk = coef.replace("y", "x")  # Note: vgather mask used before coef. overlap okay
-				SF = s.replace("y", "x")      # XMMn scalars [S, F] packed
+				coef = "ymm3"  # scalar S or F broadcast, e.g. [S, S, S, S]
+				msk = "xmm3"   # Note: vgather mask used before coef. overlap okay
+				addr = "xmm4"  # Addresses [&S, &F] IMPORTANT: Can *not* not overlap with dest `sf` nor mask `msk`. Will cause runtime #UD fault!
+				sf = "xmm5"    # scalars [S, F] packed
 				# TODO: (optimization) skip for S=1.0 and/or F=1.0 (Note: S, F >= 0)
 				if "F" in self.allKeys:
 					src += f"\t\t; scale s' ({spin}) and f' ({flux})\n"
 					src += f"\t\tlea rax, SFref\n"
 					src += f"\t\tmov rsi, {regi}                           {pad}; calculate array offset\n"
 					src += f"\t\tshl rsi, 4                             ; mul 16\n"
-					src += f"\t\tvmovapd {SF}, xmmword ptr [rax + rsi]  ; pointers (double*[]) to [S, F]\n"
+					src += f"\t\tvmovapd {addr}, xmmword ptr [rax + rsi]  ; pointers (double*[]) to [S, F]\n"
 					src += f"\t\txor rax, rax                           ; 0 base for absolute vgather\n"
 					src += f"\t\tvpcmpeqq {msk}, {msk}, {msk}              ; load mask (all 1's)\n"
-					src += f"\t\tvgatherqpd {SF}, [rax + {SF}], {msk}\n"
-					src += f"\t\tvbroadcastsd {coef}, {SF}                ; {coef} = [S, S, S, S]\n"
+					src += f"\t\tvgatherqpd {sf}, [rax + {addr}], {msk}\n"
+					src += f"\t\tvbroadcastsd {coef}, {sf}                ; {coef} = [S, S, S, S]\n"
 					src += f"\t\tvmulpd {spin}, {spin}, {coef}                ; scale {spin} by S\n"
-					src += f"\t\t_vpermj {SF}, {SF}                     ; [F, S]\n"
-					src += f"\t\tvbroadcastsd {coef}, {SF}                ; {coef} = [F, F, F, F]\n"
+					src += f"\t\t_vpermj {sf}, {sf}                     ; [F, S]\n"
+					src += f"\t\tvbroadcastsd {coef}, {sf}                ; {coef} = [F, F, F, F]\n"
 					src += f"\t\tvmulpd {flux}, {flux}, {coef}                ; scale {flux} by F\n"
 				else:
 					src += f"\t\t; scale s' ({spin})\n"
@@ -1231,7 +1233,7 @@ class Model:
 					src += f"\t\tshl {regi}, {self.SIZEOF_NODE.bit_length() - 1}  ; mul SIZEOF_NODE ({self.SIZEOF_NODE})\n"
 				else:
 					src += f"\t\timul {regi}, SIZEOF_NODE\n"
-				src += f"\t\tvmovapd [rax + {regi} + OFFSETOF_SPIN], {spin} {pad}; update s' -> spin\n"
+				src += f"\t\tvmovapd [rax + {regi} + OFFSETOF_SPIN], {spin}  {pad}; update s' -> spin\n"
 				if "F" in self.allKeys:
 					src += f"\t\tvmovapd [rax + {regi} + OFFSETOF_FLUX], {flux}  {pad}; update f' -> flux\n"
 				src += f"\t\t{SKIP}:\n\n"
@@ -1330,202 +1332,29 @@ class Model:
 		# ---------------------------------------------------------------------
 		src += "END"  # absolute end of ASM file
 
-		with open(out_path, "w", encoding="utf-8") as file:
+		def reserve_tempfile(suffix):
+			""" Create an empty temp file for later use. """
+			fd, path = mkstemp(suffix=suffix)
+			os.close(fd)
+			return path
+
+		if asm is None:
+			asm = reserve_tempfile(".asm")
+		if obj is None:
+			obj = reserve_tempfile(".obj")
+		if _def is None:
+			_def = reserve_tempfile(".def")
+		if dll is None:
+			dll = reserve_tempfile(".dll")
+		
+		# DEBUG
+		print("ASM:", asm)
+		print("OBJ:", obj)
+		print("DEF:", _def)
+		print("DLL:", dll)
+		
+		with open(asm, "w", encoding="utf-8") as file:
 			file.write(src)
 		
 		# TODO: compile/assemble
 		# TODO: dynamically link to python??
-
-
-# Examples:
-def example_3d():
-	width = 11
-	height = 10
-	depth = 10
-	molPosL = 5
-	molPosR = 5
-	topL = 3
-	bottomL = 6
-	frontR = 3
-	backR = 6
-
-	msd = Model()
-	msd.edges = []
-	
-	fml = []
-	for x in range(0, molPosL):
-		for y in range(topL, bottomL + 1):
-			for z in range(0, depth):
-				fml.append((x, y, z))
-				# internal FML_FML edges:
-				if x + 1 < molPosL:
-					msd.edges.append(((x, y, z), (x + 1, y, z)))
-				if y + 1 <= bottomL:
-					msd.edges.append(((x, y, z), (x, y + 1, z)))
-				if z + 1 < depth:
-					msd.edges.append(((x, y, z), (x, y, z + 1)))
-	
-	mol = []
-	for x in range(molPosL, molPosR + 1):
-		for y in range(topL, bottomL + 1):
-			for z in range(frontR, backR + 1):
-				if y == topL or y == bottomL or z == frontR or z == backR:
-					mol.append((x, y, z))
-					# internal mol_mol edges:
-					if x + 1 <= molPosR:
-						msd.edges.append(((x, y, z), (x + 1, y, z)))
-					# FML_mol edges:
-					if molPosL - 1 >= 0:
-						msd.edges.append(((molPosL - 1, y, z), (molPosL, y, z)))
-					# mol_FMR edges:
-					if molPosR + 1 < width:
-						msd.edges.append(((molPosR, y, z), (molPosR + 1, y, z)))
-	
-	fmr = []
-	for x in range(molPosR + 1, width):
-		for y in range(0, height):
-			for z in range(frontR, backR + 1):
-				fmr.append((x, y, z))
-				# internal FMR_FMR edges
-				if x + 1 < width:
-					msd.edges.append(((x, y, z), (x + 1, y, z)))
-				if y + 1 < height:
-					msd.edges.append(((x, y, z), (x, y + 1, z)))
-				if z + 1 <= backR:
-					msd.edges.append(((x, y, z), (x, y, z + 1)))
-	
-	# LR direct coupling
-	for y in range(topL, bottomL + 1):
-		for z in range(frontR, backR + 1):
-			if y == topL or y == bottomL or z == frontR or z == backR:
-				# FML_FMR edges:
-				if molPosL - 1 >= 0 and molPosR + 1 < width:
-					msd.edges.append(((molPosL - 1, y, z), (molPosR + 1, y, z)))
-
-	msd.regions = { "FML": fml, "mol": mol, "FMR": fmr }
-	msd.nodes = fml + mol + fmr
-	msd.nodeId = lambda node: f"{node[0]}_{node[1]}_{node[2]}"
-	# msd.mutableNodes = msd.nodes  # now automatic
-
-	msd.globalParameters = {
-		"kT": 0.25,
-		"S": 1,
-		"F": 0,
-		"J": 1
-	}
-	msd.regionNodeParameters = {
-		"mol": { "S": 10 }
-	}
-	msd.regionEdgeParameters = {
-		("mol", "FMR"): { "J": -1 }
-	}
-	msd.programParameters = {
-		"simCount": 1000000,
-		"freq": 50000
-	}
-
-	# testing localNodeParameters
-	def is_dictesk(obj):
-		return hasattr(obj, "keys") and callable(obj.keys) and hasattr(obj, "__getitem__")
-	def deep_union_2(a, b):
-		u = {**a, **b}
-		for k in a.keys() & b.keys():
-			v1, v2 = a[k], b[k]
-			if is_dictesk(v1) and is_dictesk(v2):
-				u[k] = deep_union_2(v1, v2)
-		return u
-	def deep_union(*dicts):
-		from functools import reduce
-		return reduce(deep_union_2, dicts, {})
-	
-	# testing immutableNodes()
-	msd.mutableNodes = [*msd.nodes]
-	for y in range(topL, bottomL + 1):
-		for z in range(0, depth):
-			msd.mutableNodes.remove((0, y, z))
-	for y in range(0, height):
-		for z in range(frontR, backR + 1):
-			msd.mutableNodes.remove((width - 1, y, z, ))
-
-	msd.localNodeParameters = deep_union({
-		(0, topL, z): { "S": 2 } for z in range(depth)
-	}, {
-		(0, y, 0): { "F": 1 } for y in range(topL, bottomL + 1)
-	})
-
-	return msd
-
-	# TODO: (though) Currently, msd.nodes mst be defined, and msd.mutableNodes
-	#	is optional, then self.immutableNodes gets computed. Is this the best
-	#	pattern for the user? SHould we allow alternate patterns like defining
-	#	self.nodes and self.immutableNodes; or
-	#	self.mutabelNodes and self.immutableNodes: forcing them to specify?
-	#	(idk)
-
-def example_1d():
-	# 1D model with the classic 3 sections.
-	#
-	#   |  FML  |mol|  FMR  |
-	# 0*--1---2---3---4---5---6*
-	# ^        \     /        ^ {0,6} are leads and immutable
-	#           \---/ Direct coupling (2,4) (e.g. JLR)
-
-	msd = Model()
-	msd.nodes = [0, 1, 2, 3, 4, 5, 6]
-	msd.mutableNodes = [1, 2, 3, 4, 5]  # excluding 0, 6
-	msd.edges = [(i, i+1) for i in range(len(msd.nodes) - 1)]
-	msd.edges += [(2, 4)]
-	msd.globalParameters = {
-		"S": 1.0,
-		# "F": 0.5,
-		"kT": 0.1,
-		"B": (0.1, 0, 0),
-		"J": 1.0
-	}
-	msd.regions = {
-		"FML": [1, 2],
-		"mol": [3],
-		"FMR": [4, 5]
-	}
-	msd.regionNodeParameters = {
-		"FML": { "A": (0.0, 0.0, 0.2) },
-		# "mol": { "Je0": 3.0 },
-		"FMR": { "A": (0.0, 0.0, -0.2) }
-	}
-	msd.regionEdgeParameters = {
-		("mol", "FMR"): { "J": -1.0 },
-		("FML", "FMR"): { "J": 0.1 }
-	}
-	msd.localNodeParameters = {
-		0: { "S": 10.0 },
-		6: { "S": 10.0 }
-	}
-	msd.programParameters = {
-		"seed": [0, 42, 1234567, 200]
-	}
-	return msd
-
-def simple_1d():
-	n = 10
-
-	msd = Model()
-	msd.nodes = list(range(n))
-	msd.edges = [(i, i+1) for i in range(n-1)]
-	msd.globalParameters = {
-		"kT": 0.01,
-		"S": 1.0,
-		"J": 1.0,
-		"B": (1.0, 0, 0)
-	}
-	return msd
-
-# tests
-if __name__ == "__main__":
-	msd = example_1d()
-	msd.compile("out/msd-example_1d.asm")
-
-	msd = example_3d()
-	msd.compile("out/msd-example_3d.asm")
-
-	msd = simple_1d()
-	msd.compile("out/simple_1d.asm")
