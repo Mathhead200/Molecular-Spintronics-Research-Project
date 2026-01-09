@@ -440,7 +440,7 @@ class Model:
 		src += f"NODE_COUNT           EQU {len(self.nodes)}\n\n"
 		# define memeory for nodes
 		src += "NODES SEGMENT ALIGN(32)  ; AVX-256 (i.e. 32-byte) alignment\n"
-		src += "PUBLIC nodes\n"
+		src += "PUBLIC nodes\n"  # TODO: DEBUG (remove)
 		src += "nodes\t"
 		for i, node in enumerate([*self.mutableNodes, *self.immutableNodes]):
 			self.nodeIndex[node] = i  # store map: node -> array index
@@ -640,6 +640,48 @@ class Model:
 			src += f"D   dq {Dx}, {Dy}, {Dz}, 0.0\n"
 		src += "GLOBAL_EDGE ENDS\n\n"
 
+		# parallel arrays:
+		def node_ref_array(ks: list, vs=0.0, name=None, align: int=None):
+			""" Generate .data array of pointers to some node field, k, for each mutable node. """
+			if name is None:
+				name = f"{''.join(ks)}ref"
+			src = ""
+			src += f"; array of {ks} pointers (double *) parallel to (mutable) nodes\n"
+			if align is not None:
+				src += f"{name.upper()} SEGMENT ALIGN({align})\n"
+			src += f"{name}\t"
+			if len(self.mutableNodes) == 0:
+				src += "; 0 byte array. no mutable nodes.\n"
+			first_line = True
+			for node in self.mutableNodes:
+				idx = self.nodeIndex[node]
+				for k, v in zip(ks, vs):
+					if first_line:
+						first_line = False
+					else:
+						src += "\t\t"  # ASM formating: first struct must be on same line as symbol (i.e. "dU")
+					if k in self.localNodeParameters.get(node, {}):
+						src += f"dq nodes + SIZEOF_NODE*{idx} + OFFSETOF_{k}  ; nodes[{idx}] -> &nodes[{idx}].{k} (local)\n"
+					else:
+						_, region = self.getUnambiguousRegionNodeParameter(node, k)  # we don't need value, only region
+						if region is not None:
+							rid = self.regionId(region)
+							src += f"dq {rid} + OFFSETOF_{k}  ; nodes[{idx}] -> &{rid}.{k} (region)\n"
+						elif k in self.globalKeys:
+							src += f"dq {k}  ; nodes[{idx}] -> &{k} (global)\n"
+						else:
+							raise ValueError(f"For mutable node {self.nodeId(node)}, {k} is not defined at any level. Potential fix: model.globalParameters[\"{k}\"] = {v}")
+			if align is not None:
+				src += f"{name.upper()} ENDS\n"
+			src += "\n"
+			return src
+
+		# S,F parallel array
+		if "F" in self.allKeys:
+			src += node_ref_array(["S", "F"], [1.0, 0.0], align=16)
+		else:
+			src += node_ref_array(["S"], [1.0])
+
 		# deltaU array (function pointers):
 		src += "; array of function pointers parallel to (mutable) nodes\n"
 		src += "deltaU\t"
@@ -651,41 +693,14 @@ class Model:
 			src += f"dq deltaU_{self.nodeId(node)}  ; nodes[{self.nodeIndex[node]}]\n"
 		src += "\n"
 
-		def node_ref_array(k, v=0.0):
-			""" Generate .data array of pointers to some node field, k, for each mutable node. """
-			src = ""
-			src += f"; array of {k} pointers (double *) parallel to (mutable) nodes\n"
-			src += f"{k}ref\t"
-			if len(self.mutableNodes) == 0:
-				src += "; 0 byte array. no mutable nodes.\n"
-			for i, node in enumerate(self.mutableNodes):
-				if i != 0:  # loop index, not node index.
-					src += "\t\t"  # ASM formating: first struct must be on same line as symbol (i.e. "dU")
-				idx = self.nodeIndex[node]
-				if k in self.localNodeParameters.get(node, {}):
-					src += f"dq nodes + SIZEOF_NODE*{idx} + OFFSETOF_{k}  ; nodes[{idx}] -> &nodes[{idx}].{k} (local)\n"
-				else:
-					_, region = self.getUnambiguousRegionNodeParameter(node, k)  # we don't need value, only region
-					if region is not None:
-						rid = self.regionId(region)
-						src += f"dq {rid} + OFFSETOF_{k}  ; nodes[{idx}] -> &{rid}.{k} (region)\n"
-					elif k in self.globalKeys:
-						src += f"dq {k}  ; nodes[{idx}] -> &{k} (global)\n"
-					else:
-						raise ValueError(f"For mutable node {self.nodeId(node)}, {k} is not defined at any level. Potential fix: model.globalParameters[\"{k}\"] = {v}")
-			src += "\n"
-			return src
-		
-		src += node_ref_array("kT", 0.1)
-		src += node_ref_array("S", 1.0)
-		if "F" in self.allKeys:
-			src += node_ref_array("F", 0.0)
+		# kT parallel array
+		src += node_ref_array(["kT"], [0.1])
 
 		# misc. constants
 		# src += "; misc. constants\n"
 		# src += "ONE dq 1.0\n\n"
 
-		# ---------------------------------------------------------------------
+		# PRNG state
 		if prng.startswith("xoshiro256"):  # TODO: support other PRNGs
 			if seed is None or len(seed) == 0:
 				src += ".data?\n"
@@ -1012,13 +1027,13 @@ class Model:
 		src += "; @return (void)\n"
 		src += "PUBLIC metropolis\n"
 		src += "metropolis PROC\n"
-		src += "\t; *rax: scratch reg.; *rax - scratch reg.\n"
+		src += "\t; *rax: scratch reg.\n"
 		src += "\t;  rcx: loop counter\n"
 		src += "\t;  rdx: index[3] (or index[2] in TAIL)\n"
 		src += "\t;  rbx: \n"
 		src += "\t;  rsp: (stack pointer)\n"
 		src += "\t;  rbp: (base pointer)\n"
-		src += "\t;  rsi: \n"
+		src += "\t;  *rsi: scratch reg.\n"
 		src += "\t;  rdi: \n"
 		src += "\t;  r8:  index[0]\n"
 		src += "\t;  r9:  index[1]\n"
@@ -1035,12 +1050,13 @@ class Model:
 		src += "\t;  ymm14: vectorized PRNG state[2]\n"
 		src += "\t;  ymm15: vectorized PRNG state[3]\n\n"
 		# preamble
-		src += "\t;preamble: save non-volitile registers\n"
+		src += "\t; preamble: save non-volitile registers\n"
 		src += "\tpush rbp\n"
 		src += "\tmov rbp, rsp\n"
-		src += "\tsub rsp, (10)*16 + 8  ; space for the 10 non-volitile XMM6-15 reg. +8 for alignment\n"
+		src += "\tsub rsp, (10)*16 + 8  ; space for the 10 non-volitile XMM6-15 reg. and RSI\n"
 		for i in range(10):  # XMM6-15
 			src += f"\tvmovdqu xmmword ptr [rbp - ({i+1})*16], xmm{6+i}\n"
+		src += f"\tmov qword ptr [rbp - (10)*16 - 8], rsi\n"
 		src += "\n"
 		# load PRNG state, and other constants
 		if prng.startswith("xoshiro256"):  # TODO: support other PRNGs
@@ -1050,6 +1066,7 @@ class Model:
 			src += "\tvmovdqa ymm14, ymmword ptr [prng_state + (2)*32]\n"
 			src += "\tvmovdqa ymm15, ymmword ptr [prng_state + (3)*32]\n"
 		src += "\tmov r11, MUTABLE_NODE_COUNT ; load mutable nodes array size\n"
+		# loop metropolis algo. in batchs of 4 (`True`) until TAIL (`False`)
 		for batch4 in [True, False]:
 			if batch4:
 				regis = ["r8", "r9", "r10", "rdx"]
@@ -1091,6 +1108,7 @@ class Model:
 			src += f"\t\t_vones {one}                                                   ; [1.0, 1.0, 1.0, 1.0]\n"
 			src += f"\t\t_vomega ymm11, ymm11, {one}                                    ; (vectorized) \\omega \\in [0, 1)\n"
 			src += f"\t\t_vln ymm11, ymm11, {one}, ymm7, ymm8, ymm9, ymm10, xmm10, rax  ; (vectorized) ln(\\omega) \\in [-inf, 0)\n\n"
+			# (repeat 3 or 4 times)
 			for regi in regis:
 				pad = " " * (3 - len(regi))
 				# pick uniformally random new state for the node
@@ -1151,17 +1169,30 @@ class Model:
 				# scale by S and F
 				spin = wxys
 				flux = flux
-				coef = zmsk  # scalar S or F
+				coef = zmsk                   # scalar S or F broadcast
+				msk = coef.replace("y", "x")  # Note: vgather mask used before coef. overlap okay
+				SF = s.replace("y", "x")      # XMMn scalars [S, F] packed
 				# TODO: (optimization) skip for S=1.0 and/or F=1.0 (Note: S, F >= 0)
-				src += f"\t\tlea rax, Sref\n"
-				src += f"\t\tmov rax, qword ptr [rax + {regi}*8]    {pad}; double* -> rax\n"
-				src += f"\t\tvbroadcastsd {coef}, qword ptr [rax]  ; {coef} = [S, S, S, S]\n"
-				src += f"\t\tvmulpd {spin}, {spin}, {coef}             ; scale {spin} by S\n"
 				if "F" in self.allKeys:
-					src += f"\t\tlea rax, Fref\n"
-					src += f"\t\tmov rax, qword ptr [rax + {regi}*8]    {pad}; double* -> rax\n"
-					src += f"\t\tvbroadcastsd {coef}, qword ptr [rax]  ; {coef} = [F, F, F, F]\n"
-					src += f"\t\tvmulpd {flux}, {flux}, {coef}             ; scale {flux} by F\n"
+					src += f"\t\t; scale s' ({spin}) and f' ({flux})\n"
+					src += f"\t\tlea rax, SFref\n"
+					src += f"\t\tmov rsi, {regi}                           {pad}; calculate array offset\n"
+					src += f"\t\tshl rsi, 4                             ; mul 16\n"
+					src += f"\t\tvmovapd {SF}, xmmword ptr [rax + rsi]  ; pointers (double*[]) to [S, F]\n"
+					src += f"\t\txor rax, rax                           ; 0 base for absolute vgather\n"
+					src += f"\t\tvpcmpeqq {msk}, {msk}, {msk}              ; load mask (all 1's)\n"
+					src += f"\t\tvgatherqpd {SF}, [rax + {SF}], {msk}\n"
+					src += f"\t\tvbroadcastsd {coef}, {SF}                ; {coef} = [S, S, S, S]\n"
+					src += f"\t\tvmulpd {spin}, {spin}, {coef}                ; scale {spin} by S\n"
+					src += f"\t\t_vpermj {SF}, {SF}                     ; [F, S]\n"
+					src += f"\t\tvbroadcastsd {coef}, {SF}                ; {coef} = [F, F, F, F]\n"
+					src += f"\t\tvmulpd {flux}, {flux}, {coef}                ; scale {flux} by F\n"
+				else:
+					src += f"\t\t; scale s' ({spin})\n"
+					src += f"\t\tlea rax, Sref\n"
+					src += f"\t\tmov rax, qword ptr [rax + {regi}*8]   {pad}; pointer (double*) to S\n"
+					src += f"\t\tvbroadcastsd {coef}, qword ptr [rax]  ; [S, S, S, S]\n"
+					src += f"\t\tvmulpd {spin}, {spin}, {coef}  ; scale {spin} by S\n"
 				src += "\n"
 				# compute -ΔU for the propsed state change
 				src += "\t\t; compute -deltaU for the proposed state change\n"
@@ -1226,7 +1257,8 @@ class Model:
 		src += "\t; epilogue: restore non-volitile registers\n"
 		for i in range(10):  # XMM6-15
 			src += f"\tvmovdqu xmm{6+i}, xmmword ptr [rbp - ({i+1})*16]\n"
-		src += "\tadd rsp, (10)*16 + 8  ; space for the 10 non-volitile XMM6-15 reg. +8 for alignment\n"
+		src += f"\tmov rsi, qword ptr [rbp - (10)*16 - 8]\n"
+		src += "\tadd rsp, (10)*16 + 8  ; (aligned) space for the 10 non-volitile XMM6-15 reg. and RSI\n"
 		src += "\tpop rbp\n"
 		src += "\tret\n"
 		src += "metropolis ENDP\n\n"
