@@ -400,8 +400,7 @@ class Model:
 		# includes
 		src += "include vec.inc  ; _vdotp, etc.\n"
 		src += "include prng.inc  ; splitmix64, xoshiro256ss, etc. \n"
-		src += "include ln.inc  ; _vln\n"
-		src += "include dumpreg.inc  ; DEBUG\n\n"  # TODO: (DEBUG)
+		src += "include ln.inc  ; _vln\n\n"
 		
 		# ---------------------------------------------------------------------
 		src += ".data\n"
@@ -1207,7 +1206,6 @@ class Model:
 				src += f"\t\t{SKIP}:\n\n"
 				# TODO?: parameter modification(s); e.g. global.B -= dB
 				# ...
-				src += "\t\t_dumpreg\n"  # DEBUG
 				if not batch4 and regi != "rdx":
 					src += "\t\t; done?\n"
 					src += "\t\tdec rcx\n"
@@ -1288,8 +1286,7 @@ class Model:
 		# src += "\tmov rcx, 7   ; number of iterations\n"
 		# src += "\tsub rsp, 40  ; reserve shadow space\n"
 		# src += "\tcall metropolis\n"
-		# src += "\tadd rsp, 40  ; free shadow space\n"
-		# src += "\t_dumpreg\n\n"  # DEBUG
+		# src += "\tadd rsp, 40  ; free shadow space\n\n"
 		# src += "\txor rax, rax  ; return 0\n"
 		src += "\tDLL_THREAD_ATTACH:   ; do nothing\n"
 		src += "\tDLL_THREAD_DETACH:   ; do nothing\n"
@@ -1476,6 +1473,20 @@ def example_1d():
 	}
 	return msd
 
+def simple_1d():
+	n = 10
+
+	msd = Model()
+	msd.nodes = list(range(n))
+	msd.edges = [(i, i+1) for i in range(n-1)]
+	msd.globalParameters = {
+		"kT": 0.01,
+		"S": 1.0,
+		"J": 1.0,
+		"B": (1.0, 0, 0)
+	}
+	return msd
+
 # tests
 if __name__ == "__main__":
 	msd = example_1d()
@@ -1483,3 +1494,6 @@ if __name__ == "__main__":
 
 	msd = example_3d()
 	msd.compile("out/msd-example_3d.asm")
+
+	msd = simple_1d()
+	msd.compile("out/simple_1d.asm")
