@@ -5,7 +5,9 @@ from math import log2, ceil
 from .prng import SplitMix64
 import os
 from tempfile import mkstemp
+from importlib import resources
 from .build import VisualStudio
+from subprocess import CalledProcessError
 
 type vec = tuple[float, float, float]
 
@@ -345,7 +347,7 @@ class Config:
 			return v
 		return self.globalParameters.get(k, None)
 	
-	def compile(self, tool=VisualStudio(), asm: str=None, _def: str=None, obj: str=None, dll: str=None):
+	def compile(self, tool=VisualStudio(), asm: str=None, _def: str=None, obj: str=None, dll: str=None, dir=None):
 		# Check for and fix missing required attributes;
 		if "nodes"                not in self.__dict__:  self.nodes = {}
 		if "mutableNodes"         not in self.__dict__:  self.mutableNodes = self.nodes
@@ -980,7 +982,7 @@ class Config:
 						phase3 = True
 						src3 += load_insn  # load B into ymm9
 						if not out_init:
-							src3 += f"\t_vdotp {resx}, {prmy}, {dsm}, {prmx}, {prmy}  ; ({prmy}, {dsm})\n\n"
+							src3 += f"\t_vdotp {resx}, {resy}, {prmy}, {dsm}, {prmx}  ; ({prmy}, {dsm})\n\n"
 							out_init = True
 						else:
 							src3 += f"\t_vdotadd {resx}, {resy}, {prmy}, {dsm}, {prmx}  ; ({prmy}, {dsm})\n\n"
@@ -1335,27 +1337,35 @@ class Config:
 
 		def reserve_tempfile(suffix):
 			""" Create an empty temp file for later use. """
-			fd, path = mkstemp(suffix=suffix)
+			fd, path = mkstemp(suffix=suffix, dir=dir)
 			os.close(fd)
 			return path
 
-		if asm is None:
-			asm = reserve_tempfile(".asm")
-		if obj is None:
-			obj = reserve_tempfile(".obj")
-		if _def is None:
-			_def = reserve_tempfile(".def")
-		if dll is None:
-			dll = reserve_tempfile(".dll")
+		asm_temp, obj_temp, dll_temp = False, False, False  # bool flags for cleanup
+		if asm is None:  asm = reserve_tempfile(".asm");  asm_temp = True
+		if obj is None:  obj = reserve_tempfile(".obj");  obj_temp = True
+		# if _def is None: _def = reserve_tempfile(".def"); _def_temp = True
+		if dll is None:  dll = reserve_tempfile(".dll");  dll_temp = True
 		
 		# DEBUG
 		print("ASM:", asm)
 		print("OBJ:", obj)
-		print("DEF:", _def)
+		# print("DEF:", _def)
 		print("DLL:", dll)
 		
 		with open(asm, "w", encoding="utf-8") as file:
 			file.write(src)
 		
-		# TODO: compile/assemble
+		# compile/assemble
+		with resources.as_file(resources.files(__package__)) as package_path:
+			try:
+				tool.assemble(asm, out=obj, include=[str(package_path)])
+				tool.dlink(obj, out=dll, entry="DllMain")
+			except CalledProcessError as ex:
+				raise  # TODO: (stub) Re-raise exception
+		
+		# clean up tempp files
+		if asm_temp:  os.remove(asm)
+		if obj_temp:  os.remove(obj)
+
 		# TODO: dynamically link to python??
