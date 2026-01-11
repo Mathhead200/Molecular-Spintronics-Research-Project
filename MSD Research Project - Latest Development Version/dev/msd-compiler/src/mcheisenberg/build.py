@@ -42,6 +42,7 @@ class VisualStudio(Assembler, Linker):
 		cmd = f'{self.setup} && link /DLL {src} {entry} {out}'
 		subprocess.run(cmd, shell=True, check=True)
 
+# Testing:
 if __name__ == "__main__":
 	print("test build.py")
 	tool = VisualStudio()
