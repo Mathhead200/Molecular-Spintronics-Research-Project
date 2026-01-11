@@ -1,6 +1,6 @@
 from ctypes import CDLL
 
-# This wrapper around DLL
+# Thin wrapper for DLL
 class Driver:
 	def __init__(self, dll):
-		pass
+		pass  # TODO

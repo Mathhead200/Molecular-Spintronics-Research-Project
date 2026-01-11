@@ -8,6 +8,8 @@ from tempfile import mkstemp
 from importlib import resources
 from .build import VisualStudio
 from subprocess import CalledProcessError
+from .driver import Driver
+from .runtime import Runtime
 
 type vec = tuple[float, float, float]
 
@@ -1368,4 +1370,5 @@ class Config:
 		if asm_temp:  os.remove(asm)
 		if obj_temp:  os.remove(obj)
 
-		# TODO: dynamically link to python??
+		# dynamically link to python
+		return Runtime(dll, delete=dll_temp)
