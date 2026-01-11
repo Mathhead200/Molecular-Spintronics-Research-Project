@@ -2,9 +2,10 @@ from typing import Callable, Generic, Iterable, Optional, Self, TypedDict, TypeV
 from datetime import datetime
 from collections import defaultdict
 from math import log2, ceil
-from .prng import SplitMix64  # local lib
+from .prng import SplitMix64
 import os
 from tempfile import mkstemp
+from .build import VisualStudio
 
 type vec = tuple[float, float, float]
 
@@ -344,7 +345,7 @@ class Config:
 			return v
 		return self.globalParameters.get(k, None)
 	
-	def compile(self, asm: str=None, _def: str=None, obj: str=None, dll: str=None):
+	def compile(self, tool=VisualStudio(), asm: str=None, _def: str=None, obj: str=None, dll: str=None):
 		# Check for and fix missing required attributes;
 		if "nodes"                not in self.__dict__:  self.nodes = {}
 		if "mutableNodes"         not in self.__dict__:  self.mutableNodes = self.nodes
