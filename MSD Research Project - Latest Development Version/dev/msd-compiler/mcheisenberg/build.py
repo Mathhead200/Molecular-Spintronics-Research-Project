@@ -10,7 +10,7 @@ class Assembler:
 		raise NotImplementedError()
 
 class Linker:
-	def dlink(*src, out=None, entry=None) -> list[str]:
+	def dlink(*src, out=None, entry=None, exports=None) -> list[str]:
 		raise NotImplementedError()
 
 class VisualStudio(Assembler, Linker):
@@ -35,11 +35,12 @@ class VisualStudio(Assembler, Linker):
 		cmd = f'{self.setup} && ml64 /c {include} {out} {src}'
 		subprocess.run(cmd, shell=True, check=True)
 
-	def dlink(self, *src, out=None, entry=None):
+	def dlink(self, *src, out=None, entry=None, exports=None):
 		src = ' '.join(quote(s) for s in src)  # e.g. 'file1.obj file2.obj'
-		entry = f'/entry:{entry}' if entry is not None else ''
 		out = f'/OUT:{quote(out)}' if out is not None else ''
-		cmd = f'{self.setup} && link /DLL {src} {entry} {out}'
+		entry = f'/entry:{entry}' if entry is not None else ''
+		exports = f'/DEF:{quote(exports)}' if exports is not None else ''
+		cmd = f'{self.setup} && link /DLL {src} {entry} {exports} {out} /NOIMPLIB /NOEXP /INCREMENTAL:NO'
 		subprocess.run(cmd, shell=True, check=True)
 
 # Testing:
