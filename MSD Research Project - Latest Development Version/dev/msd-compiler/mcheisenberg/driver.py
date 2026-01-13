@@ -25,7 +25,7 @@ class Driver:
 		
 		n = (config.SIZEOF_EDGE // 8) * config.EDGE_COUNT
 		if n > 0:
-			self.edges = (c_double).in_dll(self.dll, "edges")
+			self.edges = (c_double * n).in_dll(self.dll, "edges")
 			self.symbols.append("edges")
 		
 		if config.SIZEOF_REGION != 0:

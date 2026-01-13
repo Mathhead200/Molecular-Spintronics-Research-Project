@@ -97,7 +97,7 @@ class Config:
 		if "nodeId" not in self.__dict__:
 			self.nodeId = lambda node: str(node)
 		if "regionId" not in self.__dict__:
-			self.regionId = lambda region: str(region)
+			self.regionId = lambda region: str(region) 
 		# fields set durring compilation 
 		self.localNodeKeys: set[str] = None    # set[str]: which localNodeParameters are being used?
 		self.localEdgeKeys: set[str] = None    # set[str]: which localEdgeParameters are being used?
@@ -417,15 +417,72 @@ class Config:
 		prng = self.programParameters["prng"]
 		seed = self.programParameters.get("seed", None)
 
-		# Do all nodes referenced in self.edges actually exist in self.nodes?
+		# CHECK: Do all nodes referenced in self.edges actually exist in self.nodes?
 		for edge in self.edges:
 			if len(edge) != 2:
 				raise ValueError(f"All edges must have exactly 2 nodes: len={len(edge)} for edge {edge}")
 			for node in edge:
 				if node not in self.nodes:
 					raise KeyError(f"All nodes referenced in model.edges must exist in model.nodes: Couldn't find node {node} referenced in edge {edge}")
-				
-		# Is PRNG algorithm supported?
+		
+		# CHECK: Are all parameters (i.e. dict keys) supported by the program and
+		# 	in the correct dicts (i.e. edge parameter in node dict)?
+		ALLOWED_NODE_PARAMETERS = ["B", "A", "S", "F", "kT", "Je0"]
+		ALLOWED_EDGE_PARAMETERS = ["J", "Je1", "Jee", "b", "D"]
+		ALLOWED_PRGM_PARAMETERS = ["prng", "seed"]
+		for n, p in self.localNodeParameters.items():
+			for k, v in p.items():
+				if k not in ALLOWED_NODE_PARAMETERS:
+					if k in ALLOWED_EDGE_PARAMETERS:
+						raise KeyError(f'{k} is an edge parameters and unsupported in localNodeParameters[{n}]["{k}"]. Fix: config.localEdgeParameters[{n}, {n}]["{k}"] = {v}')
+					elif k in ALLOWED_PRGM_PARAMETERS:
+						raise KeyError(f'{k} is a program parameter and unsupported in localNodeParameters[{n}]["{k}"]. Fix: config.programParameters[{n}, {n}]["{k}"] = {v}')
+					else:
+						raise KeyError(f'{k} is an unrecognized parameter and unsupported in localNodeParameters[{n}]["{k}"]. Typo? (Allowable node parameters: {ALLOWED_NODE_PARAMETERS})')
+		for e, p in self.localEdgeParameters.items():
+			n0, n1 = e
+			for k, v in p.items():
+				if k not in ALLOWED_EDGE_PARAMETERS:
+					if k in ALLOWED_NODE_PARAMETERS:
+						raise KeyError(f'{k} is a node parameters and unsupported in localEdgeParameters[{n0}, {n1}]["{k}"]. Fix: config.localNodeParameters[{n0}]["{k}"] = {v}')
+					elif k in ALLOWED_PRGM_PARAMETERS:
+						raise KeyError(f'{k} is a program parameter and unsupported in localEdeParameters[{n0}, {n1}]["{k}"]. Fix: config.programParameters["{k}"] = {v}')
+					else:
+						raise KeyError(f'{k} is an unrecognized parameter and unsupported in localEdgeParameters["{k}"]. Typo? (Allowable edge parameters: {ALLOWED_EDGE_PARAMETERS})')
+		for r, p in self.regionNodeParameters.items():
+			for k, v in p.items():
+				if k not in ALLOWED_NODE_PARAMETERS:
+					if k in ALLOWED_EDGE_PARAMETERS:
+						raise KeyError(f'{k} is an edge parameters and unsupported in regionNodeParameters[{r}]["{k}"]. Fix: config.regionEdgeParameters[{r}]["{k}"] = {v}')
+					elif k in ALLOWED_PRGM_PARAMETERS:
+						raise KeyError(f'{k} is a program parameter and unsupported in regionNodeParameters[{r}]["{k}"]. Fix: config.programParameters[{r}]["{k}"] = {v}')
+					else:
+						raise KeyError(f'{k} is an unrecognized parameter and unsupported in regionNodeParameters[{r}]["{k}"]. Typo? (Allowable node parameters: {ALLOWED_NODE_PARAMETERS})')
+		for r, p in self.regionNodeParameters.items():
+			for k, v in p.items():
+				if k not in ALLOWED_EDGE_PARAMETERS:
+					if k in ALLOWED_NODE_PARAMETERS:
+						raise KeyError(f'{k} is a node parameters and unsupported in regionEdgeParameters[{r}]["{k}"]. Fix: config.regionNodeParameters[{r}]["{k}"] = {v}')
+					elif k in ALLOWED_PRGM_PARAMETERS:
+						raise KeyError(f'{k} is a program parameter and unsupported in regionEdgeParameters[{r}]["{k}"]. Fix: config.programParameters[{r}]["{k}"] = {v}')
+					else:
+						raise KeyError(f'{k} is an unrecognized parameter and unsupported in regionNodeParameters[{r}]["{k}"]. Typo? (Allowable edge parameters: {ALLOWED_EDGE_PARAMETERS})')
+		for k, v in self.globalParameters.items():
+			if k not in ALLOWED_NODE_PARAMETERS + ALLOWED_EDGE_PARAMETERS:
+				if k in ALLOWED_PRGM_PARAMETERS:
+					raise KeyError(f'{k} is a program parameter and unsupported in globalParameters["{k}"]. Fix: config.prograParameters["{k}"] = {v}')
+				else:
+					raise KeyError(f'{k} is an unrecognized parameter and unsupported in globalParameters["{k}"]. Typo? (Allowable node/edge parameters: {ALLOWED_NODE_PARAMETERS + ALLOWED_EDGE_PARAMETERS})')
+		for k, v in self.programParameters.items():
+			if k not in ALLOWED_PRGM_PARAMETERS:
+				if k in ALLOWED_NODE_PARAMETERS:
+					raise KeyError(f'{k} is a node parameter and unsupported in programParameters["{k}"]. Fix: config.globalParameters["{k}"] = {v}')
+				elif k in ALLOWED_EDGE_PARAMETERS:
+					raise KeyError(f'{k} is an edge parameter and unsupported in programParameters["{k}"]. Fix: config.globalParameters["{k}"] = {v}')
+				else:
+					raise KeyError(f'{k} is an unrecognized parameter and unsupported in programParameters["{k}"]. Typo? (Allowable program parameters: {ALLOWED_PRGM_PARAMETERS})')
+		
+		# CHECK: Is PRNG algorithm supported?
 		if prng not in ["xoshiro256**", "xoshiro256++", "xoshiro256+"]:
 			raise ValueError(f"Unsupported psuedo-random number generator algorithm: {prng}. Suggested algorithm model.programParameters[\"prng\"] = \"xoshiro256**\"")
 		if seed is not None:
@@ -752,7 +809,7 @@ class Config:
 						_, region = self.getUnambiguousRegionNodeParameter(node, k)  # we don't need value, only region
 						if region is not None:
 							rid = self.regionId(region)
-							src += f"dq {rid} + OFFSETOF_{k}  ; nodes[{idx}] -> &{rid}.{k} (region)\n"
+							src += f"dq {rid} + OFFSETOF_REGION_{k}  ; nodes[{idx}] -> &{rid}.{k} (region)\n"
 						elif k in self.globalKeys:
 							src += f"dq {k}  ; nodes[{idx}] -> &{k} (global)\n"
 						else:

@@ -1,20 +1,52 @@
 from __future__ import annotations
 from .driver import Driver
-from collections.abc import Sequence
+from collections.abc import Sequence, Mapping
 import os
 from typing import TYPE_CHECKING, KeysView
 if TYPE_CHECKING:
 	from .config import Config, vec
 
 def div8(n: int) -> int:
-	return n // 8 if n is not None else None
+	return int(n // 8) if n is not None else None
 
+# Wrapper allowing read-only access to underlying list/Sequence
+class ReadOnlyList(Sequence):
+	def __init__(self, lst: Sequence):  self._lst = lst
+
+	def __len__(self):          return len(self._lst)	
+	def __getitem__(self, i):   return self._lst[i]
+	def __iter__(self):         return iter(self._lst)
+	def __contains__(self, v):  return v in self._lst
+
+# Parent to be extended/derived from
+class AbstractReadOnlyDict(Mapping):
+	def keys(self):    return iter(self)
+	def values(self):  return (self[k] for k in self)
+	def items(self):   return ((k, self[k]) for k in self)
+	def get(self, key, default=None):  return self[key] if key in self else default
+
+# Wrapper allowing read-only access to underlying dict
+class ReadOnlyDict(AbstractReadOnlyDict):
+	def __init__(self, dct: dict):  self._dct = dct
+
+	def __getitem__(self, i):  return self._dct[i]
+	def __iter__(self):        return iter(self._dct)
+	def __len__(self):         return len(self._dct)
+
+	def get(self, key, default=None):  return self._dct.get(key, default)
+
+# Provides properties (i.e. getters and setters) for local node state and parameters.
+# `None` is returned by getters for undefined state/parameters.
+# KeyError is raised by setters for undefined state/parameters.
+# If node parameters are defined at a higher level (e.g. region, or global),
+#	getters will pass through this information, but setters will raise KeyError.
 class NodeProxy:
 	def __init__(self, runtime: Runtime, node):
 		self._runtime = runtime
 		self._node = node
 		self._index = runtime.config.nodeIndex[node]
 	
+	# get scalar (float) only from NODES; or None.
 	def _getScalar(self, param: str) -> float:
 		runtime = self._runtime
 		offset = runtime._offsets[param]
@@ -22,15 +54,7 @@ class NodeProxy:
 			return None
 		return runtime._fromNodes(self._index, offset)
 	
-	def _fgetScalar(self, param: str) -> vec:
-		config = self._runtime.config
-		if param in config.localNodeParameters[self._node]:
-			return self._getScalar(param)
-		_, region = config.getUnambiguousRegionNodeParameter(self._node, param)  # we don't need value, only region
-		if region is not None:
-			return ()  # TODO: (stub) from `region`
-		return ()  # TODO: (stub) global
-	
+	# get vector (tuple) only from NODES; or None.
 	def _getVector(self, param: str) -> vec:
 		runtime = self._runtime
 		offset = runtime._offsets[param]
@@ -38,40 +62,66 @@ class NodeProxy:
 			return None
 		return tuple(runtime._fromNodes(self._index, offset + i) for i in range(3))
 	
+	# get scalar (float) from either NODES, REGIONS, or GLOBAL_NODE; or None.
+	def _fgetScalar(self, param: str) -> vec:
+		runtime = self._runtime
+		config = runtime.config
+		if param in config.localNodeParameters.get(self._node, {}):
+			return self._getScalar(param)
+		_, region = config.getUnambiguousRegionNodeParameter(self._node, param)  # we don't need value, only region
+		if region is not None:
+			return getattr(runtime.region[region], param)
+		return ()  # TODO: (stub) global
+
+	# get vector (tuple) from either NODES, REGION, or GLOBAL_NODE; or None.
 	def _fgetVector(self, param: str) -> vec:
-		config = self._runtime.config
-		if param in config.localNodeParameters[self._node]:
+		runtime = self._runtime
+		config = runtime.config
+		if param in config.localNodeParameters.get(self._node, {}):
 			return self._getVector(param)
 		_, region = config.getUnambiguousRegionNodeParameter(self._node, param)  # we don't need value, only region
 		if region is not None:
-			return ()  # TODO: (stub) from `region`
+			return getattr(runtime.region[region], param)
 		return ()  # TODO: (stub) global
-
-	def _setScalar(self, param: str, index: int, value: float) -> None:
-		runtime = self._runtime
-		offset = runtime._offsets[param]
-		if offset is None:
-			raise KeyError(f"{param} is not defined (anywhere) in Config")
-		runtime._toNodes(self._index, offset, value)
 	
-	def _fsetScalar(self, param: str):
-		config = self._runtime.config
-		if param not in config.localNodeParameters[self._node]:
-			raise KeyError(f"For node {self._node}, can't modify {param} which was not defined locally in Config")
-
-	def _setVector(self, param: str, value: vec):
+	# set scalar (float) in NODES; or KeyError. Bypasses localNodeParameters.
+	# For node state, e.g. (no known scalar state -- UNUSED)
+	def _setScalar(self, param: str, value: float) -> None:
 		runtime = self._runtime
 		offset = runtime._offsets[param]
 		if offset is None:
-			raise KeyError(f"{param} is not defined (anywhere) in Config")
+			raise KeyError(f"For node {self._node}, {param} is undefined in Config")
+		runtime._toNodes(self._index, offset, value)
+
+	# set scalar (float) in NODES; or KeyError.
+	def _fsetScalar(self, param: str, value: float) -> None:
+		runtime = self._runtime
+		config = runtime.config
+		if param not in config.localNodeParameters.get(self._node, {}):
+			raise KeyError(f"For node {self._node}, can't modify {param} which was not defined locally in Config")
+		offset = runtime._offsets[param];  assert offset is not None  # DEBUG (assert)
+		runtime._toNodes(self._index, offset, value)
+
+	# set scalar (float) in NODES; or KeyError. Bypasses localNodeParameters.
+	# For node state, e.g. spin and flux.
+	def _setVector(self, param: str, value: float) -> None:
+		runtime = self._runtime
+		offset = runtime._offsets[param]
+		if offset is None:
+			raise KeyError(f"For node {self._node}, {param} is undefined in Config")
 		for i in range(3):
 			runtime._toNodes(self._index, offset + i, value[i])
 	
-	def _fsetVector(self, param: str, value: vec):
+	# set vector (tuple) in NODES, or KeyError.
+	def _fsetVector(self, param: str, value: vec) -> None:
+		runtime = self._runtime
 		config = self._runtime.config
-		if param not in config.localNodeParameters[self._node]:
+		if param not in config.localNodeParameters.get(self._node, {}):
 			raise KeyError(f"For node {self._node}, can't modify {param} which was not defined locally in Config")
-	
+		offset = runtime._offsets[param];  assert offset is not None  # DEBUG (assert)
+		for i in range(3):
+			runtime._toNodes(self._index, offset + i, value[i])
+
 for attr in ["spin", "flux"]:
 	setattr(NodeProxy, attr, property(
 		fget=lambda self,        _a=attr: self._getVector(_a),
@@ -80,7 +130,7 @@ for attr in ["spin", "flux"]:
 for param in ["B", "A"]:
 	setattr(NodeProxy, param, property(
 		fget=lambda self,        _p=param: self._fgetVector(_p),
-		fset=lambda self, value, _p=param: self.fsetVector(_p, value)
+		fset=lambda self, value, _p=param: self._fsetVector(_p, value)
 	))
 for param in ["S", "F", "kT", "Je0"]:
 	setattr(NodeProxy, param, property(
@@ -88,34 +138,240 @@ for param in ["S", "F", "kT", "Je0"]:
 		fset=lambda self, value, _p=param: self._fsetScalar(_p, value)
 	))
 
-class NodeListProxy:
+# Similar to NodeProxy, but for edge parameters.
+class EdgeProxy:
+	def __init__(self, runtime: Runtime, edge):
+		self._runtime = runtime
+		self._edge = edge
+		self._index = runtime.config.edgeIndex[edge]
+	
+	# get scalar (float) only from EDGES; or None
+	def _getScalar(self, param: str) -> float:
+		runtime = self._runtime
+		offset = runtime._offsets[param]
+		if offset is None:
+			return None
+		return runtime._fromEdges(self._index, offset)
+	
+	# get vector (tuple) only from EDGES; or None
+	def _getVector(self, param: str) -> vec:
+		runtime = self._runtime
+		offset = runtime._offsets[param]
+		if offset is None:
+			return None
+		return tuple(runtime._fromEdges(self._index, offset + i) for i in range(3))
+	
+	# get scalar (float) from either EDGES, EDGE_REGIONS, or GLOBAL_EDGE; or None
+	def _fgetScalar(self, param: str) -> vec:
+		runtime = self._runtime
+		config = runtime.config
+		if param in config.localEdgeParameters.get(self._edge, {}):
+			return self._getScalar(param)
+		_, eregion = config.getUnambiguousRegionEdgeParameter(self._edge, param)  # we don't need value, only eregion
+		if eregion is not None:
+			return getattr(runtime.eregion[eregion], param)
+		return ()  # TODO: (stub) global
+
+	# get vector (tuple) from either EDGES, EDGE_REGION, or GLOBAL_EDGE; or None
+	def _fgetVector(self, param: str) -> vec:
+		runtime = self._runtime
+		config = runtime.config
+		if param in config.localEdgeParameters.get(self._edge, {}):
+			return self._getVector(param)
+		_, eregion = config.getUnambiguousRegionEdgeParameter(self._edge, param)  # we don't need value, only eregion
+		if eregion is not None:
+			return getattr(runtime.eregion[eregion], param)
+		return ()  # TODO: (stub) global
+	
+	# set scalar (float) in EDGES; or KeyError
+	def _fsetScalar(self, param: str, value: float) -> None:
+		runtime = self._runtime
+		config = runtime.config
+		if param not in config.localEdgeParameters.get(self._edge, {}):
+			raise KeyError(f"For edge {self._edge}, can't modify {param} which was not defined locally in Config")
+		offset = runtime._offsets[param];  assert offset is not None  # DEBUG (assert)
+		runtime._toEdges(self._index, offset, value)
+	
+	# set vector (tuple) in EDGES; or KeyError.
+	def _fsetVector(self, param: str, value: vec) -> None:
+		runtime = self._runtime
+		config = self._runtime.config
+		if param not in config.localEdgeParameters.get(self._edge, {}):
+			raise KeyError(f"For edge {self._edge}, can't modify {param} which was not defined locally in Config")
+		offset = runtime._offsets[param];  assert offset is not None  # DEBUG (assert)
+		for i in range(3):
+			runtime._toEdges(self._index, offset + i, value[i])
+
+for param in ["J", "Je1", "Jee", "b"]:
+	setattr(EdgeProxy, param, property(
+		fget=lambda self,        _p=param: self._fgetScalar(_p),
+		fset=lambda self, value, _p=param: self._fsetScalar(_p, value)
+	))
+for param in ["D"]:
+	setattr(EdgeProxy, param, property(
+		fget=lambda self,        _p=param: self._fgetVector(_p),
+		fset=lambda self, value, _p=param: self._fsetVector(_p, value)
+	))
+
+# Similar to NodeProxy/EdgeProxy but for region (node) parameters
+class RegionProxy:
+	def __init__(self, runtime: Runtime, region):
+		self._runtime = runtime
+		self._region = region
+		self._rid = runtime.config.regionId(region)
+	
+	# get scalar (float) only from REGIONS; or None
+	def _getScalar(self, param: str) -> float:
+		runtime = self._runtime
+		offset = runtime._region_offsets[param]
+		if offset is None:
+			return None
+		return runtime._fromRegions(self._rid, offset)
+	
+	# get vector (tuple) only from REGIONS; or None
+	def _getVector(self, param: str) -> vec:
+		runtime = self._runtime
+		offset = runtime._region_offsets[param]
+		if offset is None:
+			return None
+		return tuple(runtime._fromRegions(self._rid, offset + i) for i in range(3))
+
+	# get scalar (float) from either REGION or GLOBAL_NODE; or None
+	def _fgetScalar(self, param: str) -> float:
+		config = self._runtime.config
+		if param in config.regionNodeParameters.get(self._region, {}):
+			return self._getScalar(param)
+		return ()  # TODO: (stub) global
+	
+	# get vector (tuple) from either REGION or GLOBAL_NODE; or None
+	def _fgetVector(self, param: str) -> vec:
+		config = self._runtime.config
+		if param in config.regionNodeParameters.get(self._region, {}):
+			return self._getVector(param)
+		return ()  # TODO: (stub) global
+
+	# set scalar (float) in REGION; or KeyError
+	def _fsetScalar(self, param: str, value: float) -> None:
+		runtime = self._runtime
+		config = runtime.config
+		if param not in config.regionNodeParameters.get(self._region, {}):
+			raise KeyError(f"For region {self._region}, can't modify {param} which was not defined in Config")
+		offset = runtime._region_offsets[param];  assert offset is not None  # DEBUG (assert)
+		runtime._toRegions(self._rid, offset, value)
+	
+	# set vector (tuple) in REGION; or KeyError
+	def _fsetVector(self, param: str, value: vec) -> None:
+		runtime = self._runtime
+		config = runtime.config
+		if param not in config.regionNodeParameters.get(self._region, {}):
+			raise KeyError(f"For region {self._region}, can't modify {param} which was not defined in Config")
+		offset = runtime._region_offsets[param];  assert offset is not None  # DEBUG (assert)
+		for i in range(3):
+			runtime._toRegions(self._rid, offset + i, value)
+
+for param in ["B", "A"]:
+	setattr(RegionProxy, param, property(
+		fget=lambda self,        _p=param: self._fgetVector(_p),
+		fset=lambda self, value, _p=param: self._fsetVector(_p, value)
+	))
+for param in ["S", "F", "kT", "Je0"]:
+	setattr(RegionProxy, param, property(
+		fget=lambda self,        _p=param: self._fgetScalar(_p),
+		fset=lambda self, value, _p=param: self._fsetScalar(_p, value)
+	))
+
+# Similar to RegionProxy but for region edge parameters
+class ERegionProxy:
+	def __init__(self, runtime: Runtime, eregion: tuple):
+		self._runtime = runtime
+		self._eregion = eregion
+		regionId = runtime.config.regionId  # function
+		self._erid = f"{regionId(eregion[0])}_{regionId(eregion[1])}"
+	
+	# get scalar (float) only from EDGE_REGIONS; or None
+	def _getScalar(self, param: str) -> float:
+		runtime = self._runtime
+		offset = runtime._region_offsets[param]
+		if offset is None:
+			return None
+		return runtime._fromERegions(self._erid, offset)
+	
+	# get vector (tuple) only from EDGE_REGIONS; or None
+	def _getVector(self, param: str) -> vec:
+		runtime = self._runtime
+		offset = runtime._region_offsets[param]
+		if offset is None:
+			return None
+		return tuple(runtime._fromERegions(self._erid, offset + i) for i in range(3))
+
+	# get scalar (float) from either EDGE_REGION or GLOBAL_EDGE; or None
+	def _fgetScalar(self, param: str) -> float:
+		config = self._runtime.config
+		if param in config.regionEdgeParameters.get(self._region, {}):
+			return self._getScalar(param)
+		return ()  # TODO: (stub) global
+	
+	# get vector (tuple) from either EDGE_REGION or GLOBAL_EDGE; or None
+	def _fgetVector(self, param: str) -> vec:
+		config = self._runtime.config
+		if param in config.regionEdgeParameters.get(self._eregion, {}):
+			return self._getVector(param)
+		return ()  # TODO: (stub) global
+
+	# set scalar (float) in EDGE_REGION; or KeyError
+	def _fsetScalar(self, param: str, value: float) -> None:
+		runtime = self._runtime
+		config = runtime.config
+		if param not in config.regionEdgeParameters.get(self._eregion, {}):
+			raise KeyError(f"For edge-region {self._eregion}, can't modify {param} which was not defined in Config")
+		offset = runtime._region_offsets[param];  assert offset is not None  # DEBUG (assert)
+		runtime._toERegions(self._erid, offset, value)
+	
+	# set vector (tuple) in EDGE_REGION; or KeyError
+	def _fsetVector(self, param: str, value: vec) -> None:
+		runtime = self._runtime
+		config = runtime.config
+		if param not in config.regionEdgeParameters.get(self._eregion, {}):
+			raise KeyError(f"For edge region {self._eregion}, can't modify {param} which was not defined in Config")
+		offset = runtime._region_offsets[param];  assert offset is not None  # DEBUG (assert)
+		for i in range(3):
+			runtime._toERegions(self._erid, offset + i, value)
+
+for param in ["J", "Je1", "Jee", "b"]:
+	setattr(ERegionProxy, param, property(
+		fget=lambda self,        _p=param: self._fgetScalar(_p),
+		fset=lambda self, value, _p=param: self._fsetScalar(_p, value)
+	))
+for param in ["D"]:
+	setattr(ERegionProxy, param, property(
+		fget=lambda self,        _p=param: self._fgetVector(_p),
+		fset=lambda self, value, _p=param: self._fsetVector(_p, value)
+	))
+
+class NodeListProxy(ReadOnlyDict):
 	def __init__(self, runtime: Runtime):
+		super().__init__(runtime._node_proxies)
 		self._runtime = runtime
 	
 	def __getitem__(self, node) -> NodeProxy:
 		try:
-			return self._runtime._node_proxies[node]
+			return super().__getitem__(node)
 		except KeyError as ex:
 			raise KeyError(f"Node {node} is not defined in Config") from ex
 
-class EdgeProxy:
-	pass  # TODO
-
-class EdgeListProxy:
+class EdgeListProxy(ReadOnlyDict):
 	def __init__(self, runtime: Runtime):
+		super().__init__(runtime._edge_proxies)
 		self._runtime = runtime
 	
 	def __getitem__(self, edge: tuple) -> EdgeProxy:
 		try:
-			return self._runtime._edge_proxies[edge]
+			return super().__getitem__(edge)
 		except KeyError as ex:
 			raise KeyError(f"Edge {edge} in not defined in Config") from ex
 	
 	def __call__(self, node0, node1) -> EdgeProxy:
 		return self[(node0, node1)]
-
-class RegionProxy:
-	pass  # TODO
 
 class RegionListProxy:
 	def __init__(self, runtime: Runtime):
@@ -126,9 +382,6 @@ class RegionListProxy:
 			return self._runtime._region_proxies[region]
 		except KeyError as ex:
 			raise KeyError(f"Region {region} is not defined in Config") from ex
-
-class ERegionProxy:
-	pass  # TODO
 
 class ERegionListProxy:
 	def __init__(self, runtime: Runtime):
@@ -143,38 +396,26 @@ class ERegionListProxy:
 	def __call__(self, region0, region1) -> ERegionProxy:
 		return self[(region0, region1)]
 
-class GlobalsProxy:
-	pass  # TODO
-
-class SpinListProxy:
+class SpinListProxy(ReadOnlyDict):
 	def __init__(self, runtime: Runtime):
+		super().__init__({ node: proxy.spin for node, proxy in runtime._node_proxies.items() })
 		self._runtime = runtime
 	
-	def __getitem__(self, node) -> vec:
-		return self._runtime.node[node].spin
-	
-	def __setitem__(self, node, spin: vec):
+	def __setitem__(self, node, spin: vec) -> None:
 		self._runtime.node[node].spin = spin
 
-class FluxListProxy:
+class FluxListProxy(ReadOnlyDict):
 	def __init__(self, runtime: Runtime):
+		super().__init__({ node: proxy.flux for node, proxy in runtime._node_proxies.items() })
 		self._runtime = runtime
 	
 	def __getitem__(self, node) -> vec:
 		return self._runtime.node[node].flux
 	
-	def __setitem__(self, node, flux: vec):
+	def __setitem__(self, node, flux: vec) -> None:
 		self._runtime.node[node].flux = flux
 
-class ReadOnlyList(Sequence):
-	def __init__(self, lst):    self._lst = lst
-
-	def __len__(self):          return len(self._lst)
-	def __getitem__(self, i):   return self._lst[i]
-	def __iter__(self):         return iter(self._lst)
-	def __contains__(self, v):  return v in self._lst
-	# no __setitem__, append, extend, pop, etc. — attempts to mutate via wrapper fail
-
+# Handles communication to and from the DLL, as well as the liftime of the DLL file.
 class Runtime:
 	def __init__(self, config: Config, dll: str, delete: bool=False):
 		self.dll = dll
@@ -182,36 +423,74 @@ class Runtime:
 		self.driver = Driver(config, dll)
 		self._delete = delete  # delete on exit?
 		self._node_len = config.SIZEOF_NODE // 8  # in doubles (8-byte elements)
+		self._edge_len = config.SIZEOF_EDGE // 8  # ^^
 		self._offsets = {
-			"spin": div8(config.OFFSETOF_SPIN),
+			"spin": div8(config.OFFSETOF_SPIN),  # node offsets
 			"flux": div8(config.OFFSETOF_FLUX),
-			"B": div8(config.OFFSETOF_B),
-			"A": div8(config.OFFSETOF_A),
-			"S": div8(config.OFFSETOF_S),
-			"F": div8(config.OFFSETOF_F),
-			"kT": div8(config.OFFSETOF_kT),
-			"Je0": div8(config.OFFSETOF_Je0)
+			"B":    div8(config.OFFSETOF_B),
+			"A":    div8(config.OFFSETOF_A),
+			"S":    div8(config.OFFSETOF_S),
+			"F":    div8(config.OFFSETOF_F),
+			"kT":   div8(config.OFFSETOF_kT),
+			"Je0":  div8(config.OFFSETOF_Je0),
+			"J":    div8(config.OFFSETOF_J),     # edge offsets
+			"Je1":  div8(config.OFFSETOF_Je1),
+			"Jee":  div8(config.OFFSETOF_Jee),
+			"b":    div8(config.OFFSETOF_b),
+			"D":    div8(config.OFFSETOF_D)
 		}
-		self._node_proxies = { node: NodeProxy(self, node) for node in config.nodes }
-		self._edge_proxies = { edge: EdgeProxy(self, edge) for edge in config.edges }
-		self._region_proxies = { region: RegionProxy(self, region) for region in config.regions.keys() }
-		self._eregion_proxies = { eregion: ERegionProxy(self, eregion) for eregion in config.regionCombos }
-		self._node_list_proxy = NodeListProxy(self)
-		self._spin_list_proxy = SpinListProxy(self)
-		self._flux_list_proxy = FluxListProxy(self)
-		self._edge_list_proxy = EdgeListProxy(self)
-		self._region_list_proxy = RegionListProxy(self)
+		self._region_offsets ={
+			"B":   div8(config.OFFSETOF_REGION_B),    # region node offsets
+			"A":   div8(config.OFFSETOF_REGION_A),
+			"S":   div8(config.OFFSETOF_REGION_S),
+			"F":   div8(config.OFFSETOF_REGION_F),
+			"kT":  div8(config.OFFSETOF_REGION_kT),
+			"Je0": div8(config.OFFSETOF_REGION_Je0),
+			"J":   div8(config.OFFSETOF_REGION_J),    # region edge offsets
+			"Je1": div8(config.OFFSETOF_REGION_Je1),
+			"Jee": div8(config.OFFSETOF_REGION_Jee),
+			"b":   div8(config.OFFSETOF_REGION_B),
+			"D":   div8(config.OFFSETOF_REGION_D)
+		}
+		self._node_proxies    = { node:    NodeProxy(self, node)       for node    in config.nodes          }
+		self._edge_proxies    = { edge:    EdgeProxy(self, edge)       for edge    in config.edges          }
+		self._region_proxies  = { region:  RegionProxy(self, region)   for region  in config.regions.keys() }
+		self._eregion_proxies = { eregion: ERegionProxy(self, eregion) for eregion in config.regionCombos   }
+		self._node_list_proxy    = NodeListProxy(self)
+		self._spin_list_proxy    = SpinListProxy(self)
+		self._flux_list_proxy    = FluxListProxy(self)
+		self._edge_list_proxy    = EdgeListProxy(self)
+		self._region_list_proxy  = RegionListProxy(self)
 		self._eregion_list_proxy = ERegionListProxy(self)
-		self._globals_proxy = GlobalsProxy(self)
-		self._nodes_view = ReadOnlyList(config.nodes)
-		self._edges_view = ReadOnlyList(config.edges)
-		self._eregions_view = ReadOnlyList(config.regionCombos)
+		self._nodes_view    = ReadOnlyList([ *self._node_proxies.keys()    ])
+		self._edges_view    = ReadOnlyList([ *self._edge_proxies.keys()    ])
+		self._regions_view  = ReadOnlyList([ *self._region_proxies.keys()  ])
+		self._eregions_view = ReadOnlyList([ *self._eregion_proxies.keys() ])
+		# self._globals_proxy = GlobalsProxy(self)
 	
 	def _fromNodes(self, index: int, offset: int) -> float:
 		return self.driver.nodes[index * self._node_len + offset]
+
+	def _fromEdges(self, index: int, offset: int) -> float:
+		return self.driver.edges[index * self._edge_len + offset]
 	
+	def _fromRegions(self, rid: str, offset: int) -> float:
+		return getattr(self.driver, rid)[offset]
+
+	def _fromERegions(self, erid: str, offset: int) -> float:
+		return getattr(self.driver, erid)[offset]
+
 	def _toNodes(self, index: int, offset: int, value: float) -> None:
 		self.driver.nodes[index * self._node_len + offset] = value
+	
+	def _toEdges(self, index: int, offset: int, value: float) -> None:
+		self.driver.edges[index * self._edge_len + offset] = value
+	
+	def _toRegions(self, rid: str, offset: int, value: float) -> None:
+		getattr(self.driver, rid)[offset] = value
+	
+	def _toERegions(self, erid: str, offset: int, value: float) -> None:
+		getattr(self.driver, erid)[offset] = value
 
 	def shutdown(self):
 		self.driver.free()
@@ -226,53 +505,62 @@ class Runtime:
 		return False
 
 	@property
-	def nodes(self) -> Sequence:
-		return self._nodes_view
-	
-	@property
-	def node(self):
+	def node(self) -> Mapping:
 		return self._node_list_proxy
 
 	@property
-	def spin(self):
+	def spin(self) -> Mapping:
 		return self._spin_list_proxy
 
 	@property
-	def flux(self):
+	def flux(self) -> Mapping:
 		return self._flux_list_proxy
-	
-	@property
-	def edges(self) -> Sequence:
-		return self._edges_view
 
 	@property
-	def edge(self):
+	def edge(self) -> Mapping:
 		return self._edge_list_proxy
-	
-	@property
-	def regions(self) -> KeysView:
-		return self.config.regions.keys()
 
 	@property
-	def region(self):
+	def region(self) -> Mapping:
 		return self._region_list_proxy
-	
-	@property
-	def eregions(self) -> Sequence:
-		return self._eregions_view
 	
 	@property
 	def eregion(self):
 		return self._eregion_list_proxy
-
-	@property
-	def globals(self) -> dict:
-		return { param: getattr(self._globals_proxy, param) for param in self.config.globalParameters.keys() }
 
 	def __getitem__(self, region):
 		if type(region) is tuple:
 			return self.eregion[region]
 		else:
 			return self.region[region]
+	
+	@property
+	def nodes(self) -> Sequence:
+		return self._nodes_view
+	
+	@property
+	def edges(self) -> Sequence:
+		return self._edges_view
+
+	@property
+	def regions(self) -> Sequence:
+		return self._regions_view
+	
+	@property
+	def eregions(self) -> Sequence:
+		return self._eregions_view
+	
+	# TODO
+	@property
+	def globals(self) -> dict:
+		return { param: getattr(self._globals_proxy, param) for param in self.config.globalParameters.keys() }
+
+	@property
+	def spins(self) -> Sequence[vec]:
+		return ReadOnlyList([ *self.spin.values() ])
+	
+	@property
+	def fluxes(self) -> Sequence[vec]:
+		return ReadOnlyList([ *self.fluxes.values() ])
 
 # TODO: add global properties to runtime
