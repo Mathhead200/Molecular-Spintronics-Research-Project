@@ -1,12 +1,8 @@
 import mcheisenberg as mch
 
 def print_nodes(model: mch.Config, rt: mch.Runtime) -> None:
-	SPAN = model.SIZEOF_NODE // 8
-	for j in range(model.NODE_COUNT):
-		print(j, ": ", sep="", end="")
-		for i in range(SPAN):
-			print(rt.driver.nodes[j * SPAN + i], ", ", sep="", end="")
-		print()
+	for n in model.nodes:
+		print(f"{n}: {rt.spin[n]}")
 
 if __name__ == "__main__":
 	n = 10
@@ -23,5 +19,6 @@ if __name__ == "__main__":
 
 	with model.compile(dir=".") as rt:
 		print_nodes(model, rt)
-		rt.driver.metropolis(100000000)
+		rt.driver.metropolis(20000000)
+		rt.spin[9] = (0.0, 0.0, 0.0)
 		print_nodes(model, rt)

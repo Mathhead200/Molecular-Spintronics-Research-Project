@@ -1,15 +1,16 @@
 from __future__ import annotations
-from typing import Callable, Generic, Iterable, Optional, Self, TypedDict, TypeVar
-from datetime import datetime
-from collections import defaultdict
-from math import log2, ceil
-from .prng import SplitMix64
-import os
-from tempfile import mkstemp
-from importlib import resources
 from .build import VisualStudio
-from subprocess import CalledProcessError
+from .prng import SplitMix64
 from .runtime import Runtime
+from collections import defaultdict
+from copy import deepcopy
+from datetime import datetime
+from importlib import resources
+from math import log2, ceil
+from subprocess import CalledProcessError
+from tempfile import mkstemp
+from typing import Callable, Generic, Iterable, Optional, Self, TypedDict, TypeVar
+import os
 
 type vec = tuple[float, float, float]
 
@@ -394,11 +395,11 @@ class Config:
 			return v
 		return self.globalParameters.get(k, None)
 	
-	def compile(self, tool=VisualStudio(), asm: str=None, _def: str=None, obj: str=None, dll: str=None, dir=None) -> Runtime:
+	def compile(self, tool=VisualStudio(), asm: str=None, _def: str=None, obj: str=None, dll: str=None, dir: str=None, copy_config: bool=True) -> Runtime:
 		# Check for and fix missing required attributes;
-		if "nodes"                not in self.__dict__:  self.nodes = {}
+		if "nodes"                not in self.__dict__:  self.nodes = []
 		if "mutableNodes"         not in self.__dict__:  self.mutableNodes = self.nodes
-		if "edges"                not in self.__dict__:  self.edges = {}
+		if "edges"                not in self.__dict__:  self.edges = []
 		if "regions"              not in self.__dict__:  self.regions = {}
 		if "localNodeParameters"  not in self.__dict__:  self.localNodeParameters = {}
 		if "localEdgeParameters"  not in self.__dict__:  self.localEdgeParameters = {}
@@ -437,7 +438,7 @@ class Config:
 		self.localEdgeKeys = Config.innerKeys(self.localEdgeParameters)    # set[str]
 		self.regionNodeKeys = Config.innerKeys(self.regionNodeParameters)  # set[str]
 		self.regionEdgeKeys = Config.innerKeys(self.regionEdgeParameters)  # set[str]
-		self.globalKeys = self.globalParameters.keys()                    # set[str]
+		self.globalKeys = { *self.globalParameters.keys() }                # set[str]
 		self.allKeys = self.localNodeKeys | self.localEdgeKeys | self.regionNodeKeys | self.regionEdgeKeys | self.globalKeys
 		self.constParameters = self.allKeys - self.variableParameters  # set[str]
 		self.immutableNodes = self.calcImmutableNodes()  # list[Node]
@@ -1469,4 +1470,4 @@ class Config:
 		if _def_temp:  os.remove(_def)
 
 		# dynamically link to python
-		return Runtime(config=self, dll=dll, delete=dll_temp)
+		return Runtime(config=deepcopy(self), dll=dll, delete=dll_temp)
