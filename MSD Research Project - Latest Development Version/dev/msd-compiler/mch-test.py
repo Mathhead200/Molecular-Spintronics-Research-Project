@@ -37,8 +37,8 @@ if __name__ == "__main__":
 		},
 	}
 	model.regionEdgeParameters = {
-		"R": {
-			"B": -0.1
+		("R", "R"): {
+			"b": 0.1
 		}
 	}
 	model.globalParameters = {
@@ -49,6 +49,8 @@ if __name__ == "__main__":
 	}
 
 	with model.compile(dir=".", asm="mch-test.asm") as rt:
+		rt.seed(0)
+		print(rt.prng_state)
 		print_spins(rt)
 		print_Js(rt)
 		print_kTs(rt)
@@ -57,11 +59,11 @@ if __name__ == "__main__":
 		rt.spin[9] = (0.0, 0.0, 0.0)
 		rt.edge[0, 1].J = 2.0
 		rt.region["L"].kT = 1.0
-		rt.region["R"].b = -0.1
+		rt.eregion["R", "R"].b = -0.1
 		print_spins(rt)
 		rt.driver.metropolis(20000000)
 		print_spins(rt)
 		print_Js(rt)
 		print_kTs(rt)
 		print_bs(rt)
-		print(rt.region["R"].b)
+		print(rt.eregion["R", "R"].b)

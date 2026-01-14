@@ -1,6 +1,5 @@
 from __future__ import annotations
 from .build import VisualStudio
-from .prng import SplitMix64
 from .runtime import Runtime
 from collections import defaultdict
 from copy import deepcopy
@@ -9,7 +8,7 @@ from importlib import resources
 from math import log2, ceil
 from subprocess import CalledProcessError
 from tempfile import mkstemp
-from typing import Callable, Generic, Iterable, Optional, Self, TypedDict, TypeVar
+from typing import Callable, Generic, Iterable, Optional, Self, TypedDict, TypeVar, Sequence
 import os
 
 type vec = tuple[float, float, float]
@@ -419,12 +418,14 @@ class Config:
 
 		# CHECK: Do all nodes referenced in self.edges actually exist in self.nodes?
 		for edge in self.edges:
+			if type(edge) is not tuple:
+				raise ValueError(f"All edges must be tuples: type={type(edge)} for edge {edge}")
 			if len(edge) != 2:
 				raise ValueError(f"All edges must have exactly 2 nodes: len={len(edge)} for edge {edge}")
 			for node in edge:
 				if node not in self.nodes:
 					raise KeyError(f"All nodes referenced in model.edges must exist in model.nodes: Couldn't find node {node} referenced in edge {edge}")
-		
+
 		# CHECK: Are all parameters (i.e. dict keys) supported by the program and
 		# 	in the correct dicts (i.e. edge parameter in node dict)?
 		ALLOWED_NODE_PARAMETERS = ["B", "A", "S", "F", "kT", "Je0"]
@@ -458,7 +459,7 @@ class Config:
 						raise KeyError(f'{k} is a program parameter and unsupported in regionNodeParameters[{r}]["{k}"]. Fix: config.programParameters[{r}]["{k}"] = {v}')
 					else:
 						raise KeyError(f'{k} is an unrecognized parameter and unsupported in regionNodeParameters[{r}]["{k}"]. Typo? (Allowable node parameters: {ALLOWED_NODE_PARAMETERS})')
-		for r, p in self.regionNodeParameters.items():
+		for r, p in self.regionEdgeParameters.items():
 			for k, v in p.items():
 				if k not in ALLOWED_EDGE_PARAMETERS:
 					if k in ALLOWED_NODE_PARAMETERS:
@@ -502,6 +503,34 @@ class Config:
 		self.regionCombos = self.calcAllRegionCombos()  # list[Edge]
 		self.nodeIndex = {}  # dict[Node, int]
 		self.edgeIndex = {}  # dict[Edge, int]
+
+		# CHECK: Do all keys in localNodeParameters reference nodes in self.nodes?
+		for node in self.localNodeParameters:
+			if node not in self.nodes:
+				raise KeyError(f"dict key {node} in localNodeParameters is not a defined node in config.nodes")
+
+		# CHECK: Do all keys in localEdgeParameters reference edges in self.edgs?
+		for edge in self.localEdgeParameters:
+			if type(edge) is not tuple:
+				raise KeyError(f"dict key {edge} in localEdgeParameters must be a tuple: type={type(edge)}")
+			if len(edge) != 2:
+				raise KeyError(f"dict key {edge} in localEdgeParameter must reference exactly 2 nodes: len={len(edge)}")
+			if edge not in self.edges:
+				raise KeyError(f"dict key {edge} in localEdgeParameters is not a defined edge in config.edges")
+
+		# CHECK: Do all keys in regionNodeParameters reference regions in self.regions?
+		for region in self.regionNodeParameters:
+			if region not in self.regions:
+				raise KeyError(f"dit key {region} in regionNodeParameters is not a defined region in config.regions")
+
+		# CHECK: Do all edge-regions reference regions that actually exists in self.regions?
+		for combo in self.regionEdgeParameters.keys():
+			if type(combo) is not tuple:
+				raise KeyError(f"dict keys {combo} in regionEdgeParameters must be a tuple: type={type(combo)}")
+			if len(combo) != 2:
+				raise KeyError(f"dict key {combo} in regionEdgeParameters must reference exactly 2 regions (or None): len={len(combo)}")
+			if combo not in self.regionCombos:
+				raise KeyError(f"dict key {combo} in regionEdgeParameters is not referencing a defined edge-region. Defined edge-regions are: {self.regionCombos}")
 
 		exports = []  # [(symbol: str, data: bool), ...]
 
@@ -730,7 +759,7 @@ class Config:
 			if "J"   in self.regionEdgeKeys:  src += f"OFFSETOF_REGION_J   EQU 32*({offset32}) + 8*(0)\n";  self.OFFSETOF_REGION_J   = 32 * offset32 + 8*0
 			if "Je1" in self.regionEdgeKeys:  src += f"OFFSETOF_REGION_Je1 EQU 32*({offset32}) + 8*(1)\n";  self.OFFSETOF_REGION_Je1 = 32 * offset32 + 8*1
 			if "Jee" in self.regionEdgeKeys:  src += f"OFFSETOF_REGION_Jee EQU 32*({offset32}) + 8*(2)\n";  self.OFFSETOF_REGION_Jee = 32 * offset32 + 8*2
-			if "b"   in self.regionEdgeKeys:  src += f"OFFSETOF_REGION_b   EQU 32*({offset32}) + 8*(3)\n";  self.OFFSETOF_REGIONN_b  = 32 * offset32 + 8*3
+			if "b"   in self.regionEdgeKeys:  src += f"OFFSETOF_REGION_b   EQU 32*({offset32}) + 8*(3)\n";  self.OFFSETOF_REGION_b   = 32 * offset32 + 8*3
 			offset32 += 1
 		if "D" in self.regionEdgeKeys:
 			self.OFFSETOF_REGION_D = 32 * offset32
@@ -857,19 +886,7 @@ class Config:
 				src += ".data\n"
 				src += "PRNG SEGMENT ALIGN(32)\n"
 				# use given seed, plus SplitMix64 if len < 16
-				prng_state = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
-				for n, s in enumerate(seed):
-					prng_state[n // 4][n % 4] = int(s)
-				if len(seed) < 16:
-					sm64: SplitMix64 = None  # initialized in loop
-					for j_offset in range(4):
-						n = len(seed) - 1 - j_offset  # final 4 seeds (if they exist)
-						j = n % 4
-						i = n // 4
-						if n >= 0:  # true for at least offset==0 since len(seed) != 0
-							sm64 = SplitMix64(int(seed[n]))
-						for i_offset in range(i + 1, 4):
-							prng_state[i_offset][j] = sm64.next()
+				prng_state = Runtime._generateXoshiro256State(seed)
 				src += "prng_state dq\t"
 				for i, row in enumerate(prng_state):
 					if i != 0:

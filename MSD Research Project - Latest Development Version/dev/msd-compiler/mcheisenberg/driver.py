@@ -72,6 +72,10 @@ class Driver:
 
 		# TODO: _ref parallel arrays?
 
+		assert config.programParameters["prng"].startswith("xoshiro256")   # TODO: support other PRNGs
+		self.prng_state = (c_double * (4 * 4)).in_dll(self.dll, "prng_state")
+		self.symbols.append("prng_state")
+
 	def metropolis(self, iterations: c_int64) -> None:
 		self.dll.metropolis(iterations)
 	
