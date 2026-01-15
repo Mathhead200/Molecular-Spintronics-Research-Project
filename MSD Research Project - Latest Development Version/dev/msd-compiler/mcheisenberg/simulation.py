@@ -5,7 +5,9 @@ from numpy import ndarray
 import numpy as np
 
 class NodeVectorParameterProxy:
-	def __init__(self)
+	def __init__(self, simulation: Simulation, param: str):
+		self._runtime = simulation.rt
+		pass  # TODO
 
 # The full state of the Simulation at some simulation time, t.
 class Snapshot:
