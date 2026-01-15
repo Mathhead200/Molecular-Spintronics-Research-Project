@@ -4,6 +4,9 @@ from collections.abc import Sequence, Mapping
 from numpy import ndarray
 import numpy as np
 
+class NodeVectorParameterProxy:
+	def __init__(self)
+
 # The full state of the Simulation at some simulation time, t.
 class Snapshot:
 	def __init__(self, sim: Simulation):
@@ -73,15 +76,18 @@ class Simulation:
 		self.samples.append(Snapshot(self))
 	
 	@property
-	def spins(self) -> Sequence[ndarray]:
-		return [np.array(s) for s in self.rt.spins]
+	def spins(self) -> ndarray:
+		""" shape: (n, 3) """
+		return np.array([np.array(s) for s in self.rt.spins])
 	
 	@property
-	def fluxes(self) -> Sequence[ndarray]:
-		return [np.array(f) for f in self.rt.fluxes]
+	def fluxes(self) -> ndarray:
+		""" shape: (n, 3) """
+		return np.array([np.array(f) if f is not None else Simulation.VEC_ZERO for f in self.rt.fluxes])
 
 	@property
-	def magnetizations(self) -> Sequence[ndarray]:
+	def magnetizations(self) -> ndarray:
+		""" shape: (n, 3) """
 		return self.spins + self.fluxes
 	
 	# TODO ...

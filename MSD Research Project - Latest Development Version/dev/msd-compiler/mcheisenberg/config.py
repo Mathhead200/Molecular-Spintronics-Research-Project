@@ -1,14 +1,15 @@
 from __future__ import annotations
 from .build import VisualStudio
 from .runtime import Runtime
+from .util import StrJoiner, floats, is_pow2
 from collections import defaultdict
 from copy import deepcopy
 from datetime import datetime
 from importlib import resources
-from math import log2, ceil
+from math import ceil, log2
 from subprocess import CalledProcessError
 from tempfile import mkstemp
-from typing import Callable, Generic, Iterable, Optional, Self, TypedDict, TypeVar, Sequence
+from typing import Callable, Generic, Iterable, Optional, TypeVar, TypedDict
 import os
 
 type vec = tuple[float, float, float]
@@ -72,23 +73,6 @@ class _Config(Generic[Index, Region], TypedDict, total=False):
 
 	nodeId: Callable[[Node], str]      # returned str must conform to C identifier spec.
 	regionId: Callable[[Region], str]  # returned str must conform to C identifier spec. Must be able to handle None as input.
-
-def floats(values: Iterable) -> tuple[float]:
-	return (float(x) for x in values)
-
-def is_pow2(n: int) -> bool:
-	return n > 0 and (n & (n - 1)) == 0
-
-class StrJoiner:
-	def __init__(self):
-		self.pieces = []
-
-	def __iadd__(self, value):
-		self.pieces.append(value)
-		return self
-
-	def __str__(self):
-		return "".join(self.pieces)
 
 class Config:
 	def __init__(self, **kw):

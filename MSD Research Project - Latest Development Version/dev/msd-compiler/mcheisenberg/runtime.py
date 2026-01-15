@@ -1,40 +1,12 @@
 from __future__ import annotations
 from .driver import Driver
 from .prng import SplitMix64
+from .util import AbstractReadOnlyDict, ReadOnlyDict, ReadOnlyList, div8
 from collections.abc import Sequence, Mapping
 import os
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
 	from .config import Config, vec
-
-def div8(n: int) -> int:
-	return int(n // 8) if n is not None else None
-
-# Wrapper allowing read-only access to underlying list/Sequence
-class ReadOnlyList(Sequence):
-	def __init__(self, lst: Sequence):  self._lst = lst
-
-	def __len__(self):          return len(self._lst)	
-	def __getitem__(self, i):   return self._lst[i]
-	def __iter__(self):         return iter(self._lst)
-	def __contains__(self, v):  return v in self._lst
-
-# Parent to be extended/derived from
-class AbstractReadOnlyDict(Mapping):
-	def keys(self):    return iter(self)
-	def values(self):  return (self[k] for k in self)
-	def items(self):   return ((k, self[k]) for k in self)
-	def get(self, key, default=None):  return self[key] if key in self else default
-
-# Wrapper allowing read-only access to underlying dict
-class ReadOnlyDict(AbstractReadOnlyDict):
-	def __init__(self, dct: dict):  self._dct = dct
-
-	def __getitem__(self, i):  return self._dct[i]
-	def __iter__(self):        return iter(self._dct)
-	def __len__(self):         return len(self._dct)
-
-	def get(self, key, default=None):  return self._dct.get(key, default)
 
 # Provides properties (i.e. getters and setters) for local node state and parameters.
 # `None` is returned by getters for undefined state/parameters.
@@ -416,7 +388,6 @@ for param in ["S", "F", "kT", "Je0", "J", "Je1", "Jee", "b"]:
 class NodeListProxy(ReadOnlyDict):
 	def __init__(self, runtime: Runtime):
 		super().__init__(runtime._node_proxies)
-		self._runtime = runtime
 	
 	def __getitem__(self, node) -> NodeProxy:
 		try:
@@ -427,7 +398,6 @@ class NodeListProxy(ReadOnlyDict):
 class EdgeListProxy(ReadOnlyDict):
 	def __init__(self, runtime: Runtime):
 		super().__init__(runtime._edge_proxies)
-		self._runtime = runtime
 	
 	def __getitem__(self, edge: tuple) -> EdgeProxy:
 		try:
@@ -438,23 +408,23 @@ class EdgeListProxy(ReadOnlyDict):
 	def __call__(self, node0, node1) -> EdgeProxy:
 		return self[(node0, node1)]
 
-class RegionListProxy:
+class RegionListProxy(ReadOnlyDict):
 	def __init__(self, runtime: Runtime):
-		self._runtime = runtime
+		super().__init__(runtime._region_proxies)
 	
 	def __getitem__(self, region) -> RegionProxy:
 		try:
-			return self._runtime._region_proxies[region]
+			return super().__getitem__(region)
 		except KeyError as ex:
 			raise KeyError(f"Region {region} is not defined in Config") from ex
 
-class ERegionListProxy:
+class ERegionListProxy(ReadOnlyDict):
 	def __init__(self, runtime: Runtime):
-		self._runtime = runtime
+		super().__init__(runtime._eregion_proxies)
 	
 	def __getitem__(self, eregion: tuple) -> ERegionProxy:
 		try:
-			return self._runtime._eregion_proxies[eregion]
+			return super().__getitem__(eregion)
 		except KeyError as ex:
 			raise KeyError(f"Edge-region {eregion} in not defined in Config") from ex
 	

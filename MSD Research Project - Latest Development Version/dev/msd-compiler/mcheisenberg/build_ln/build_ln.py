@@ -1,24 +1,13 @@
 # vectorized
 
-from math import log, ceil
+from math import log
 from time import time
-from remez import remez
-from struct import pack
+from util import StrJoiner
+from util.remez import remez
 
 M_TRUNC = 10
 MINIMAX_DEG = 4
 
-class StrJoiner:
-	def __init__(self):
-		self.pieces = []
-
-	def __iadd__(self, value):
-		self.pieces.append(value)
-		return self
-
-	def __str__(self):
-		return "".join(self.pieces)
-	
 def minimax_coefs(delta = 1 / 2**(M_TRUNC + 1), deg = MINIMAX_DEG):
 	fx = "np.log1p(x)"
 	fx_der = "1.0/(1.0 + x)"
@@ -57,7 +46,7 @@ def minimax_coefs(delta = 1 / 2**(M_TRUNC + 1), deg = MINIMAX_DEG):
 
 	return coefs
 
-if __name__ == "__main__":
+def build_ln(out="mcheisenburg/ln.inc"):
 	t = time()
 
 	coefs = minimax_coefs()  # floats
@@ -172,8 +161,11 @@ if __name__ == "__main__":
 	src += "\tvaddpd dest, dest, temp4Y  ; ln(m) + x*ln(2)\n"
 	src +="ENDM\n"
 
-	with open(f"src/ln.inc", "w", encoding="utf-8") as file:
+	with open(out, "w", encoding="utf-8") as file:
 		file.write(str(src))
 	
 	t = time() - t
 	print(f"Done. time: {t:.3f} s")
+
+if __name__ == "__main__":
+	build_ln()
