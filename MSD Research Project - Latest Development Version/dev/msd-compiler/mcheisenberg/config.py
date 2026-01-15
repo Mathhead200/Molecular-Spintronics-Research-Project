@@ -539,6 +539,7 @@ class Config:
 		# options
 		src += "OPTION CASEMAP:NONE\n\n"
 		# includes
+		src += "include dumpreg.inc\n"  # DEBUG
 		src += "include vec.inc  ; _vdotp, etc.\n"
 		src += "include prng.inc  ; splitmix64, xoshiro256ss, etc. \n"
 		src += "include ln.inc  ; _vln\n\n"
@@ -1155,6 +1156,8 @@ class Config:
 						src += f"\tvsubpd {dsm}, {m1i}, {smi}  ; \\Delta m_i = m'_i - m_i\n\n"
 					else:
 						src += f"\t; ({dsm}) \\Delta m_i = \\Delta s_i since \\Delta f_i = 0\n\n"
+				else:
+					src += "\t; Phase 3: (skip)\n\n"
 				src += str(src3)
 				# return:
 				if not out_init:
@@ -1534,14 +1537,18 @@ class Config:
 		with resources.as_file(resources.files(__package__)) as package_path:
 			try:
 				tool.assemble(asm, out=obj, include=[str(package_path)])
-				tool.dlink(obj, out=dll, entry="DllMain", exports=_def)
+				# tool.dlink(obj, out=dll, entry="DllMain", exports=_def)
+				tool.dlink(obj, "ucrt.lib", "legacy_stdio_definitions.lib", out=dll, entry="DllMain", exports=_def)  # DEBUG
 			except CalledProcessError as ex:
 				raise  # TODO: (stub) Re-raise exception
 		
-		# clean up tempp files
+		# clean up temp files
 		if  asm_temp:  os.remove( asm)
 		if  obj_temp:  os.remove( obj)
 		if _def_temp:  os.remove(_def)
 
 		# dynamically link to python
-		return Runtime(config=deepcopy(self), dll=dll, delete=dll_temp)
+		c = self
+		if copy_config:
+			c = deepcopy(c)
+		return Runtime(config=c, dll=dll, delete=dll_temp)
