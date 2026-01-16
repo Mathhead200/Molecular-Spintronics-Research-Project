@@ -1,12 +1,40 @@
 from __future__ import annotations
-from .runtime import Runtime, \
-	ScalarParameterProxy as RuntimeScalarParameterProxy, \
-	VectorParameterProxy as RuntimeVectorParameterProxy
+from .runtime import Runtime
 from collections.abc import Sequence, Mapping
 from numpy import ndarray
 import numpy as np
 
-class SimulationParameterProxy:
+class ParameterProxy:
+	def __init__(self, simulation: Simulation, param: str):
+		self._runtime_proxy = getattr(simulation.rt, param)  # Returned proxy should be const. Get once and store.
+		self._param = param
+	
+	@property
+	def _runtime_value(self):
+		return self._runtime_proxy.value
+	
+	@_runtime_value.setter
+	def _runtime_value(self, value) -> None:
+		self._runtime_proxy.value = value
+
+	def __getitem__(self, key):
+		return self._runtime_proxy[key]
+	
+	def __setitem__(self, key, value) -> None:
+		self._runtime_proxy[key] = value
+	
+	@property
+	def name(self):
+		return self._param
+	
+	@property
+	def value(self):
+		raise NotImplementedError()  # abstract
+	
+	@value.setter
+	def value(self, v) -> None:
+		raise NotImplementedError()  # abstract
+
 	def __add__(self, addend):       return self.value + addend
 	def __sub__(self, subtrahend):   return self.value - subtrahend
 	def __mul__(self, multiplier):   return self.value * multiplier
@@ -26,13 +54,13 @@ class SimulationParameterProxy:
 	def __rmod__(self, dividend):       return dividend % self.value
 	def __rpow__(self, base):           return base ** self.value
 
-	def __iadd__(self, addend):        self.value = self + addend; return self
+	def __iadd__(self, addend):        self.value = self + addend;     return self
 	def __isub__(self, subtrahend):    self.value = self - subtrahend; return self
 	def __imul__(self, multiplier):    self.value = self * multiplier; return self
-	def __itruediv__(self, divisor):   self.value = self / divisor; return self
-	def __ifloordiv__(self, divisor):  self.value = self // divisor; return
-	def __imod__(self, modulus):       self.value = self % modulus; return self
-	def __ipow__(self, exponent):      self.value = self ** exponent; return self
+	def __itruediv__(self, divisor):   self.value = self / divisor;    return self
+	def __ifloordiv__(self, divisor):  self.value = self // divisor;   return self
+	def __imod__(self, modulus):       self.value = self % modulus;    return self
+	def __ipow__(self, exponent):      self.value = self ** exponent;  return self
 
 	def __eq__(self, other):  return self.value == other
 	def __ne__(self, other):  return self.value != other
@@ -41,21 +69,41 @@ class SimulationParameterProxy:
 	def __gt__(self, other):  return self.value > other
 	def __ge__(self, other):  return self.value >= other
 
-class VectorParameterProxy(RuntimeVectorParameterProxy, SimulationParameterProxy):
+class VectorParameterProxy(ParameterProxy):
+	def __array__(self, dtype=None) -> ndarray:
+		return np.asarray(self._runtime_value, dtype=dtype)
+
 	@property
 	def value(self) -> ndarray:
-		return self.__array__()
+		return self.__array__(dtype=float)
 	
-	def __array__(self, dtype=None) -> ndarray:
-		return np.array([*super().value], dtype=dtype)
+	@value.setter
+	def value(self, value: ndarray):
+		self._runtime_value = tuple(value.astype(float).tolist())
+
+	def __len__(self):   return len(self._runtime_value)
+	def __iter__(self):  return iter(self.value)
+
+	# numpy specific stuff
+	__array_priority__ = -1000.0  # VERY LOW: Let other numpy arrray coerce this object
+
+	def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
+		return getattr(ufunc, method)(self.value, *inputs, **kwargs)
 	
-	def __len__(self):                return len(self.value)
-	def __getitem__(self, i):         return self.value[i]
-	def __setitem__(self, i, value):  self.value[i] = value
-	def __iter__(self):               return iter(self.value)
+	def __array_function__(self, func, types, args, kwargs):
+		return func(self.value, *args, **kwargs)
 	
+class ScalarParameterProxy(ParameterProxy):
+	def __float__(self) -> float:
+		return self._runtime_value
+
+	@property
+	def value(self) -> float:
+		return float(self)
 	
-class ScalarParameterProxy(RuntimeScalarParameterProxy, SimulationParameterProxy):  pass
+	@value.setter
+	def value(self, value: float) -> None:
+		self._runtime_value = value
 
 # The full state of the Simulation at some simulation time, t.
 class Snapshot:
@@ -80,6 +128,10 @@ class Simulation:
 		self.rt = rt
 		self.t = 0  # current simulation time since last restart (i.e. seed, reinitialization, or randomization)
 		self.samples = []
+		for param in ["A", "B", "D"]:
+			setattr(self, f"_{param}_proxy", VectorParameterProxy(self, param))
+		for param in ["S", "F", "kT", "Je0", "J", "Je1", "Jee", "b"]:
+			setattr(self, f"_{param}_proxy", ScalarParameterProxy(self, param))
 
 	def seed(self, *seed: int) -> None:
 		self.rt.seed()
@@ -141,3 +193,9 @@ class Simulation:
 		return self.spins + self.fluxes
 	
 	# TODO ...
+
+for param in ["A", "B", "S", "F", "kT", "Je0", "J", "Je1", "Jee", "b", "D"]:
+	setattr(Simulation, param, property(
+		fget=lambda self,        _p=param: getattr(self, f"_{_p}_proxy"),
+		fset=lambda self, value, _p=param: 
+	))

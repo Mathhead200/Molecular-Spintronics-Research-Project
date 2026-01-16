@@ -459,12 +459,19 @@ class StateListProxy(AbstractReadOnlyDict):
 class ParameterProxy:
 	def __init__(self, runtime: Runtime, param: str):
 		self._runtime = runtime
-		self.name = param
-		print(self.name, type(self.value), str(self.value), repr(self.value), self.value)  # DEBUG
+		self._param = param
 	
+	@property
+	def name(self):
+		return self._param
+
 	@property
 	def value(self):
 		return getattr(self._runtime._globals_proxy, self.name)
+	
+	@value.setter
+	def value(self, value) -> None:
+		setattr(self._runtime._globals_proxy, self.name, value)
 
 	def __getitem__(self, key):
 		param = self.name
