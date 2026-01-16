@@ -352,14 +352,17 @@ class GlobalsProxy:
 		self._runtime = runtime
 	
 	def _getScalar(self, param: str) -> float:
-		return getattr(self._runtime.driver, param, None).value
+		runtime = self._runtime
+		if param not in runtime.config.globalParameters:
+			return None
+		return getattr(runtime.driver, param).value
 	
 	def _getVector(self,  param: str) -> vec:
-		try:
-			v = getattr(self._runtime.driver, param)
-			return tuple(v[i] for i in range(3))
-		except AttributeError:
+		runtime = self._runtime
+		if param not in runtime.config.globalParameters:
 			return None
+		v = getattr(runtime.driver, param)
+		return tuple(v[i] for i in range(3))
 	
 	def _setScalar(self, param: str, value: float) -> None:
 		try:

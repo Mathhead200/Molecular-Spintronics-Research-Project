@@ -75,6 +75,10 @@ class _Config(Generic[Index, Region], TypedDict, total=False):
 	regionId: Callable[[Region], str]  # returned str must conform to C identifier spec. Must be able to handle None as input.
 
 class Config:
+	ALLOWED_NODE_PARAMETERS = { "B", "A", "S", "F", "kT", "Je0" }
+	ALLOWED_EDGE_PARAMETERS = { "J", "Je1", "Jee", "b", "D" }
+	ALLOWED_PRGM_PARAMETERS = { "prng", "seed" }
+	
 	def __init__(self, **kw):
 		self.__dict__ = _Config(*kw)
 		if "nodeId" not in self.__dict__:
@@ -412,60 +416,57 @@ class Config:
 
 		# CHECK: Are all parameters (i.e. dict keys) supported by the program and
 		# 	in the correct dicts (i.e. edge parameter in node dict)?
-		ALLOWED_NODE_PARAMETERS = ["B", "A", "S", "F", "kT", "Je0"]
-		ALLOWED_EDGE_PARAMETERS = ["J", "Je1", "Jee", "b", "D"]
-		ALLOWED_PRGM_PARAMETERS = ["prng", "seed"]
 		for n, p in self.localNodeParameters.items():
 			for k, v in p.items():
-				if k not in ALLOWED_NODE_PARAMETERS:
-					if k in ALLOWED_EDGE_PARAMETERS:
+				if k not in Config.ALLOWED_NODE_PARAMETERS:
+					if k in Config.ALLOWED_EDGE_PARAMETERS:
 						raise KeyError(f'{k} is an edge parameters and unsupported in localNodeParameters[{n}]["{k}"]. Fix: config.localEdgeParameters[{n}, {n}]["{k}"] = {v}')
-					elif k in ALLOWED_PRGM_PARAMETERS:
+					elif k in Config.ALLOWED_PRGM_PARAMETERS:
 						raise KeyError(f'{k} is a program parameter and unsupported in localNodeParameters[{n}]["{k}"]. Fix: config.programParameters[{n}, {n}]["{k}"] = {v}')
 					else:
-						raise KeyError(f'{k} is an unrecognized parameter and unsupported in localNodeParameters[{n}]["{k}"]. Typo? (Allowable node parameters: {ALLOWED_NODE_PARAMETERS})')
+						raise KeyError(f'{k} is an unrecognized parameter and unsupported in localNodeParameters[{n}]["{k}"]. Typo? (Allowable node parameters: {Config.ALLOWED_NODE_PARAMETERS})')
 		for e, p in self.localEdgeParameters.items():
 			n0, n1 = e
 			for k, v in p.items():
-				if k not in ALLOWED_EDGE_PARAMETERS:
-					if k in ALLOWED_NODE_PARAMETERS:
+				if k not in Config.ALLOWED_EDGE_PARAMETERS:
+					if k in Config.ALLOWED_NODE_PARAMETERS:
 						raise KeyError(f'{k} is a node parameters and unsupported in localEdgeParameters[{n0}, {n1}]["{k}"]. Fix: config.localNodeParameters[{n0}]["{k}"] = {v}')
-					elif k in ALLOWED_PRGM_PARAMETERS:
+					elif k in Config.ALLOWED_PRGM_PARAMETERS:
 						raise KeyError(f'{k} is a program parameter and unsupported in localEdeParameters[{n0}, {n1}]["{k}"]. Fix: config.programParameters["{k}"] = {v}')
 					else:
-						raise KeyError(f'{k} is an unrecognized parameter and unsupported in localEdgeParameters["{k}"]. Typo? (Allowable edge parameters: {ALLOWED_EDGE_PARAMETERS})')
+						raise KeyError(f'{k} is an unrecognized parameter and unsupported in localEdgeParameters["{k}"]. Typo? (Allowable edge parameters: {Config.ALLOWED_EDGE_PARAMETERS})')
 		for r, p in self.regionNodeParameters.items():
 			for k, v in p.items():
-				if k not in ALLOWED_NODE_PARAMETERS:
-					if k in ALLOWED_EDGE_PARAMETERS:
+				if k not in Config.ALLOWED_NODE_PARAMETERS:
+					if k in Config.ALLOWED_EDGE_PARAMETERS:
 						raise KeyError(f'{k} is an edge parameters and unsupported in regionNodeParameters[{r}]["{k}"]. Fix: config.regionEdgeParameters[{r}]["{k}"] = {v}')
-					elif k in ALLOWED_PRGM_PARAMETERS:
+					elif k in Config.ALLOWED_PRGM_PARAMETERS:
 						raise KeyError(f'{k} is a program parameter and unsupported in regionNodeParameters[{r}]["{k}"]. Fix: config.programParameters[{r}]["{k}"] = {v}')
 					else:
-						raise KeyError(f'{k} is an unrecognized parameter and unsupported in regionNodeParameters[{r}]["{k}"]. Typo? (Allowable node parameters: {ALLOWED_NODE_PARAMETERS})')
+						raise KeyError(f'{k} is an unrecognized parameter and unsupported in regionNodeParameters[{r}]["{k}"]. Typo? (Allowable node parameters: {Config.ALLOWED_NODE_PARAMETERS})')
 		for r, p in self.regionEdgeParameters.items():
 			for k, v in p.items():
-				if k not in ALLOWED_EDGE_PARAMETERS:
-					if k in ALLOWED_NODE_PARAMETERS:
+				if k not in Config.ALLOWED_EDGE_PARAMETERS:
+					if k in Config.ALLOWED_NODE_PARAMETERS:
 						raise KeyError(f'{k} is a node parameters and unsupported in regionEdgeParameters[{r}]["{k}"]. Fix: config.regionNodeParameters[{r}]["{k}"] = {v}')
-					elif k in ALLOWED_PRGM_PARAMETERS:
+					elif k in Config.ALLOWED_PRGM_PARAMETERS:
 						raise KeyError(f'{k} is a program parameter and unsupported in regionEdgeParameters[{r}]["{k}"]. Fix: config.programParameters[{r}]["{k}"] = {v}')
 					else:
-						raise KeyError(f'{k} is an unrecognized parameter and unsupported in regionNodeParameters[{r}]["{k}"]. Typo? (Allowable edge parameters: {ALLOWED_EDGE_PARAMETERS})')
+						raise KeyError(f'{k} is an unrecognized parameter and unsupported in regionNodeParameters[{r}]["{k}"]. Typo? (Allowable edge parameters: {Config.ALLOWED_EDGE_PARAMETERS})')
 		for k, v in self.globalParameters.items():
-			if k not in ALLOWED_NODE_PARAMETERS + ALLOWED_EDGE_PARAMETERS:
-				if k in ALLOWED_PRGM_PARAMETERS:
+			if k not in Config.ALLOWED_NODE_PARAMETERS | Config.ALLOWED_EDGE_PARAMETERS:
+				if k in Config.ALLOWED_PRGM_PARAMETERS:
 					raise KeyError(f'{k} is a program parameter and unsupported in globalParameters["{k}"]. Fix: config.prograParameters["{k}"] = {v}')
 				else:
-					raise KeyError(f'{k} is an unrecognized parameter and unsupported in globalParameters["{k}"]. Typo? (Allowable node/edge parameters: {ALLOWED_NODE_PARAMETERS + ALLOWED_EDGE_PARAMETERS})')
+					raise KeyError(f'{k} is an unrecognized parameter and unsupported in globalParameters["{k}"]. Typo? (Allowable node/edge parameters: {Config.ALLOWED_NODE_PARAMETERS | Config.ALLOWED_EDGE_PARAMETERS})')
 		for k, v in self.programParameters.items():
-			if k not in ALLOWED_PRGM_PARAMETERS:
-				if k in ALLOWED_NODE_PARAMETERS:
+			if k not in Config.ALLOWED_PRGM_PARAMETERS:
+				if k in Config.ALLOWED_NODE_PARAMETERS:
 					raise KeyError(f'{k} is a node parameter and unsupported in programParameters["{k}"]. Fix: config.globalParameters["{k}"] = {v}')
-				elif k in ALLOWED_EDGE_PARAMETERS:
+				elif k in Config.ALLOWED_EDGE_PARAMETERS:
 					raise KeyError(f'{k} is an edge parameter and unsupported in programParameters["{k}"]. Fix: config.globalParameters["{k}"] = {v}')
 				else:
-					raise KeyError(f'{k} is an unrecognized parameter and unsupported in programParameters["{k}"]. Typo? (Allowable program parameters: {ALLOWED_PRGM_PARAMETERS})')
+					raise KeyError(f'{k} is an unrecognized parameter and unsupported in programParameters["{k}"]. Typo? (Allowable program parameters: {Config.ALLOWED_PRGM_PARAMETERS})')
 		
 		# CHECK: Is PRNG algorithm supported?
 		if prng not in ["xoshiro256**", "xoshiro256++", "xoshiro256+"]:
