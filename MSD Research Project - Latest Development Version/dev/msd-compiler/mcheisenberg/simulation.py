@@ -1,27 +1,53 @@
 from __future__ import annotations
 from .runtime import Runtime
 from .util import AbstractReadableDict
-from collections.abc import Sequence, Mapping
 from numpy import ndarray
+from typing import Any, Mapping, Sequence
 import numpy as np
 
+def _simvec(v: tuple|None) -> ndarray:
+	""" Convert a Runtime tuple vec to a Simulation numpy ndarray. """
+	if v is not None:
+		return np.asarray(v, dtype=float)
+	return Simulation.VEC_ZERO
+
+def _rtvec(v: ndarray) -> tuple:
+	""" Converts a Simulation numpy ndarray to a Runtime tuple vec. """
+	return tuple(v.astype(float).tolist())
+
 class StateProxy(AbstractReadableDict):
-	def __init__(self, simulation: Simulation, state: str):
+	def __init__(self, simulation: Simulation, runtime_name: str, sim_name: str):
+		self._sim = simulation
 		self._runtime = simulation.rt
-		self._state = state
-	
+		self._prop = runtime_name
+		self._name = sim_name
+
 	@property
 	def name(self):
-		return self._state
+		return self._name
+
+	def __iter__(self):                    return iter(self._runtime.nodes)	
+	def __len__(self) -> int:              return len(self._runtime.nodes)
+	def __contains__(self, node) -> bool:  return node in self._runtime.nodes
+
+class RuntimeStateProxy(StateProxy):
+	@property
+	def runtime_name(self):
+		return self._prop
 	
 	def __getitem__(self, node) -> ndarray:
-		return getattr(self._runtime.node, self.name)
-	
-	def __iter__(self):
-		return iter(getattr(self._runtime.node, self.name).keys())  # TODO: (stub)
+		return _simvec(getattr(self._runtime.node[node], self.runtime_name))
 
-	def __contains__(self, node) -> bool:
-		return node in self._runtime.nodes
+	def __setitem__(self, node, value: ndarray) -> None:
+		setattr(self._runtime.node[node], self.runtime_name, _rtvec(value))
+
+class LocalMagnetizationProxy(StateProxy):
+	def __getitem__(self, node) -> ndarray:
+		sim = self._sim
+		return sim.s[node] + sim.f[node]
+	
+	def __setitem__(self, node, value):
+		raise NotImplementedError(f"{self.name} is a read-only value. To set, use sim.s and/or sim.f. (m = s + f)")
 
 class ParameterProxy:
 	def __init__(self, simulation: Simulation, param: str):
@@ -94,7 +120,7 @@ class VectorParameterProxy(ParameterProxy):
 
 	@property
 	def value(self) -> ndarray:
-		return self.__array__(dtype=float)
+		return _simvec(self._runtime_value)
 	
 	@value.setter
 	def value(self, value: ndarray):
@@ -142,28 +168,35 @@ class Snapshot:
 # Runtime wrapper which converts everything to Numpy arrays.ndarray and adds
 #	simulation logic like recording samples, aggregates (e.g. mag, M, MS, MF, etc.), etc.
 class Simulation:
-	VEC_ZERO = np.array([0.0, 0.0, 0.0])
-	VEC_I    = np.array([1.0, 0.0, 0.0])
-	VEC_J    = np.array([0.0, 1.0, 0.0])
-	VEC_K    = np.array([0.0, 0.0, 1.0])
+	VEC_ZERO = _simvec(Runtime.VEC_ZERO)
+	VEC_I    = _simvec(Runtime.VEC_I)
+	VEC_J    = _simvec(Runtime.VEC_J)
+	VEC_K    = _simvec(Runtime.VEC_K)
+
+	PARAMETERS = {"A", "B", "S", "F", "kT", "Je0", "J", "Je1", "Jee", "b", "D"}
+	STATES = {"s", "f", "m"}  # TODO M, MS, MF, U, etc...
 
 	def __init__(self, rt: Runtime):
 		self.rt = rt
 		self.t = 0  # current simulation time since last restart (i.e. seed, reinitialization, or randomization)
 		self.samples = []
-		self._spin_proxy = StateProxy(self, "spin")
-		self._flux_proxy = StateProxy(self, "flux")
+		self._spin_proxy = RuntimeStateProxy(self, "spin", "s")
+		self._flux_proxy = RuntimeStateProxy(self, "flux", "f")
+		self._local_magnetization_proxy = LocalMagnetizationProxy(self, None, "m")
 		for param in ["A", "B", "D"]:
 			setattr(self, f"_{param}_proxy", VectorParameterProxy(self, param))
 		for param in ["S", "F", "kT", "Je0", "J", "Je1", "Jee", "b"]:
 			setattr(self, f"_{param}_proxy", ScalarParameterProxy(self, param))
+
+	def _recalclate_state(self):
+		pass  # TODO: U, M, etc.
 
 	def seed(self, *seed: int) -> None:
 		self.rt.seed()
 		self.t = 0
 		self.samples = []
 	
-	def reinitialize(self, initSpin: ndarray=VEC_I, initFlux: ndarray=VEC_ZERO) -> None:
+	def reinitialize(self, initSpin: ndarray=VEC_J, initFlux: ndarray=VEC_ZERO) -> None:
 		self.rt.reinitialize(tuple(initSpin.tolist()), tuple(initFlux.tolist()))
 		self.t = 0
 		self.samples = []
@@ -192,10 +225,12 @@ class Simulation:
 			self.record()
 			while iterations > freq:
 				self.rt.metropolis(freq)
+				self.t += freq
 				self.record()
 				iterations -= freq
 			if iterations != 0:
 				self.rt.metropolis(iterations)
+				self.t += iterations
 			if bookend:
 				self.record()
 	
@@ -203,28 +238,46 @@ class Simulation:
 		self.samples.append(Snapshot(self))
 	
 	@property
-	def s(self) -> ndarray:
+	def nodes(self) -> Sequence:
+		return self.rt.nodes
+	
+	@property
+	def edges(self) -> Sequence[tuple]:
+		return self.rt.edges
+	
+	@property
+	def regions(self) -> Sequence:
+		return self.rt.regions
+	
+	@property
+	def eregions(self) -> Sequence[tuple]:
+		return self.rt.eregions
+
+	@property
+	def s(self) -> Mapping[Any, ndarray]:
 		""" spin """
 		return self._spin_proxy
-
-	@property
-	def spins(self) -> ndarray:
-		""" shape: (n, 3) """
-		return np.array([np.array(s) for s in self.rt.spins])
 	
 	@property
-	def fluxes(self) -> ndarray:
-		""" shape: (n, 3) """
-		return np.array([np.array(f) if f is not None else Simulation.VEC_ZERO for f in self.rt.fluxes])
-
-	@property
-	def magnetizations(self) -> ndarray:
-		""" shape: (n, 3) """
-		return self.spins + self.fluxes
+	def f(self) -> Mapping[Any, ndarray]:
+		""" flux """
+		return self._flux_proxy
 	
-	# TODO ...
+	@property
+	def m(self) -> Mapping[Any, ndarray]:
+		""" (local) magnetization """
+		return self._local_magnetization_proxy
+	
+	@property
+	def parameters(self) -> Sequence[str]:
+		return self.rt.config.allKeys
 
-for param in ["A", "B", "S", "F", "kT", "Je0", "J", "Je1", "Jee", "b", "D"]:
+	def __getitem__(self, attr: str):
+		if attr not in Simulation.PARAMETERS | Simulation.STATES:
+			raise KeyError(f"{attr} is an unrecognized parameter or state")
+		return getattr(self, attr)
+
+for param in Simulation.PARAMETERS:
 	setattr(Simulation, param, property(
 		fget=lambda self,        _p=param: getattr(self, f"_{_p}_proxy"),
 		fset=lambda self, value, _p=param: setattr(getattr(self, f"_{_p}_proxy"), "value", value)

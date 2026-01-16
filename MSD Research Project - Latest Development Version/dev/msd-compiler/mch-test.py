@@ -1,17 +1,17 @@
 import mcheisenberg as mch
 
 def print_spins(sim: mch.Simulation):
-	for s in sim.spins:
+	for s in sim.s.values():
 		print(f"{s} ", end="")
 	print()
 
 def print_fluxess(sim: mch.Simulation):
-	for f in sim.fluxes:
+	for f in sim.f.values():
 		print(f"{f} ", end="")
 	print()
 
 def print_magnetizations(sim: mch.Simulation):
-	for m in sim.magnetizations:
+	for m in sim.m.values():
 		print(f"{m} ", end="")
 	print()
 
