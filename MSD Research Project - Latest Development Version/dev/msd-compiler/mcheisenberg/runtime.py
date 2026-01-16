@@ -1,7 +1,7 @@
 from __future__ import annotations
 from .driver import Driver
 from .prng import SplitMix64
-from .util import AbstractReadOnlyDict, ReadOnlyDict, ReadOnlyList, div8
+from .util import AbstractReadableDict, ReadOnlyDict, ReadOnlyList, div8
 from collections.abc import Sequence, Mapping
 import os
 from typing import TYPE_CHECKING
@@ -431,7 +431,7 @@ class ERegionListProxy(ReadOnlyDict):
 	def __call__(self, region0, region1) -> ERegionProxy:
 		return self[(region0, region1)]
 
-class StateListProxy(AbstractReadOnlyDict):
+class StateListProxy(AbstractReadableDict):
 	def __init__(self, runtime: Runtime, state: str):
 		self._proxy_list = runtime.node
 		self._state = state  # e.g. "spin", or "flux"

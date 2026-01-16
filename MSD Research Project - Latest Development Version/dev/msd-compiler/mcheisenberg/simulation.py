@@ -1,8 +1,27 @@
 from __future__ import annotations
 from .runtime import Runtime
+from .util import AbstractReadableDict
 from collections.abc import Sequence, Mapping
 from numpy import ndarray
 import numpy as np
+
+class StateProxy(AbstractReadableDict):
+	def __init__(self, simulation: Simulation, state: str):
+		self._runtime = simulation.rt
+		self._state = state
+	
+	@property
+	def name(self):
+		return self._state
+	
+	def __getitem__(self, node) -> ndarray:
+		return getattr(self._runtime.node, self.name)
+	
+	def __iter__(self):
+		return iter(getattr(self._runtime.node, self.name).keys())  # TODO: (stub)
+
+	def __contains__(self, node) -> bool:
+		return node in self._runtime.nodes
 
 class ParameterProxy:
 	def __init__(self, simulation: Simulation, param: str):
@@ -81,17 +100,21 @@ class VectorParameterProxy(ParameterProxy):
 	def value(self, value: ndarray):
 		self._runtime_value = tuple(value.astype(float).tolist())
 
-	def __len__(self):   return len(self._runtime_value)
-	def __iter__(self):  return iter(self.value)
+	def __len__(self):
+		assert len(self.value) == 3  # DEBUG
+		return 3
+	
+	def __iter__(self):
+		return iter(self.value)
 
 	# numpy specific stuff
 	__array_priority__ = -1000.0  # VERY LOW: Let other numpy arrray coerce this object
 
 	def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
-		return getattr(ufunc, method)(self.value, *inputs, **kwargs)
+		return self.value.__array_ufunc__(ufunc, method, *inputs, **kwargs)
 	
 	def __array_function__(self, func, types, args, kwargs):
-		return func(self.value, *args, **kwargs)
+		return self.value.__array_function__(func, types, args, kwargs)
 	
 class ScalarParameterProxy(ParameterProxy):
 	def __float__(self) -> float:
@@ -109,8 +132,8 @@ class ScalarParameterProxy(ParameterProxy):
 class Snapshot:
 	def __init__(self, sim: Simulation):
 		self.t = sim.t
-		self.spins = np.array([s.copy() for s in sim.spins])
-		self.fluxes = np.array([f.copy() for f in sim.fluxes])  # TODO: if fluxes?
+		self.spins = np.array(sim.spins)
+		self.fluxes = np.array(sim.fluxes)  # TODO: if fluxes?
 		# TODO: copy mutatable parameters
 		# TODO: copy other state information: spin/flux, parameters (if they vary), energy, and (maybe) macros like overall magnetization, etc.
 
@@ -128,6 +151,8 @@ class Simulation:
 		self.rt = rt
 		self.t = 0  # current simulation time since last restart (i.e. seed, reinitialization, or randomization)
 		self.samples = []
+		self._spin_proxy = StateProxy(self, "spin")
+		self._flux_proxy = StateProxy(self, "flux")
 		for param in ["A", "B", "D"]:
 			setattr(self, f"_{param}_proxy", VectorParameterProxy(self, param))
 		for param in ["S", "F", "kT", "Je0", "J", "Je1", "Jee", "b"]:
@@ -178,6 +203,11 @@ class Simulation:
 		self.samples.append(Snapshot(self))
 	
 	@property
+	def s(self) -> ndarray:
+		""" spin """
+		return self._spin_proxy
+
+	@property
 	def spins(self) -> ndarray:
 		""" shape: (n, 3) """
 		return np.array([np.array(s) for s in self.rt.spins])
@@ -197,5 +227,5 @@ class Simulation:
 for param in ["A", "B", "S", "F", "kT", "Je0", "J", "Je1", "Jee", "b", "D"]:
 	setattr(Simulation, param, property(
 		fget=lambda self,        _p=param: getattr(self, f"_{_p}_proxy"),
-		fset=lambda self, value, _p=param: 
+		fset=lambda self, value, _p=param: setattr(getattr(self, f"_{_p}_proxy"), "value", value)
 	))
