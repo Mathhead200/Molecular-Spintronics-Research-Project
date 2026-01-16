@@ -16,7 +16,7 @@ def print_magnetizations(sim: mch.Simulation):
 	print()
 
 if __name__ == "__main__":
-	n = 10
+	n = 2
 	
 	model = mch.Config()
 	model.nodes = [*range(n)]
@@ -26,7 +26,7 @@ if __name__ == "__main__":
 	with model.compile(dir=".", asm="mch-test.asm") as rt:
 		sim = mch.Simulation(rt)
 
-		sim.metropolis(700 * 1000 * 1000)
-		print_spins(sim)
-		print_fluxess(sim)
+		sim.rt.kT = 0.1
+		sim.metropolis(7)
 		print_magnetizations(sim)
+		print(sim.rt.kT)

@@ -454,6 +454,60 @@ class StateListProxy(AbstractReadOnlyDict):
 			return None
 		return getattr(proxy, self._state)
 
+# Acts like the global parameter when used as a value, but allows the lookup
+#	for local/region parameters via __getitem__/__setitem__.
+class ParameterProxy:
+	def __init__(self, runtime: Runtime, param: str):
+		self._runtime = runtime
+		self.name = param
+		print(self.name, type(self.value), str(self.value), repr(self.value), self.value)  # DEBUG
+	
+	@property
+	def value(self):
+		return getattr(self._runtime._globals_proxy, self.name)
+
+	def __getitem__(self, key):
+		param = self.name
+		runtime = self._runtime
+		config = runtime.config
+		if param in config.localNodeParameters.get(key, {}):
+			return getattr(runtime.node[key], param)
+		if param in config.localEdgeParameters.get(key, {}):
+			return getattr(runtime.edge[key], param)
+		if param in config.regionNodeParameters.get(key, {}):
+			return getattr(runtime.region[key], param)
+		if param in config.regionEdgeParameters.get(key, {}):
+			return getattr(runtime.eregion[key], param)
+		return self.value  # global parameter
+
+	def __setitem__(self, key, value) -> None:
+		param = self.name
+		runtime = self._runtime
+		config = runtime.config
+		if param in config.localNodeParameters.get(key, {}):
+			setattr(runtime.node[key], param, value)
+		elif param in config.localEdgeParameters.get(key, {}):
+			setattr(runtime.edge[key], param, value)
+		elif param in config.regionNodeParameters.get(key, {}):
+			setattr(runtime.region[key], param, value)
+		elif param in config.regionEdgeParameters.get(key, {}):
+			setattr(runtime.eregion[key], param, value)
+		else:
+			raise KeyError(f"Parameter {param} is not defined for (node, edge, region, or edge-region) {key}")
+	
+	def __str__(self) -> str:  return str(self.value)
+	def __repr__(self) -> str: return repr(self.value)
+
+# Acts like a float
+class ScalarParameterProxy(ParameterProxy):
+	def __float__(self) -> float:  return self.value
+
+# Acts like a tuple
+class VectorParameterProxy(ParameterProxy):
+	def __iter__(self) -> vec:  return self.value
+	def __len__(self) -> int:  return len(self.value)
+
+
 # Handles communication to and from the DLL, as well as the liftime of the DLL file.
 class Runtime:
 	VEC_ZERO = (0.0, 0.0, 0.0)
@@ -502,8 +556,6 @@ class Runtime:
 		self._eregion_proxies = { eregion: ERegionProxy(self, eregion) for eregion in config.regionCombos   }
 		self._globals_proxy = GlobalsProxy(self)
 		self._node_list_proxy    = NodeListProxy(self)
-		self._spin_list_proxy    = StateListProxy(self, "spin")
-		self._flux_list_proxy    = StateListProxy(self, "flux")
 		self._edge_list_proxy    = EdgeListProxy(self)
 		self._region_list_proxy  = RegionListProxy(self)
 		self._eregion_list_proxy = ERegionListProxy(self)
@@ -511,7 +563,13 @@ class Runtime:
 		self._edges_view    = ReadOnlyList([ *self._edge_proxies.keys()    ])
 		self._regions_view  = ReadOnlyList([ *self._region_proxies.keys()  ])
 		self._eregions_view = ReadOnlyList([ *self._eregion_proxies.keys() ])
-	
+		self._spin_list_proxy    = StateListProxy(self, "spin")
+		self._flux_list_proxy    = StateListProxy(self, "flux")
+		for param in ["A", "B", "D"]:
+			setattr(self, f"_{param}_proxy", VectorParameterProxy(self, param))  # e.g. self._B_proxy
+		for param in ["S", "F", "kT", "Je0", "J", "Je1", "Jee", "b"]:
+			setattr(self, f"_{param}_proxy", ScalarParameterProxy(self, param))  # e.g. self._J_proxy
+
 	def _fromNodes(self, index: int, offset: int) -> float:
 		return self.driver.nodes[index * self._node_len + offset]
 
@@ -706,6 +764,6 @@ class Runtime:
 
 for param in ["A", "B", "S", "F", "kT", "Je0", "J", "Je1", "Jee", "b", "D"]:
 	setattr(Runtime, param, property(
-		fget=lambda self,        _p=param: getattr(self._globals_proxy, _p),
+		fget=lambda self,        _p=param: getattr(self, f"_{_p}_proxy"),
 		fset=lambda self, value, _p=param: setattr(self._globals_proxy, _p, value)
 	))

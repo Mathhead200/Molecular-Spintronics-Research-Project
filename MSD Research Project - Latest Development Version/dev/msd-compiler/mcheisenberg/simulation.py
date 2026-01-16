@@ -1,13 +1,61 @@
 from __future__ import annotations
-from .runtime import Runtime
+from .runtime import Runtime, \
+	ScalarParameterProxy as RuntimeScalarParameterProxy, \
+	VectorParameterProxy as RuntimeVectorParameterProxy
 from collections.abc import Sequence, Mapping
 from numpy import ndarray
 import numpy as np
 
-class NodeVectorParameterProxy:
-	def __init__(self, simulation: Simulation, param: str):
-		self._runtime = simulation.rt
-		pass  # TODO
+class SimulationParameterProxy:
+	def __add__(self, addend):       return self.value + addend
+	def __sub__(self, subtrahend):   return self.value - subtrahend
+	def __mul__(self, multiplier):   return self.value * multiplier
+	def __truediv__(self, divisor):  return self.value / divisor
+	def __floordiv__(self, divisor): return self.value // divisor
+	def __mod__(self, modulus):      return self.value % modulus
+	def __pow__(self, exponent):     return self.value ** exponent
+	def __neg__(self):               return -self.value
+	def __pos__(self):               return +self.value
+	def __abs__(self):               return abs(self.value)
+
+	def __radd__(self, augend):         return augend + self.value
+	def __rsub__(self, minuend):        return minuend - self.value
+	def __rmul__(self, multiplicand):   return multiplicand * self.value
+	def __rtruediv__(self, dividend):   return dividend / self.value
+	def __rfloordiv__(self, dividend):  return dividend // self.value
+	def __rmod__(self, dividend):       return dividend % self.value
+	def __rpow__(self, base):           return base ** self.value
+
+	def __iadd__(self, addend):        self.value = self + addend; return self
+	def __isub__(self, subtrahend):    self.value = self - subtrahend; return self
+	def __imul__(self, multiplier):    self.value = self * multiplier; return self
+	def __itruediv__(self, divisor):   self.value = self / divisor; return self
+	def __ifloordiv__(self, divisor):  self.value = self // divisor; return
+	def __imod__(self, modulus):       self.value = self % modulus; return self
+	def __ipow__(self, exponent):      self.value = self ** exponent; return self
+
+	def __eq__(self, other):  return self.value == other
+	def __ne__(self, other):  return self.value != other
+	def __lt__(self, other):  return self.value < other
+	def __le__(self, other):  return self.value <= other
+	def __gt__(self, other):  return self.value > other
+	def __ge__(self, other):  return self.value >= other
+
+class VectorParameterProxy(RuntimeVectorParameterProxy, SimulationParameterProxy):
+	@property
+	def value(self) -> ndarray:
+		return self.__array__()
+	
+	def __array__(self, dtype=None) -> ndarray:
+		return np.array([*super().value], dtype=dtype)
+	
+	def __len__(self):                return len(self.value)
+	def __getitem__(self, i):         return self.value[i]
+	def __setitem__(self, i, value):  self.value[i] = value
+	def __iter__(self):               return iter(self.value)
+	
+	
+class ScalarParameterProxy(RuntimeScalarParameterProxy, SimulationParameterProxy):  pass
 
 # The full state of the Simulation at some simulation time, t.
 class Snapshot:
