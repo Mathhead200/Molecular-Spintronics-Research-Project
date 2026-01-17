@@ -1,4 +1,4 @@
-from typing import Iterable, Mapping, Sequence
+from collections.abc import Collection, Iterable, Mapping, Sequence
 
 def floats(values: Iterable) -> tuple[float]:
 	return (float(x) for x in values)
@@ -20,14 +20,18 @@ class StrJoiner:
 	def __str__(self):
 		return "".join(self.pieces)
 
-# Wrapper allowing read-only access to underlying list/Sequence
-class ReadOnlyList(Sequence):
-	def __init__(self, lst: Sequence):  self._lst = lst
+class ReadOnlyCollection(Collection):
+	def __init__(self, c: Collection):  self._obj = c
 
-	def __len__(self):          return len(self._lst)	
-	def __getitem__(self, i):   return self._lst[i]
-	def __iter__(self):         return iter(self._lst)
-	def __contains__(self, v):  return v in self._lst
+	def __len__(self):          return len(self._obj)
+	def __iter__(self):         return iter(self._obj)
+	def __contains__(self, v):  return v in self._obj
+
+# Wrapper allowing read-only access to underlying list/Sequence
+class ReadOnlyList(ReadOnlyCollection):
+	def __init__(self, lst: Sequence):  super().__init__(lst)
+	
+	def __getitem__(self, i):   return self._obj[i]
 
 # Parent to be extended/derived from
 class AbstractReadableDict(Mapping):

@@ -13,4 +13,4 @@ if __name__ == "__main__":
 		sim = mch.Simulation(rt)
 
 		sim.metropolis(7)
-		print(sim.s.values())
+		print(sim.n[__NODES__])

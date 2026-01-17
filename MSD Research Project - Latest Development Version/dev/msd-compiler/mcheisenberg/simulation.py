@@ -1,9 +1,8 @@
 from __future__ import annotations
 from .config import Config
 from .runtime import Runtime
-from .simulation_proxies import ...  # TODO: finsih proxies first
-from .util import AbstractReadableDict
-from collections.abc import Callable, Iterator, Mapping, Sequence
+from .simulation_proxies import *
+from collections.abc import Mapping, Sequence
 from numpy.typing import NDArray
 from typing import Annotated, Any, TYPE_CHECKING
 import numpy as np
@@ -18,27 +17,29 @@ type Region = Any  # type parameter
 type Edge = tuple[Node, Node]
 type ERegion = tuple[Region, Region]
 
-def _simvec(v: tuple|None) -> numpy_vec:
+
+def simvec(v: tuple|None) -> numpy_vec:
 	""" Convert a Runtime tuple vec to a Simulation numpy ndarray. """
 	if v is None:
 		return Simulation.VEC_ZERO
 	return np.asarray(v, dtype=float)
 
-def _rtvec(v: numpy_vec) -> vec:
+def rtvec(v: numpy_vec) -> vec:
 	""" Converts a Simulation numpy ndarray to a Runtime tuple vec. """
 	return tuple(v.astype(float).tolist())
 
-def _simscal(x: float|None) -> float:
+def simscal(x: float|None) -> float:
 	""" Convert a Runtime float|None to a Simulation float. """
 	if x is None:
 		return 0.0
 	return x
 
-def _rtscal(x: float) -> float:
+def rtscal(x: float) -> float:
 	""" Convert a Simulation float to a Runtime float. """
 	# Does nothing, but is a placeholder in case we want to change the
 	# 	Simulation scalar data type later.
 	return x
+
 
 # -----------------------------------------------------------------------------
 # The full state of the Simulation at some simulation time, t.
@@ -52,44 +53,50 @@ class Snapshot:
 
 	# TODO ...
 
+
 # -----------------------------------------------------------------------------
 # Runtime wrapper which converts everything to numpy float arrays and adds
 #	simulation logic like recording samples, aggregates (e.g. m, U, n, etc.), etc.
 class Simulation:
-	VEC_ZERO = _simvec(Runtime.VEC_ZERO)
-	VEC_I    = _simvec(Runtime.VEC_I)
-	VEC_J    = _simvec(Runtime.VEC_J)
-	VEC_K    = _simvec(Runtime.VEC_K)
+	VEC_ZERO = simvec(Runtime.VEC_ZERO)
+	VEC_I    = simvec(Runtime.VEC_I)
+	VEC_J    = simvec(Runtime.VEC_J)
+	VEC_K    = simvec(Runtime.VEC_K)
 
 	NODE_PARAMETERS = Config.ALLOWED_NODE_PARAMETERS
 	EDGE_PARAMETERS = Config.ALLOWED_EDGE_PARAMETERS
 	PARAMETERS = NODE_PARAMETERS | EDGE_PARAMETERS
-	STATES = {"s", "f", "m"}  # TODO M, MS, MF, U, etc...
+	STATES = {"n", "s", "f", "m", "u", "c", "x"}  # TODO: state variable for number of edges?
 
 	def __init__(self, rt: Runtime):
 		self.rt = rt
 		self.t = 0  # current simulation time since last restart (i.e. seed, reinitialization, or randomization)
 		self.samples = []
-		self.u_node = {
-			node: {
-				param: 0.0
-				for param in Simulation.NODE_PARAMETERS				
-			} for node in self.rt.config.nodes
-		}  # sim.u_node[node][node_param] = local energy for the associated interaction
-		self.u_edge = {
-			edge: {
-				param: 0.0
-				for param in Simulation.EDGE_PARAMETERS
-			} for edge in self.rt.config.edges
-		}  # sim.u_edge[edge][edge_param] = bond energy for the associated interaction
-		self._spin_proxy = RuntimeVectorStateProxy(self, "spin", "s")
-		self._flux_proxy = RuntimeVectorStateProxy(self, "flux", "f")
-		self._local_magnetization_proxy = LocalMagnetizationProxy(self, None, "m")
-		for param in ["A", "B", "D"]:
-			setattr(self, f"_{param}_proxy", VectorParameterProxy(self, param))
-		for param in ["S", "F", "kT", "Je0", "J", "Je1", "Jee", "b"]:
-			setattr(self, f"_{param}_proxy", ScalarParameterProxy(self, param))
+		# self.u_node = {
+		# 	node: {
+		# 		param: 0.0
+		# 		for param in Simulation.NODE_PARAMETERS				
+		# 	} for node in self.rt.config.nodes
+		# }  # sim.u_node[node][node_param] = local energy for the associated interaction
+		# self.u_edge = {
+		# 	edge: {
+		# 		param: 0.0
+		# 		for param in Simulation.EDGE_PARAMETERS
+		# 	} for edge in self.rt.config.edges
+		# }  # sim.u_edge[edge][edge_param] = bond energy for the associated interaction
+		for param in ["A", "B"]:
+			setattr(self, f"_{param}_proxy", VectorNodeParameterProxy(self, param))
+		for param in ["S", "F", "kT", "Je0"]:
+			setattr(self, f"_{param}_proxy", ScalarNodeParameterProxy(self, param))
+		for param in ["J", "Je1", "Jee", "b"]:
+			setattr(self, f"_{param}_proxy", ScalarEdgeParameterProxy(self, param))
+		for param in ["D"]:
+			setattr(self, f"_{param}_proxy", VectorEdgeParameterProxy(self, param))
+		# self._spin_proxy = RuntimeVectorStateProxy(self, "spin", "s")
+		# self._flux_proxy = RuntimeVectorStateProxy(self, "flux", "f")
+		# self._local_magnetization_proxy = LocalMagnetizationProxy(self, None, "m")
 
+	# TODO: REMOVE?
 	def _recalclate_energy(self) -> None:
 		# This tracking of interanl energy could be done in ASM,
 		#	but since it is not needed during the metropolis algorithm,

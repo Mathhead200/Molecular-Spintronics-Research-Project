@@ -1,32 +1,47 @@
 from __future__ import annotations
-from .util import AbstractReadableDict
-from collections.abc import Callable, Iterator
+from .util import AbstractReadableDict, ReadOnlyCollection, ReadOnlyList
+from collections.abc import Callable, Collection, Iterator, Sequence
+from numpy.typing import NDArray
 from typing import Any, TYPE_CHECKING
 import numpy as np
 if TYPE_CHECKING:
 	from .config import vec
 	from .simulation import *
 
+
+__NODES__ = "__NODES__"  # enum
+__EDGES__ = "__EDGES__"  # enum
+
+
 class Proxy:
-	def __init__(self, simulation, sim_name: str, elements: list):
+	def __init__(self, simulation, sim_name: str, elements: Collection, subscripts: Sequence=[]):
 		self._sim = simulation
 		self._name = sim_name
 		self._elements = elements
-	
+		self._subscripts = subscripts
+
+	def filter(self, key: Any) -> Collection:
+		""" Parse the filter, and returns a collection of candidate elements. """
+		raise NotImplementedError()  # abstract
+
+	def __getitem__(self, key: Any) -> Proxy:
+		elements = [x for x in self.filter(key) if x in self._elements]  # itersection of new elements and self._elements
+		if len(elements) == 0:
+			raise ValueError(f"{key} is valid by itself, but disjoint with previous subscripts: {self._subscripts}")
+		return self.__class__(self._sim, self._name, elements, self._subscripts + [key])  # new Proxy of same type (i.e. subclass)
+
 	@property
 	def name(self) -> str:
 		return self._name
 	
 	@property
-	def values(self) -> numpy_mat|numpy_list:
-		return np.asarray()  # TODO: stub
+	def elements(self):
+		return ReadOnlyCollection(self._elements)
 
-	def __getitem__(self, key: Node|Edge|Region|ERegion) -> Proxy:
-		runtime = self._sim.rt
-		config = runtime.config
-		if param in config.localNodeParameters.get(key, {}):
-			self._elements = 
-			return self
+	@property
+	def subscripts(self):
+		return ReadOnlyList(self._subscripts)
+
 
 # Interface for a numerical/mathamatical object, e.g. numpy ndarray, or float.
 #	Any object which can be used in mathamatical expressions, namely
@@ -71,6 +86,7 @@ class Numeric:
 	def __ge__(self, other):  return self.value >= other
 
 	def __str__(self) -> str:  return str(self.value)
+	def __hash__(self):  return hash(self.value)
 
 # Behaves as an numpy ndarray.
 class Vector(Numeric):
@@ -98,63 +114,138 @@ class Scalar(Numeric):
 	def __float__(self) -> float:
 		return self.value
 
+class Int(Numeric):
+	def __int__(self) -> int:    return self.value
+	def __index__(self) -> int:  return self.value
+
+	def __or__(self, other):      return self.value | other
+	def __xor__(self, other):     return self.value ^ other
+	def __and__(self, other):     return self.value & other
+	def __lshift__(self, shift):  return self.value << shift
+	def __rshift__(self, shift):  return self.value >> shift
+	def __invert__(self):         return ~self.value
+
+	def __ror__(self, other):      return other | self.value
+	def __rxor__(self, other):     return other ^ self.value
+	def __rand__(self, other):     return other & self.value
+	def __rlshift__(self, value):  return value << self.value
+	def __rrshift__(self, value):  return value << self.value
+
+class NumericProxy(Numeric, Proxy):  pass
+
+# Function
+def values(proxy: NumericProxy) -> NDArray:
+	return np.asarray([ proxy[x].value for x in proxy._elements ])
+
+
 # Proxy for parameters, e.g. J, B, kT, n, etc. Parameters do not aggrigate like
 #	"results", e.g. s, f, m, u. Instead they access location specific
 #	information, e.g. J["FML"] would get the J value used in region "FML", and
 #	not the sum of J values used across the region.
-class ParameterProxy(Numeric):
+class ParameterProxy(Numeric, Proxy):
 	def __init__(self,
 		simulation: Simulation,
 		param: str,
+		elements: Sequence[Node|Edge],
 		to_sim: Callable[[vec|float], numpy_vec|float],  # for getting simulation value from runtime
 		to_rt: Callable[[numpy_vec|float], vec|float]    # for updating runtime value from simualtion
 	):
+		super().__init__(simulation, param, elements)
 		self._runtime_proxy = getattr(simulation.rt, param)  # Returned proxy should be const. Get once and store.
-		self._param = param
 		self._to_sim = to_sim
 		self._to_rt = to_rt
-		self._nodes = simulation.nodes  # only node_list_proxy. No copy is made.
+	
+	@property
+	def key(self) -> Node|Edge|Region|ERegion:
+		return self._subscripts[-1]  # only the last subscript is relevant for prarameter proxies
 	
 	@property
 	def _runtime_value(self) -> vec|float:
-		return self._runtime_proxy.value
+		if len(self._subscripts) == 0:
+			return self._runtime_proxy.value
+		else:
+			return self._runtime_proxy[self.key]
 	
 	@_runtime_value.setter
 	def _runtime_value(self, value: vec|float) -> None:
-		self._runtime_proxy.value = value
-
-	def get_runtime_value(self, key: Node|Edge|Region|ERegion):
-		return self._runtime_proxy[key]
-	
-	def set_runtime_value(self, key: Node|Edge|Region|ERegion, value: vec|float) -> None:
-		self._runtime_proxy[key] = value
-	
-	@property
-	def name(self) -> str:
-		return self._param
+		if len(self._subscripts) == 0:
+			self._runtime_proxy.value = value
+		else:
+			self._runtime_proxy[self.key] = value
 	
 	@property
 	def value(self) -> numpy_vec:
-		return self._to_sim(self._runtime_proxy.value)
+		return self._to_sim(self._runtime_value)
 
 	@value.setter
 	def value(self, value: numpy_vec) -> None:
-		self._runtime_proxy.value = self._to_rt(value)
+		self._runtime_value = self._to_rt(value)
 	
-	def __getitem__(self, key: Node|Edge|Region|ERegion) -> numpy_vec:
-		return _simvec(self.get_runtime_value(key))
-	
-	def __setitem__(self, key: Node|Edge|Region|ERegion, value: numpy_vec) -> None:
-		self.set_runtime_value(key, _rtvec(value))
-	
-	def values(self) -> numpy_mat|numpy_list:
-		return np.asarray([ self[node] for node in self._nodes ])
+	def __setitem__(self, key: Node|Edge|Region|ERegion, value: numpy_vec|float) -> None:
+		self[key].value = value
 
-class VectorParameterProxy(VectorProxy, ParameterProxy):  pass
-class ScalarParameterProxy(ScalarProxy, ParameterProxy):  pass
+class NodeParameterProxy(ParameterProxy):
+	def __init__(self, simulation: Simulation, param: str, to_sim: Callable[[vec|float], numpy_vec|float], to_rt: Callable[[numpy_vec|float], vec|float]):
+		super().__init__(simulation, param, simulation.nodes, to_sim, to_rt)
+	
+	def filter(self, key: Node|Region) -> Collection[Node]:
+		config = self._sim.rt.config
+		if key in config.nodes:
+			# key is interpreted a (local) Node
+			elements = [key]
+		elif key in config.regions:
+			# key is interpreted as a Region
+			elements = [config.regions[key]]
+		else:
+			raise KeyError(f"Subscript [{key}] is undefined for parameter {self.name}: not a node nor region in Config")
+		return elements
 
-# Keeps an internal list, _elements, of either nodes, or edges, (or both, e.g.
-#	in the case of energy, u). Provides a subscript method which 
+class EdgeParameterProxy(ParameterProxy):
+	def __init__(self, simulation: Simulation, param: str, to_sim: Callable[[vec|float], numpy_vec|float], to_rt: Callable[[numpy_vec|float], vec|float]):
+		super().__init__(simulation, param, simulation.edges, to_sim, to_rt)
+	
+	def filter(self, key: Edge|ERegion) -> Collection[Edge]:
+		config = self._sim.rt.config
+		elements = None
+		if key in config.edges:
+			# key is interpreted as a (local) Edge
+			elements = [key]  
+		elif key in config.regionCombos:
+			# key is interpreted as an ERegion
+			R = (config.regions[key[i]] for i in range(2))  # nodes in both regions
+			elements = [e for e in config.edges if e[0] in R[0] and e[1] in R[1]]
+		else:
+			raise KeyError(f"Subscript [{key}] is undefined for parameter {self.name}: not an edge nor edge-region in Config")
+		return elements
+
+class VectorNodeParameterProxy(Vector, NodeParameterProxy):
+	def __init__(self, simulation: Simulation, param: str):
+		super().__init__(simulation, param, to_sim=simvec, to_rt=rtvec)
+
+class ScalarNodeParameterProxy(Scalar, NodeParameterProxy):
+	def __init__(self, simulation: Simulation, param: str):
+		super().__init__(simulation, param, to_sim=simscal, to_rt=rtscal)
+
+class VectorEdgeParameterProxy(Vector, EdgeParameterProxy):
+	def __init__(self, simulation: Simulation, param: str):
+		super().__init__(simulation, param, to_sim=simvec, to_rt=rtvec)
+
+class ScalarEdgeParameterProxy(Scalar, EdgeParameterProxy):
+	def __init__(self, simulation: Simulation, param: str):
+		super().__init__(simulation, param, to_sim=simscal, to_rt=rtscal)
+
+
+# Number of nodes in proxy
+class NProxy(Scalar, Proxy):
+	def __init__(self, simulation: Simulation, sim_name: str="n"):
+		super().__init__(simulation, sim_name, simulation.nodes + simulation.edges)
+
+	@property
+	def value(self) -> int:
+
+
+
+# TODO: REMOVE -- vv OLD STUFF vv
 class ResultProxy(NumericProxy):
 	def __init__(self, simulation: Simulation, sim_name: str):
 		self._sim = simulation
