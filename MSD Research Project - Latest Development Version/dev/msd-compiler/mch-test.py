@@ -1,4 +1,5 @@
 import mcheisenberg as mch
+from mcheisenberg import __NODES__, __EDGES__
 import numpy as np
 
 if __name__ == "__main__":
@@ -11,6 +12,9 @@ if __name__ == "__main__":
 
 	with model.compile(dir=".", asm="mch-test.asm") as rt:
 		sim = mch.Simulation(rt)
-
+		sim.rt.spin[0] = (1.0, 0.0, 0.0)
+		print(sim.s.values())
 		sim.metropolis(7)
+		print(sim.s)
+		print(sim.u)
 		print(sim.n[__NODES__])

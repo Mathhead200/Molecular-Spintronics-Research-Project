@@ -9,8 +9,10 @@ from importlib import resources
 from math import ceil, log2
 from subprocess import CalledProcessError
 from tempfile import mkstemp
-from typing import Callable, Generic, Iterable, Optional, TypeVar, TypedDict
+from typing import Generic, Optional, TypeVar, TypedDict, TYPE_CHECKING
 import os
+if TYPE_CHECKING:
+	from collections.abc import Callable, Collection, Iterable
 
 type vec = tuple[float, float, float]
 
@@ -48,8 +50,8 @@ class _Config(Generic[Index, Region], TypedDict, total=False):
 	type Node = Index
 	type Edge = tuple[Node, Node]
 
-	type Nodes = Iterable[Node]
-	type Edges = Iterable[Edge]
+	type Nodes = Collection[Node]
+	type Edges = Collection[Edge]
 
 	nodes: Nodes
 	edges: Edges  # tuple elemenets must be elements of (in) self.nodes
