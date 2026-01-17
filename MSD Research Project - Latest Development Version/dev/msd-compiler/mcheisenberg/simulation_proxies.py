@@ -15,10 +15,10 @@ __EDGES__ = "__EDGES__"  # enum
 
 class Proxy:
 	def __init__(self, simulation, sim_name: str, elements: Collection, subscripts: Sequence=[]):
-		self._sim = simulation
+		self._sim: Simulation = simulation
 		self._name = sim_name
-		self._elements = elements
-		self._subscripts = subscripts
+		self._elements: Collection = elements
+		self._subscripts: Sequence = subscripts
 
 	def filter(self, key: Any) -> Collection:
 		""" Parse the filter, and returns a collection of candidate elements. """
@@ -35,11 +35,11 @@ class Proxy:
 		return self._name
 	
 	@property
-	def elements(self):
+	def elements(self) -> Collection:
 		return ReadOnlyCollection(self._elements)
 
 	@property
-	def subscripts(self):
+	def subscripts(self) -> Sequence:
 		return ReadOnlyList(self._subscripts)
 
 
@@ -117,6 +117,7 @@ class Scalar(Numeric):
 class Int(Numeric):
 	def __int__(self) -> int:    return self.value
 	def __index__(self) -> int:  return self.value
+	def __bool__(self) -> bool:  return bool(self.value)
 
 	def __or__(self, other):      return self.value | other
 	def __xor__(self, other):     return self.value ^ other
@@ -189,34 +190,20 @@ class NodeParameterProxy(ParameterProxy):
 		super().__init__(simulation, param, simulation.nodes, to_sim, to_rt)
 	
 	def filter(self, key: Node|Region) -> Collection[Node]:
-		config = self._sim.rt.config
-		if key in config.nodes:
-			# key is interpreted a (local) Node
-			elements = [key]
-		elif key in config.regions:
-			# key is interpreted as a Region
-			elements = [config.regions[key]]
-		else:
-			raise KeyError(f"Subscript [{key}] is undefined for parameter {self.name}: not a node nor region in Config")
-		return elements
+		sim = self._sim
+		if key in sim.nodes:    return [key]  # key is interpreted a (local) node
+		if key in sim.regions:  return sim.regions[key]  # key is interpreted as a (node) region
+		raise KeyError(f"Subscript [{key}] is undefined for parameter {self.name}: not a node nor region in Config")
 
 class EdgeParameterProxy(ParameterProxy):
 	def __init__(self, simulation: Simulation, param: str, to_sim: Callable[[vec|float], numpy_vec|float], to_rt: Callable[[numpy_vec|float], vec|float]):
 		super().__init__(simulation, param, simulation.edges, to_sim, to_rt)
 	
 	def filter(self, key: Edge|ERegion) -> Collection[Edge]:
-		config = self._sim.rt.config
-		elements = None
-		if key in config.edges:
-			# key is interpreted as a (local) Edge
-			elements = [key]  
-		elif key in config.regionCombos:
-			# key is interpreted as an ERegion
-			R = (config.regions[key[i]] for i in range(2))  # nodes in both regions
-			elements = [e for e in config.edges if e[0] in R[0] and e[1] in R[1]]
-		else:
-			raise KeyError(f"Subscript [{key}] is undefined for parameter {self.name}: not an edge nor edge-region in Config")
-		return elements
+		sim = self._sim
+		if key in sim.edges:     return [key]              # key is interpreted as a (local) edge
+		if key in sim.eregions:  return sim.eregions[key]  # key is interpreted as an edge-region
+		raise KeyError(f"Subscript [{key}] is undefined for parameter {self.name}: not an edge nor edge-region in Config")
 
 class VectorNodeParameterProxy(Vector, NodeParameterProxy):
 	def __init__(self, simulation: Simulation, param: str):
@@ -236,65 +223,30 @@ class ScalarEdgeParameterProxy(Scalar, EdgeParameterProxy):
 
 
 # Number of nodes in proxy
-class NProxy(Scalar, Proxy):
+class NProxy(Int, Proxy):
 	def __init__(self, simulation: Simulation, sim_name: str="n"):
 		super().__init__(simulation, sim_name, simulation.nodes + simulation.edges)
 
 	@property
 	def value(self) -> int:
+		return len(self._elements)
 
-
-
-# TODO: REMOVE -- vv OLD STUFF vv
-class ResultProxy(NumericProxy):
-	def __init__(self, simulation: Simulation, sim_name: str):
-		self._sim = simulation
-		self._name = sim_name
-		self._elements: list[Node|Edge] = None  # set by subclass
-
-	@property
-	def name(self) -> str:
-		return self._name
-	
-class VectorResultProxy(ResultProxy):
-	def __init__(self, simulation: Simulation, sim_name: str):
-		super().
-
-class VectorStateProxy(AbstractReadableDict):
-	def __init__(self, simulation: Simulation, runtime_name: str, sim_name: str):
-		self._sim = simulation
-		self._runtime = simulation.rt
-		self._prop = runtime_name
-		self._name = sim_name
-
-	@property
-	def name(self):
-		return self._name
-
-	def __iter__(self) -> Iterator[Node]:  return iter(self._runtime.nodes)	
-	def __len__(self) -> int:              return len(self._runtime.nodes)
-	def __contains__(self, node) -> bool:  return node in self._runtime.nodes
-
-	# Override: allows getting all nodes as a shape=(N, 3) numpy matrix for
-	#	vector states, or shape=(N,) numpy vector for scalar states.
-	def values(self) -> numpy_mat:
-		return np.asarray([ *super().values() ])
-
-class RuntimeVectorStateProxy(VectorStateProxy):
-	@property
-	def runtime_name(self):
-		return self._prop
-	
-	def __getitem__(self, node: Node) -> numpy_vec:
-		return _simvec(getattr(self._runtime.node[node], self.runtime_name))
-
-	def __setitem__(self, node: Node, value: numpy_vec) -> None:
-		setattr(self._runtime.node[node], self.runtime_name, _rtvec(value))
-
-class LocalMagnetizationProxy(VectorStateProxy):
-	def __getitem__(self, node: Node) -> numpy_vec:
+	def filter(self, key: Node|Edge|Region|ERegion|str) -> Collection[Node|Edge]:
 		sim = self._sim
-		return sim.s[node] + sim.f[node]
+		if key == __NODES__:       return sim.nodes  # interpreted as the set of all nodes
+		if key == __EDGES__:       return sim.edges  # interpreted as the set of all edges
+		if key in sim.nodes:       return [key]      # interpreted as a (local) node
+		if key in sim.edges:       return [key]      # interpreted as a (local) edge
+		if key in sim.regions:     return sim.regions[key]     # interpreted as a (node) region
+		if key in sim.eregions:    return sim.eregions[key]    # interpreted as an edge-region
+		if key in sim.parameters:  return sim.parameters[key]  # interpreted as a (node or edge) parameter
+		raise KeyError(f"Undefined subscript: {key}")
+
+class UProxy(Scalar, Proxy):
+	def __init__(self, simulation: Simulation, sim_name="u"):
+		super().__init__(simulation, sim_name, simulation.nodes + simulation.edges)
 	
-	def __setitem__(self, node, value):
-		raise NotImplementedError(f"{self.name} is a read-only value. To set, use sim.s and/or sim.f. (m = s + f)")
+	@property
+	def value(self) -> float:
+		return 0.0  # TODO: (stub)
+	

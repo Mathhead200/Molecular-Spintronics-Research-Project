@@ -485,7 +485,7 @@ class Config:
 		self.allKeys = self.localNodeKeys | self.localEdgeKeys | self.regionNodeKeys | self.regionEdgeKeys | self.globalKeys
 		self.constParameters = self.allKeys - self.variableParameters  # set[str]
 		self.immutableNodes = self.calcImmutableNodes()  # list[Node]
-		self.regionCombos = self.calcAllRegionCombos()  # list[Edge]
+		self.regionCombos = self.calcAllRegionCombos()  # list[tuple[Region|None, Region|None]]
 		self.nodeIndex = {}  # dict[Node, int]
 		self.edgeIndex = {}  # dict[Edge, int]
 

@@ -17,9 +17,9 @@ class Runtime:
 	VEC_K    = (0.0, 0.0, 1.0)
 	
 	def __init__(self, config: Config, dll: str, delete: bool=False):
-		self.dll = dll
-		self.config = config
-		self.driver = Driver(config, dll)
+		self.dll: str = dll
+		self.config: Config = config
+		self.driver: Driver = Driver(config, dll)
 		self._delete = delete  # delete on exit?
 		self._node_len = config.SIZEOF_NODE // 8  # in doubles (8-byte elements)
 		self._edge_len = config.SIZEOF_EDGE // 8  # ^^

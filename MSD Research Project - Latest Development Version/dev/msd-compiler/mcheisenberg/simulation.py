@@ -2,6 +2,7 @@ from __future__ import annotations
 from .config import Config
 from .runtime import Runtime
 from .simulation_proxies import *
+from .util import ReadOnlyDict
 from collections.abc import Mapping, Sequence
 from numpy.typing import NDArray
 from typing import Annotated, Any, TYPE_CHECKING
@@ -69,9 +70,9 @@ class Simulation:
 	STATES = {"n", "s", "f", "m", "u", "c", "x"}  # TODO: state variable for number of edges?
 
 	def __init__(self, rt: Runtime):
-		self.rt = rt
+		self.rt: Runtime = rt
 		self.t = 0  # current simulation time since last restart (i.e. seed, reinitialization, or randomization)
-		self.samples = []
+		self.samples: list[Snapshot] = []
 		# self.u_node = {
 		# 	node: {
 		# 		param: 0.0
@@ -163,19 +164,27 @@ class Simulation:
 	
 	@property
 	def nodes(self) -> Sequence[Node]:
-		return self.rt.nodes
+		return ReadOnlyList(self.rt.config.nodes)
 	
 	@property
 	def edges(self) -> Sequence[Edge]:
-		return self.rt.edges
+		return ReadOnlyList(self.rt.config.edges)
 	
 	@property
-	def regions(self) -> Sequence[Region]:
-		return self.rt.regions
+	def regions(self) -> Mapping[Region, Sequence[Node]]:
+		return ReadOnlyDict(self.rt.config.regions)
 	
 	@property
-	def eregions(self) -> Sequence[ERegion]:
-		return self.rt.eregions
+	def eregions(self) -> Mapping[ERegion, Sequence[Edge]]:
+		edges = self.rt.config.edges    # list[Edge]
+		nodes = self.rt.config.regions  # Region -> list[Node]
+		return ReadOnlyDict({
+			eregion: [
+				edge
+				for edge in edges
+				if edge[0] in nodes[eregion[0]] and edge[1] in nodes[eregion[1]]
+			] for eregion in self.rt.config.regionEdgeParameters.keys()
+		})
 
 	@property
 	def s(self) -> Mapping[Any, numpy_vec]:
@@ -193,8 +202,25 @@ class Simulation:
 		return self._local_magnetization_proxy
 	
 	@property
-	def parameters(self) -> Sequence[str]:
-		return self.rt.config.allKeys
+	def parameters(self) -> Mapping[str, Sequence[Node]|Sequence[Edge]]:
+		config = self.rt.config
+		return {
+			param: [
+				node
+				for node in config.nodes
+				if config.hasNodeParameter(node, param)
+			]
+			for param in config.allKeys
+			if param in Simulation.NODE_PARAMETERS
+		} | {
+			param: [
+				edge
+				for edge in config.edges
+				if config.hasEdgeParameter(edge, param)
+			]
+			for param in config.allKeys
+			if param in Simulation.EDGE_PARAMETERS
+		}
 
 	def __getitem__(self, attr: str):
 		if attr not in Simulation.PARAMETERS | Simulation.STATES:
