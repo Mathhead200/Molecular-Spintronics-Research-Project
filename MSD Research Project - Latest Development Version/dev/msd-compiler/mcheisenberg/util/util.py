@@ -43,8 +43,8 @@ class AbstractReadableDict(Mapping):
 	def values(self):  return (self[k] for k in self)
 	def items(self):   return ((k, self[k]) for k in self)
 	def get(self, key, default=None):  return self[key] if key in self else default
-	def __or__(self, other):   return dict(self) | other
-	def __ror__(self, other):  return other | dict(self)
+	def __or__(self, other):   return dict(self) | dict(other)
+	def __ror__(self, other):  return dict(other) | dict(self)
 
 	# TODO: __eq__, __ne__, __str__, __hash__, __reeduce(_ex)__,
 
