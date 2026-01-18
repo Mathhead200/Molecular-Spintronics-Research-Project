@@ -1,12 +1,15 @@
 from __future__ import annotations
+from .constants import EDGE_PARAMETERS, NODE_PARAMETERS, PARAMETERS
 from .runtime import Runtime
-from .simulation_proxies import *
-from .simulation_util import EDGE_PARAMETERS, NODE_PARAMETERS, PARAMETERS, STATES, VEC_J, VEC_ZERO
-from .util import ReadOnlyDict
+from .simulation_proxies import MProxy, NProxy, ScalarEdgeParameterProxy, ScalarNodeParameterProxy, StateProxy, UProxy, VectorEdgeParameterProxy, VectorNodeParameterProxy
+from .simulation_util import VEC_J, VEC_ZERO
+from .util import ReadOnlyDict, ReadOnlyOrderedSet, ordered_set
+from itertools import chain
 from typing import TYPE_CHECKING
 import numpy as np
 if TYPE_CHECKING:
-	from collections.abc import Sequence
+	from .simulation_util import Edge, ERegion, Node, Region, numpy_vec
+	from collections.abc import Collection, Sequence
 
 
 # The full state of the Simulation at some simulation time, t.
@@ -24,8 +27,22 @@ class Snapshot:
 # Runtime wrapper which converts everything to numpy float arrays and adds
 #	simulation logic like recording samples, aggregates (e.g. m, U, n, etc.), etc.
 class Simulation:
+	NODE_PARAMETERS = ordered_set(NODE_PARAMETERS)
+	EDGE_PARAMETERS = ordered_set(EDGE_PARAMETERS)
+	STATES = ordered_set(["n", "s", "f", "m", "u", "c", "x"])
+	ALL_PROXIES = ordered_set(chain(PARAMETERS, STATES))
+
 	def __init__(self, rt: Runtime):
 		self.rt: Runtime = rt
+
+		# set of defined parameters, preserving order defined in Config:
+		config = self.rt.config
+		node_p =    [ p for params in config.localNodeParameters.values()  for p in params ]
+		edge_p =    [ p for params in config.localEdgeParameters.values()  for p in params ]
+		region_p =  [ p for params in config.regionNodeParameters.values() for p in params ]
+		eregion_p = [ p for params in config.regionEdgeParameters.values() for p in params ]
+		global_p =  [ p for p in config.globalParameters.keys() ]
+		self._parameters = ordered_set(global_p + region_p + eregion_p + node_p + edge_p)
 
 		self.t = 0  # current simulation time since last restart (i.e. seed, reinitialization, or randomization)
 		self.samples: list[Snapshot] = []
@@ -45,15 +62,6 @@ class Simulation:
 		self._u_proxy = UProxy(self)
 		self._c_proxy = None  # TODO: (stub)
 		self._x_proxy = None  # TODO: (stub)
-
-		# set of defined parameters, preserving order defined in Config:
-		config = self.rt.config
-		node_p =    [ p for params in config.localNodeParameters.values()  for p in params ]
-		edge_p =    [ p for params in config.localEdgeParameters.values()  for p in params ]
-		region_p =  [ p for params in config.regionNodeParameters.values() for p in params ]
-		eregion_p = [ p for params in config.regionEdgeParameters.values() for p in params ]
-		global_p =  [ p for p in config.globalParameters.keys() ]
-		self._parameters = ordered_set(global_p + region_p + eregion_p + node_p + edge_p)
 
 	def seed(self, *seed: int) -> None:
 		self.rt.seed()
@@ -103,11 +111,11 @@ class Simulation:
 	
 	@property
 	def nodes(self) -> ReadOnlyDict[Node, None]:  # Note: dict: Node -> None acting as ordered set
-		return ReadOnlyDict({ node: None for node in self.rt.config.nodes })
+		return ReadOnlyOrderedSet(ordered_set(self.rt.config.nodes))
 	
 	@property
 	def edges(self) -> ReadOnlyDict[Edge, None]:  # Note: dict: Edge -> None acting as ordered set
-		return ReadOnlyDict({ edge: None for edge in self.rt.config.edges })
+		return ReadOnlyOrderedSet(ordered_set(self.rt.config.edges))
 	
 	@property
 	def regions(self) -> ReadOnlyDict[Region, Collection[Node]]:
@@ -130,7 +138,7 @@ class Simulation:
 		config = self.rt.config
 		parameters = {}
 		for p in self._parameters:
-			if p in NODE_PARAMETERS:
+			if p in Simulation.NODE_PARAMETERS:
 				parameters[p] = [node for node in config.nodes if config.hasNodeParameter(node, p)]
 			else:
 				assert p in EDGE_PARAMETERS
@@ -138,11 +146,11 @@ class Simulation:
 		return ReadOnlyDict(parameters)
 
 	def __getitem__(self, attr: str):
-		if attr not in PARAMETERS | STATES:
+		if attr not in Simulation.ALL_PROXIES:
 			raise KeyError(f"{attr} is an unrecognized parameter or state")
 		return getattr(self, attr)
 
-for param in PARAMETERS | STATES:
+for param in Simulation.ALL_PROXIES:
 	setattr(Simulation, param, property(
 		fget=lambda self,        _p=param: getattr(self, f"_{_p}_proxy"),
 		fset=lambda self, value, _p=param: setattr(getattr(self, f"_{_p}_proxy"), "value", value)

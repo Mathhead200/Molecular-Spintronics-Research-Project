@@ -1,18 +1,20 @@
 from __future__ import annotations
-from .simulation_util import rtscal, rtvec, simscal, simvec, __EDGES__, __NODES__
-from .util import ReadOnlyCollection, ReadOnlyList, ReadOnlyDict, ordered_set
+from .constants import __EDGES__, __NODES__
+from .simulation_util import rtscal, rtvec, simscal, simvec
+from .util import ReadOnlyCollection, ReadOnlyDict, ReadOnlyList, ReadOnlyOrderedSet, ordered_set
 from copy import copy
+from itertools import chain
 from numpy.typing import NDArray
 from typing import Any, override, TYPE_CHECKING
 import numpy as np
 if TYPE_CHECKING:
 	from .config import vec
 	from .simulation import Simulation
-	from .simulation_util import Edge, ERegion, Node, Region, numpy_vec
-	from collections.abc import Callable, Collection, Sequence
+	from .simulation_util import Edge, ERegion, Node, Parameter, Region, numpy_vec
+	from collections.abc import Callable, Collection, Iterable, Sequence
 
 
-type Filter = Callable[[Simulation, str, Any], Collection]  # (Proxy.simulation, Proxy.name, key) -> candidate_elements
+type Filter = Callable[[Simulation, str, Any], Iterable]  # (Proxy.simulation, Proxy.name, key) -> candidate_elements
 
 class Proxy:
 	def __init__(self, simulation, sim_name: str, elements: Collection, filter: Filter, subscripts: list=[]):
@@ -53,7 +55,8 @@ def _edge_filter(sim: Simulation, param: str, key: Edge|ERegion) -> Collection[E
 	if key in sim.eregions:  return sim.eregions[key]  # key is interpreted as an edge-region
 	raise KeyError(f"Subscript [{key}] is undefined for parameter {param}: not an edge nor edge-region in Config")
 
-def _full_filter(sim: Simulation, param: str, key: Node|Edge|Region|ERegion|str) -> Collection[Node|Edge]:
+# Allow parameter keys, but only stores Node|Edge keys as elements
+def _ntype_filter(sim: Simulation, param: str, key: Node|Edge|Region|ERegion|Parameter) -> Collection[Node|Edge]:
 	if key == __NODES__:       return sim.nodes  # interpreted as the set of all nodes
 	if key == __EDGES__:       return sim.edges  # interpreted as the set of all edges
 	if key in sim.nodes:       return [key]      # interpreted as a (local) node
@@ -61,7 +64,18 @@ def _full_filter(sim: Simulation, param: str, key: Node|Edge|Region|ERegion|str)
 	if key in sim.regions:     return sim.regions[key]     # interpreted as a (node) region
 	if key in sim.eregions:    return sim.eregions[key]    # interpreted as an edge-region
 	if key in sim.parameters:  return sim.parameters[key]  # interpreted as a (node or edge) parameter
-	raise KeyError(f"For parameter {param}, undefined subscript: {key}")
+	raise KeyError(f"For parameter {param}, undefined subscript: [{key}]")
+
+# Allows parameter keys, and stores Node|Edge|Parameter keys are elements
+def _utype_filter(sim: Simulation, param: str, key: Node|Edge|Region|ERegion|Parameter) -> Collection[Node|Edge|Parameter]:
+	if key == __NODES__:       return chain(sim.nodes, sim.parameters)
+	if key == __EDGES__:       return chain(sim.edges, sim.parameters)
+	if key in sim.nodes:       return chain([key], sim.parameters)
+	if key in sim.edges:       return chain([key], sim.parameters)
+	if key in sim.regions:     return chain(sim.regions[key], sim.parameters)
+	if key in sim.eregions:    return chain(sim.eregions[key], sim.parameters)
+	if key in sim.parameters:  return chain(sim.nodes, sim.edges, [key])
+	raise KeyError(f"For parameter {param}, Unrecognized subscript: [{key}]")
 
 
 # Interface for a numerical/mathamatical object, e.g. numpy ndarray, or float.
@@ -106,7 +120,8 @@ class Numeric:
 	def __gt__(self, other):  return self.value > other
 	def __ge__(self, other):  return self.value >= other
 
-	def __str__(self) -> str:  return str(self.value)
+	def __str__(self):   return str(self.value)
+	def __repr__(self):  return repr(self.value)
 	def __hash__(self):  return hash(self.value)
 
 # Behaves as an numpy ndarray
@@ -162,13 +177,13 @@ class Int(Numeric):
 
 class NumericProxy(Proxy, Numeric):
 	def __setitem__(self, key, value) -> None:
-		self[key].value = value
+		self[key].value = value	
 
 	def values(self) -> NDArray:
-		return np.array([ self[key] for key in self._elements ])
+		return np.array([self[key].value for key in self._elements], dtype=float)
 	
 	def items(self) -> Collection[tuple[Any, Any]]:
-		return ReadOnlyDict([ (key, self[key]) for key in self._elements ])
+		return ReadOnlyList([ (key, self[key].value) for key in self._elements ])
 
 
 # Proxy for parameters, e.g. J, B, kT, n, etc. Parameters do not aggrigate like
@@ -232,7 +247,7 @@ class StateProxy(NumericProxy, Vector):
 	def __init__(self, sim: Simulation, rt_attr: str, sim_name: str):
 		super().__init__(sim, sim_name, elements=sim.nodes, filter=_node_filter)
 		self._runtime_proxy = getattr(sim.rt, rt_attr)
-
+	
 	@override
 	@property
 	def value(self) -> numpy_vec:
@@ -246,7 +261,8 @@ class StateProxy(NumericProxy, Vector):
 	def value(self, value: numpy_vec|vec) -> None:
 		if len(self._elements) != 1:
 			raise ValueError(f"Can't directly assign to {self._name} for a non-local selection. (Subscript(s): {self._subscripts}.) Instead, select nodes individually and set them one at a time.")
-		self._runtime_proxy[self.key] = rtvec(value)
+		node = [*self._elements][0]
+		self._runtime_proxy[node] = rtvec(value)
 
 class MProxy(NumericProxy, Vector):
 	def __init__(self, sim: Simulation, sim_name: str="m"):
@@ -265,7 +281,7 @@ class MProxy(NumericProxy, Vector):
 # Number of nodes in selection
 class NProxy(NumericProxy, Int):
 	def __init__(self, sim: Simulation, sim_name: str="n"):
-		super().__init__(sim, sim_name, elements=(sim.nodes | sim.edges), filter=_full_filter)
+		super().__init__(sim, sim_name, elements=ordered_set(chain(sim.nodes, sim.edges)), filter=_ntype_filter)
 	
 	@override
 	@property
@@ -275,9 +291,107 @@ class NProxy(NumericProxy, Int):
 # Internal Energy in selection
 class UProxy(NumericProxy, Scalar):
 	def __init__(self, sim: Simulation, sim_name="u"):
-		super().__init__(sim, sim_name, elements=(sim.nodes | sim.edges), filter=_full_filter)
+		parameters = ordered_set(sim.parameters)
+		parameters.pop("S", None)  # these parameters don't contribute to energy
+		parameters.pop("F", None)
+		super().__init__(sim, sim_name, elements=ordered_set(chain(sim.nodes, sim.edges, parameters)), filter=_utype_filter)
 	
 	@override
 	@property
 	def value(self) -> float:
-		return 0.0  # TODO: (stub)
+		sim = self._sim
+		
+		# separate selected nodes, edges, and parameters in elements
+		nodes = []
+		edges = []
+		parameters = set()
+		for x in self._elements:
+			if x in sim.nodes:
+				nodes.append(x)
+			elif x in sim.edges:
+				edges.append(x)
+			else:
+				assert x in sim.parameters  # DEBUG
+				parameters.add(x)
+		
+		u = 0.0     # Result: internal energy
+
+		if len(nodes) != 0:
+			m = None    # cache (node parameters: B, A)
+
+			if "B" in parameters:
+				m = np.array([sim.m[i] for i in nodes], dtype=float)
+				B = np.array([sim.B[i] for i in nodes], dtype=float)
+				u -= np.sum(B * m)
+			
+			if "A" in parameters:
+				if m is None:  m = np.array([sim.m[i] for i in nodes], dtype=float)
+				A = np.array([sim.A[i] for i in nodes], dtype=float)
+				u -= np.sum(A * (m * m))
+			
+			if "Je0" in parameters:
+				s = np.array([sim.s[i] for i in nodes], dtype=float)
+				f = np.array([sim.f[i] for i in nodes], dtype=float)
+				Je0 = np.array([sim.Je0[i] for i in nodes], dtype=float)
+				u -= np.sum(Je0 * np.sum(s * f, axis=1), axis=0)  # sum( Je0[i] * (s[i] @ f[i]) )
+
+		if len(edges) != 0:
+			s_i = None  # cache (edge parameters: J, Je1)
+			s_j = None  # cache (edge parameters: J, Je1)
+			f_i = None  # cache (edge parameters: Je1, Jee)
+			f_j = None  # cache (edge parameters: Je1, Jee)
+			m_i = None  # cache (edge parameters: b, D)
+			m_j = None  # cache (edge parameters: b, D)
+
+			if "J" in parameters:
+				s_i = np.array([sim.s[i] for i, _ in edges], dtype=float)
+				s_j = np.array([sim.s[j] for _, j in edges], dtype=float)
+				J = np.array([sim.J[e] for e in edges], dtype=float)
+				u -= np.sum(J * np.sum(s_i * s_j, axis=1), axis=0)  # sum( J * (s[i] @ s[j]) )
+
+			if "Je1" in parameters:
+				if s_i is None:  s_i = np.array([sim.s[i] for i, _ in edges], dtype=float)
+				if s_j is None:  s_j = np.array([sim.s[j] for _, j in edges], dtype=float)
+				f_i = np.array([sim.f[i] for i, _ in edges], dtype=float)
+				f_j = np.array([sim.f[j] for _, j in edges], dtype=float)
+				Je1 = np.array([sim.Je1[e] for e in edges], dtype=float)
+				u -= np.sum(Je1 * (np.sum(s_i * f_j, axis=1) + np.sum(s_j * f_i, axis=1)), axis=0)  # sum( Je1 * (s[i] @ f[j] + s[j] @ f[i]) )
+
+			if "Jee" in parameters:
+				if f_i is None:  f_i = np.array([sim.f[i] for i, _ in edges], dtype=float)
+				if f_j is None:  f_j = np.array([sim.f[j] for _, j in edges], dtype=float)
+				Jee = np.array([sim.Jee[e] for e in edges], dtype=float)
+				u -= np.sum(Jee * np.sum(f_i * f_j, axis=1), axis=0)  # sum( Jee * (f[i] @ f[j]) )
+
+			if "b" in parameters:
+				m_i = np.array([sim.m[i] for i, _ in edges], dtype=float)
+				m_j = np.array([sim.m[j] for _, j in edges], dtype=float)
+				b = np.array([sim.b[e] for e in edges], dtype=float)
+				dotp = np.sum(m_i * m_j, axis=1)
+				u -= np.sum(b * (dotp * dotp), axis=0)  # sum( b * (m[i] @ m[j])**2 )
+
+			if "D" in parameters:
+				if m_i is None:  m_i = np.array([sim.m[i] for i, _ in edges], dtype=float)
+				if m_j is None:  m_j = np.array([sim.m[j] for _, j in edges], dtype=float)
+				D = np.array([sim.D[e] for e in edges], dtype=float)
+				u -= np.sum(D * np.cross(m_i, m_j))
+
+		return float(u)
+
+	def keys(self) -> Collection[Node|Edge]:
+		sim = self._sim
+		nodes = sim.nodes
+		edges = sim.edges
+		keys = ordered_set(self._elements)
+		for k in self._elements:
+			if k not in chain(nodes, edges):
+				keys.pop(k, None)  # discard parameter elements, leaving only Collection[Node|Edge]
+		return ReadOnlyOrderedSet(keys)
+	
+	@override
+	def values(self) -> NDArray:
+		return np.array([self[k] for k in self.keys()], dtype=float)
+
+	@override
+	def items(self) -> Collection[tuple[Node|Edge, float]]:
+		return ReadOnlyList([ (k, self[k].value) for k in self.keys() ])

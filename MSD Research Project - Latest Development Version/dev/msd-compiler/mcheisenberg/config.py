@@ -1,5 +1,7 @@
 from __future__ import annotations
+from .asm_reserved_keywords import MASM_RESERVED_KEYWORDS
 from .build import VisualStudio
+from .constants import EDGE_PARAMETERS, NODE_PARAMETERS
 from .runtime import Runtime
 from .util import StrJoiner, floats, is_pow2
 from collections import defaultdict
@@ -77,10 +79,32 @@ class _Config(Generic[Index, Region], TypedDict, total=False):
 	regionId: Callable[[Region], str]  # returned str must conform to C identifier spec. Must be able to handle None as input.
 
 class Config:
-	ALLOWED_NODE_PARAMETERS = { "B", "A", "S", "F", "kT", "Je0" }
-	ALLOWED_EDGE_PARAMETERS = { "J", "Je1", "Jee", "b", "D" }
+	ALLOWED_NODE_PARAMETERS = set(NODE_PARAMETERS)
+	ALLOWED_EDGE_PARAMETERS = set(EDGE_PARAMETERS)
 	ALLOWED_PRGM_PARAMETERS = { "prng", "seed" }
-	
+	RESERVED_IDS = {
+		"NODES", "EDGES", "REGIONS", "EDGE_REGIONS", "GLOBAL_NODE", "GLOBAL_EDGE",
+		"kTref", "Sref", "Fref", "SFref", "prng_state", "metropolis", "seed"
+	}
+
+	@staticmethod
+	def validate_id(id, err_prefix: str="Node or region"):
+		id = str(id)
+		if id.startswith("OFFSETOF"):
+			raise ValueError(f"{err_prefix} {id} reserved: starts with OFFSETOF")
+		if id.startswith("SIZEOF"):
+			raise ValueError(f"{err_prefix} {id} reserved: starts with SIZEOF")
+		if id.endswith("COUNT"):
+			raise ValueError(f"{err_prefix} {id} reserved: ends with COUNT")
+		if id.startswith("deltaU"):
+			raise ValueError(f"{err_prefix} {id} reserved: starts with deltaU")
+		if id in Config.ALLOWED_NODE_PARAMETERS | Config.ALLOWED_EDGE_PARAMETERS:
+			raise ValueError(f"{err_prefix} {id} reserved: matches parameter name")
+		if id in Config.RESERVED_IDS:
+			raise ValueError(f"{err_prefix} {id} reserved")
+		if id.upper() in MASM_RESERVED_KEYWORDS:  # case insensitive
+			raise ValueError(f"{err_prefix} {id} reserved: MASM keyword (directive, instruction, etc.)")
+
 	def __init__(self, **kw):
 		self.__dict__ = _Config(*kw)
 		if "nodeId" not in self.__dict__:
@@ -405,6 +429,12 @@ class Config:
 		# aliases
 		prng = self.programParameters["prng"]
 		seed = self.programParameters.get("seed", None)
+
+		# CHECK: Make sure all node and region names are valid identifiers for ASM output
+		for id in self.nodes:
+			Config.validate_id(id, err_prefix="Node")
+		for id in self.regions:
+			Config.validate_id(id, err_prefix="Region")
 
 		# CHECK: Do all nodes referenced in self.edges actually exist in self.nodes?
 		for edge in self.edges:

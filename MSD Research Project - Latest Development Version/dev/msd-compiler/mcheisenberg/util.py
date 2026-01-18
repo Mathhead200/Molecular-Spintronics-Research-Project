@@ -75,3 +75,8 @@ class ReadOnlyDict(AbstractReadableDict):
 
 	def __str__(self):   return str(self._obj)
 	def __repr__(self):  return repr(self._obj)
+
+# Just changes the defalt view behaviour. Otherwise still a Mapping.
+class ReadOnlyOrderedSet(ReadOnlyDict):
+	def __str__(self):   return str(self._obj.keys())
+	def __repr__(self):  return repr(self._obj.keys())

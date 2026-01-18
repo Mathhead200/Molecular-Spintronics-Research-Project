@@ -1,5 +1,4 @@
 from __future__ import annotations
-from .config import Config
 from numpy.typing import NDArray
 from typing import Annotated, Any, TYPE_CHECKING
 import numpy as np
@@ -13,20 +12,13 @@ type Node = Any    # type parameter
 type Region = Any  # type parameter
 type Edge = tuple[Node, Node]
 type ERegion = tuple[Region, Region]
+type Parameter = str
 
 
 VEC_ZERO = np.zeros(3, dtype=float)
 VEC_I = np.array([1.0, 0.0, 0.0])
 VEC_J = np.array([0.0, 1.0, 0.0])
 VEC_K = np.array([0.0, 0.0, 10])
-
-NODE_PARAMETERS = Config.ALLOWED_NODE_PARAMETERS
-EDGE_PARAMETERS = Config.ALLOWED_EDGE_PARAMETERS
-PARAMETERS = NODE_PARAMETERS | EDGE_PARAMETERS
-STATES = {"n", "s", "f", "m", "u", "c", "x"}  # TODO: state variable for number of edges?
-
-__NODES__ = "__NODES__"  # enum
-__EDGES__ = "__EDGES__"  # enum
 
 
 def simvec(v: vec|numpy_vec|None) -> numpy_vec:
