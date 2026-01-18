@@ -26,8 +26,10 @@ class Snapshot:
 class Simulation:
 	def __init__(self, rt: Runtime):
 		self.rt: Runtime = rt
+
 		self.t = 0  # current simulation time since last restart (i.e. seed, reinitialization, or randomization)
 		self.samples: list[Snapshot] = []
+		
 		for param in ["A", "B"]:
 			setattr(self, f"_{param}_proxy", VectorNodeParameterProxy(self, param))
 		for param in ["S", "F", "kT", "Je0"]:
@@ -39,10 +41,19 @@ class Simulation:
 		self._n_proxy = NProxy(self)
 		self._s_proxy = StateProxy(self, "spin", "s")
 		self._f_proxy = StateProxy(self, "flux", "f")
-		self._m_proxy = None  # TODO: (stub)
+		self._m_proxy = MProxy(self)
 		self._u_proxy = UProxy(self)
 		self._c_proxy = None  # TODO: (stub)
 		self._x_proxy = None  # TODO: (stub)
+
+		# set of defined parameters, preserving order defined in Config:
+		config = self.rt.config
+		node_p =    [ p for params in config.localNodeParameters.values()  for p in params ]
+		edge_p =    [ p for params in config.localEdgeParameters.values()  for p in params ]
+		region_p =  [ p for params in config.regionNodeParameters.values() for p in params ]
+		eregion_p = [ p for params in config.regionEdgeParameters.values() for p in params ]
+		global_p =  [ p for p in config.globalParameters.keys() ]
+		self._parameters = ordered_set(global_p + region_p + eregion_p + node_p + edge_p)
 
 	def seed(self, *seed: int) -> None:
 		self.rt.seed()
@@ -53,13 +64,11 @@ class Simulation:
 		self.rt.reinitialize(tuple(initSpin.tolist()), tuple(initFlux.tolist()))
 		self.t = 0
 		self.samples = []
-		# TODO: recalculate energy?
 	
 	def randomize(self, *seed: int) -> None:
 		self.rt.randomize(*seed)
 		self.t = 0
 		self.samples = []
-		# TODO: recalculate energy?
 
 	def metropolis(self, iterations: int, freq: int=0, bookend: bool=True) -> None:
 		"""
@@ -98,7 +107,7 @@ class Simulation:
 	
 	@property
 	def edges(self) -> ReadOnlyDict[Edge, None]:  # Note: dict: Edge -> None acting as ordered set
-		return ReadOnlyList({ edge: None for edge in self.rt.config.edges })
+		return ReadOnlyDict({ edge: None for edge in self.rt.config.edges })
 	
 	@property
 	def regions(self) -> ReadOnlyDict[Region, Collection[Node]]:
@@ -119,23 +128,14 @@ class Simulation:
 	@property
 	def parameters(self) -> ReadOnlyDict[str, Sequence[Node]|Sequence[Edge]]:
 		config = self.rt.config
-		return ReadOnlyDict({
-			param: [
-				node
-				for node in config.nodes
-				if config.hasNodeParameter(node, param)
-			]
-			for param in config.allKeys
-			if param in NODE_PARAMETERS
-		} | {
-			param: [
-				edge
-				for edge in config.edges
-				if config.hasEdgeParameter(edge, param)
-			]
-			for param in config.allKeys
-			if param in EDGE_PARAMETERS
-		})
+		parameters = {}
+		for p in self._parameters:
+			if p in NODE_PARAMETERS:
+				parameters[p] = [node for node in config.nodes if config.hasNodeParameter(node, p)]
+			else:
+				assert p in EDGE_PARAMETERS
+				parameters[p] = [edge for edge in config.edges if config.hasEdgeParameter(edge, p)]
+		return ReadOnlyDict(parameters)
 
 	def __getitem__(self, attr: str):
 		if attr not in PARAMETERS | STATES:

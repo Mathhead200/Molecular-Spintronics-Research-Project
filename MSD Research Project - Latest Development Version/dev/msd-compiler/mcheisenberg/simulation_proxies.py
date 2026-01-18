@@ -1,34 +1,34 @@
 from __future__ import annotations
-from .simulation_util import rtscal, rtvec, simscal, simvec, PARAMETERS
-from .util import ReadOnlyCollection, ReadOnlyList
-from collections.abc import Callable, Collection, Sequence
+from .simulation_util import rtscal, rtvec, simscal, simvec, __EDGES__, __NODES__
+from .util import ReadOnlyCollection, ReadOnlyList, ReadOnlyDict, ordered_set
 from copy import copy
 from numpy.typing import NDArray
-from typing import Any, TYPE_CHECKING
+from typing import Any, override, TYPE_CHECKING
 import numpy as np
 if TYPE_CHECKING:
 	from .config import vec
 	from .simulation import Simulation
-	from .simulation_util import numpy_vec
+	from .simulation_util import Edge, ERegion, Node, Region, numpy_vec
+	from collections.abc import Callable, Collection, Sequence
 
 
 type Filter = Callable[[Simulation, str, Any], Collection]  # (Proxy.simulation, Proxy.name, key) -> candidate_elements
 
 class Proxy:
-	def __init__(self, simulation, sim_name: str, elements: Collection, filter: Filter, subscripts: Sequence=[]):
+	def __init__(self, simulation, sim_name: str, elements: Collection, filter: Filter, subscripts: list=[]):
 		self._sim: Simulation = simulation
 		self._name = sim_name
 		self._elements: Collection = elements
 		self._filter = filter
-		self._subscripts: Sequence = subscripts
+		self._subscripts: list = subscripts
 
 	def __getitem__(self, key: Any) -> Proxy:
 		proxy = copy(self)
 		candidate_elements = self._filter(self._sim, self._name, key)
-		proxy._elements = { x: None for x in candidate_elements if x in self._elements }  # (set) itersection of candidate_elements and self._elements
+		proxy._elements = { x: None for x in candidate_elements if x in self._elements }  # (ordered set) itersection of candidate_elements and self._elements
 		if len(proxy._elements) == 0:
 			raise ValueError(f"{key} is valid by itself, but disjoint with previous subscripts: {self._subscripts}")
-		proxy._subscripts += [key]
+		proxy._subscripts = self._subscripts + [key]
 		return proxy
 
 	@property
@@ -44,10 +44,10 @@ class Proxy:
 		return ReadOnlyList(self._subscripts)
 
 def _node_filter(sim: Simulation, param: str, key: Node|Region) -> Collection[Node]:
-	if key in sim.nodes:    return [key]  # key is interpreted a (local) node
+	if key in sim.nodes:    return [key]             # key is interpreted a (local) node
 	if key in sim.regions:  return sim.regions[key]  # key is interpreted as a (node) region
 	raise KeyError(f"Subscript [{key}] is undefined for parameter {param}: not a node nor region in Config")
-	
+
 def _edge_filter(sim: Simulation, param: str, key: Edge|ERegion) -> Collection[Edge]:
 	if key in sim.edges:     return [key]              # key is interpreted as a (local) edge
 	if key in sim.eregions:  return sim.eregions[key]  # key is interpreted as an edge-region
@@ -112,7 +112,7 @@ class Numeric:
 # Behaves as an numpy ndarray
 class Vector(Numeric):
 	def __array__(self, dtype=None) -> numpy_vec:
-		return np.asarray(self.value, dtype=dtype)
+		return self.value
 	
 	def __len__(self):
 		assert len(self.value) == 3  # DEBUG
@@ -121,13 +121,18 @@ class Vector(Numeric):
 	def __iter__(self):
 		return iter(self.value)
 
-	# numpy specific stuff
-	__array_priority__ = -1000.0  # VERY LOW: Let other numpy arrray coerce this object
-
+	# numpy specific stuff:
+	#	Should we prefer this object's ufunc __array_ufunc__ and __array_function__
+	#	over ndarray's (ndarray.__array_priority__ == 0). This allows our methods
+	#	to first unwrap all Numeric objects, then propogate to ndarray (or any other "ducks").
+	__array_priority__ = 1000.0  # VERY HIGH
+	
 	def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
+		inputs = [x.value if isinstance(x, Numeric) else x for x in inputs]
 		return self.value.__array_ufunc__(ufunc, method, *inputs, **kwargs)
 	
 	def __array_function__(self, func, types, args, kwargs):
+		args = [x.value if isinstance(x, Numeric) else x for x in args]
 		return self.value.__array_function__(func, types, args, kwargs)
 
 # Behaves as a float
@@ -156,6 +161,9 @@ class Int(Numeric):
 
 
 class NumericProxy(Proxy, Numeric):
+	def __setitem__(self, key, value) -> None:
+		self[key].value = value
+
 	def values(self) -> NDArray:
 		return np.array([ self[key] for key in self._elements ])
 	
@@ -171,7 +179,7 @@ class ParameterProxy(NumericProxy):
 	def __init__(self,
 		simulation: Simulation,
 		param: str,
-		elements: Sequence[Node|Edge],
+		elements: Collection[Node|Edge],
 		filter: Filter,
 		to_sim: Callable[[vec|float], numpy_vec|float]=None,  # for getting simulation value from runtime
 		to_rt: Callable[[numpy_vec|float], vec|float]=None    # for updating runtime value from simualtion
@@ -182,33 +190,25 @@ class ParameterProxy(NumericProxy):
 		self._to_rt = to_rt
 	
 	@property
-	def key(self) -> Node|Edge|Region|ERegion:
+	def _key(self) -> Node|Edge|Region|ERegion:
 		return self._subscripts[-1]  # only the last subscript is relevant for prarameter proxies
 	
-	@property
-	def _runtime_value(self) -> vec|float:
-		if len(self._subscripts) == 0:
-			return self._runtime_proxy.value
-		else:
-			return self._runtime_proxy[self.key]
-	
-	@_runtime_value.setter
-	def _runtime_value(self, value: vec|float) -> None:
-		if len(self._subscripts) == 0:
-			self._runtime_proxy.value = value
-		else:
-			self._runtime_proxy[self.key] = value
-	
+	@override
 	@property
 	def value(self) -> numpy_vec:
-		return self._to_sim(self._runtime_value)
+		if len(self._subscripts) == 0:
+			value = self._runtime_proxy.value  # global parameter
+		else:
+			value = self._runtime_proxy[self._key]
+		return self._to_sim(value)
 
 	@value.setter
 	def value(self, value: numpy_vec) -> None:
-		self._runtime_value = self._to_rt(value)
-	
-	def __setitem__(self, key: Node|Edge|Region|ERegion, value: numpy_vec|float) -> None:
-		self[key].value = value
+		value = self._to_rt(value)
+		if len(self._subscripts) == 0:
+			self._runtime_proxy.value = value  # global parameter
+		else:
+			self._runtime_proxy[self._key] = value
 
 class VectorNodeParameterProxy(ParameterProxy, Vector):
 	def __init__(self, sim: Simulation, param: str):
@@ -232,29 +232,42 @@ class StateProxy(NumericProxy, Vector):
 	def __init__(self, sim: Simulation, rt_attr: str, sim_name: str):
 		super().__init__(sim, sim_name, elements=sim.nodes, filter=_node_filter)
 		self._runtime_proxy = getattr(sim.rt, rt_attr)
-	
-	@property
-	def key(self) -> Node:
-		return self._subscripts[-1]  # only the last subscript is relevant for "state" proxies
 
+	@override
 	@property
 	def value(self) -> numpy_vec:
-		return np.sum(self.values(), axis=0)  # add all the row (i.e. axis=0) vectors
+		if len(self._elements) > 1:
+			return np.sum(self.values(), axis=0)  # add all the row (i.e. axis=0) vectors
+		else:
+			node = [*self._elements][0]
+			return simvec(self._runtime_proxy[node])
 	
 	@value.setter
-	def value(self, value: numpy_vec) -> None:
+	def value(self, value: numpy_vec|vec) -> None:
 		if len(self._elements) != 1:
 			raise ValueError(f"Can't directly assign to {self._name} for a non-local selection. (Subscript(s): {self._subscripts}.) Instead, select nodes individually and set them one at a time.")
 		self._runtime_proxy[self.key] = rtvec(value)
 
-	def __setitem__(self, key: Node|Edge|Region|ERegion, value: numpy_vec|float) -> None:
-		self[key].value = value
+class MProxy(NumericProxy, Vector):
+	def __init__(self, sim: Simulation, sim_name: str="m"):
+		super().__init__(sim, sim_name, elements=sim.nodes, filter=_node_filter)
+
+	@override
+	@property
+	def value(self) -> numpy_vec:
+		if len(self._elements) > 1:
+			return np.sum(self.values(), axis=0)  # add all the row (i.e. axis=0) vectors
+		else:
+			runtime = self._sim.rt
+			node = [*self._elements][0]
+			return simvec(runtime.spin[node]) + simvec(runtime.flux[node])
 
 # Number of nodes in selection
 class NProxy(NumericProxy, Int):
 	def __init__(self, sim: Simulation, sim_name: str="n"):
 		super().__init__(sim, sim_name, elements=(sim.nodes | sim.edges), filter=_full_filter)
 	
+	@override
 	@property
 	def value(self) -> int:
 		return len(self._elements)
@@ -264,7 +277,7 @@ class UProxy(NumericProxy, Scalar):
 	def __init__(self, sim: Simulation, sim_name="u"):
 		super().__init__(sim, sim_name, elements=(sim.nodes | sim.edges), filter=_full_filter)
 	
+	@override
 	@property
 	def value(self) -> float:
 		return 0.0  # TODO: (stub)
-

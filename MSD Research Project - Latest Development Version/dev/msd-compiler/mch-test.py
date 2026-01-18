@@ -12,9 +12,15 @@ if __name__ == "__main__":
 
 	with model.compile(dir=".", asm="mch-test.asm") as rt:
 		sim = mch.Simulation(rt)
+		print(sim.nodes)
+		print(sim.edges)
+		print(sim.regions)
+		print(sim.eregions)
+		print(sim.parameters)
 		sim.rt.spin[0] = (1.0, 0.0, 0.0)
-		print(sim.s.values())
-		sim.metropolis(7)
-		print(sim.s)
+		print(sim.m.values())
+		print(sim.m)
 		print(sim.u)
 		print(sim.n[__NODES__])
+		print(sim.n[__EDGES__])
+		sim.metropolis(7)

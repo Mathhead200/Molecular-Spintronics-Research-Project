@@ -29,15 +29,15 @@ __NODES__ = "__NODES__"  # enum
 __EDGES__ = "__EDGES__"  # enum
 
 
-def simvec(v: tuple|None) -> numpy_vec:
+def simvec(v: vec|numpy_vec|None) -> numpy_vec:
 	""" Convert a Runtime tuple vec to a Simulation numpy ndarray. """
 	if v is None:
 		return VEC_ZERO
 	return np.asarray(v, dtype=float)
 
-def rtvec(v: numpy_vec) -> vec:
+def rtvec(v: vec|numpy_vec|None) -> vec:
 	""" Converts a Simulation numpy ndarray to a Runtime tuple vec. """
-	return tuple(v.astype(float).tolist())
+	return tuple(simvec(v).astype(float).tolist())
 
 def simscal(x: float|None) -> float:
 	""" Convert a Runtime float|None to a Simulation float. """
@@ -45,8 +45,8 @@ def simscal(x: float|None) -> float:
 		return 0.0
 	return x
 
-def rtscal(x: float) -> float:
+def rtscal(x: float|None) -> float:
 	""" Convert a Simulation float to a Runtime float. """
-	# Does nothing, but is a placeholder in case we want to change the
-	# 	Simulation scalar data type later.
+	if x is None:
+		return 0.0
 	return x
