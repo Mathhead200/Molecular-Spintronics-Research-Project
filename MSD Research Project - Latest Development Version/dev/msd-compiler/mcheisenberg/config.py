@@ -430,6 +430,12 @@ class Config:
 		prng = self.programParameters["prng"]
 		seed = self.programParameters.get("seed", None)
 
+		# CHECK: No duplicate nodes or edges (TODO: allow duplicate edges?)
+		if len(set(self.nodes)) != len(self.nodes):
+			raise ValueError("Duplicate nodes.")
+		if len(set(self.edges)) != len(self.edges):
+			raise ValueError("Duplicate edges.")
+
 		# CHECK: Make sure all node and region names are valid identifiers for ASM output
 		for id in self.nodes:
 			Config.validate_id(id, err_prefix="Node")

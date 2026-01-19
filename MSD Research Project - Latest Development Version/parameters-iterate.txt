@@ -1,18 +1,18 @@
-simCount = 500000000000
-freq = 300000000
+simCount = 1000000000
+freq = 1000000
 
 # dimensions of bounding box
 width  = 11
-height = 50
-depth  = 50
+height = 25
+depth  = 25
 
 # boundaries which define the exact dimensions of FM_L, FM_R, and mol.
 molPosL = 5
 molPosR = 5
-topL    = 23
-bottomL = 27
-frontR  = 23
-backR   = 27
+topL    = 10
+bottomL = 14
+frontR  = 10
+backR   = 14
 
 
 # Tempurature
@@ -35,8 +35,8 @@ Fm = 0
 JL = 1
 JR = 1
 Jm = 1
-JmL = 0
-JmR = 0
+JmL = 1
+JmR = -1
 JLR = 0
 
 # exchange coupling between a spin and its local flux

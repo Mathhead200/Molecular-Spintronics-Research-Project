@@ -16,8 +16,8 @@ if TYPE_CHECKING:
 class Snapshot:
 	def __init__(self, sim: Simulation):
 		self.t = sim.t
-		self.spins = np.array(sim.spins)
-		self.fluxes = np.array(sim.fluxes)  # TODO: if fluxes?
+		self.s = np.array(sim.s.items())
+		self.f = np.array(sim.f.items())
 		# TODO: copy mutatable parameters
 		# TODO: copy other state information: spin/flux, parameters (if they vary), energy, and (maybe) macros like overall magnetization, etc.
 

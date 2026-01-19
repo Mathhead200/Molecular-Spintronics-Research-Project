@@ -15,7 +15,7 @@ if __name__ == "__main__":
 		"Je0": 1.0
 	}
 
-	with model.compile(dir=".", asm="mch-test.asm") as rt:
+	with model.compile(dir=".", asm="mc-test.asm") as rt:
 		sim = mch.Simulation(rt)
 		s = sim.s
 		f = sim.f
