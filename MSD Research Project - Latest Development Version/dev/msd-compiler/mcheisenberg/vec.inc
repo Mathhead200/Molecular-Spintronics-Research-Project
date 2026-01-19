@@ -117,6 +117,8 @@ _vdotp MACRO destX, destY, src1Y, src2Y, tempX
 ENDM
 
 ; Assumes dest is pure scalar, i.e. (s, 0, 0, 0)
+; Notes:
+;	* temp can overlap with src1 or src2 (unlike _vdotadd) since they are only used once at the top.
 ; See: _vdotadd
 _vdotadds MACRO destX, destY, src1Y, src2Y, tempX
 	; input src1 = (a, b, c, d); src2 = (x, y, z, w)
@@ -125,6 +127,8 @@ _vdotadds MACRO destX, destY, src1Y, src2Y, tempX
 ENDM
 
 ; Assumes dest is pure scalar, i.e. (s, 0, 0, 0)
+; Notes:
+;	* temp can overlap with src1 or src2 (unlike _vndotadd) since they are only used once at the top.
 ; See: _vndotadd
 _vndotadds MACRO destX, destY, src1Y, src2Y, tempX
 	; input src1 = (a, b, c, d); src2 = (x, y, z, w)
@@ -135,15 +139,14 @@ ENDM
 ; Computes the dot product of scr1 and scr2, and adds it to (scalar) dest.
 ; Types: XMMn, YMMn, YMMn, YMMn, XMMn
 ; Preconditions:
-;	1. temp can NOT overlap with dest.
+;	1. temp can NOT overlap with dest NOR src.
 ;	2. destY is YMMn version of destX.
 ; Postconditions:
 ;	1. dest is modified and scalar, i.e. dest = (result, ?, 0, 0).
-;	2. src1 and src2 are not modified unless they overlap with dest or temp.
+;	2. src1 and src2 are not modified.
 ;	3. temp is clobbered!
 ;	4. dest[1] is clobbered! And dest[2:3] = 0
 ; Notes:
-;	* temp can overlap with src1 or src2 since they are only used once at the top.
 ;	* dest can be the same as one or both of src1 and src2.
 _vdotadd MACRO destX, destY, src1Y, src2Y, tempX
 	; Inputs:	destY = (s, ?, ?, ?)

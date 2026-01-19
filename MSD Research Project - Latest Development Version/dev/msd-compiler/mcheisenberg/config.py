@@ -948,7 +948,7 @@ class Config:
 				resx, resy = "xmm0", "ymm0"   # result (return: -ΔU = -ΔU_Je0 - ΔU_A - ΔU_J - ΔU_Je1 - ΔU_Jee - ΔU_b - ΔU_B - ΔU_D)
 				s1i = "ymm1"                  # s'_i (param: new spin)
 				f1i = "ymm2"                  # f'_i (param: new flux)
-				prmx, prmy = "xmm3", "ymm3"  # scalar parameter (Je0, J, Je1, Jee, b), or vector parameter (A, B, D)
+				prmx, prmy = "xmm3", "ymm3"    # scalar parameter (Je0, J, Je1, Jee, b), or vector parameter (A, B, D)
 				smi = "ymm4"                  # s_i, m_i, then (unused)
 				fm1 = "ymm5"                  # f_i, m'_i, then (unused)
 				dsm = "ymm6"                  # (unused), Δs_i, then Δm_i
@@ -980,7 +980,7 @@ class Config:
 				# try to compute -ΔU_Je0 = Je0 (s'⋅f' - s⋅f):
 				if "Je0" in self.allKeys:
 					src1 += "\t; -deltaU_Je0 calculation\n"
-					# where is Jeo defined?
+					# where is Je0 defined?
 					load_insn = None
 					if "Je0" in self.localNodeParameters.get(node, {}):
 						load_insn = f"\tvmovsd {prmx}, qword ptr [nodes + ({index})*SIZEOF_NODE + OFFSETOF_Je0]  ; load Je0_{nid} (local)\n"
@@ -1008,15 +1008,6 @@ class Config:
 							out_init = True
 						else:
 							src1 += f"\tvfmadd231sd {resx}, {prmx}, {tmpx}  ; {resx} += {prmx} * {tmpx}\n\n"
-				# commit phase 1
-				if phase1:
-					src += "\t; Phase 1:\n"
-					src += f"\tvmovapd {smi}, ymmword ptr [nodes + ({index})*SIZEOF_NODE + OFFSETOF_SPIN]  ; load s_i\n"
-					if flux_mode:
-						src += f"\tvmovapd {fm1}, ymmword ptr [nodes + ({index})*SIZEOF_NODE + OFFSETOF_FLUX]  ; load f_i\n"
-				else:
-					src += "\t; Phase 1: (skip)\n"
-				src += "\n" + str(src1)  # actual ASM (or comments)
 				# Phase 2: compute (m_i, m'_i, Δs_i, Δf_i) -> -ΔU_(A, J, Je1, Jee, b):
 				phase2: bool = False  # does phase 2 contain any code?
 				src2 = StrJoiner()    # buffer phase 2 src to emit after load
@@ -1043,10 +1034,10 @@ class Config:
 						src2 += f"\tvmulpd {tmpy}, {m1i}, {m1i}  ; m' Hadamard squared: m'2\n"
 						src2 += f"\tvfnmadd231pd {tmpy}, {smi}, {smi}  ; {tmpy} -= {smi} * {smi} -> m'2 - m2\n"
 						if not out_init:
-							src2 += f"\t_vdotp {resx}, {resy}, {prmy}, {tmpy}, {prmx}  ; ({prmy}, {tmpy})\n\n"
+							src2 += f"\t_vdotp {resx}, {resy}, {prmy}, {tmpy}, {tmp2x}  ; ({prmy}, {tmpy})\n\n"
 							out_init = True
 						else:
-							src2 += f"\t_vdotadd {resx}, {resy}, {prmy}, {tmpy}, {prmy}  ; ({prmy}, {tmpy})\n\n"
+							src2 += f"\t_vdotadd {resx}, {resy}, {prmy}, {tmpy}, {tmp2x}  ; ({prmy}, {tmpy})\n\n"
 				# compute -ΔU_J = Σ_j{J Δs_i·s_j}:
 				if "J" in self.allKeys:
 					src2 += "\t; -deltaU_J calculation\n"
@@ -1081,7 +1072,7 @@ class Config:
 							# Note: edge in self.edgeIndex may be false if ASM edge array is empty or missing local variables for this edge. This is fine.
 							edgelbl = f"edges[{self.edgeIndex[edge]}]" if edge in self.edgeIndex else "edge"
 							if load_insn is None:
-								src += "; skip. For the edge, J is not defined at any level (local, region, nor global).\n"
+								src2 += "; skip. For the edge, J is not defined at any level (local, region, nor global).\n"
 							else:
 								phase2 = True
 								nid0 = self.nodeId(edge[0])
@@ -1122,20 +1113,6 @@ class Config:
 				if "b" in self.allKeys:
 					src2 += "\t; -deltaU_b calculation\n"
 					src2 += "\t; TODO ...\n\n" # TODO (stub)
-				# commit phase 2
-				if phase2:
-					src += "\t; Phase 2:\n"
-					src += f"\tvsubpd {dsm}, {s1i}, {smi}  ; \\Delta s_i = s'_i - s_i\n"
-					if flux_mode:
-						src += f"\tvsubpd {dfi}, {f1i}, {fm1}  ; \\Detla f = f'_i - f_i\n"
-						src += f"\tvaddpd {smi}, {smi}, {fm1}  ; m_i = s_i + f_i\n"
-						src += f"\tvaddpd {fm1}, {s1i}, {f1i}  ; m'_i = s'_i + f'_i\n"
-					else:
-						src += f"\t; ({smi}) m_i = s_i since f_i = 0\n"
-						src += f"\t; ({m1i}) m'_i = s'_i since f'_i = 0\n"
-				else:
-					src += "\t; Phase 2: (skip)\n"
-				src += "\n" + str(src2)
 				# Phase 3 compute (Δm_i) -> -ΔU_(B, D):
 				phase3: bool = False  # does phase 3 contain any code?
 				src3 = StrJoiner()    # buffer phase 3 src to emit after load
@@ -1157,16 +1134,41 @@ class Config:
 						src3 += f"\t; skip. For this node, B is not defined at any level (local, region, nor global).\n\n"
 					else:
 						phase3 = True
-						src3 += load_insn  # load B into ymm9
+						src3 += load_insn  # load B into prmy
 						if not out_init:
-							src3 += f"\t_vdotp {resx}, {resy}, {prmy}, {dsm}, {prmx}  ; ({prmy}, {dsm})\n\n"
+							src3 += f"\t_vdotp {resx}, {resy}, {prmy}, {dsm}, {tmpx}  ; ({prmy}, {dsm})\n\n"
 							out_init = True
 						else:
-							src3 += f"\t_vdotadd {resx}, {resy}, {prmy}, {dsm}, {prmx}  ; ({prmy}, {dsm})\n\n"
+							src3 += f"\t_vdotadd {resx}, {resy}, {prmy}, {dsm}, {tmpx}  ; ({prmy}, {dsm})\n\n"
 				# compute -ΔU_D:
 				if "D" in self.allKeys:
 					src3 += "\t; -deltaU_D calculation\n"
 					src3 += "\t; TODO ...\n\n" # TODO (stub)
+				# commit phase 1
+				if phase1 or phase2 or phase3:
+					src += "\t; Phase 1:\n"
+					src += f"\tvmovapd {smi}, ymmword ptr [nodes + ({index})*SIZEOF_NODE + OFFSETOF_SPIN]  ; load s_i\n"
+					if flux_mode:
+						src += f"\tvmovapd {fm1}, ymmword ptr [nodes + ({index})*SIZEOF_NODE + OFFSETOF_FLUX]  ; load f_i\n"
+				else:
+					src += "\t; Phase 1: (skip)\n"
+				src += "\n" + str(src1)  # actual ASM (or comments)
+				# commit phase 2
+				if phase2 or phase3:
+					src += "\t; Phase 2:\n"
+					src += f"\tvsubpd {dsm}, {s1i}, {smi}  ; \\Delta s_i = s'_i - s_i\n"
+					if flux_mode:
+						if phase2:  # not needed for phase3
+							src += f"\tvsubpd {dfi}, {f1i}, {fm1}  ; \\Detla f = f'_i - f_i\n"
+						src += f"\tvaddpd {smi}, {smi}, {fm1}  ; m_i = s_i + f_i\n"
+						src += f"\tvaddpd {m1i}, {s1i}, {f1i}  ; m'_i = s'_i + f'_i\n"
+					else:
+						src += f"\t; ({smi}) m_i = s_i since f_i = 0\n"
+						src += f"\t; ({m1i}) m'_i = s'_i since f'_i = 0\n"
+				else:
+					src += "\t; Phase 2: (skip)\n"
+				src += "\n" + str(src2)
+				# commit phase 3
 				if phase3:
 					src += "\t; Phase 3:\n"
 					if flux_mode:
@@ -1179,6 +1181,7 @@ class Config:
 				# return:
 				if not out_init:
 					src += f"\tvxorpd {resx}, {resx}, {resx}  ; return 0.0\n"  # fall back in case there are no parameters set for this node
+				# src += "\t_dumpreg\n"  # DEBUG: make sure xmm0 (ΔU) matches python calculated "u" for each parameter
 				src += "\tret\n"
 				src += f"{proc_id} ENDP\n\n"
 				exports.append((proc_id, False))
