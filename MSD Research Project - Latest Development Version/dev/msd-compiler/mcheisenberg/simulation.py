@@ -14,14 +14,12 @@ if TYPE_CHECKING:
 
 # The full state of the Simulation at some simulation time, t.
 class Snapshot:
+	SAVES = [ *NODE_PARAMETERS, *EDGE_PARAMETERS, "s", "f", "m", "u" ]
+
 	def __init__(self, sim: Simulation):
 		self.t = sim.t
-		self.s = np.array(sim.s.items())
-		self.f = np.array(sim.f.items())
-		# TODO: copy mutatable parameters
-		# TODO: copy other state information: spin/flux, parameters (if they vary), energy, and (maybe) macros like overall magnetization, etc.
-
-	# TODO ...
+		for p in Snapshot.SAVES:
+			setattr(self, p, dict(getattr(sim, p).items()))
 
 
 # Runtime wrapper which converts everything to numpy float arrays and adds
@@ -29,7 +27,7 @@ class Snapshot:
 class Simulation:
 	NODE_PARAMETERS = ordered_set(NODE_PARAMETERS)
 	EDGE_PARAMETERS = ordered_set(EDGE_PARAMETERS)
-	STATES = ordered_set(["n", "s", "f", "m", "u", "c", "x"])
+	STATES = ordered_set(["n", "s", "f", "m", "u"])
 	ALL_PROXIES = ordered_set(chain(PARAMETERS, STATES))
 
 	def __init__(self, rt: Runtime):
@@ -44,8 +42,8 @@ class Simulation:
 		global_p =  [ p for p in config.globalParameters.keys() ]
 		self._parameters = ordered_set(global_p + region_p + eregion_p + node_p + edge_p)
 
-		self.t = 0  # current simulation time since last restart (i.e. seed, reinitialization, or randomization)
-		self.samples: list[Snapshot] = []
+		self.t = 0  # current simulation time since last restart (i.e. reinitialization, or randomization)
+		self._history: list[Snapshot] = []
 		
 		for param in ["A", "B"]:
 			setattr(self, f"_{param}_proxy", VectorNodeParameterProxy(self, param))
@@ -62,21 +60,21 @@ class Simulation:
 		self._u_proxy = UProxy(self)
 		self._c_proxy = None  # TODO: (stub)
 		self._x_proxy = None  # TODO: (stub)
+	
+	def clear_history(self) -> None:
+		self.t = 0
+		self._history = []
 
 	def seed(self, *seed: int) -> None:
 		self.rt.seed()
-		self.t = 0
-		self.samples = []
 	
 	def reinitialize(self, initSpin: numpy_vec=VEC_J, initFlux: numpy_vec=VEC_ZERO) -> None:
 		self.rt.reinitialize(tuple(initSpin.tolist()), tuple(initFlux.tolist()))
-		self.t = 0
-		self.samples = []
+		self.clear_history()
 	
 	def randomize(self, *seed: int) -> None:
 		self.rt.randomize(*seed)
-		self.t = 0
-		self.samples = []
+		self.clear_history()
 
 	def metropolis(self, iterations: int, freq: int=0, bookend: bool=True) -> None:
 		"""

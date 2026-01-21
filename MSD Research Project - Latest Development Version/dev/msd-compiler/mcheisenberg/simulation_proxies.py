@@ -1,6 +1,6 @@
 from __future__ import annotations
 from .constants import __EDGES__, __NODES__
-from .simulation_util import rtscal, rtvec, simscal, simvec
+from .simulation_util import VEC_ZERO, rtscal, rtvec, simscal, simvec
 from .util import ReadOnlyCollection, ReadOnlyDict, ReadOnlyList, ReadOnlyOrderedSet, ordered_set
 from copy import copy
 from itertools import chain
@@ -9,7 +9,7 @@ from typing import Any, override, TYPE_CHECKING
 import numpy as np
 if TYPE_CHECKING:
 	from .config import vec
-	from .simulation import Simulation
+	from .simulation import Simulation, Snapshot
 	from .simulation_util import Edge, ERegion, Node, Parameter, Region, numpy_vec
 	from collections.abc import Callable, Collection, Iterable, Sequence
 
@@ -17,12 +17,16 @@ if TYPE_CHECKING:
 type Filter = Callable[[Simulation, str, Any], Iterable]  # (Proxy.simulation, Proxy.name, key) -> candidate_elements
 
 class Proxy:
-	def __init__(self, simulation, sim_name: str, elements: Collection, filter: Filter, subscripts: list=[]):
+	def __init__(self, simulation: Simulation, sim_name: str, elements: Collection, filter: Filter, subscripts: list=[]):
 		self._sim: Simulation = simulation
 		self._name = sim_name
 		self._elements: Collection = elements
 		self._filter = filter
 		self._subscripts: list = subscripts
+	
+	@property
+	def history(self) -> dict[int, Any]:
+		raise NotImplementedError()  # abstract
 
 	def __getitem__(self, key: Any) -> Proxy:
 		proxy = copy(self)
@@ -210,7 +214,7 @@ class ParameterProxy(NumericProxy):
 	
 	@override
 	@property
-	def value(self) -> numpy_vec:
+	def value(self) -> float|numpy_vec:
 		if len(self._subscripts) == 0:
 			value = self._runtime_proxy.value  # global parameter
 		else:
@@ -218,12 +222,27 @@ class ParameterProxy(NumericProxy):
 		return self._to_sim(value)
 
 	@value.setter
-	def value(self, value: numpy_vec) -> None:
+	def value(self, value: float|numpy_vec) -> None:
 		value = self._to_rt(value)
 		if len(self._subscripts) == 0:
 			self._runtime_proxy.value = value  # global parameter
 		else:
 			self._runtime_proxy[self._key] = value
+	
+	def _get_consistant_value(self, snapshot: Snapshot):
+		result = None
+		t = snapshot.t
+		for key in self._elements:
+			value = getattr(snapshot, self.name)[key]
+			if result is None:     # store first value
+				result = value
+			elif result != value:  # for global or region selections, make sure all values are equal
+				raise KeyError(f"Parameter {self._name} is not consistant across selection from subscript [{self._subscripts}]")
+
+	@override
+	@property
+	def history(self) -> dict[int, float|numpy_vec]:
+		return { snapshot.t: self._get_consistant_value(snapshot) for snapshot in self._sim._history }
 
 class VectorNodeParameterProxy(ParameterProxy, Vector):
 	def __init__(self, sim: Simulation, param: str):
@@ -241,6 +260,10 @@ class ScalarEdgeParameterProxy(ParameterProxy, Scalar):
 	def __init__(self, sim: Simulation, param: str):
 		super().__init__(sim, param, elements=sim.edges, filter=_edge_filter, to_sim=simscal, to_rt=rtscal)
 
+
+def _sum(snapshot: Snapshot, hist_name: str):
+	# sum of values from dict: _elements (e.g. nodes) -> values
+	return np.sum(np.array([ *getattr(snapshot, hist_name).values() ]), axis=0)
 
 # For spin and flux
 class StateProxy(NumericProxy, Vector):
@@ -263,6 +286,14 @@ class StateProxy(NumericProxy, Vector):
 			raise ValueError(f"Can't directly assign to {self._name} for a non-local selection. (Subscript(s): {self._subscripts}.) Instead, select nodes individually and set them one at a time.")
 		node = [*self._elements][0]
 		self._runtime_proxy[node] = rtvec(value)
+	
+	@override
+	@property
+	def history(self) -> dict[int, numpy_vec]:
+		return {
+			snapshot.t: _sum(snapshot, self._name)
+			for snapshot in self._sim._history
+		}
 
 class MProxy(NumericProxy, Vector):
 	def __init__(self, sim: Simulation, sim_name: str="m"):
@@ -277,6 +308,11 @@ class MProxy(NumericProxy, Vector):
 			runtime = self._sim.rt
 			node = [*self._elements][0]
 			return simvec(runtime.spin[node]) + simvec(runtime.flux[node])
+	
+	@override
+	@property
+	def history(self) -> dict[int, numpy_vec]:
+		return { snapshot.t: _sum(snapshot, self._name) for snapshot in self._sim._history }
 
 # Number of nodes in selection
 class NProxy(NumericProxy, Int):
@@ -287,6 +323,12 @@ class NProxy(NumericProxy, Int):
 	@property
 	def value(self) -> int:
 		return len(self._elements)
+	
+	@override
+	@property
+	def history(self) -> dict[int, int]:
+		# n can't change over time
+		return { snapshot.t: self.value for snapshot in self._sim._history }
 
 # Internal Energy in selection
 class UProxy(NumericProxy, Scalar):
@@ -395,3 +437,8 @@ class UProxy(NumericProxy, Scalar):
 	@override
 	def items(self) -> Collection[tuple[Node|Edge, float]]:
 		return ReadOnlyList([ (k, self[k].value) for k in self.keys() ])
+	
+	@override
+	@property
+	def history(self) -> dict[int, float]:
+		return { snapshot.t: _sum(snapshot, self._name) for snapshot in self._sim._history }
