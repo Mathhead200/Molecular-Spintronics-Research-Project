@@ -1,5 +1,5 @@
 from __future__ import annotations
-from .util import Numeric
+from .util import Numeric, ReadOnlyDict
 from collections.abc import Mapping
 from numpy.typing import NDArray
 from typing import Annotated, Any, TYPE_CHECKING, override
@@ -120,6 +120,10 @@ class Scalar(Numeric):
 # [interface]
 class Arrangeable:
 	@property
+	def __dtype__(self) -> type:
+		return None  # default impl.
+	
+	@property
 	def array(self) -> NDArray:
 		raise NotImplementedError("abstract")
 
@@ -128,4 +132,17 @@ class ArrangeableMapping(Mapping[Any, Numeric]):
 	@override
 	@property
 	def array(self) -> NDArray:
-		return np.array([self[key].value for key in self], dtype=float)
+		return np.array([self[key].value for key in self], dtype=self.__dtype__)
+
+# Wrapper for dict of Numerics to interop as ndarray.
+# Used by Proxy.history
+class ArrangeableDict(ReadOnlyDict, ArrangeableMapping, Array):
+	def __init__(self, d: Mapping, dtype=None):
+		super().__init__(d)
+		if dtype is not None:
+			self.__dtype__ = dtype
+	
+	@override
+	@property
+	def value(self) -> NDArray:
+		return self.array

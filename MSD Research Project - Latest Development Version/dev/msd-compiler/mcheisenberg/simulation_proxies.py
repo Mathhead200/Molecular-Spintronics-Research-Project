@@ -1,11 +1,10 @@
 from __future__ import annotations
 from .constants import __EDGES__, __NODES__
-from .simulation_util import Array, Arrangeable, ArrangeableMapping, Scalar, Vector, VEC_ZERO, rtscal, rtvec, simscal, simvec
-from .util import IInt, Numeric, ReadOnlyCollection, ReadOnlyDict, ReadOnlyList, ordered_set
+from .simulation_util import ArrangeableDict, ArrangeableMapping, Scalar, Vector, VEC_ZERO, rtscal, rtvec, simscal, simvec
+from .util import IInt, Numeric, ReadOnlyCollection, ReadOnlyList, ordered_set
 from collections.abc import Mapping
 from copy import copy
 from itertools import chain
-from numpy.typing import NDArray
 from typing import Any, override, TYPE_CHECKING
 import numpy as np
 if TYPE_CHECKING:
@@ -144,7 +143,7 @@ class ParameterProxy(NumericProxy):
 	@override
 	@property
 	def history(self) -> dict[int, float|numpy_vec]:
-		return { snapshot.t: self._get_consistant_value(snapshot) for snapshot in self._sim._history }
+		return ArrangeableDict({ snapshot.t: self._get_consistant_value(snapshot) for snapshot in self._sim._history })
 
 
 class VectorNodeParameterProxy(ParameterProxy, Vector):
@@ -193,10 +192,10 @@ class StateProxy(NumericProxy, Vector):
 	@override
 	@property
 	def history(self) -> dict[int, numpy_vec]:
-		return {
+		return ArrangeableDict({
 			snapshot.t: _sum(snapshot, self._name)
 			for snapshot in self._sim._history
-		}
+		})
 
 class MProxy(NumericProxy, Vector):
 	def __init__(self, sim: Simulation, sim_name: str="m"):
@@ -215,7 +214,7 @@ class MProxy(NumericProxy, Vector):
 	@override
 	@property
 	def history(self) -> dict[int, numpy_vec]:
-		return { snapshot.t: _sum(snapshot, self._name) for snapshot in self._sim._history }
+		return ArrangeableDict({ snapshot.t: _sum(snapshot, self._name) for snapshot in self._sim._history })
 
 # Number of nodes in selection
 class NProxy(NumericProxy, IInt):
@@ -231,7 +230,7 @@ class NProxy(NumericProxy, IInt):
 	@property
 	def history(self) -> dict[int, int]:
 		# n can't change over time
-		return { snapshot.t: self.value for snapshot in self._sim._history }
+		return ArrangeableDict({ snapshot.t: self.value for snapshot in self._sim._history }, dtype=int)
 
 # Internal Energy in selection
 class UProxy(NumericProxy, Scalar):
@@ -340,4 +339,4 @@ class UProxy(NumericProxy, Scalar):
 	@override
 	@property
 	def history(self) -> dict[int, float]:
-		return { snapshot.t: _sum(snapshot, self._name) for snapshot in self._sim._history }
+		return ArrangeableDict({ snapshot.t: _sum(snapshot, self._name) for snapshot in self._sim._history })
