@@ -2,7 +2,7 @@ from __future__ import annotations
 from .constants import EDGE_PARAMETERS, NODE_PARAMETERS, PARAMETERS
 from .runtime import Runtime
 from .simulation_proxies import MProxy, NProxy, ScalarEdgeParameterProxy, ScalarNodeParameterProxy, StateProxy, UProxy, VectorEdgeParameterProxy, VectorNodeParameterProxy
-from .simulation_util import VEC_J, VEC_ZERO
+from .simulation_util import VEC_J, VEC_ZERO, simscal, simvec
 from .util import ReadOnlyDict, ReadOnlyOrderedSet, ordered_set
 from itertools import chain
 from typing import TYPE_CHECKING
@@ -14,16 +14,34 @@ if TYPE_CHECKING:
 
 # The full state of the Simulation at some simulation time, t.
 class Snapshot:
-	SAVES = [ *NODE_PARAMETERS, *EDGE_PARAMETERS, "s", "f", "m", "u" ]
+	SAVES = [ *NODE_PARAMETERS, *EDGE_PARAMETERS, "s", "f", "m" ]  # "u"
 
 	def __init__(self, sim: Simulation):
 		self.t = sim.t
-		for p in Snapshot.SAVES:
-			setattr(self, p, dict(getattr(sim, p).items()))
+		rt = sim.rt
+		config = rt.config
+		nodes = config.nodes
+		edges = config.edges
+		self.A   = { i:  simvec(rt.A[i])   for i in nodes }
+		self.S   = { i:  simvec(rt.S[i])   for i in nodes }
+		self.F   = { i: simscal(rt.F[i])   for i in nodes }
+		self.kT  = { i: simscal(rt.kT[i])  for i in nodes }
+		self.Je0 = { i: simscal(rt.Je0[i]) for i in nodes }
 
+		self.J   = { i: simscal(rt.J[i])   for i in edges }
+		self.Je1 = { i: simscal(rt.Je1[i]) for i in edges }
+		self.Jee = { i: simscal(rt.Jee[i]) for i in edges }
+		self.b   = { i: simscal(rt.b[i])   for i in edges }
+		self.D   = { i:  simvec(rt.D[i])   for i in edges }
+		
+		self.s = { i: simvec(rt.spin[i])    for i in nodes }
+		self.f = { i: simvec(rt.flux[i])    for i in nodes }
+		self.m = { i: self.s[i] + self.f[i] for i in nodes }
+
+		# self.u = dict(sim.u.items())  # TODO: TOO SLOW
 
 # Runtime wrapper which converts everything to numpy float arrays and adds
-#	simulation logic like recording samples, aggregates (e.g. m, U, n, etc.), etc.
+#	simulation logic like recording snapshots, aggregates (e.g. m, U, n, etc.), etc.
 class Simulation:
 	NODE_PARAMETERS = ordered_set(NODE_PARAMETERS)
 	EDGE_PARAMETERS = ordered_set(EDGE_PARAMETERS)
@@ -60,10 +78,6 @@ class Simulation:
 		self._u_proxy = UProxy(self)
 		self._c_proxy = None  # TODO: (stub)
 		self._x_proxy = None  # TODO: (stub)
-	
-	def clear_history(self) -> None:
-		self.t = 0
-		self._history = []
 
 	def seed(self, *seed: int) -> None:
 		self.rt.seed()
@@ -104,8 +118,12 @@ class Simulation:
 	
 	def record(self) -> Snapshot:
 		sample = Snapshot(self)
-		self.samples.append(sample)
+		self._history.append(sample)
 		return sample
+
+	def clear_history(self) -> None:
+		self.t = 0
+		self._history = []
 	
 	@property
 	def nodes(self) -> ReadOnlyDict[Node, None]:  # Note: dict: Node -> None acting as ordered set

@@ -1,7 +1,8 @@
 from __future__ import annotations
 from .constants import __EDGES__, __NODES__
-from .simulation_util import VEC_ZERO, rtscal, rtvec, simscal, simvec
-from .util import ReadOnlyCollection, ReadOnlyDict, ReadOnlyList, ReadOnlyOrderedSet, ordered_set
+from .simulation_util import Array, Arrangeable, ArrangeableMapping, Scalar, Vector, VEC_ZERO, rtscal, rtvec, simscal, simvec
+from .util import IInt, Numeric, ReadOnlyCollection, ReadOnlyDict, ReadOnlyList, ordered_set
+from collections.abc import Mapping
 from copy import copy
 from itertools import chain
 from numpy.typing import NDArray
@@ -11,12 +12,12 @@ if TYPE_CHECKING:
 	from .config import vec
 	from .simulation import Simulation, Snapshot
 	from .simulation_util import Edge, ERegion, Node, Parameter, Region, numpy_vec
-	from collections.abc import Callable, Collection, Iterable, Sequence
+	from collections.abc import Callable, Collection, Iterable, Iterator, Sequence
 
 
 type Filter = Callable[[Simulation, str, Any], Iterable]  # (Proxy.simulation, Proxy.name, key) -> candidate_elements
 
-class Proxy:
+class Proxy(Mapping[Any, "Proxy"]):
 	def __init__(self, simulation: Simulation, sim_name: str, elements: Collection, filter: Filter, subscripts: list=[]):
 		self._sim: Simulation = simulation
 		self._name = sim_name
@@ -27,6 +28,10 @@ class Proxy:
 	@property
 	def history(self) -> dict[int, Any]:
 		raise NotImplementedError()  # abstract
+	
+	def __len__(self) -> int:             len(self._elements)
+	def __iter__(self) -> Iterator:       iter(self.elements)  # TODO: do I need ReadOnly wrapper?
+	def __contains__(self, key) -> bool:  return key in self._elements
 
 	def __getitem__(self, key: Any) -> Proxy:
 		proxy = copy(self)
@@ -82,112 +87,9 @@ def _utype_filter(sim: Simulation, param: str, key: Node|Edge|Region|ERegion|Par
 	raise KeyError(f"For parameter {param}, Unrecognized subscript: [{key}]")
 
 
-# Interface for a numerical/mathamatical object, e.g. numpy ndarray, or float.
-#	Any object which can be used in mathamatical expressions, namely
-#	parameters proxies and result proxies can inherit from this class.
-class Numeric:
-	@property
-	def value(self) -> Any:  # return somthing "numerical"
-		raise NotImplementedError()  # abstract
-
-	def __add__(self, addend):       return self.value + addend
-	def __sub__(self, subtrahend):   return self.value - subtrahend
-	def __mul__(self, multiplier):   return self.value * multiplier
-	def __truediv__(self, divisor):  return self.value / divisor
-	def __floordiv__(self, divisor): return self.value // divisor
-	def __mod__(self, modulus):      return self.value % modulus
-	def __pow__(self, exponent):     return self.value ** exponent
-	def __neg__(self):               return -self.value
-	def __pos__(self):               return +self.value
-	def __abs__(self):               return abs(self.value)
-
-	def __radd__(self, augend):         return augend + self.value
-	def __rsub__(self, minuend):        return minuend - self.value
-	def __rmul__(self, multiplicand):   return multiplicand * self.value
-	def __rtruediv__(self, dividend):   return dividend / self.value
-	def __rfloordiv__(self, dividend):  return dividend // self.value
-	def __rmod__(self, dividend):       return dividend % self.value
-	def __rpow__(self, base):           return base ** self.value
-
-	def __iadd__(self, addend):        self.value = self + addend;     return self
-	def __isub__(self, subtrahend):    self.value = self - subtrahend; return self
-	def __imul__(self, multiplier):    self.value = self * multiplier; return self
-	def __itruediv__(self, divisor):   self.value = self / divisor;    return self
-	def __ifloordiv__(self, divisor):  self.value = self // divisor;   return self
-	def __imod__(self, modulus):       self.value = self % modulus;    return self
-	def __ipow__(self, exponent):      self.value = self ** exponent;  return self
-
-	def __eq__(self, other):  return self.value == other
-	def __ne__(self, other):  return self.value != other
-	def __lt__(self, other):  return self.value < other
-	def __le__(self, other):  return self.value <= other
-	def __gt__(self, other):  return self.value > other
-	def __ge__(self, other):  return self.value >= other
-
-	def __str__(self):   return str(self.value)
-	def __repr__(self):  return repr(self.value)
-	def __hash__(self):  return hash(self.value)
-
-# Behaves as an numpy ndarray
-class Vector(Numeric):
-	def __array__(self, dtype=None) -> numpy_vec:
-		return self.value
-	
-	def __len__(self):
-		assert len(self.value) == 3  # DEBUG
-		return 3
-	
-	def __iter__(self):
-		return iter(self.value)
-
-	# numpy specific stuff:
-	#	Should we prefer this object's ufunc __array_ufunc__ and __array_function__
-	#	over ndarray's (ndarray.__array_priority__ == 0). This allows our methods
-	#	to first unwrap all Numeric objects, then propogate to ndarray (or any other "ducks").
-	__array_priority__ = 1000.0  # VERY HIGH
-	
-	def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
-		inputs = [x.value if isinstance(x, Numeric) else x for x in inputs]
-		return self.value.__array_ufunc__(ufunc, method, *inputs, **kwargs)
-	
-	def __array_function__(self, func, types, args, kwargs):
-		args = [x.value if isinstance(x, Numeric) else x for x in args]
-		return self.value.__array_function__(func, types, args, kwargs)
-
-# Behaves as a float
-class Scalar(Numeric):
-	def __float__(self) -> float:
-		return self.value
-
-# Behaves as int
-class Int(Numeric):
-	def __int__(self) -> int:    return self.value
-	def __index__(self) -> int:  return self.value
-	def __bool__(self) -> bool:  return bool(self.value)
-
-	def __or__(self, other):      return self.value | other
-	def __xor__(self, other):     return self.value ^ other
-	def __and__(self, other):     return self.value & other
-	def __lshift__(self, shift):  return self.value << shift
-	def __rshift__(self, shift):  return self.value >> shift
-	def __invert__(self):         return ~self.value
-
-	def __ror__(self, other):      return other | self.value
-	def __rxor__(self, other):     return other ^ self.value
-	def __rand__(self, other):     return other & self.value
-	def __rlshift__(self, value):  return value << self.value
-	def __rrshift__(self, value):  return value << self.value
-
-
-class NumericProxy(Proxy, Numeric):
+class NumericProxy(Proxy, Numeric, ArrangeableMapping):
 	def __setitem__(self, key, value) -> None:
-		self[key].value = value	
-
-	def values(self) -> NDArray:
-		return np.array([self[key].value for key in self._elements], dtype=float)
-	
-	def items(self) -> Collection[tuple[Any, Any]]:
-		return ReadOnlyList([ (key, self[key].value) for key in self._elements ])
+		self[key].value = value
 
 
 # Proxy for parameters, e.g. J, B, kT, n, etc. Parameters do not aggrigate like
@@ -231,18 +133,19 @@ class ParameterProxy(NumericProxy):
 	
 	def _get_consistant_value(self, snapshot: Snapshot):
 		result = None
-		t = snapshot.t
 		for key in self._elements:
 			value = getattr(snapshot, self.name)[key]
 			if result is None:     # store first value
 				result = value
 			elif result != value:  # for global or region selections, make sure all values are equal
 				raise KeyError(f"Parameter {self._name} is not consistant across selection from subscript [{self._subscripts}]")
+		return result
 
 	@override
 	@property
 	def history(self) -> dict[int, float|numpy_vec]:
 		return { snapshot.t: self._get_consistant_value(snapshot) for snapshot in self._sim._history }
+
 
 class VectorNodeParameterProxy(ParameterProxy, Vector):
 	def __init__(self, sim: Simulation, param: str):
@@ -315,7 +218,7 @@ class MProxy(NumericProxy, Vector):
 		return { snapshot.t: _sum(snapshot, self._name) for snapshot in self._sim._history }
 
 # Number of nodes in selection
-class NProxy(NumericProxy, Int):
+class NProxy(NumericProxy, IInt):
 	def __init__(self, sim: Simulation, sim_name: str="n"):
 		super().__init__(sim, sim_name, elements=ordered_set(chain(sim.nodes, sim.edges)), filter=_ntype_filter)
 	
@@ -420,7 +323,7 @@ class UProxy(NumericProxy, Scalar):
 
 		return float(u)
 
-	def keys(self) -> Collection[Node|Edge]:
+	def _keys(self) -> Collection[Node|Edge]:
 		sim = self._sim
 		nodes = sim.nodes
 		edges = sim.edges
@@ -428,15 +331,11 @@ class UProxy(NumericProxy, Scalar):
 		for k in self._elements:
 			if k not in chain(nodes, edges):
 				keys.pop(k, None)  # discard parameter elements, leaving only Collection[Node|Edge]
-		return ReadOnlyOrderedSet(keys)
-	
-	@override
-	def values(self) -> NDArray:
-		return np.array([self[k] for k in self.keys()], dtype=float)
+		return keys
 
 	@override
-	def items(self) -> Collection[tuple[Node|Edge, float]]:
-		return ReadOnlyList([ (k, self[k].value) for k in self.keys() ])
+	def __iter__(self) -> Iterator[Node|Edge]:
+		return iter(self._keys())
 	
 	@override
 	@property
