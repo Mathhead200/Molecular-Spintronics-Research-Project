@@ -48,16 +48,50 @@ def rtscal(x: float|None) -> float:
 	return x
 
 
+def dot(a: NDArray, b: NDArray, temp: NDArray=None) -> numpy_col:
+	"""
+	Compute the rowwise dot product between two matricies of row-vectors.
+	The result is the (1D) transpose of a column vector with each dot product in the corresponding row.
+	Precondition: All parameters should be the same shape.
+	Postcondition: temp can be one of the source operands, but clobbers temp either way!
+	"""
+	a = np.asarray(a)
+	n = np.asarray(b)
+	d = a.ndim - 1
+	if temp is None:
+		return np.sum(a * b, axis=d)
+	else:
+		np.multiply(a, b, out=temp)
+		return np.sum(temp, axis=d)
+
+def norm_sq(array: NDArray, temp: NDArray=None) -> numpy_col:
+	"""
+	Compute the norm squared of a matrix of row-vectors.
+	The result is the (1D) transpose of a column vector with each squre in the corresponding row.
+	"""
+	return dot(array, array, temp=temp)
+
+def norm(array: NDArray, temp: NDArray=None) -> numpy_col:
+	"""
+	Compute the norm of a matrix of row-vectors.
+	The result is a column vector with each norm in the corresponding row.
+	"""
+	temp = norm_sq(array, temp=temp)
+	if isinstance(temp, np.ndarray):
+		return np.sqrt(temp, out=temp)
+	else:
+		return np.sqrt(temp)
+
+
 def mean(proxy: Proxy) -> Any:
 	""" The arithmetic mean of a Simulation variable (over time). """
 	return np.mean(proxy.history, axis=0)
 
 def cov(a: Proxy, b: Proxy) -> float:
 	""" The (scalar) covariance between two simulation variables (over time). """
-	if (a.ndim <= 1):
-		return mean(a * b) - mean(a) * mean(b)  # scalar variable
-	else:              
-		return mean(a @ b) - mean(a) @ mean(b)  # vector variable
+	A = a.history.array(None)  # allocate new buffer
+	B = b.history.array(None)  # allocate new buffer
+	return mean(dot(A, B)) - dot(mean(A), mean(B))
 
 def var(proxy: Proxy) -> float:
 	""" The variance of a Simulation variable (over time). """
@@ -67,32 +101,15 @@ def std(proxy: Proxy) -> float:
 	""" The standard deviation of a Simulation variable (over time). """
 	return np.sqrt(var(proxy))
 
-def dot(a: numpy_mat, b: numpy_mat) -> numpy_col:
-	"""
-	Compute the rowwise dot product between two matricies of row-vectors.
-	The result is a column vector with each dot product in the corresponding row.
-	"""
-	return np.sum(a * b, axis=1)
-
-def norm_sq(array: numpy_mat) -> numpy_col:
-	"""
-	Compute the norm squared of a matrix of row-vectors.
-	The result is a column vector with each squre in the corresponding row.
-	"""
-	return dot(array, array)
-
-def norm(array: numpy_mat) -> numpy_col:
-	"""
-	Compute the norm of a matrix of row-vectors.
-	The result is a column vector with each norm in the corresponding row.
-	"""
-	return np.sqrt(norm_sq(array))
-
 
 # [interface] Behaves as an numpy ndarray
-class Array(Numeric):
+class Array(Numeric[NDArray]):
 	def __array__(self, dtype=None) -> NDArray:
 		return self.value
+	
+	def __matmul__(self, other):   return self.value @ other
+	def __rmatmul__(self, other):  return other @ self.value
+	def __imatmul__(self, other):  self.value @= other;  return self
 
 	# numpy specific stuff:
 	#	Should we prefer this object's ufunc __array_ufunc__ and __array_function__
@@ -101,18 +118,20 @@ class Array(Numeric):
 	__array_priority__ = 1000.0  # VERY HIGH
 	
 	def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
-		inputs = [x.value if isinstance(x, Numeric) else x for x in inputs]
+		inputs = tuple(x.value if isinstance(x, Numeric) else x for x in inputs)
 		return self.value.__array_ufunc__(ufunc, method, *inputs, **kwargs)
 	
-	def __array_function__(self, func, types, args, kwargs):
-		args = [x.value if isinstance(x, Numeric) else x for x in args]
-		return self.value.__array_function__(func, types, args, kwargs)
+	# def __array_function__(self, func, types, args, kwargs):
+	# 	print(str(func), *(type(arg) for arg in args))
+	# 	args = tuple(x.value if isinstance(x, Numeric) else x for x in args)
+	# 	print(str(func), *(type(arg) for arg in args))
+	# 	return self.value.__array_function__(func, types, args, kwargs)
 
 type Vector = Array  # except __array__ -> numpy_vec
 Vector = Array  # So we can use Vector at runtime as parent type, etc.
 
 # [interface] Behaves as a float
-class Scalar(Numeric):
+class Scalar(Numeric[float]):
 	def __float__(self) -> float:
 		return self.value
 
@@ -128,21 +147,36 @@ class Arrangeable:
 		raise NotImplementedError("abstract")
 
 # [interface]
-class ArrangeableMapping(Mapping[Any, Numeric]):
-	@override
-	@property
-	def array(self) -> NDArray:
-		return np.array([self[key].value for key in self], dtype=self.__dtype__)
-
-# Wrapper for dict of Numerics to interop as ndarray.
-# Used by Proxy.history
-class ArrangeableDict(ReadOnlyDict, ArrangeableMapping, Array):
-	def __init__(self, d: Mapping, dtype=None):
-		super().__init__(d)
-		if dtype is not None:
-			self.__dtype__ = dtype
-	
+class NumericArrangeable(Array, Arrangeable):
 	@override
 	@property
 	def value(self) -> NDArray:
-		return self.array
+		return self.array()
+
+# [interface]
+class ArrangeableMapping[K, V](Arrangeable, Mapping[K, Numeric[V]]):
+	@override
+	def array(self, out: NDArray=None) -> NDArray:
+		values = [self[key].value for key in self]
+		if out is None:
+			return np.array(values, dtype=self.__dtype__)
+		else:
+			out[:] = values  # use existing output buffer
+			return out
+
+# Wrapper for dict of Numerics to interop as ndarray.
+# Used by Proxy.history
+class ArrangeableDict[K, V](ReadOnlyDict[K, V], NumericArrangeable):
+	def __init__(self, d: Mapping, dtype=None):
+		super().__init__(d)
+		if dtype is not None:
+			setattr(self, "__dtype__", dtype)
+
+	@override
+	def array(self, out: NDArray=None) -> NDArray:
+		values = [*self.values()]
+		if out is None:
+			return np.array(values, dtype=self.__dtype__)
+		else:
+			out[:] = values  # use existing output buffer
+			return out

@@ -22,23 +22,25 @@ class Snapshot:
 		config = rt.config
 		nodes = config.nodes
 		edges = config.edges
+		self.B   = { i:  simvec(rt.B[i])   for i in nodes }
 		self.A   = { i:  simvec(rt.A[i])   for i in nodes }
 		self.S   = { i:  simvec(rt.S[i])   for i in nodes }
 		self.F   = { i: simscal(rt.F[i])   for i in nodes }
 		self.kT  = { i: simscal(rt.kT[i])  for i in nodes }
 		self.Je0 = { i: simscal(rt.Je0[i]) for i in nodes }
 
-		self.J   = { i: simscal(rt.J[i])   for i in edges }
-		self.Je1 = { i: simscal(rt.Je1[i]) for i in edges }
-		self.Jee = { i: simscal(rt.Jee[i]) for i in edges }
-		self.b   = { i: simscal(rt.b[i])   for i in edges }
-		self.D   = { i:  simvec(rt.D[i])   for i in edges }
+		self.J   = { e: simscal(rt.J[e])   for e in edges }
+		self.Je1 = { e: simscal(rt.Je1[e]) for e in edges }
+		self.Jee = { e: simscal(rt.Jee[e]) for e in edges }
+		self.b   = { e: simscal(rt.b[e])   for e in edges }
+		self.D   = { e:  simvec(rt.D[e])   for e in edges }
 		
-		self.s = { i: simvec(rt.spin[i])    for i in nodes }
-		self.f = { i: simvec(rt.flux[i])    for i in nodes }
-		self.m = { i: self.s[i] + self.f[i] for i in nodes }
+		self.s = { e: simvec(rt.spin[e])    for e in nodes }
+		self.f = { e: simvec(rt.flux[e])    for e in nodes }
+		self.m = { e: self.s[e] + self.f[e] for e in nodes }
 
-		# self.u = dict(sim.u.items())  # TODO: TOO SLOW
+		u = sim.u.array()  # compute energies in paralell with numpy
+		self.u = { key: float(u[idx]) for idx, key in enumerate(sim.u.keys()) }
 
 # Runtime wrapper which converts everything to numpy float arrays and adds
 #	simulation logic like recording snapshots, aggregates (e.g. m, U, n, etc.), etc.
@@ -126,11 +128,15 @@ class Simulation:
 		self._history = []
 	
 	@property
-	def nodes(self) -> ReadOnlyDict[Node, None]:  # Note: dict: Node -> None acting as ordered set
+	def history(self) -> Sequence:
+		return self._history  # TODO: (stub) What should the aggrigate history interface be?
+	
+	@property
+	def nodes(self) -> ReadOnlyOrderedSet[Node]:  # Note: dict: Node -> None acting as ordered set
 		return ReadOnlyOrderedSet(ordered_set(self.rt.config.nodes))
 	
 	@property
-	def edges(self) -> ReadOnlyDict[Edge, None]:  # Note: dict: Edge -> None acting as ordered set
+	def edges(self) -> ReadOnlyOrderedSet[Edge]:  # Note: dict: Edge -> None acting as ordered set
 		return ReadOnlyOrderedSet(ordered_set(self.rt.config.edges))
 	
 	@property
@@ -150,15 +156,15 @@ class Simulation:
 		})
 	
 	@property
-	def parameters(self) -> ReadOnlyDict[str, Sequence[Node]|Sequence[Edge]]:
+	def parameters(self) -> ReadOnlyDict[str, ReadOnlyOrderedSet[Node]|ReadOnlyOrderedSet[Edge]]:
 		config = self.rt.config
 		parameters = {}
 		for p in self._parameters:
 			if p in Simulation.NODE_PARAMETERS:
-				parameters[p] = [node for node in config.nodes if config.hasNodeParameter(node, p)]
+				parameters[p] = ReadOnlyOrderedSet(ordered_set(node for node in config.nodes if config.hasNodeParameter(node, p)))
 			else:
 				assert p in EDGE_PARAMETERS
-				parameters[p] = [edge for edge in config.edges if config.hasEdgeParameter(edge, p)]
+				parameters[p] = ReadOnlyOrderedSet(ordered_set(edge for edge in config.edges if config.hasEdgeParameter(edge, p)))
 		return ReadOnlyDict(parameters)
 
 	def __getitem__(self, attr: str):

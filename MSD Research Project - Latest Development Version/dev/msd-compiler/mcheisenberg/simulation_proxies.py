@@ -1,7 +1,7 @@
 from __future__ import annotations
 from .constants import __EDGES__, __NODES__
-from .simulation_util import ArrangeableDict, ArrangeableMapping, Scalar, Vector, VEC_ZERO, dot, rtscal, rtvec, simscal, simvec
-from .util import IInt, Numeric, ReadOnlyCollection, ReadOnlyList, ordered_set
+from .simulation_util import *
+from .util import *
 from collections.abc import Mapping
 from copy import copy
 from itertools import chain
@@ -10,29 +10,30 @@ import numpy as np
 if TYPE_CHECKING:
 	from .config import vec
 	from .simulation import Simulation, Snapshot
-	from .simulation_util import Edge, ERegion, Node, Parameter, Region, numpy_mat, numpy_vec
+	from .simulation_util import *
 	from collections.abc import Callable, Collection, Iterable, Iterator, Sequence
 
 
 type Filter = Callable[[Simulation, str, Any], Iterable]  # (Proxy.simulation, Proxy.name, key) -> candidate_elements
+class History[H](NumericArrangeable, Mapping[int, H]):  pass
 
-class Proxy(Mapping[Any, "Proxy"]):
-	def __init__(self, simulation: Simulation, sim_name: str, elements: Collection, filter: Filter, subscripts: list=[]):
+class Proxy[E, H](Mapping[Any, "Proxy[H]"]):
+	def __init__(self, simulation: Simulation, sim_name: str, elements: Collection[E], filter: Filter, subscripts: list=[]):
 		self._sim: Simulation = simulation
 		self._name = sim_name
-		self._elements: Collection = elements
+		self._elements: Collection[E] = elements
 		self._filter = filter
 		self._subscripts: list = subscripts
-	
+
 	@property
-	def history(self) -> dict[int, Any]:
+	def history(self) -> History[H]:
 		raise NotImplementedError()  # abstract
 	
-	def __len__(self) -> int:             len(self._elements)
-	def __iter__(self) -> Iterator:       iter(self.elements)  # TODO: do I need ReadOnly wrapper?
+	def __len__(self) -> int:             return len(self._elements)
+	def __iter__(self) -> Iterator[E]:    return iter(self.elements)  # TODO: do I need ReadOnly wrapper?
 	def __contains__(self, key) -> bool:  return key in self._elements
 
-	def __getitem__(self, key: Any) -> Proxy:
+	def __getitem__(self, key: Any) -> Proxy[E, H]:
 		proxy = copy(self)
 		candidate_elements = self._filter(self._sim, self._name, key)
 		proxy._elements = { x: None for x in candidate_elements if x in self._elements }  # (ordered set) itersection of candidate_elements and self._elements
@@ -41,12 +42,21 @@ class Proxy(Mapping[Any, "Proxy"]):
 		proxy._subscripts = self._subscripts + [key]
 		return proxy
 
+	def _select(self, elements: Collection) -> Proxy[E, H]:
+		clone = copy(self)
+		clone._elements = elements
+		return clone
+
+	def select(self, elements: Iterable) -> Proxy[E, H]:
+		""" Wrapper extending functionality to general Iterables, e.g. generators. """
+		return self._select([*elements])
+
 	@property
 	def name(self) -> str:
 		return self._name
 
 	@property
-	def elements(self) -> Collection:
+	def elements(self) -> Collection[E]:
 		return ReadOnlyCollection(self._elements)
 
 	@property
@@ -86,7 +96,7 @@ def _utype_filter(sim: Simulation, param: str, key: Node|Edge|Region|ERegion|Par
 	raise KeyError(f"For parameter {param}, Unrecognized subscript: [{key}]")
 
 
-class NumericProxy(Proxy, Numeric, ArrangeableMapping):
+class NumericProxy[E, T](Proxy[E, T], Numeric[T], ArrangeableMapping[int, T]):
 	def __setitem__(self, key, value) -> None:
 		self[key].value = value
 
@@ -95,7 +105,7 @@ class NumericProxy(Proxy, Numeric, ArrangeableMapping):
 #	"states", e.g. n, s, f, m, u. Instead they access location specific
 #	information, e.g. J["FML"] would get the J value used in region "FML", and
 #	not the sum of J values used across the region.
-class ParameterProxy(NumericProxy):
+class ParameterProxy(NumericProxy[Node|Edge, numpy_vec|float]):
 	def __init__(self,
 		simulation: Simulation,
 		param: str,
@@ -142,7 +152,7 @@ class ParameterProxy(NumericProxy):
 
 	@override
 	@property
-	def history(self) -> dict[int, float|numpy_vec]:
+	def history(self) -> ArrangeableDict[int, float|numpy_vec]:
 		return ArrangeableDict({ snapshot.t: self._get_consistant_value(snapshot) for snapshot in self._sim._history })
 
 
@@ -168,7 +178,7 @@ def _sum(snapshot: Snapshot, hist_name: str):
 	return np.sum(np.array([ *getattr(snapshot, hist_name).values() ]), axis=0)
 
 # For spin and flux
-class StateProxy(NumericProxy, Vector):
+class StateProxy(NumericProxy[Node, numpy_vec], Vector):
 	def __init__(self, sim: Simulation, rt_attr: str, sim_name: str):
 		super().__init__(sim, sim_name, elements=sim.nodes, filter=_node_filter)
 		self._runtime_proxy = getattr(sim.rt, rt_attr)
@@ -191,13 +201,13 @@ class StateProxy(NumericProxy, Vector):
 	
 	@override
 	@property
-	def history(self) -> dict[int, numpy_vec]:
+	def history(self) -> ArrangeableDict[int, numpy_vec]:
 		return ArrangeableDict({
 			snapshot.t: _sum(snapshot, self._name)
 			for snapshot in self._sim._history
 		})
 
-class MProxy(NumericProxy, Vector):
+class MProxy(NumericProxy[Node, numpy_vec], Vector):
 	def __init__(self, sim: Simulation, sim_name: str="m"):
 		super().__init__(sim, sim_name, elements=sim.nodes, filter=_node_filter)
 
@@ -205,7 +215,7 @@ class MProxy(NumericProxy, Vector):
 	@property
 	def value(self) -> numpy_vec:
 		if len(self._elements) > 1:
-			return np.sum(self.values(), axis=0)  # add all the row (i.e. axis=0) vectors
+			return np.sum(self.array(), axis=0)  # add all the row (i.e. axis=0) vectors
 		else:
 			runtime = self._sim.rt
 			node = [*self._elements][0]
@@ -213,11 +223,11 @@ class MProxy(NumericProxy, Vector):
 	
 	@override
 	@property
-	def history(self) -> dict[int, numpy_vec]:
+	def history(self) -> ArrangeableDict[int, numpy_vec]:
 		return ArrangeableDict({ snapshot.t: _sum(snapshot, self._name) for snapshot in self._sim._history })
 
 # Number of nodes in selection
-class NProxy(NumericProxy, IInt):
+class NProxy(NumericProxy[Node|Edge, int], IInt):
 	def __init__(self, sim: Simulation, sim_name: str="n"):
 		super().__init__(sim, sim_name, elements=ordered_set(chain(sim.nodes, sim.edges)), filter=_ntype_filter)
 	
@@ -228,118 +238,124 @@ class NProxy(NumericProxy, IInt):
 	
 	@override
 	@property
-	def history(self) -> dict[int, int]:
+	def history(self) -> ArrangeableDict[int, int]:
 		# n can't change over time
 		return ArrangeableDict({ snapshot.t: self.value for snapshot in self._sim._history }, dtype=int)
 
 # Internal Energy in selection
-class UProxy(NumericProxy, Scalar):
+class UProxy(NumericProxy[Node|Edge|str, float], Scalar):
 	def __init__(self, sim: Simulation, sim_name="u"):
-		self._parameters = ordered_set(sim.parameters)
-		self._parameters.pop("S", None)  # these parameters don't contribute to energy
-		self._parameters.pop("F", None)
-		self._nodes = sim.nodes
-		self._edges = sim.edges
-		super().__init__(sim, sim_name, elements=ordered_set(chain(self._nodes, self._edges, self._parameters)), filter=_utype_filter)
+		parameters = sim.parameters - ["S", "F"]  # these parameters don't contribute to energy
+		super().__init__(sim, sim_name, elements=ordered_set(chain(sim.nodes, sim.edges, parameters)), filter=_utype_filter)
 
-	def _calc_node_values(self) -> numpy_mat:
+	@property
+	def parameters(self) -> Collection[str]:
+		return self._sim.parameters & self._elements
+	
+	@property
+	def nodes(self) -> OrderedSet[Node]:
+		return self._elements & self._sim.nodes
+	
+	@property
+	def edges(self) -> OrderedSet[Edge]:
+		return self._elements & self._sim.edges
+
+	@override
+	def array(self, out: numpy_vec=None) -> numpy_vec:
 		sim = self._sim
-		parameters = self._parameters
-		nodes = self._nodes
+		parameters = self.parameters
+		nodes = self.nodes
+		edges = self.edges
+		N = len(nodes)
+		M = len(edges)
+		L = N+M
 
-		u = np.zeros((len(nodes), 3), dtype=float)  # each row, (scalar) u[i] is the energy for node i (in order of self._nodes == sim.nodes)
+		# Row vector, u. Each element/column, (scalar) u[key], is the energy for either a node, key=i, or an edges, key=(i,j).
+		# Order: first, u[0:N], all nodes in order of sim.nodes. Then, u[N:N+M], all edges in order of sim.edges.
+		if out is None:
+			out = np.zeros((L,), dtype=float)
+		else:
+			out[0:L] = 0  # clear (zero) slice of output where results will be calculated and stored
 
-		if len(nodes) != 0:
-			m = None    # cache (node parameters: B, A)
+		if N != 0:
+			m = None    # cache (used for calculations: B, A); shape=(N, 3)
+			buf_mat = np.empty((N, 3), dtype=float)  # temporary buffers
+			buf_list = np.empty((N,), dtype=float)
 
-			if "B" in self._parameters:
-				m = np.array([sim.m[i] for i in nodes], dtype=float)
-				B = np.array([sim.B[i] for i in nodes], dtype=float)
-				u -= dot(B, m)
+			if "B" in parameters:
+				m = sim.m._select(nodes).array(None)  # (new buffer)
+				B = sim.B._select(nodes).array(buf_mat)
+				out[0:N] -= dot(B, m, temp=buf_mat)
 			
 			if "A" in parameters:
-				if m is None:  m = np.array([sim.m[i] for i in nodes], dtype=float)
-				A = np.array([sim.A[i] for i in nodes], dtype=float)
-				u -= dot(A, m * m)
+				if m is None:  m = sim.m._select(nodes).array(None)  # (new buffer)
+				A = sim.A._select(nodes).array(buf_mat)
+				np.multiply(m, m, out=m)  # (!) Hadamard product: [[mx * mx, my * my, mz * mz], ...]; don't need m anymore
+				out[0:N] -= dot(A, m, temp=buf_mat)
 			
 			if "Je0" in parameters:
-				s = np.array([sim.s[i] for i in nodes], dtype=float)
-				f = np.array([sim.f[i] for i in nodes], dtype=float)
-				Je0 = np.array([sim.Je0[i] for i in nodes], dtype=float)
-				u -= Je0 * dot(s, f)
+				s = sim.s._select(nodes).array(m)  # (!) don't need m anymore
+				f = sim.f._select(nodes).array(buf_mat)  # (!) don't need f after this
+				Je0 = sim.Je0._select(nodes).array(buf_list)
+				out[0:N] -= np.multiply(Je0, dot(s, f, temp=buf_mat), out=buf_list)
 		
-		return u
-	
-	def _calc_edge_values(self) -> numpy_mat:
-		sim = self._sim
-		parameters = self._parameters
-		edges = self._edges
-
-		u = np.zeros((len(edges), 3), dtype=float)  # each row, (scalar) u[i] is the energy for edge (i,j) (in order of self._edges == sim.edges)
-
-		if len(edges) != 0:
-			s_i = None  # cache (edge parameters: J, Je1)
-			s_j = None  # cache (edge parameters: J, Je1)
-			f_i = None  # cache (edge parameters: Je1, Jee)
-			f_j = None  # cache (edge parameters: Je1, Jee)
-			m_i = None  # cache (edge parameters: b, D)
-			m_j = None  # cache (edge parameters: b, D)
+		if M != 0:
+			s_i = None  # cache (used for calculations: J, Je1); shape=(M, 3)
+			s_j = None  # cache (used for calculations: J, Je1); shape=(M, 3)
+			f_i = None  # cache (used for calculations: Je1, Jee); shape=(M, 3)
+			f_j = None  # cache (used for calculations: Je1, Jee); shape=(M, 3)
+			m_i = None  # cache (used for calculations: b, D); shape=(M, 3)
+			m_j = None  # cache (used for calculations: b, D); shape=(M, 3)
+			buf_mat = np.empty((M, 3), dtype=float)
+			buf_list = np.empty((M,), dtype=float)
 
 			if "J" in parameters:
-				s_i = np.array([sim.s[i] for i, _ in edges], dtype=float)
-				s_j = np.array([sim.s[j] for _, j in edges], dtype=float)
-				J = np.array([sim.J[e] for e in edges], dtype=float)
-				u -= J * dot(s_i, s_j)
+				s_i = sim.s.select(i for i, _ in edges).array(None)  # new buffer
+				s_j = sim.s.select(j for _, j in edges).array(None)  # new buffer
+				J = sim.J._select(edges).array(buf_list)
+				out[N:L] -= np.multiply(J, dot(s_i, s_j, temp=buf_mat), out=buf_list)
 
 			if "Je1" in parameters:
-				if s_i is None:  s_i = np.array([sim.s[i] for i, _ in edges], dtype=float)
-				if s_j is None:  s_j = np.array([sim.s[j] for _, j in edges], dtype=float)
-				f_i = np.array([sim.f[i] for i, _ in edges], dtype=float)
-				f_j = np.array([sim.f[j] for _, j in edges], dtype=float)
-				Je1 = np.array([sim.Je1[e] for e in edges], dtype=float)
-				u -= Je1 * (dot(s_i, f_j) + dot(s_j, f_i))
+				if s_i is None:  s_i = sim.s.select(i for i, _ in edges).array(None)  # new buffer
+				if s_j is None:  s_j = sim.s.select(j for _, j in edges).array(None)  # new buffer
+				f_i = sim.f.select(i for i, _ in edges).array(None)  # new buffer
+				f_j = sim.f.select(j for _, j in edges).array(None)  # new buffer
+				Je1 = sim.Je1._select(edges).array(buf_list)
+				dotp1 = dot(s_i, f_j, temp=buf_mat)
+				dotp2 = dot(f_i, s_j, temp=buf_mat)
+				np.add(dotp1, dotp2, out=buf_mat)
+				out[N:L] -= np.multiply(Je1, buf_mat, temp=buf_list)
 
 			if "Jee" in parameters:
-				if f_i is None:  f_i = np.array([sim.f[i] for i, _ in edges], dtype=float)
-				if f_j is None:  f_j = np.array([sim.f[j] for _, j in edges], dtype=float)
-				Jee = np.array([sim.Jee[e] for e in edges], dtype=float)
-				u -= Jee * dot(f_i, f_j)
+				if f_i is None:  sim.f.select(i for i, _ in edges).array(None)  # new buffer
+				if f_j is None:  sim.f.select(j for _, j in edges).array(None)  # new buffer
+				Jee = sim.Jee._select(edges).array(buf_list)
+				out[N:L] -= np.multiply(Jee, dot(f_i, f_j, temp=buf_mat), temp=buf_list)
 
 			if "b" in parameters:
-				m_i = np.array([sim.m[i] for i, _ in edges], dtype=float)
-				m_j = np.array([sim.m[j] for _, j in edges], dtype=float)
-				b = np.array([sim.b[e] for e in edges], dtype=float)
-				dotp = dot(m_i, m_j)
-				u -= b * (dotp * dotp)
+				m_i = sim.m.select(i for i, _ in edges).array(None)  # new buffer
+				m_j = sim.m.select(j for _, j in edges).array(None)  # new buffer
+				b = sim.b._select(edges).array(buf_list)
+				out[N:L] -= np.multiply(b, dot(m_i, m_j, temp=buf_mat), temp=buf_list)
 
 			if "D" in parameters:
-				if m_i is None:  m_i = np.array([sim.m[i] for i, _ in edges], dtype=float)
-				if m_j is None:  m_j = np.array([sim.m[j] for _, j in edges], dtype=float)
-				D = np.array([sim.D[e] for e in edges], dtype=float)
-				u -= dot(D, np.cross(m_i, m_j))
-		
-		return u
+				if m_i is None:  m_i = sim.m.select(i for i, _ in edges).array(None)  # new buffer
+				if m_j is None:  m_j = sim.m.select(j for _, j in edges).array(None)  # new buffer
+				D = sim.D._select(edges).array(buf_mat)
+				out[N:L] -= dot(D, np.cross(m_i, m_j), temp=buf_mat)
+
+		return out
 
 	@override
 	@property
 	def value(self) -> float:
-		return float(np.sum(self._calc_node_values()) + np.sum(self._calc_edge_values))
-
-	def _keys(self) -> Collection[Node|Edge]:
-		sim = self._sim
-		nodes = sim.nodes
-		edges = sim.edges
-		keys = ordered_set(self._elements)
-		for k in self._elements:
-			if k not in chain(nodes, edges):
-				keys.pop(k, None)  # discard parameter elements, leaving only Collection[Node|Edge]
-		return keys
+		return float(np.sum(self.array()))
 
 	@override
 	def __iter__(self) -> Iterator[Node|Edge]:
-		return iter(self._keys())
+		return chain(self.nodes, self.edges)
 	
 	@override
 	@property
-	def history(self) -> dict[int, float]:
-		return ArrangeableDict({ snapshot.t: _sum(snapshot, self._name) for snapshot in self._sim._history })
+	def history(self) -> ArrangeableDict[int, float]:
+		return ArrangeableDict({ snapshot.t: float(_sum(snapshot, self._name)) for snapshot in self._sim._history })
