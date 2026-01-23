@@ -1,6 +1,6 @@
 from __future__ import annotations
 from .constants import __EDGES__, __NODES__
-from .simulation_util import ArrangeableDict, ArrangeableMapping, Scalar, Vector, VEC_ZERO, rtscal, rtvec, simscal, simvec
+from .simulation_util import ArrangeableDict, ArrangeableMapping, Scalar, Vector, VEC_ZERO, dot, rtscal, rtvec, simscal, simvec
 from .util import IInt, Numeric, ReadOnlyCollection, ReadOnlyList, ordered_set
 from collections.abc import Mapping
 from copy import copy
@@ -10,7 +10,7 @@ import numpy as np
 if TYPE_CHECKING:
 	from .config import vec
 	from .simulation import Simulation, Snapshot
-	from .simulation_util import Edge, ERegion, Node, Parameter, Region, numpy_vec
+	from .simulation_util import Edge, ERegion, Node, Parameter, Region, numpy_mat, numpy_vec
 	from collections.abc import Callable, Collection, Iterable, Iterator, Sequence
 
 
@@ -235,49 +235,47 @@ class NProxy(NumericProxy, IInt):
 # Internal Energy in selection
 class UProxy(NumericProxy, Scalar):
 	def __init__(self, sim: Simulation, sim_name="u"):
-		parameters = ordered_set(sim.parameters)
-		parameters.pop("S", None)  # these parameters don't contribute to energy
-		parameters.pop("F", None)
-		super().__init__(sim, sim_name, elements=ordered_set(chain(sim.nodes, sim.edges, parameters)), filter=_utype_filter)
-	
-	@override
-	@property
-	def value(self) -> float:
+		self._parameters = ordered_set(sim.parameters)
+		self._parameters.pop("S", None)  # these parameters don't contribute to energy
+		self._parameters.pop("F", None)
+		self._nodes = sim.nodes
+		self._edges = sim.edges
+		super().__init__(sim, sim_name, elements=ordered_set(chain(self._nodes, self._edges, self._parameters)), filter=_utype_filter)
+
+	def _calc_node_values(self) -> numpy_mat:
 		sim = self._sim
-		
-		# separate selected nodes, edges, and parameters in elements
-		nodes = []
-		edges = []
-		parameters = set()
-		for x in self._elements:
-			if x in sim.nodes:
-				nodes.append(x)
-			elif x in sim.edges:
-				edges.append(x)
-			else:
-				assert x in sim.parameters  # DEBUG
-				parameters.add(x)
-		
-		u = 0.0     # Result: internal energy
+		parameters = self._parameters
+		nodes = self._nodes
+
+		u = np.zeros((len(nodes), 3), dtype=float)  # each row, (scalar) u[i] is the energy for node i (in order of self._nodes == sim.nodes)
 
 		if len(nodes) != 0:
 			m = None    # cache (node parameters: B, A)
 
-			if "B" in parameters:
+			if "B" in self._parameters:
 				m = np.array([sim.m[i] for i in nodes], dtype=float)
 				B = np.array([sim.B[i] for i in nodes], dtype=float)
-				u -= np.sum(B * m)
+				u -= dot(B, m)
 			
 			if "A" in parameters:
 				if m is None:  m = np.array([sim.m[i] for i in nodes], dtype=float)
 				A = np.array([sim.A[i] for i in nodes], dtype=float)
-				u -= np.sum(A * (m * m))
+				u -= dot(A, m * m)
 			
 			if "Je0" in parameters:
 				s = np.array([sim.s[i] for i in nodes], dtype=float)
 				f = np.array([sim.f[i] for i in nodes], dtype=float)
 				Je0 = np.array([sim.Je0[i] for i in nodes], dtype=float)
-				u -= np.sum(Je0 * np.sum(s * f, axis=1), axis=0)  # sum( Je0[i] * (s[i] @ f[i]) )
+				u -= Je0 * dot(s, f)
+		
+		return u
+	
+	def _calc_edge_values(self) -> numpy_mat:
+		sim = self._sim
+		parameters = self._parameters
+		edges = self._edges
+
+		u = np.zeros((len(edges), 3), dtype=float)  # each row, (scalar) u[i] is the energy for edge (i,j) (in order of self._edges == sim.edges)
 
 		if len(edges) != 0:
 			s_i = None  # cache (edge parameters: J, Je1)
@@ -291,7 +289,7 @@ class UProxy(NumericProxy, Scalar):
 				s_i = np.array([sim.s[i] for i, _ in edges], dtype=float)
 				s_j = np.array([sim.s[j] for _, j in edges], dtype=float)
 				J = np.array([sim.J[e] for e in edges], dtype=float)
-				u -= np.sum(J * np.sum(s_i * s_j, axis=1), axis=0)  # sum( J * (s[i] @ s[j]) )
+				u -= J * dot(s_i, s_j)
 
 			if "Je1" in parameters:
 				if s_i is None:  s_i = np.array([sim.s[i] for i, _ in edges], dtype=float)
@@ -299,28 +297,33 @@ class UProxy(NumericProxy, Scalar):
 				f_i = np.array([sim.f[i] for i, _ in edges], dtype=float)
 				f_j = np.array([sim.f[j] for _, j in edges], dtype=float)
 				Je1 = np.array([sim.Je1[e] for e in edges], dtype=float)
-				u -= np.sum(Je1 * (np.sum(s_i * f_j, axis=1) + np.sum(s_j * f_i, axis=1)), axis=0)  # sum( Je1 * (s[i] @ f[j] + s[j] @ f[i]) )
+				u -= Je1 * (dot(s_i, f_j) + dot(s_j, f_i))
 
 			if "Jee" in parameters:
 				if f_i is None:  f_i = np.array([sim.f[i] for i, _ in edges], dtype=float)
 				if f_j is None:  f_j = np.array([sim.f[j] for _, j in edges], dtype=float)
 				Jee = np.array([sim.Jee[e] for e in edges], dtype=float)
-				u -= np.sum(Jee * np.sum(f_i * f_j, axis=1), axis=0)  # sum( Jee * (f[i] @ f[j]) )
+				u -= Jee * dot(f_i, f_j)
 
 			if "b" in parameters:
 				m_i = np.array([sim.m[i] for i, _ in edges], dtype=float)
 				m_j = np.array([sim.m[j] for _, j in edges], dtype=float)
 				b = np.array([sim.b[e] for e in edges], dtype=float)
-				dotp = np.sum(m_i * m_j, axis=1)
-				u -= np.sum(b * (dotp * dotp), axis=0)  # sum( b * (m[i] @ m[j])**2 )
+				dotp = dot(m_i, m_j)
+				u -= b * (dotp * dotp)
 
 			if "D" in parameters:
 				if m_i is None:  m_i = np.array([sim.m[i] for i, _ in edges], dtype=float)
 				if m_j is None:  m_j = np.array([sim.m[j] for _, j in edges], dtype=float)
 				D = np.array([sim.D[e] for e in edges], dtype=float)
-				u -= np.sum(D * np.cross(m_i, m_j))
+				u -= dot(D, np.cross(m_i, m_j))
+		
+		return u
 
-		return float(u)
+	@override
+	@property
+	def value(self) -> float:
+		return float(np.sum(self._calc_node_values()) + np.sum(self._calc_edge_values))
 
 	def _keys(self) -> Collection[Node|Edge]:
 		sim = self._sim
