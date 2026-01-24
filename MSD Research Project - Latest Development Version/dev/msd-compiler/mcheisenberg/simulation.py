@@ -3,12 +3,12 @@ from .constants import EDGE_PARAMETERS, NODE_PARAMETERS, PARAMETERS
 from .runtime import Runtime
 from .simulation_proxies import MProxy, NProxy, ScalarEdgeParameterProxy, ScalarNodeParameterProxy, StateProxy, UProxy, VectorEdgeParameterProxy, VectorNodeParameterProxy
 from .simulation_util import VEC_J, VEC_ZERO, simscal, simvec
-from .util import ReadOnlyDict, ReadOnlyOrderedSet, ordered_set
+from .util import *
 from itertools import chain
 from typing import TYPE_CHECKING
 import numpy as np
 if TYPE_CHECKING:
-	from .simulation_util import Edge, ERegion, Node, Region, numpy_vec
+	from .simulation_util import *
 	from collections.abc import Collection, Sequence
 
 
@@ -156,7 +156,7 @@ class Simulation:
 		})
 	
 	@property
-	def parameters(self) -> ReadOnlyDict[str, ReadOnlyOrderedSet[Node]|ReadOnlyOrderedSet[Edge]]:
+	def parameters(self) -> ReadOnlyDict[Parameter, ReadOnlyOrderedSet[Node]|ReadOnlyOrderedSet[Edge]]:
 		config = self.rt.config
 		parameters = {}
 		for p in self._parameters:

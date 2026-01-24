@@ -2,7 +2,7 @@ from __future__ import annotations
 from .constants import __EDGES__, __NODES__
 from .simulation_util import *
 from .util import *
-from collections.abc import Mapping
+from collections.abc import Mapping, MappingView, KeysView, ItemsView, ValuesView
 from copy import copy
 from itertools import chain
 from typing import Any, override, TYPE_CHECKING
@@ -16,6 +16,18 @@ if TYPE_CHECKING:
 
 type Filter = Callable[[Simulation, str, Any], Iterable]  # (Proxy.simulation, Proxy.name, key) -> candidate_elements
 class History[H](NumericArrangeable, Mapping[int, H]):  pass
+
+def repr_view(view: MappingView) -> str:
+	return f"{ view.__class__.__name__ }({ list(view) })"
+
+class ProxyKeysView(KeysView):
+	def __repr__(self) -> str:  return repr_view(self)
+
+class ProxyValuesView(ValuesView):
+	def __repr__(self) -> str:  return repr_view(self)
+
+class ProxyItemsView(ItemsView):
+	def __repr__(self) -> str:  return repr_view(self)
 
 class Proxy[E, H](Mapping[Any, "Proxy[H]"]):
 	def __init__(self, simulation: Simulation, sim_name: str, elements: Collection[E], filter: Filter, subscripts: list=[]):
@@ -62,6 +74,19 @@ class Proxy[E, H](Mapping[Any, "Proxy[H]"]):
 	@property
 	def subscripts(self) -> Sequence:
 		return ReadOnlyList(self._subscripts)
+	
+	@override
+	def keys(self) -> KeysView:
+		return ProxyKeysView(self)
+
+	@override
+	def values(self) -> ValuesView:
+		return ProxyValuesView(self)
+	
+	@override
+	def items(self) -> ItemsView:
+		return ProxyItemsView(self)
+
 
 def _node_filter(sim: Simulation, param: str, key: Node|Region) -> Collection[Node]:
 	if key in sim.nodes:    return [key]             # key is interpreted a (local) node
@@ -96,8 +121,8 @@ def _utype_filter(sim: Simulation, param: str, key: Node|Edge|Region|ERegion|Par
 	raise KeyError(f"For parameter {param}, Unrecognized subscript: [{key}]")
 
 
-class NumericProxy[E, T](Proxy[E, T], Numeric[T], ArrangeableMapping[int, T]):
-	def __setitem__(self, key, value) -> None:
+class NumericProxy[E, H](Proxy[E, H], Numeric[H], ArrangeableMapping[int, H]):
+	def __setitem__(self, key: Any, value: H) -> None:
 		self[key].value = value
 
 
@@ -187,7 +212,7 @@ class StateProxy(NumericProxy[Node, numpy_vec], Vector):
 	@property
 	def value(self) -> numpy_vec:
 		if len(self._elements) > 1:
-			return np.sum(self.values(), axis=0)  # add all the row (i.e. axis=0) vectors
+			return np.sum(self.array(), axis=0)  # add all the row (i.e. axis=0) vectors
 		else:
 			node = [*self._elements][0]
 			return simvec(self._runtime_proxy[node])
@@ -243,7 +268,7 @@ class NProxy(NumericProxy[Node|Edge, int], IInt):
 		return ArrangeableDict({ snapshot.t: self.value for snapshot in self._sim._history }, dtype=int)
 
 # Internal Energy in selection
-class UProxy(NumericProxy[Node|Edge|str, float], Scalar):
+class UProxy(NumericProxy[Node|Edge|Parameter, float], Scalar):
 	def __init__(self, sim: Simulation, sim_name="u"):
 		parameters = sim.parameters - ["S", "F"]  # these parameters don't contribute to energy
 		super().__init__(sim, sim_name, elements=ordered_set(chain(sim.nodes, sim.edges, parameters)), filter=_utype_filter)

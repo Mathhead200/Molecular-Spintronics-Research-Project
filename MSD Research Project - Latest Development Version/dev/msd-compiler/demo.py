@@ -1,4 +1,4 @@
-from mcheisenberg.models import MSD
+from mcheisenberg.model import MSD
 import mcheisenberg as mc
 import time
 
