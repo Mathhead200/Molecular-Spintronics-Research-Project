@@ -31,7 +31,7 @@ if __name__ == "__main__":
 		
 		for i in range(5):
 			sim.metropolis(1)
-			u_brray = u.array()
+			u_brray = u.values()
 			print(f"u[t={sim.t}]:", u, { k: (float(v), float(d)) for k, v, d in zip(u.keys(), u_brray, u_brray - u_array) })
 			print(f"s|f[t={sim.t}]:", s.values(), f.values())
 			u_array = u_brray

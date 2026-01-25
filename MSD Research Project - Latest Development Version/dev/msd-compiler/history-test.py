@@ -1,5 +1,5 @@
 import mcheisenberg as mc
-from mcheisenberg.models import MSD
+from mcheisenberg.model import MSD
 import numpy as np
 import time
 
@@ -23,5 +23,5 @@ if __name__ == "__main__":
 		
 		print("Avg. U:", mc.mean(sim.u))
 		print("Avg. M:", mc.mean(sim.m))
-		print("Avg. |M|:", np.mean(mc.norm(sim.m.history)))
+		print("Avg. |M|:", mc.mean(mc.norm(sim.m)))
 		print("|Avg. M|:", mc.norm(mc.mean(sim.m)))

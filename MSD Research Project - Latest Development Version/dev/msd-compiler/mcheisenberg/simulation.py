@@ -1,7 +1,7 @@
 from __future__ import annotations
 from .constants import EDGE_PARAMETERS, NODE_PARAMETERS, PARAMETERS
 from .runtime import Runtime
-from .simulation_proxies import MProxy, NProxy, ScalarEdgeParameterProxy, ScalarNodeParameterProxy, StateProxy, UProxy, VectorEdgeParameterProxy, VectorNodeParameterProxy
+from .simulation_proxies import *
 from .simulation_util import VEC_J, VEC_ZERO, simscal, simvec
 from .util import *
 from itertools import chain
@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 if TYPE_CHECKING:
 	from .simulation_util import *
-	from collections.abc import Collection, Sequence
+	from collections.abc import Sequence
 
 
 # The full state of the Simulation at some simulation time, t.
@@ -47,7 +47,7 @@ class Snapshot:
 class Simulation:
 	NODE_PARAMETERS = ordered_set(NODE_PARAMETERS)
 	EDGE_PARAMETERS = ordered_set(EDGE_PARAMETERS)
-	STATES = ordered_set(["n", "s", "f", "m", "u"])
+	STATES = ordered_set(["n", "s", "f", "m", "u", "x", "c"])
 	ALL_PROXIES = ordered_set(chain(PARAMETERS, STATES))
 
 	def __init__(self, rt: Runtime):
@@ -101,8 +101,8 @@ class Simulation:
 		self._f_proxy = StateProxy(self, "flux", "f")
 		self._m_proxy = MProxy(self)
 		self._u_proxy = UProxy(self)
+		self._x_proxy = ChiProxy(self)
 		self._c_proxy = None  # TODO: (stub)
-		self._x_proxy = None  # TODO: (stub)
 
 	def seed(self, *seed: int) -> None:
 		self.rt.seed(seed)
@@ -169,6 +169,8 @@ class Simulation:
 	@property
 	def parameters(self) -> ReadOnlyDict[Parameter, ReadOnlyOrderedSet[Node]|ReadOnlyOrderedSet[Edge]]:
 		return self._parameters
+
+	# @properties added below: Simulation.s, .f, .m, .u, .n, .J, .B, etc.
 
 	def __getitem__(self, attr: str):
 		if attr not in Simulation.ALL_PROXIES:

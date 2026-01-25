@@ -14,26 +14,27 @@
 
 | <span id="mc">mcheisenburg</span> | name | description | type parameters | alias |
 | --------------------------------- | ---- | --------------- | ----------- | ----- |
-| class | [Config](#config)  | Defines a configuration as a mathematical graph/network.                          |||
-| class | Runtime            | Handles communication with the native code (DLL).                                 |||
-| class | [Simulation](#sim) | Controller for a running model.                                                   |||
-| class | Snapshot           | Stores data for specific recorded times in the simulation.                        |||
-| class | Assembler          | Defines a specific build tool for building object files.                          |||
-| class | Linker             | Defines a specific build tool for building dynamic link libraries.                |||
-| class | VisualStudio       | Defines the Microsoft VC assembler (ml64) and linker (link).                      |||
-| class | Proxy              | Parent type for NumericProxy.                                                     | E, H ||
-| class | NumericProxy       | The parent type for simulation variable views, e.g. Simulation.m, Simulation.u    | E, H ||
-| class | History            | Type definiton for a NumericArrangeable, Mapping[int, H]. See [Proxy.history](#). | H    ||
-| class | Arrangeable        | Any object that has a canonical numpy.NDArray representation.                     |||
-| class | ArrangeableMapping | A Mapping[K, Numeric[V]] that is Arrangeable                                      | K, V ||
+| class | [Config](#config)       | Defines a configuration as a mathematical graph/network.                          |||
+| class | Runtime                 | Handles communication with the native code (DLL).                                 |||
+| class | [Simulation](#sim)      | Controller for a running model.                                                   |||
+| class | Snapshot                | Stores data for specific recorded times in the simulation.                        |||
+| class | Assembler               | Defines a specific build tool for building object files.                          |||
+| class | Linker                  | Defines a specific build tool for building dynamic link libraries.                |||
+| class | VisualStudio            | Defines the Microsoft VC assembler (ml64) and linker (link).                      |||
+| class | [Proxy](#proxy)         | Parent type for NumericProxy.                                                     | E, H ||
+| class | [NumericProxy](#nproxy) |  The parent type for simulation variable views, e.g. Simulation.m, Simulation.u    | E, H ||
+| class | History                 | Type definiton for a NumericArrangeable, Mapping[int, H]. See [Proxy.history](#). | H    ||
+| class | Arrangeable             | Any object that has a canonical numpy.NDArray representation.                     |||
+| class | ArrangeableMapping      | A Mapping[K, Numeric[V]] that is Arrangeable                                      | K, V ||
 | type  | numpy_vec          | A 1D numpy.NDArray (vector). For 3D vectors.                                      || Annotated[NDArray[np.float64], (3,)]     |
 | type  | numpy_list         | A 1D numpy.NDArray (vector). For arbitrary-length lists of scalars.               || Annotated[NDArray[np.float64], ("N",)]   |
 | type  | numpy_mat          | A 2D numpy.NDArray (matrix). For arbitary-length lists of vectors.                || Annotated[NDArray[np.float64], ("N", 3)] |
-| type  | Node               | Type should match objects found in Config.nodes.                                  || Any                                    |
-| type  | Edge               | Type should match objects found in Config.edges.                                  || tuple[Node, Node]                      |
-| type  | Region             | Type should match objects found in Config.regions.keys().                         || Any                                    |
-| type  | ERegion            |                                                                                   || tuple[Region, Region]                  |
-| type  | Parameter          | Represents a simulation parameter, e.g. "J", "B"                                  || str                                    |
+| type  | numpy_sq           | A 3 by 3 numpy.NDArray (matrix).                                                  || Annotated[NDArray[np.float64], (3, 3)]   |
+| type  | Node               | Type should match objects found in Config.nodes.                                  || Any                                      |
+| type  | Edge               | Type should match objects found in Config.edges.                                  || tuple[Node, Node]                        |
+| type  | Region             | Type should match objects found in Config.regions.keys().                         || Any                                      |
+| type  | ERegion            |                                                                                   || tuple[Region, Region]                    |
+| type  | Parameter          | Represents a simulation parameter, e.g. "J", "B"                                  || str                                      |
 | file  | vec.inc            | MASM file containing macros for common vector operations.                                                |||
 | file  | prng.inc           | MASM file containing macros for a vectorized PRNG xoshiro256**\|++\|+ implementations.                   |||
 | file  | ln.inc             | Generated (tunable) MASM file containing log-tables and _vln macro for vectorized ln approximation.      |||
@@ -117,8 +118,8 @@
 | property    | A   | Anisotropy factor at m[i].                                                  || Proxy[numpy_vec] ||
 | property    | b   | Biquadratic coupling coefficint between m[i] and m[j].                      || Proxy[float]     ||
 | property    | D   | Dyzlinski-Moriya interaction (DMI) factor betweeen m[i] and m[j].           || Proxy[numpy_vec] ||
-| property    | x   | Magnetic susceptibility tensor at m[i]. Calculated with the temporal covariance matrix method. || numpy_mat ||
-| property    | c   | Specific heat ...                                                                              || ...       ||
+| property    | x   | Magnetic susceptibility tensor at m[i] (non-normalized). Calculated with the temporal covariance matrix method. || numpy_mat ||
+| property    | c   | Specific heat ...                                                                                                    || ...       ||
 | property    | nodes      | All nodes in this configuration.        || ReadOnlyOrderedSet[Node]                 ||
 | property    | edges      | All edges in this configuration.        || ReadOnlyOrderedSet[Edge]                 ||
 | property    | regions    | All regions in this configuration.      || ReadOnlyDict[Region, ReadOnlyOrderedSet[Node]]   ||
@@ -130,3 +131,21 @@
 | method      | seed          | Reseed the PRNG with an optional given seed, or with a truely random entropy source if available.              | seed?=*int                                 | None               ||
 | method      | record        | Add a snapshot of the simulation's current state to the history.                                               |                                            | Snapshot           ||
 | method      | clear_history | t = 0. history = [] || None ||
+
+| <span id="proxy">Proxy</span>[E, K, H] | name | description | parameters | (return) type | default value |
+| -------------------------------------- | ---- | ----------- | ---------- | ------------- | ------------- |
+| method   | \_\_getitem\_\_  | Generate a sub-proxy with an element selector, e.g. node, edge, region, etc.  | K             | Proxy[E, K, H]   ||
+| method   | get              | Generate a (sub-)proxy with an element iterable, e.g. generator               | Iterable[E]   | Proxy[E, K, H]   ||
+| method   | sub              | Generate a (sub-)proxy with an explicit element (sub-)collection.             | Collection[E] | Proxy[E, K, H]   ||
+| method   | \_\_iter\_\_     | Iterates over local elements (i.e. nodes, and/or edges) represented by proxy. |               | Iterator[E]   ||
+| method   | \_\_len\_\_      | Number of local elements (i.e. nodes or edges) represented by proxy.          |               | int           ||
+| method   | \_\_contains\_\_ | If the given value is in this proxy's elements.                               | Any           | bool          ||
+| method   | items            | List (view) of (key, value) pairs represented by this proxy.                  |               | ItemsView     ||
+| property | history          | "Arrangable" view of hisotrical values of this proxy.                         || History[H]    ||
+| property | name             | The simulation name of this variable.                                         || str           ||
+| property | elements         | Elements represented by this proxy.                                           || Collection[E] ||
+| property | subscripts       | List of subscripts which generated this proxy.                                || Sequence[K]   ||
+
+| <span id="nproxy">NumericProxy</span>[E, K, H](<a href="#proxy">Proxy</a>[E, K, H]) | name | description | parameters | (return) type | default value |
+| ----------------------------------------------------------------------------------- | ---- | ----------- | ---------- | ------------- | ------------- |
+| method | \_\_setitem\_\_  | If possible, sets the value represented by this proxy. Otherwise, raises an error. | K, H | None ||
