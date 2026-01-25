@@ -14,4 +14,3 @@
 | ...                           | ...    | ...   | ...                          |                     |
 | vfnmsub213pd ymm1, ymm2, ymm3 | vector | 256   | ymm1 - -(ymm2 * ymm3) - ymm1 |                     |
 | ...                           | ...    | ...   | ...                          |                     |
- 

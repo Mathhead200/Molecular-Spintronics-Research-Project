@@ -1,6 +1,5 @@
 ; Vector macros for working with AVX-256 vectors
 
-.data
 ; Change VEC_I=(1.0, 0.0, 0.0, 0.0) at src
 ;	into VEC_J=(0.0, 1.0, 0.0, 0.0) at dest
 _vpermj MACRO dest, src

@@ -52,19 +52,42 @@ class Simulation:
 
 	def __init__(self, rt: Runtime):
 		self.rt: Runtime = rt
+		self.t: int = 0  # current simulation time since last restart (i.e. reinitialization, or randomization)
+		self.history: Sequence[Snapshot] = []
 
+		config = rt.config
+		# Just need to configure nodes, edges, regions, and eregions once and cache
+		edges = config.edges    # list[Edge]
+		rnodes = config.regions  # Region -> list[Node]
+		self._nodes = ReadOnlyOrderedSet(ordered_set(config.nodes))
+		self._edges = ReadOnlyOrderedSet(ordered_set(edges))
+		self._regions = ReadOnlyDict({
+			region: ReadOnlyOrderedSet(nodes)
+			for region, nodes in rnodes.items()
+		})
+		self._eregions = ReadOnlyDict({
+			eregion: ReadOnlyOrderedSet([
+				edge
+				for edge in edges
+				if edge[0] in rnodes[eregion[0]] and edge[1] in rnodes[eregion[1]]
+			]) for eregion in config.regionEdgeParameters.keys()
+		})
 		# set of defined parameters, preserving order defined in Config:
-		config = self.rt.config
 		node_p =    [ p for params in config.localNodeParameters.values()  for p in params ]
 		edge_p =    [ p for params in config.localEdgeParameters.values()  for p in params ]
 		region_p =  [ p for params in config.regionNodeParameters.values() for p in params ]
 		eregion_p = [ p for params in config.regionEdgeParameters.values() for p in params ]
 		global_p =  [ p for p in config.globalParameters.keys() ]
-		self._parameters = ordered_set(global_p + region_p + eregion_p + node_p + edge_p)
-
-		self.t = 0  # current simulation time since last restart (i.e. reinitialization, or randomization)
-		self._history: list[Snapshot] = []
+		parameters = {}
+		for p in ordered_set(global_p + region_p + eregion_p + node_p + edge_p):
+			if p in Simulation.NODE_PARAMETERS:
+				parameters[p] = ReadOnlyOrderedSet(ordered_set(node for node in config.nodes if config.hasNodeParameter(node, p)))
+			else:
+				assert p in EDGE_PARAMETERS
+				parameters[p] = ReadOnlyOrderedSet(ordered_set(edge for edge in config.edges if config.hasEdgeParameter(edge, p)))
+		self._parameters = ReadOnlyDict(parameters)
 		
+		# proxies
 		for param in ["A", "B"]:
 			setattr(self, f"_{param}_proxy", VectorNodeParameterProxy(self, param))
 		for param in ["S", "F", "kT", "Je0"]:
@@ -82,10 +105,10 @@ class Simulation:
 		self._x_proxy = None  # TODO: (stub)
 
 	def seed(self, *seed: int) -> None:
-		self.rt.seed()
+		self.rt.seed(seed)
 	
 	def reinitialize(self, initSpin: numpy_vec=VEC_J, initFlux: numpy_vec=VEC_ZERO) -> None:
-		self.rt.reinitialize(tuple(initSpin.tolist()), tuple(initFlux.tolist()))
+		self.rt.reinitialize(rtvec(initSpin), rtvec(initFlux))
 		self.clear_history()
 	
 	def randomize(self, *seed: int) -> None:
@@ -125,47 +148,27 @@ class Simulation:
 
 	def clear_history(self) -> None:
 		self.t = 0
-		self._history = []
+		self.history = []
 	
 	@property
-	def history(self) -> Sequence:
-		return self._history  # TODO: (stub) What should the aggrigate history interface be?
+	def nodes(self) -> ReadOnlyOrderedSet[Node]:
+		return self._nodes
 	
 	@property
-	def nodes(self) -> ReadOnlyOrderedSet[Node]:  # Note: dict: Node -> None acting as ordered set
-		return ReadOnlyOrderedSet(ordered_set(self.rt.config.nodes))
+	def edges(self) -> ReadOnlyOrderedSet[Edge]:
+		return self._edges
 	
 	@property
-	def edges(self) -> ReadOnlyOrderedSet[Edge]:  # Note: dict: Edge -> None acting as ordered set
-		return ReadOnlyOrderedSet(ordered_set(self.rt.config.edges))
+	def regions(self) -> ReadOnlyDict[Region, ReadOnlyOrderedSet[Node]]:
+		return self._regions
 	
 	@property
-	def regions(self) -> ReadOnlyDict[Region, Collection[Node]]:
-		return ReadOnlyDict(self.rt.config.regions)
-	
-	@property
-	def eregions(self) -> ReadOnlyDict[ERegion, Collection[Edge]]:
-		edges = self.rt.config.edges    # list[Edge]
-		nodes = self.rt.config.regions  # Region -> list[Node]
-		return ReadOnlyDict({
-			eregion: [
-				edge
-				for edge in edges
-				if edge[0] in nodes[eregion[0]] and edge[1] in nodes[eregion[1]]
-			] for eregion in self.rt.config.regionEdgeParameters.keys()
-		})
+	def eregions(self) -> ReadOnlyDict[ERegion, ReadOnlyOrderedSet[Edge]]:
+		return self._eregions
 	
 	@property
 	def parameters(self) -> ReadOnlyDict[Parameter, ReadOnlyOrderedSet[Node]|ReadOnlyOrderedSet[Edge]]:
-		config = self.rt.config
-		parameters = {}
-		for p in self._parameters:
-			if p in Simulation.NODE_PARAMETERS:
-				parameters[p] = ReadOnlyOrderedSet(ordered_set(node for node in config.nodes if config.hasNodeParameter(node, p)))
-			else:
-				assert p in EDGE_PARAMETERS
-				parameters[p] = ReadOnlyOrderedSet(ordered_set(edge for edge in config.edges if config.hasEdgeParameter(edge, p)))
-		return ReadOnlyDict(parameters)
+		return self._parameters
 
 	def __getitem__(self, attr: str):
 		if attr not in Simulation.ALL_PROXIES:
