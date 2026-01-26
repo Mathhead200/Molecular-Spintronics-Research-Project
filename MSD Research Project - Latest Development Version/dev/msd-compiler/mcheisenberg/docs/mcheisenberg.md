@@ -104,24 +104,24 @@
 | constructor | \_\_init\_\_ | Wraps a Runtime. || Runtime |||
 | field       | t       | Simulation time, i.e. number of iterations since last (re)initialization or clean. || int                | 0  |
 | field       | history | Contains the snapshots taken with metropolis(..., freq=...).                       || Sequence[Snapshot] | [] |
-| property    | s   | Spin.                                                                       || Proxy[numpy_vec] ||
-| property    | f   | "Flux."                                                                     || Proxy[numpy_vec] ||
-| property    | m   | Magnetization: s + f                                                        || Proxy[numpy_vec] ||
-| property    | u   | Internal energy.                                                            || Proxy[float]     ||
-| property    | n   | Number of nodes and/or edges.                                               || Proxy[int]       ||
-| property    | kT  | Temperature at m[i].                                                        || Proxy[float]     ||
-| property    | J   | Heisenberg excahnge coupling coefficient between s[i] and s[j].             || Proxy[float]     ||
-| property    | Je0 | r=0 Flux exchange coupling coefficient between s[i] and f[i].               || Proxy[float]     ||
-| property    | Je1 | r=1 Flux exchange coupling coefficint between s[i] and f[j] and vice-versa. || Proxy[float]     ||
-| property    | Jee | r=1 Flux exchange coupling coefficint betweeen f[i] and f[j].               || Proxy[float]     ||
-| property    | B   | External applied magnetic field on m[i].                                    || Proxy[numpy_vec] ||
-| property    | A   | Anisotropy factor at m[i].                                                  || Proxy[numpy_vec] ||
-| property    | b   | Biquadratic coupling coefficint between m[i] and m[j].                      || Proxy[float]     ||
-| property    | D   | Dyzlinski-Moriya interaction (DMI) factor betweeen m[i] and m[j].           || Proxy[numpy_vec] ||
-| property    | x   | Magnetic susceptibility tensor at m[i] (non-normalized). Calculated with the temporal covariance matrix method. || numpy_mat ||
-| property    | c   | Specific heat ...                                                                                                    || ...       ||
-| property    | nodes      | All nodes in this configuration.        || ReadOnlyOrderedSet[Node]                 ||
-| property    | edges      | All edges in this configuration.        || ReadOnlyOrderedSet[Edge]                 ||
+| property    | s   | Spin.                                                                       || Proxy[..., Node|Region, numpy_vec]  ||
+| property    | f   | "Flux."                                                                     || Proxy[..., Node|Region, numpy_vec]  ||
+| property    | m   | Magnetization: s + f                                                        || Proxy[..., Node|Region, numpy_vec]  ||
+| property    | u   | Internal energy.                                                            || Proxy[..., Node|Edge|Region|ERegion|Parameter, float] ||
+| property    | n   | Number of nodes and/or edges.                                               || Proxy[..., Region|ERegion, int]     ||
+| property    | kT  | Temperature at m[i].                                                        || Proxy[..., Node|Region, float]      ||
+| property    | J   | Heisenberg excahnge coupling coefficient between s[i] and s[j].             || Proxy[..., Edge|ERegion, float]     ||
+| property    | Je0 | r=0 Flux exchange coupling coefficient between s[i] and f[i].               || Proxy[..., Node|Region, float]      ||
+| property    | Je1 | r=1 Flux exchange coupling coefficint between s[i] and f[j] and vice-versa. || Proxy[..., Edge|ERegion, float]     ||
+| property    | Jee | r=1 Flux exchange coupling coefficint betweeen f[i] and f[j].               || Proxy[..., Edge|ERegion, float]     ||
+| property    | B   | External applied magnetic field on m[i].                                    || Proxy[..., Node|Region, numpy_vec]  ||
+| property    | A   | Anisotropy factor at m[i].                                                  || Proxy[..., Node|Region, numpy_vec]  ||
+| property    | b   | Biquadratic coupling coefficint between m[i] and m[j].                      || Proxy[..., Egde|ERegion, float]     ||
+| property    | D   | Dyzlinski-Moriya interaction (DMI) factor betweeen m[i] and m[j].           || Proxy[..., Edge|ERegion, numpy_vec] ||
+| property    | x   | Magnetic susceptibility tensor at m[i] (normalized). Calculated with the temporal covariance matrix method.  || Proxy[..., Node|Region, numpy_mat]             ||
+| property    | c   | Specific heat at m[i] (normalized). Calculated with the temporal variance method. Assumes (Boltzmann) k=1.0. || Proxy[Node|Edge|Parameter, ..., float] ||
+| property    | nodes      | All nodes in this configuration.        || ReadOnlyOrderedSet[Node]                         ||
+| property    | edges      | All edges in this configuration.        || ReadOnlyOrderedSet[Edge]                         ||
 | property    | regions    | All regions in this configuration.      || ReadOnlyDict[Region, ReadOnlyOrderedSet[Node]]   ||
 | property    | eregions   | All edge-regions in this configuration. || ReadOnlyDict[ERetgion, ReadOnlyOrderedSet[Edge]] ||
 | property    | parameters | All parameters in this configuration and which nodes or edges they affect. || ReadOnlyDict[Parameter, ReadOnlyOrderedSet[Node]\|ReadOnlyOrderedSet[Edge]] ||

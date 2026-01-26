@@ -87,14 +87,16 @@ def _mean(a: NDArray) -> NDArray:
 def _cov(a: NDArray, b: NDArray, temp: NDArray=None) -> NDArray|np.float64:
 	mean_a = _mean(a)
 	mean_b = _mean(b)
-	dotp = dot(a, b, temp=temp)
+	dotp = _dot(a, b, temp=temp)
 	return _mean(dotp) - dot(mean_a, mean_b, temp=temp)
 
 def _var(a: NDArray, temp: NDArray=None) -> NDArray|np.float64:
-	return _cov(a, a, temp=temp)
+	mean = _mean(a)
+	dotp = _dot(a, a, temp=temp)
+	return _mean(dotp) - dot(mean, mean, temp=temp)
 
 def _std(a: NDArray, temp: NDArray=None) -> NDArray|np.float64:
-	return np.sqrt(_var(a))
+	return np.sqrt(_var(a, temp=temp))
 
 def _asarray(temp: NDArray, *potential_proxies: Proxy|NDArray) -> tuple[NDArray, ...]:
 	for i, p in enumerate(potential_proxies):

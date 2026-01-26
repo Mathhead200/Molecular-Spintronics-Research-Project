@@ -1,7 +1,7 @@
 from __future__ import annotations
 from .constants import __EDGES__, __NODES__
 from .simulation_util import *
-from .simulation_util import _cov
+from .simulation_util import _cov, _var
 from .util import *
 from collections.abc import Mapping, MappingView, KeysView, ItemsView, ValuesView
 from copy import copy
@@ -263,6 +263,7 @@ class MProxy(NumericProxy[Node, Node|Region, numpy_vec], Vector):
 	def history(self) -> ArrangeableDict[int, numpy_vec]:
 		return ArrangeableDict({ snapshot.t: _sum(snapshot, self._name) for snapshot in self._sim._history })
 
+
 # Number of nodes in selection
 class NProxy(NumericProxy[Node|Edge, Node|Edge, Region|ERegion, int], IInt):
 	def __init__(self, sim: Simulation, sim_name: str="n"):
@@ -289,12 +290,12 @@ class NProxy(NumericProxy[Node|Edge, Node|Edge, Region|ERegion, int], IInt):
 		# n can't change over time
 		return ArrangeableDict({ snapshot.t: self.value for snapshot in self._sim._history }, dtype=int)
 
-# Internal Energy in selection
-class UProxy(NumericProxy[Node|Edge|Parameter, Node|Edge|Region|ERegion|Parameter, float], Scalar):
-	def __init__(self, sim: Simulation, sim_name="u"):
+
+class UTypeProxy(NumericProxy[Node|Edge|Parameter, Node|Edge|Region|ERegion|Parameter, float], Scalar):
+	def __init__(self, sim: Simulation, sim_name: str):
 		parameters = sim.parameters - ["S", "F"]  # these parameters don't contribute to energy
 		super().__init__(sim, sim_name, elements=ordered_set(chain(sim.nodes, sim.edges, parameters)), filter=_utype_filter)
-
+	
 	@property
 	def parameters(self) -> Collection[str]:
 		return self._sim.parameters & self._elements
@@ -314,6 +315,11 @@ class UProxy(NumericProxy[Node|Edge|Parameter, Node|Edge|Region|ERegion|Paramete
 	@override
 	def __len__(self) -> int:
 		return len(self.nodes) + len(self.edges)
+
+# Internal Energy in selection
+class UProxy(NumericProxy[Node|Edge|Parameter, Node|Edge|Region|ERegion|Parameter, float], Scalar):
+	def __init__(self, sim: Simulation, sim_name: str="u"):
+		super().__init__(sim, sim_name)
 
 	@override
 	def values(self, out: NDArray=None) -> numpy_vec:
@@ -406,18 +412,67 @@ class UProxy(NumericProxy[Node|Edge|Parameter, Node|Edge|Region|ERegion|Paramete
 	def history(self) -> ArrangeableDict[int, float]:
 		return ArrangeableDict({ snapshot.t: float(_sum(snapshot, self._name)) for snapshot in self._sim._history })
 
+
+class CProxy(UTypeProxy, Scalar):
+	def __init__(self, sim: Simulation, sim_name="c"):
+		super().__init__(sim, sim_name)
+	
+	@override
+	@property
+	def value(self) -> float:
+		sim = self._sim
+		nodes = self.nodes
+		u = sim.u.sub(self._elements).history
+		kT = sim.kT.sub(nodes).value
+		n = len(nodes)
+		return _var(u) / (kT * n)
+
+	@override
+	@property
+	def values(self) -> numpy_list:
+		sim = self._sim
+		parameters = self.parameters
+		nodes = self.nodes
+		edges = self.edges
+		C = np.empty((len(nodes),), dtype=float)
+		for idx, node in nodes:
+			u = sim.u.sub([node, *parameters]).history
+			u += 0.5 * sim.u.get(chain((e for e in edges if node in e), parameters)).history
+			C[idx] = _var(u, temp=u)
+		return C
+
 class ChiProxy(NumericProxy[Node, Node|Region, numpy_sq], Array):
 	def __init__(self, sim: Simulation, sim_name="x"):
 		super().__init__(sim, sim_name, elements=sim.nodes, filter=_node_filter)
+
+	def _calc(m_history: numpy_mat, out: NDArray) -> None:
+		for alpha in range(3):     # alpha = 0,1,2; representing the (x,y,z)-components of m, respectively
+			for beta in range(3):  # beta = ...(x,y,z)...
+				out[alpha][beta] = _cov(m_history[:, alpha], m_history[:, beta])
 
 	@override
 	@property
 	def value(self) -> numpy_sq:
 		sim = self._sim
-		kT = sim.kT.sub(self._elements).value
-		m  = sim.m.sub(self._elements).array()  # [[m_x, m_y, m_z], ...]
-		x = [[None, None, None], [None, None, None], [None, None, None]]
-		for alpha in range(3):     # alpha = 0,1,2; representing the (x,y,z)-components of m, respectively
-			for beta in range(3):  # beta = ...(x,y,z)...
-				x[alpha][beta] = _cov(m[:, alpha], m[:, beta])
-		return (1.0 / kT) * np.array(x)
+		nodes = self._elements
+		m = sim.m.sub(nodes).history
+		kT = sim.kT.sub(nodes).value
+		n = len(nodes)
+		x = np.empty((3, 3), dtype=float)  # tenser (3 by 3 alpha-beta matrix)
+		self._calc(m, out=x)
+		return np.multiply(1.0/(kT * n), x, out=x)
+	
+	@override
+	def values(self) -> NDArray:  # list of numpy_sq
+		sim = self._sim
+		nodes = self._elements
+		X = np.empty((len(nodes), 3, 3), dtype=float)
+		for idx, node in enumerate(nodes):
+			node = [node]
+			m = sim.m.sub(node).history
+			kT = sim.kT.sub(node)
+			x = X[idx, :, :]
+			self._calc(m, out=x)
+			np.multiply(1.0/kT, x, out=x)
+		return X
+	
