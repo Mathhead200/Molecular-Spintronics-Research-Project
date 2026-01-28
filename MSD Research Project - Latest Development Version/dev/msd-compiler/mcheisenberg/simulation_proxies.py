@@ -1,9 +1,9 @@
 from __future__ import annotations
 from .constants import __EDGES__, __NODES__
 from .simulation_util import *
-from .simulation_util import _cov, _var
+from .simulation_util import _cov_list, _var_list
 from .util import *
-from collections.abc import Mapping, MappingView, KeysView, ItemsView, ValuesView
+from collections.abc import Mapping, ItemsView
 from copy import copy
 from itertools import chain
 from typing import Any, override, TYPE_CHECKING
@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 	from .simulation_util import *
 	from collections.abc import Callable, Collection, Iterable, Iterator, Sequence
 
+type vec = tuple[float, float, float]  # TODO: refactor type system. This is redefiniton from config.py
 
 type Filter = Callable[[Simulation, str, Any], Iterable]  # (Proxy.simulation, Proxy.name, key) -> candidate_elements
 class History[H](NumericArrangeable, Mapping[int, H]):  pass
@@ -68,8 +69,9 @@ class Proxy[E, K, H]:
 	def subscripts(self) -> Sequence[K]:
 		return ReadOnlyList(self._subscripts)
 
-	def items(self) -> ItemsView:
-		return ProxyItemsView(self)
+	# TODO: remove anti-pattern?
+	# def items(self) -> ItemsView:
+	# 	return ProxyItemsView(self)
 
 class NumericProxy[E, K, H](Proxy[E, K, H], NumericArrangeable):
 	def __setitem__(self, key: K, value: H) -> None:
@@ -171,7 +173,7 @@ class ParameterProxy[E: Node|Edge, K: Node|Edge|Region|ERegion, H: numpy_vec|flo
 	@override
 	@property
 	def history(self) -> ArrangeableDict[int, float|numpy_vec]:
-		return ArrangeableDict({ snapshot.t: self._get_consistant_value(snapshot) for snapshot in self._sim._history })
+		return ArrangeableDict({ snapshot.t: self._get_consistant_value(snapshot) for snapshot in self._sim.history })
 
 
 class VectorNodeParameterProxy(ParameterProxy[Node, Node|Region, numpy_vec, vec], Vector):
@@ -205,7 +207,7 @@ class StateProxy(NumericProxy[Node, Node|Region, numpy_vec], Vector):
 	@property
 	def value(self) -> numpy_vec:
 		if len(self._elements) > 1:
-			return np.sum(self.array(), axis=0)  # add all the row (i.e. axis=0) vectors
+			return np.sum(self.values(), axis=0)  # add all the row (i.e. axis=0) vectors
 		else:
 			node = [*self._elements][0]
 			return simvec(self._runtime_proxy[node])
@@ -231,7 +233,7 @@ class StateProxy(NumericProxy[Node, Node|Region, numpy_vec], Vector):
 	def history(self) -> ArrangeableDict[int, numpy_vec]:
 		return ArrangeableDict({
 			snapshot.t: _sum(snapshot, self._name)
-			for snapshot in self._sim._history
+			for snapshot in self._sim.history
 		})
 
 class MProxy(NumericProxy[Node, Node|Region, numpy_vec], Vector):
@@ -242,7 +244,7 @@ class MProxy(NumericProxy[Node, Node|Region, numpy_vec], Vector):
 	@property
 	def value(self) -> numpy_vec:
 		if len(self._elements) > 1:
-			return np.sum(self.array(), axis=0)  # add all the row (i.e. axis=0) vectors
+			return np.sum(self.values(), axis=0)  # add all the row (i.e. axis=0) vectors
 		else:
 			runtime = self._sim.rt
 			node = [*self._elements][0]
@@ -261,11 +263,11 @@ class MProxy(NumericProxy[Node, Node|Region, numpy_vec], Vector):
 	@override
 	@property
 	def history(self) -> ArrangeableDict[int, numpy_vec]:
-		return ArrangeableDict({ snapshot.t: _sum(snapshot, self._name) for snapshot in self._sim._history })
+		return ArrangeableDict({ snapshot.t: _sum(snapshot, self._name) for snapshot in self._sim.history })
 
 
 # Number of nodes in selection
-class NProxy(NumericProxy[Node|Edge, Node|Edge, Region|ERegion, int], IInt):
+class NProxy(NumericProxy[Node|Edge, Node|Edge, Region|ERegion], IInt):
 	def __init__(self, sim: Simulation, sim_name: str="n"):
 		super().__init__(sim, sim_name, elements=ordered_set(chain(sim.nodes, sim.edges)), filter=_ntype_filter)
 	
@@ -288,7 +290,7 @@ class NProxy(NumericProxy[Node|Edge, Node|Edge, Region|ERegion, int], IInt):
 	@property
 	def history(self) -> ArrangeableDict[int, int]:
 		# n can't change over time
-		return ArrangeableDict({ snapshot.t: self.value for snapshot in self._sim._history }, dtype=int)
+		return ArrangeableDict({ snapshot.t: self.value for snapshot in self._sim.history }, dtype=int)
 
 
 class UTypeProxy(NumericProxy[Node|Edge|Parameter, Node|Edge|Region|ERegion|Parameter, float], Scalar):
@@ -317,12 +319,17 @@ class UTypeProxy(NumericProxy[Node|Edge|Parameter, Node|Edge|Region|ERegion|Para
 		return len(self.nodes) + len(self.edges)
 
 # Internal Energy in selection
-class UProxy(NumericProxy[Node|Edge|Parameter, Node|Edge|Region|ERegion|Parameter, float], Scalar):
+class UProxy(UTypeProxy):
 	def __init__(self, sim: Simulation, sim_name: str="u"):
 		super().__init__(sim, sim_name)
+	
+	@override
+	@property
+	def value(self) -> float:
+		return float(np.sum(self.values(), axis=0))
 
 	@override
-	def values(self, out: NDArray=None) -> numpy_vec:
+	def values(self, out: NDArray=None) -> numpy_list:
 		sim = self._sim
 		parameters = self.parameters
 		nodes = self.nodes
@@ -371,9 +378,9 @@ class UProxy(NumericProxy[Node|Edge|Parameter, Node|Edge|Region|ERegion|Paramete
 			buf_list = np.empty((M,), dtype=float)
 
 			if "J" in parameters:
-				s_i = sim.s.get(i for i, _ in edges).array(None)  # new buffer
-				s_j = sim.s.get(j for _, j in edges).array(None)  # new buffer
-				J = sim.J.sub(edges).array(buf_list)
+				s_i = sim.s.get(i for i, _ in edges).values(None)  # new buffer
+				s_j = sim.s.get(j for _, j in edges).values(None)  # new buffer
+				J = sim.J.sub(edges).values(buf_list)
 				out[N:L] -= np.multiply(J, dot(s_i, s_j, temp=buf_mat), out=buf_list)
 
 			if "Je1" in parameters:
@@ -410,10 +417,10 @@ class UProxy(NumericProxy[Node|Edge|Parameter, Node|Edge|Region|ERegion|Paramete
 	@override
 	@property
 	def history(self) -> ArrangeableDict[int, float]:
-		return ArrangeableDict({ snapshot.t: float(_sum(snapshot, self._name)) for snapshot in self._sim._history })
+		return ArrangeableDict({ snapshot.t: float(_sum(snapshot, self._name)) for snapshot in self._sim.history })
 
 
-class CProxy(UTypeProxy, Scalar):
+class CProxy(UTypeProxy):
 	def __init__(self, sim: Simulation, sim_name="c"):
 		super().__init__(sim, sim_name)
 	
@@ -422,10 +429,10 @@ class CProxy(UTypeProxy, Scalar):
 	def value(self) -> float:
 		sim = self._sim
 		nodes = self.nodes
-		u = sim.u.sub(self._elements).history
+		u = sim.u.sub(self._elements).history.array()
 		kT = sim.kT.sub(nodes).value
 		n = len(nodes)
-		return _var(u) / (kT * n)
+		return _var_list(u) / (kT * n)
 
 	@override
 	@property
@@ -436,26 +443,26 @@ class CProxy(UTypeProxy, Scalar):
 		edges = self.edges
 		C = np.empty((len(nodes),), dtype=float)
 		for idx, node in nodes:
-			u = sim.u.sub([node, *parameters]).history
-			u += 0.5 * sim.u.get(chain((e for e in edges if node in e), parameters)).history
-			C[idx] = _var(u, temp=u)
+			u = sim.u.sub([node, *parameters]).history.array()
+			u += 0.5 * sim.u.get(chain((e for e in edges if node in e), parameters)).history.array()
+			C[idx] = _var_list(u, temp=u)
 		return C
 
 class ChiProxy(NumericProxy[Node, Node|Region, numpy_sq], Array):
 	def __init__(self, sim: Simulation, sim_name="x"):
 		super().__init__(sim, sim_name, elements=sim.nodes, filter=_node_filter)
 
-	def _calc(m_history: numpy_mat, out: NDArray) -> None:
+	def _calc(self, m_history: numpy_mat, out: NDArray) -> None:
 		for alpha in range(3):     # alpha = 0,1,2; representing the (x,y,z)-components of m, respectively
 			for beta in range(3):  # beta = ...(x,y,z)...
-				out[alpha][beta] = _cov(m_history[:, alpha], m_history[:, beta])
+				out[alpha][beta] = _cov_list(m_history[:, alpha], m_history[:, beta])
 
 	@override
 	@property
 	def value(self) -> numpy_sq:
 		sim = self._sim
 		nodes = self._elements
-		m = sim.m.sub(nodes).history
+		m = sim.m.sub(nodes).history.array()
 		kT = sim.kT.sub(nodes).value
 		n = len(nodes)
 		x = np.empty((3, 3), dtype=float)  # tenser (3 by 3 alpha-beta matrix)
@@ -469,8 +476,8 @@ class ChiProxy(NumericProxy[Node, Node|Region, numpy_sq], Array):
 		X = np.empty((len(nodes), 3, 3), dtype=float)
 		for idx, node in enumerate(nodes):
 			node = [node]
-			m = sim.m.sub(node).history
-			kT = sim.kT.sub(node)
+			m = sim.m.sub(node).history.array()
+			kT = sim.kT.sub(node).value
 			x = X[idx, :, :]
 			self._calc(m, out=x)
 			np.multiply(1.0/kT, x, out=x)

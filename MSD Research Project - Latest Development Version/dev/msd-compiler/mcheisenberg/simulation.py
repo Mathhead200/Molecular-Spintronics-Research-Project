@@ -19,9 +19,8 @@ class Snapshot:
 	def __init__(self, sim: Simulation):
 		self.t = sim.t
 		rt = sim.rt
-		config = rt.config
-		nodes = config.nodes
-		edges = config.edges
+		nodes = sim.nodes
+		edges = sim.edges
 		self.B   = { i:  simvec(rt.B[i])   for i in nodes }
 		self.A   = { i:  simvec(rt.A[i])   for i in nodes }
 		self.S   = { i:  simvec(rt.S[i])   for i in nodes }
@@ -39,8 +38,9 @@ class Snapshot:
 		self.f = { e: simvec(rt.flux[e])    for e in nodes }
 		self.m = { e: self.s[e] + self.f[e] for e in nodes }
 
-		u = sim.u.array()  # compute energies in paralell with numpy
-		self.u = { key: float(u[idx]) for idx, key in enumerate(sim.u.keys()) }
+		u = sim.u.values()  # compute energies in paralell with numpy
+		u_keys = chain(nodes, edges)
+		self.u = { key: float(u[idx]) for idx, key in enumerate(u_keys) }
 
 # Runtime wrapper which converts everything to numpy float arrays and adds
 #	simulation logic like recording snapshots, aggregates (e.g. m, U, n, etc.), etc.
@@ -102,7 +102,7 @@ class Simulation:
 		self._m_proxy = MProxy(self)
 		self._u_proxy = UProxy(self)
 		self._x_proxy = ChiProxy(self)
-		self._c_proxy = None  # TODO: (stub)
+		self._c_proxy = CProxy(self)
 
 	def seed(self, *seed: int) -> None:
 		self.rt.seed(seed)
@@ -143,7 +143,7 @@ class Simulation:
 	
 	def record(self) -> Snapshot:
 		sample = Snapshot(self)
-		self._history.append(sample)
+		self.history.append(sample)
 		return sample
 
 	def clear_history(self) -> None:

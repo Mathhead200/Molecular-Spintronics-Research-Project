@@ -84,19 +84,33 @@ def _norm(array: NDArray, temp: NDArray=None) -> NDArray|np.float64:
 def _mean(a: NDArray) -> NDArray:
 	return np.mean(a, axis=0)
 
-def _cov(a: NDArray, b: NDArray, temp: NDArray=None) -> NDArray|np.float64:
+def _cov_mat(a: NDArray, b: NDArray, temp: NDArray=None) -> NDArray:
 	mean_a = _mean(a)
 	mean_b = _mean(b)
 	dotp = _dot(a, b, temp=temp)
 	return _mean(dotp) - dot(mean_a, mean_b, temp=temp)
 
-def _var(a: NDArray, temp: NDArray=None) -> NDArray|np.float64:
+def _cov_list(a: numpy_list, b: numpy_list, temp: NDArray=None) -> np.float64:
+	mean_a = _mean(a)
+	mean_b = _mean(b)
+	dotp = np.multiply(a, b, out=temp)
+	return _mean(dotp) - mean_a * mean_b
+
+def _var_mat(a: NDArray, temp: NDArray=None) -> NDArray:
 	mean = _mean(a)
 	dotp = _dot(a, a, temp=temp)
 	return _mean(dotp) - dot(mean, mean, temp=temp)
 
-def _std(a: NDArray, temp: NDArray=None) -> NDArray|np.float64:
-	return np.sqrt(_var(a, temp=temp))
+def _var_list(a: numpy_list, temp: NDArray=None) -> np.float64:
+	mean = _mean(a)
+	dotp = np.multiply(a, a, out=temp)
+	return _mean(dotp) - mean * mean
+
+def _std_mat(a: NDArray, temp: NDArray=None) -> NDArray:
+	return np.sqrt(_var_mat(a, temp=temp))
+
+def _std_list(a: numpy_list, temp: numpy_list=None) -> np.float64:
+	return np.sqrt(_var_list(a, temp=temp))
 
 def _asarray(temp: NDArray, *potential_proxies: Proxy|NDArray) -> tuple[NDArray, ...]:
 	for i, p in enumerate(potential_proxies):
@@ -129,15 +143,21 @@ def mean(proxy: Proxy|NDArray) -> Any:
 
 def cov(a: Proxy|NDArray, b: Proxy|NDArray, temp: NDArray=None) -> NDArray|np.float64:
 	""" The (scalar) covariance between two simulation variables (over time). """
-	return _asfloat(_cov(*_asarray(temp, a, b)))
+	a, b, temp = _asarray(temp, a, b)
+	cov_f = _cov_list if a.ndim == 1 else _cov_mat
+	return _asfloat(cov_f(a, b, temp))
 
 def var(proxy: Proxy|NDArray, temp: NDArray=None) -> NDArray|np.float64:
 	""" The variance of a Simulation variable (over time). """
-	return _asfloat(_var(*_asarray(temp, proxy)))
+	a, temp = _asarray(temp, proxy)
+	var_f = _var_list if a.ndim == 1 else _var_mat
+	return _asfloat(var_f(a, temp))
 
 def std(proxy: Proxy|NDArray, temp: NDArray=None) -> NDArray|np.float64:
 	""" The standard deviation of a Simulation variable (over time). """
-	return _asfloat(_std(*_asarray(temp, proxy)))
+	a, temp = _asarray(temp, proxy)
+	std_f = _std_list if a.ndim == 1 else _std_mat
+	return _asfloat(std_f(a, temp))
 
 
 # [interface] Behaves as an numpy ndarray
@@ -185,33 +205,14 @@ class Arrangeable:
 		raise NotImplementedError("abstract")
 
 # [interface]
-class NumericArrangeable(Array, Arrangeable):
+class NumericArrangeable(Arrangeable, Array):
 	@override
 	@property
 	def value(self) -> NDArray:
 		return self.values(None)
 
-# TODO: remove
 # [interface]
-class ArrangeableMapping[K, V](Arrangeable, Mapping[K, Numeric[V]]):
-	@override
-	def array(self, out: NDArray=None) -> NDArray:
-		values = [self[key].value for key in self]
-		if out is None:
-			return np.array(values, dtype=self.__dtype__)
-		else:
-			out[:] = values  # use existing output buffer
-			return out
-
-# Wrapper for dict of Numerics to interop as ndarray.
-# Used by Proxy.history
-class ArrangeableDict[K, V](ReadOnlyDict[K, V], NumericArrangeable):
-	def __init__(self, d: Mapping, dtype=None):
-		super().__init__(d)
-		if dtype is not None:
-			setattr(self, "__dtype__", dtype)
-
-	@override
+class ArrangeableMapping[K, V](Mapping[K, V], Arrangeable):
 	def array(self, out: NDArray=None) -> NDArray:
 		values = [*self.values()]
 		if out is None:
@@ -219,3 +220,18 @@ class ArrangeableDict[K, V](ReadOnlyDict[K, V], NumericArrangeable):
 		else:
 			out[:] = values  # use existing output buffer
 			return out
+
+# [interface]
+class NumericArrangeableMapping[K, V](ArrangeableMapping[K, V], Numeric):
+	@override
+	@property
+	def value(self) -> NDArray:
+		return self.array(None)
+
+# Wrapper for dict of Numerics to interop as ndarray.
+# Used by Proxy.history
+class ArrangeableDict[K, V](ReadOnlyDict[K, V], NumericArrangeableMapping[K, V]):
+	def __init__(self, d: Mapping, dtype=None):
+		super().__init__(d)
+		if dtype is not None:
+			setattr(self, "__dtype__", dtype)

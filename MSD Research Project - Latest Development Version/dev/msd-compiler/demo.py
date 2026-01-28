@@ -2,7 +2,7 @@ from mcheisenberg.model import MSD
 import mcheisenberg as mc
 import time
 
-# ~ 2.5 minutes
+# ~ 80 minutes
 width = 11
 height = 25
 depth = 25
@@ -33,12 +33,14 @@ if __name__ == "__main__":
 		sim = mc.Simulation(runtime)
 		u = sim.u
 		m = sim.m
-		s = sim.s
+		x = sim.x  # mach. susc.
+		c = sim.c  # spec. heat
+		sim.metropolis(1_000_000_000)  # t_eq
 		sim.metropolis(1_000_000_000, freq=1_000_000)
 		print("u:", u)
-		print("m:", m)
-		print("m[FML]:", m["FML"])
-		print("m[FMR]:", m["FMR"])
+		print("m:", m, m["FML"], m["FMR"], m["mol"])
+		print("x:", x, x["FML"], x["FMR"], x["mol"])
+		print("c:", c, c["FML"], c["FMR"], c["mol"])
 
 	clock = time.perf_counter() - clock
 	print(f"Time: {clock:.3} s")
