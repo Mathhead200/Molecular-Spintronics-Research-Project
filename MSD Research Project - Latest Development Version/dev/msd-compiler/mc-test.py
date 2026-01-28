@@ -9,11 +9,12 @@ if __name__ == "__main__":
 	model.edges = [(i, i+1) for i in range(n - 1)]
 	model.globalParameters = {
 		"S": 1.0,
-		"F": 1.0,
+		"F": 2.0,
 		"kT": 0.01,
 		"J": 1.0,
 		"Je0": 1.0,
-		"B": (1.0, 0, 0)
+		"B": (1.0, 0, 0),
+		"A": (0, 0, 1.0)
 	}
 
 	with model.compile(dir=".", asm="mc-test.asm") as rt:
@@ -25,7 +26,7 @@ if __name__ == "__main__":
 		for i in sim.nodes:
 			s[i] = (0.0, (-1.0)**i, 0.0)
 			f[i] = np.array([0.0, (-1.0)**(i+1), 0.0])
-		u_array = u.array()
+		u_array = u.values()
 		print(f"u[t={sim.t}]:", u, { k: float(v) for k, v in zip(u.keys(), u_array) })
 		print(f"s|f[t={sim.t}]:", s.values(), f.values())
 		

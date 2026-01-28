@@ -1366,8 +1366,15 @@ class Config:
 				msk = "xmm3"   # Note: vgather mask used before coef. overlap okay
 				addr = "xmm4"  # Addresses [&S, &F] IMPORTANT: Can *not* not overlap with dest `sf` nor mask `msk`. Will cause runtime #UD fault!
 				sf = "xmm5"    # scalars [S, F] packed
+				w = "ymm6"  # pseudo random ω for randomizing 0 <= |f'| < F
 				# TODO: (optimization) skip for S=1.0 and/or F=1.0 (Note: S, F >= 0)
 				if "F" in self.allKeys:
+					src += "\t\t; generate \\omega coef. for randomizing |f'| = \\omega * F\n"
+					# TODO: generate ω
+					# src += f"\t\t{TODO_prng} {w}, ymm12, ymm13, ymm14, ymm15, {TODO_temp}\n"
+					# src += f"\t\t_vomega {w}, {w}, {TODO_one=1.0}\n"
+					# TODO: LABEL for skipping ω generation in case of "leftovers"
+					# src += f"\t\t_vpermk {w}, {w}\n"  # use leftovers (Do we need this?) Move ω to front of AVX reg., w=[ω, ...]
 					src += f"\t\t; scale s' ({spin}) and f' ({flux})\n"
 					src += f"\t\tlea rax, SFref\n"
 					src += f"\t\tmov rsi, {regi}                           {pad}; calculate array offset\n"

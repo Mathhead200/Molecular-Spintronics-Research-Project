@@ -3,7 +3,7 @@ from .constants import __EDGES__, __NODES__
 from .simulation_util import *
 from .simulation_util import _cov_list, _var_list
 from .util import *
-from collections.abc import Mapping, ItemsView
+from collections.abc import Mapping, KeysView
 from copy import copy
 from itertools import chain
 from typing import Any, override, TYPE_CHECKING
@@ -19,7 +19,7 @@ type vec = tuple[float, float, float]  # TODO: refactor type system. This is red
 type Filter = Callable[[Simulation, str, Any], Iterable]  # (Proxy.simulation, Proxy.name, key) -> candidate_elements
 class History[H](NumericArrangeable, Mapping[int, H]):  pass
 
-class ProxyItemsView(ItemsView):
+class ProxyKeysView(KeysView):
 	def __repr__(self) -> str:
 		return f"{ self.__class__.__name__ }({ list(self) })"
 
@@ -69,9 +69,8 @@ class Proxy[E, K, H]:
 	def subscripts(self) -> Sequence[K]:
 		return ReadOnlyList(self._subscripts)
 
-	# TODO: remove anti-pattern?
-	# def items(self) -> ItemsView:
-	# 	return ProxyItemsView(self)
+	def keys(self) -> KeysView:
+		return ProxyKeysView(self)
 
 class NumericProxy[E, K, H](Proxy[E, K, H], NumericArrangeable):
 	def __setitem__(self, key: K, value: H) -> None:
@@ -324,6 +323,10 @@ class UProxy(UTypeProxy):
 		super().__init__(sim, sim_name)
 	
 	@override
+	def __iter__(self) -> Iterator[Node|Edge]:
+		return chain(self.nodes, self.edges)
+
+	@override
 	@property
 	def value(self) -> float:
 		return float(np.sum(self.values(), axis=0))
@@ -351,20 +354,20 @@ class UProxy(UTypeProxy):
 			buf_list = np.empty((N,), dtype=float)
 
 			if "B" in parameters:
-				m = sim.m.sub(nodes).array(None)  # (new buffer)
-				B = sim.B.sub(nodes).array(buf_mat)
+				m = sim.m.sub(nodes).values(None)  # (new buffer)
+				B = sim.B.sub(nodes).values(buf_mat)
 				out[0:N] -= dot(B, m, temp=buf_mat)
 			
 			if "A" in parameters:
-				if m is None:  m = sim.m.sub(nodes).array(None)  # (new buffer)
-				A = sim.A.sub(nodes).array(buf_mat)
+				if m is None:  m = sim.m.sub(nodes).values(None)  # (new buffer)
+				A = sim.A.sub(nodes).values(buf_mat)
 				np.multiply(m, m, out=m)  # (!) Hadamard product: [[mx * mx, my * my, mz * mz], ...]; don't need m anymore
 				out[0:N] -= dot(A, m, temp=buf_mat)
 			
 			if "Je0" in parameters:
-				s = sim.s.sub(nodes).array(m)  # (!) don't need m anymore
-				f = sim.f.sub(nodes).array(buf_mat)  # (!) don't need f after this
-				Je0 = sim.Je0.sub(nodes).array(buf_list)
+				s = sim.s.sub(nodes).values(m)  # (!) don't need m anymore
+				f = sim.f.sub(nodes).values(buf_mat)  # (!) don't need f after this
+				Je0 = sim.Je0.sub(nodes).values(buf_list)
 				out[0:N] -= np.multiply(Je0, dot(s, f, temp=buf_mat), out=buf_list)
 		
 		if M != 0:
@@ -384,32 +387,32 @@ class UProxy(UTypeProxy):
 				out[N:L] -= np.multiply(J, dot(s_i, s_j, temp=buf_mat), out=buf_list)
 
 			if "Je1" in parameters:
-				if s_i is None:  s_i = sim.s.get(i for i, _ in edges).array(None)  # new buffer
-				if s_j is None:  s_j = sim.s.get(j for _, j in edges).array(None)  # new buffer
-				f_i = sim.f.get(i for i, _ in edges).array(None)  # new buffer
-				f_j = sim.f.get(j for _, j in edges).array(None)  # new buffer
-				Je1 = sim.Je1.sub(edges).array(buf_list)
+				if s_i is None:  s_i = sim.s.get(i for i, _ in edges).values(None)  # new buffer
+				if s_j is None:  s_j = sim.s.get(j for _, j in edges).values(None)  # new buffer
+				f_i = sim.f.get(i for i, _ in edges).values(None)  # new buffer
+				f_j = sim.f.get(j for _, j in edges).values(None)  # new buffer
+				Je1 = sim.Je1.sub(edges).values(buf_list)
 				dotp1 = dot(s_i, f_j, temp=buf_mat)
 				dotp2 = dot(f_i, s_j, temp=buf_mat)
 				np.add(dotp1, dotp2, out=buf_mat)
 				out[N:L] -= np.multiply(Je1, buf_mat, temp=buf_list)
 
 			if "Jee" in parameters:
-				if f_i is None:  sim.f.get(i for i, _ in edges).array(None)  # new buffer
-				if f_j is None:  sim.f.get(j for _, j in edges).array(None)  # new buffer
-				Jee = sim.Jee.sub(edges).array(buf_list)
+				if f_i is None:  sim.f.get(i for i, _ in edges).values(None)  # new buffer
+				if f_j is None:  sim.f.get(j for _, j in edges).values(None)  # new buffer
+				Jee = sim.Jee.sub(edges).values(buf_list)
 				out[N:L] -= np.multiply(Jee, dot(f_i, f_j, temp=buf_mat), temp=buf_list)
 
 			if "b" in parameters:
-				m_i = sim.m.get(i for i, _ in edges).array(None)  # new buffer
-				m_j = sim.m.get(j for _, j in edges).array(None)  # new buffer
-				b = sim.b.sub(edges).array(buf_list)
+				m_i = sim.m.get(i for i, _ in edges).values(None)  # new buffer
+				m_j = sim.m.get(j for _, j in edges).values(None)  # new buffer
+				b = sim.b.sub(edges).values(buf_list)
 				out[N:L] -= np.multiply(b, dot(m_i, m_j, temp=buf_mat), temp=buf_list)
 
 			if "D" in parameters:
-				if m_i is None:  m_i = sim.m.get(i for i, _ in edges).array(None)  # new buffer
-				if m_j is None:  m_j = sim.m.get(j for _, j in edges).array(None)  # new buffer
-				D = sim.D.sub(edges).array(buf_mat)
+				if m_i is None:  m_i = sim.m.get(i for i, _ in edges).values(None)  # new buffer
+				if m_j is None:  m_j = sim.m.get(j for _, j in edges).values(None)  # new buffer
+				D = sim.D.sub(edges).values(buf_mat)
 				out[N:L] -= dot(D, np.cross(m_i, m_j), temp=buf_mat)
 
 		return out
@@ -423,6 +426,10 @@ class UProxy(UTypeProxy):
 class CProxy(UTypeProxy):
 	def __init__(self, sim: Simulation, sim_name="c"):
 		super().__init__(sim, sim_name)
+	
+	@override
+	def __iter__(self) -> Iterable[Node]:
+		return self.nodes
 	
 	@override
 	@property
