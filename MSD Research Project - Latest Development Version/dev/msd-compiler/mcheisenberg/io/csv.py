@@ -1,0 +1,124 @@
+from ..__init__ import __version__
+from ..simulation import Simulation
+from ..util import StrJoiner
+from collections.abc import Mapping, Sequence
+from itertools import chain
+from tempfile import NamedTempfile
+from typing import Any
+import numpy as np
+
+def csv(sim: Simulation, out: str=None, dir: str=".", prefix: str=None, params: Mapping[str, Any]=None) -> str:
+	if out is None:
+		file = NamedTempfile(mode="w", encoding="utf-8", prefix=prefix, suffix=".csv", dir=dir)
+	else:
+		file = open(out, "w", encoding="utf-8")
+	with file:
+		# header row, (old) e.g. t,,M_x,M_y,M_z,M_norm,M_theta,M_phi,,ML_x,ML_y,ML_z,ML_norm,ML_theta,ML_phi,,MR_x,MR_y,MR_z,MR_norm,MR_theta,MR_phi,,Mm_x,Mm_y,Mm_z,Mm_norm,Mm_theta,Mm_phi,,MS_x,MS_y,MS_z,MS_norm,MS_theta,MS_phi,,MSL_x,MSL_y,MSL_z,MSL_norm,MSL_theta,MSL_phi,,MSR_x,MSR_y,MSR_z,MSR_norm,MSR_theta,MSR_phi,,MSm_x,MSm_y,MSm_z,MSm_norm,MSm_theta,MSm_phi,,MF_x,MF_y,MF_z,MF_norm,MF_theta,MF_phi,,MFL_x,MFL_y,MFL_z,MFL_norm,MFL_theta,MFL_phi,,MFR_x,MFR_y,MFR_z,MFR_norm,MFR_theta,MFR_phi,,MFm_x,MFm_y,MFm_z,MFm_norm,MFm_theta,MFm_phi,,U,UL,UR,Um,UmL,UmR,ULR,,,x,y,z,m_x,m_y,m_z,s_x,s_y,s_z,f_x,f_y,f_z,,,width = 11,height = 25,depth = 25,molPosL = 5,molPosR = 5,topL = 10,bottomL = 14,frontR = 10,backR = 14,simCount = 1000000000,freq = 1000000,kT = 0.1,"B = <0, 0, 0>",SL = 1,SR = 1,Sm = 1,FL = 0,FR = 0,Fm = 0,JL = 1,JR = 1,Jm = 1,JmL = 1,JmR = -1,JLR = 0,Je0L = 0,Je0R = 0,Je0m = 0,Je1L = 0,Je1R = 0,Je1m = 0,Je1mL = 0,Je1mR = 0,Je1LR = 0,JeeL = 0,JeeR = 0,Jeem = 0,JeemL = 0,JeemR = 0,JeeLR = 0,"AL = <0, 0, 0>","AR = <0, 0, 0>","Am = <0, 0, 0>",bL = 0,bR = 0,bm = 0,bmL = 0,bmR = 0,bLR = 0,"DL = <0, 0, 0>","DR = <0, 0, 0>","Dm = <0, 0, 0>","DmL = <0, 0, 0>","DmR = <0, 0, 0>","DLR = <0, 0, 0>",molType = LINEAR,randomize = 1,seed = 2064714695,,msd_version = 6.2a\n
+		headers = StrJoiner()
+		# magnetization
+		headers += 't,,M_x,M_y,M_z,M_norm,M_theta,M_phi,,'
+		for r in sim.regions:  headers += f'm_{r}_x,m_{r}_y,m_{r}_z,m_{r}_norm,m_{r}_theta,m_{r}_phi,,'
+		# magnetization due to spins
+		headers += 's_x,s_y,s_z,s_norm,s_theta,s_phi,,'
+		for r in sim.regions:  headers += f's_{r}_x,s_{r}_y,s_{r}_z,s_{r}_norm,s_{r}_theta,s_{r}_phi,,'
+		# magnetic due to fluxes
+		headers += 'f_x,f_y,f_z,f_norm,f_theta,f_phi,,'
+		for r in sim.regions:  headers += f'f_{r}_x,f_{r}_y,f_{r}_z,f_{r}_norm,f_{r}_theta,f_{r}_phi,,'
+		# energy
+		headers += 'U,'
+		for r in chain(sim.regions, sim.eregions):  headers += f'U_{r},'
+		headers += ',,'
+		# final snapshot (state)
+		n_index_len = 1
+		for n in sim.nodes:
+			if isinstance(n, Sequence):
+				n_index_len = max(n_index_len, len(n))
+		coordinate_labels = ["x", "y", "z"]
+		if n_index_len <= len(coordinate_labels):
+			for i in range(n_index_len):  headers += coordinate_labels[i] + ','
+		else:
+			for i in range(n_index_len):  headers += f'x_{i},'
+		headers += f'm_x,m_y,m_z,s_x,s_y,s_z,f_x,f_y,f_z,,,'
+		# parameters
+		config = sim.rt.config
+		for p, v in config.globalParameters.items():  headers += f'{p} = {v},'
+		for r, map in config.regionNodeParameters.items():
+			for p, v in map.items():
+				headers += f'{p}_{r} = {v},'
+		for r, map in config.regionEdgeParameters.items():
+			for p, v in map.items():
+				headers += f'{p}_{r[0]}_{r[1]} = {v},'
+		# TODO: output local parameters?
+		headers += ','
+		# optional custom user params
+		if params is not None:
+			for p, v in params.items():
+				headers += f'{p} = {v},'
+		# version
+		headers += f',,mcheisenberg_version = {__version__}\n'
+		file.write(headers.str())
+
+		# data rows
+		node_iter = iter(sim.nodes)
+		for t in [ss.t for ss in sim.history]:
+			line = StrJoiner()
+			line += f'{t},,'
+			m = sim.m.history[t]
+			m_norm = np.linalg.norm(m)
+			m_theta = np.arccos(m[2]/m_norm) if m_norm != 0 else 0.0  # TODO: double check calculations
+			m_phi = np.arctan2(m[1], m[0]) if m_norm != 0 else 0.0
+			line += f'{m[0]},{m[1]},{m[2]},{m_norm},{m_theta},{m_phi},,'
+			for r in sim.regions:
+				m = sim.m[r].history[t]
+				m_norm = np.linalg.norm(m)
+				m_theta = np.arccos(m[2]/m_norm) if m_norm != 0 else 0.0
+				m_phi = np.arctan2(m[1], m[0]) if m_norm != 0 else 0.0
+				line += f'{m[0]},{m[1]},{m[2]},{m_norm},{m_theta},{m_phi},,'
+			s = sim.s.history[t]
+			s_norm = np.linalg.norm(s)
+			s_theta = np.arccos(s[2]/s_norm) if s_norm != 0 else 0.0
+			s_phi = np.arctan2(s[1], s[0]) if s_norm != 0 else 0.0
+			line += f'{s[0]},{s[1]},{s[2]},{s_norm},{s_theta},{s_phi},,'
+			for r in sim.regions:
+				s = sim.s[r].history[t]
+				s_norm = np.linalg.norm(s)
+				s_theta = np.arccos(s[2]/s_norm) if s_norm != 0 else 0.0
+				s_phi = np.arctan2(s[1], s[0]) if s_norm != 0 else 0.0
+				line += f'{s[0]},{s[1]},{s[2]},{s_norm},{s_theta},{s_phi},,'
+			f = sim.f.history[t]
+			f_norm = np.linalg.norm(f)
+			f_theta = np.arccos(f[2]/f_norm) if f_norm != 0 else 0.0
+			f_phi = np.arctan2(f[1], f[0]) if f_norm != 0 else 0.0
+			line += f'{f[0]},{f[1]},{f[2]},{f_norm},{f_theta},{f_phi},,'
+			for r in sim.regions:
+				f = sim.f[r].history[t]
+				f_norm = np.linalg.norm(f)
+				f_theta = np.arccos(f[2]/f_norm) if f_norm != 0 else 0.0
+				f_phi = np.arctan2(f[1], f[0]) if f_norm != 0 else 0.0
+				line += f'{f[0]},{f[1]},{f[2]},{f_norm},{f_theta},{f_phi},,'
+			u = sim.u.history[t]
+			line += f'{u},'
+			for r in chain(sim.regions, sim.eregions):
+				u = sim.u[r].history[t]
+				line += f'{u},'
+			line += ',,'
+			try:
+				n = next(node_iter)
+				if isinstance(n, Sequence):
+					count = 0
+					for count, coord in enumerate(n):        line += f'{coord},'
+					for _ in range(count + 1, n_index_len):  line += ','
+				else:
+					line += f'{n},'
+					for _ in range(1, n_index_len):  line += ','
+				m = sim.m[n]
+				line += f'{m[0]},{m[1]},{m[2]},'
+				s = sim.s[n]
+				line += f'{s[0]},{s[1]},{s[2]},'
+				f = sim.f[n]
+				line += f'{f[0]},{f[1]},{f[2]},,,'
+			except StopIteration:
+				for _ in range(n_index_len):  line += ','  # blank lines
+			line += '\n'
+			file.write(line.str())
+	return file.name

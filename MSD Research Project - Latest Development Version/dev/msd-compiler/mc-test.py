@@ -9,7 +9,7 @@ if __name__ == "__main__":
 	model.edges = [(i, i+1) for i in range(n - 1)]
 	model.globalParameters = {
 		"S": 1.0,
-		"F": 2.0,
+		"F": 10.0,
 		"kT": 0.01,
 		"J": 1.0,
 		"Je0": 1.0,

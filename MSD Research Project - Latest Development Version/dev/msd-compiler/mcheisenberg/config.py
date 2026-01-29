@@ -1187,20 +1187,23 @@ class Config:
 				# return:
 				if not out_init:
 					src += f"\tvxorpd {resx}, {resx}, {resx}  ; return 0.0\n"  # fall back in case there are no parameters set for this node
-				# src += "\t_dumpreg\n"  # DEBUG: make sure xmm0 (ΔU) matches python calculated "u" for each parameter
+#				src += "\t_dumpreg\n"  # DEBUG: make sure xmm0 (ΔU) matches python calculated "u" for each parameter
 				src += "\tret\n"
 				src += f"{proc_id} ENDP\n\n"
 				exports.append((proc_id, False))
 		
 		# metropolis PROC
 		src += "; Helpers for calculating random unit vectors (Marsaglia's method)\n"
-		src += "_gen_ws MACRO w, s, one, temp\n"
+		src += "_gen_omega MACRO o, one, temp\n"
 		if prng.startswith("xoshiro256"):  # TODO: support other PRNGs
 			macro = prng.replace("*", "s").replace("+", "p")
-			src += f"\t_v{macro} w, ymm12, ymm13, ymm14, ymm15, temp\n"
+			src += f"\t_v{macro} o, ymm12, ymm13, ymm14, ymm15, temp\n"
 			src += "\t; assert one == [1.0, 1.0, 1.0, 1.0]\n"
-			src += "\t_vomega w, w, one   ; [0, 1)\n"
-		src += "\tvaddpd w, w, w      ; mul by 2 -> [0, 2)\n"
+			src += "\t_vomega o, o, one   ; [0, 1)\n"
+		src += "ENDM\n\n"
+		src += "_gen_ws MACRO o, w, s, one, temp\n"
+		src += "\t_gen_omega o, one, temp\n"
+		src += "\tvaddpd w, o, o      ; mul by 2 -> [0, 2)\n"
 		src += "\tvsubpd w, w, one    ; sub by 1 -> [-1, 1); w = [u_1, v_1, u_2, v_2]\n"
 		src += "\tvmulpd s, w, w   ; Hadamard product: [u_1^2, v_1^2, ...]\n"
 		src += "\tvhaddpd s, s, s  ; Radius squared: [s_1, s_1, s_2, s_2] where s_i = u_i^2 + v_i^2\n"
@@ -1308,12 +1311,14 @@ class Config:
 				wxys = "ymm1"  # [u_1, v_1, u_2, v_2] -> [x_1, y_1, x_2, y_2] -> s'
 				flux = "ymm2"  # f'
 				zmsk = "ymm3"  # comparision bit-mask -> [z_1, 0, z_2, 0]
-				s = "ymm4"  # [s_1, s_1, s_2, s_2] where s_i = (u_i)^2 + (v_i)^2
+				s = "ymm4"     # [s_1, s_1, s_2, s_2] where s_i = (u_i)^2 + (v_i)^2
+				omega = "ymm5" if "F" in self.allKeys else "ymm1"  # contains the PRNG random float [0, 1.0) incase it goes unused
 				lbl_suffix = f"{regi.upper()}_{["TAIL", "BATCH4"][int(batch4)]}"
 				padl = " " * (len(regi) + 1 + 6 - len(lbl_suffix))
 				MARSAGLIA_START_2 = f"MARSAGLIA_START_2_{lbl_suffix}"
 				MARSAGLIA_START_1 = f"MARSAGLIA_START_1_{lbl_suffix}"
 				MARSAGLIA_END = f"MARSAGLIA_END_{lbl_suffix}"
+				MARSAGLIA_END_LO = f"MARSAGLIA_END_LO_{lbl_suffix}" if "F" in self.allKeys else MARSAGLIA_END  # end with "leftover" omegas
 				num = regis.index(regi)
 				F = ["G", "F"][int(batch4)]
 				S = ["T", "S"][int(batch4)]
@@ -1328,12 +1333,12 @@ class Config:
 					src += "\t\t_vones ymm6                               ; [1.0, 1.0, 1.0, 1.0]\n"
 				if "F" in self.allKeys:
 					src += f"\t\t{MARSAGLIA_START_2}:             {pad}{padl}; 2 vectors, f' -> {flux}, s' -> {wxys}\n"
-					src += f"\t\t\t_gen_ws {wxys}, {s}, {one}, ymm10\n"
+					src += f"\t\t\t_gen_ws {wxys}, {wxys}, {s}, {one}, ymm10\n"
 					src += f"\t\t\tvcmppd {zmsk}, {s}, {one}, 11h          ; {s} < {one}\n"
 					src += f"\t\t\tvmovmskpd rax, {zmsk}                   ; rax = 0...bbaa where a = (s_1 < 1.0) and b = (s_2 < 1.0)\n"
 					src += f"\t\t\t{F1}:\ttest rax, 0100b                   ; test bit (b)\n"
 					src += f"\t\t\t\tjz {F2}                             ; !b -> s_2 >= 1.0\n"
-					src += f"\t\t\t\t_calc_xyz {wxys}, {zmsk}, {s}, ymm6\n"
+					src += f"\t\t\t\t_calc_xyz {wxys}, {zmsk}, {s}, {one}\n"
 					src += f"\t\t\t\tvperm2f128 {flux}, {wxys}, {zmsk}, 31h  ; [x_2, y_2, z_2, 0] = f'\n"
 					src += "\t\t\t\ttest rax, 0001b                   ; test bit (a)\n"
 					src += f"\t\t\t\tjz {MARSAGLIA_START_1}   {pad}{padl}; !a -> s_1 >= 1.0\n"
@@ -1341,40 +1346,39 @@ class Config:
 					src += f"\t\t\t\tjmp {MARSAGLIA_END}\n"
 					src += f"\t\t\t{F2}:\ttest rax, 0001b                   ; test bit (a)\n"
 					src += f"\t\t\t\tjz {MARSAGLIA_START_2}   {pad}{padl}; !a -> s_1 >= 1.0\n"
-					src += f"\t\t\t\t_calc_xyz {wxys}, {zmsk}, {s}, ymm6\n"
+					src += f"\t\t\t\t_calc_xyz {wxys}, {zmsk}, {s}, {one}\n"
 					src += f"\t\t\t\tvperm2f128 {flux}, {wxys}, {zmsk}, 20h  ; [x_1, y_1, z_1, 0] -> f'\n"
 					src += f"\t\t\t\t; jmp {MARSAGLIA_START_1}\n"
 				# either no flux. or already haveflux. only need s'
 				src += f"\t\t{MARSAGLIA_START_1}:             {pad}{padl}; only 1 vector, s' -> {wxys}\n"
-				src += f"\t\t\t_gen_ws {wxys}, {s}, ymm6, ymm10\n"
-				src += f"\t\t\tvcmppd {zmsk}, {s}, ymm6, 11h          ; {s} < ymm6\n"
+				src += f"\t\t\t_gen_ws {omega}, {wxys}, {s}, {one}, ymm10\n"
+				src += f"\t\t\tvcmppd {zmsk}, {s}, {one}, 11h          ; {s} < {one}\n"
 				src += f"\t\t\tvmovmskpd rax, {zmsk}                   ; rax = 0...bbaa where a = (s_1 < 1.0) and b = (s_2 < 1.0)\n"
-				src += f"\t\t\t{S1}:\ttest rax, 0001b                   ; test bit (a)\n"
-				src += f"\t\t\t\tjz {S2}                             ; !a -> s_1 >= 1.0\n"
+				src += f"\t\t\t{S1}:\ttest rax, 0100b                   ; test bit (b)\n"
+				src += f"\t\t\t\tjz {S2}                             ; !b -> s_2 >= 1.0\n"
+				src += f"\t\t\t\t_calc_xyz {wxys}, {zmsk}, {s}, {one}\n"
+				src += f"\t\t\t\tvperm2f128 {wxys}, {wxys}, {zmsk}, 31h  ; [x_2, y_2, z_2, 0] = s'\n"
+				src += f"\t\t\t\tjmp {MARSAGLIA_END_LO}\n"
+				src += f"\t\t\t{S2}:\ttest rax, 0001b                   ; test bit (a)\n"
+				src += f"\t\t\t\tjz {MARSAGLIA_START_1}   {pad}{padl}; !a -> s_1 >= 1.0\n"
 				src += f"\t\t\t\t_calc_xyz {wxys}, {zmsk}, {s}, ymm6\n"
 				src += f"\t\t\t\tvperm2f128 {wxys}, {wxys}, {zmsk}, 20h  ; [x_1, y_1, z_1, 0] = s'\n"
-				src += f"\t\t\t\tjmp {MARSAGLIA_END}\n"
-				src += f"\t\t\t{S2}:\ttest rax, 0100b                   ; test bit (b)\n"
-				src += f"\t\t\t\tjz {MARSAGLIA_START_1}   {pad}{padl}; !b -> s_2 >= 1.0\n"
-				src += f"\t\t\t\t_calc_xyz {wxys}, {zmsk}, {s}, ymm6\n"
-				src += f"\t\t\t\tvperm2f128 {wxys}, {wxys}, {zmsk}, 31h  ; [x_2, y_2, z_2, 0] = s'\n"
 				src += f"\t\t{MARSAGLIA_END}:\n"
 				# scale by S and F
 				spin = wxys
 				flux = flux
-				coef = "ymm3"  # scalar S or F broadcast, e.g. [S, S, S, S]
-				msk = "xmm3"   # Note: vgather mask used before coef. overlap okay
-				addr = "xmm4"  # Addresses [&S, &F] IMPORTANT: Can *not* not overlap with dest `sf` nor mask `msk`. Will cause runtime #UD fault!
-				sf = "xmm5"    # scalars [S, F] packed
-				w = "ymm6"  # pseudo random ω for randomizing 0 <= |f'| < F
+				coef = "ymm3"   # scalar S or F broadcast, e.g. [S, S, S, S]
+				msk = "xmm3"    # Note: vgather mask used before coef. overlap okay
+				addr = "xmm4"   # Addresses [&S, &F] IMPORTANT: Can *not* not overlap with dest `sf` nor mask `msk`. Will cause runtime #UD fault!
+				omegaY = omega  # pseudo random ω for randomizing 0 <= |f'| < F
+				omegaX = omega.replace("y", "x")
+				one = one       # "ymm6"
+				sf = "xmm6"     # scalars [S, F] packed; OVERLAPS with {one}
 				# TODO: (optimization) skip for S=1.0 and/or F=1.0 (Note: S, F >= 0)
 				if "F" in self.allKeys:
 					src += "\t\t; generate \\omega coef. for randomizing |f'| = \\omega * F\n"
-					# TODO: generate ω
-					# src += f"\t\t{TODO_prng} {w}, ymm12, ymm13, ymm14, ymm15, {TODO_temp}\n"
-					# src += f"\t\t_vomega {w}, {w}, {TODO_one=1.0}\n"
-					# TODO: LABEL for skipping ω generation in case of "leftovers"
-					# src += f"\t\t_vpermk {w}, {w}\n"  # use leftovers (Do we need this?) Move ω to front of AVX reg., w=[ω, ...]
+					src += f"\t\t_gen_omega {omega}, {one}, ymm10\n"
+					src += f"\t\t{MARSAGLIA_END_LO}:  ; use \"leftover\" \\omega in {omega}\n"
 					src += f"\t\t; scale s' ({spin}) and f' ({flux})\n"
 					src += f"\t\tlea rax, SFref\n"
 					src += f"\t\tmov rsi, {regi}                           {pad}; calculate array offset\n"
@@ -1388,6 +1392,8 @@ class Config:
 					src += f"\t\t_vpermj {sf}, {sf}                     ; [F, S]\n"
 					src += f"\t\tvbroadcastsd {coef}, {sf}                ; {coef} = [F, F, F, F]\n"
 					src += f"\t\tvmulpd {flux}, {flux}, {coef}                ; scale {flux} by F\n"
+					src += f"\t\tvbroadcastsd {coef}, {omegaX}                 ; {coef} = [\\omega[0], \\omega[0], \\omega[0], \\omega[0]]\n"
+					src += f"\t\tvmulpd {flux}, {flux}, {coef}                ; scale {flux} by \\omega\n"
 				else:
 					src += f"\t\t; scale s' ({spin})\n"
 					src += f"\t\tlea rax, Sref\n"

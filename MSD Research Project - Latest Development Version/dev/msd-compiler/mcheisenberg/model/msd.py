@@ -23,7 +23,7 @@ def MSD(width: int, height: int, depth: int,
 	msd = Config()
 	msd.nodes = {}  # ordered set (as dict)
 	msd.edges = []
-	msd.regions = { "FML": [], "mol": [], "FMR": [] }
+	msd.regions = { "FML": [], "FMR": [], "mol": [] }
 
 	# TODO: build nodes chucks to optimize for L1 cache
 	# add all nodes
