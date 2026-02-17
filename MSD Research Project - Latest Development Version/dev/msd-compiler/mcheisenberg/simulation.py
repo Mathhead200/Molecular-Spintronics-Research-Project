@@ -50,6 +50,25 @@ class Simulation:
 	STATES = ordered_set(["n", "s", "f", "m", "u", "x", "c"])
 	ALL_PROXIES = ordered_set(chain(PARAMETERS, STATES))
 
+	A:   VectorNodeParameterProxy
+	B:   VectorNodeParameterProxy
+	S:   ScalarNodeParameterProxy
+	F:   ScalarNodeParameterProxy
+	kT:  ScalarNodeParameterProxy
+	Je0: ScalarNodeParameterProxy
+	J:   ScalarEdgeParameterProxy
+	Je1: ScalarEdgeParameterProxy
+	Jee: ScalarEdgeParameterProxy
+	b:   ScalarEdgeParameterProxy
+	D:   VectorEdgeParameterProxy
+	n:   NProxy
+	s:   StateProxy
+	f:   StateProxy
+	m:   MProxy
+	u:   UProxy
+	x:   ChiProxy
+	c:   CProxy
+
 	def __init__(self, rt: Runtime):
 		self.rt: Runtime = rt
 		self.t: int = 0  # current simulation time since last restart (i.e. reinitialization, or randomization)
