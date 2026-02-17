@@ -2,7 +2,7 @@ from mcheisenberg.model import MSD
 import mcheisenberg as mc
 import time
 
-# ~ 80 minutes
+# ~ 80 seconds
 width = 11
 height = 25
 depth = 25
