@@ -936,14 +936,13 @@ class Config:
 		src +=  "; @param  ymm1: s'_i\n"
 		flux_note: str = " (unused)" if "F" not in self.allKeys else ""
 		src += f"; @param  ymm2: f'_i{flux_note}\n"
-		src +=  ";         ymm3: Parameter (Je0; A, J, Je1, Jee, b; B, then D)\n"
+		src +=  ";         ymm3: temp/scratch reg.\n"
 		src +=  ";         ymm4: s_i, m_i, then (unused)\n"
 		src +=  ";         ymm5: f_i, m'_i, then (unused)\n"
 		src +=  ";         ymm6: (unused), \\Delta s_i, then \\Delta m_i\n"
 		src +=  ";         ymm7: (unused), \\Delta f_i, then (unused)\n"
 		src +=  ";         ymm8: s_j, f_j, or m_j\n"
 		src +=  ";         ymm9: temp/scratch reg.\n"
-		src +=  ";         ymm10: TODO: (remove) temp/scratch reg.\n"  # TODO: remove
 		# code for deltaU_{nodeId} PROCs
 		if len(self.mutableNodes) == 0:
 			src += "; deltaU_{nodeId} PROCs missing. No mutable nodes!\n\n"
@@ -967,14 +966,13 @@ class Config:
 				resx, resy = "xmm0", "ymm0"   # result (return: -ΔU = -ΔU_Je0 - ΔU_A - ΔU_J - ΔU_Je1 - ΔU_Jee - ΔU_b - ΔU_B - ΔU_D)
 				s1i = "ymm1"                  # s'_i (param: new spin)
 				f1i = "ymm2"                  # f'_i (param: new flux)
-				prmx, prmy = "xmm3", "ymm3"    # scalar parameter (Je0, J, Je1, Jee, b), or vector parameter (A, B, D)
+				prmx, prmy = "xmm3", "ymm3"   # TODO: rename. Now just used as temp. scalar parameter (Je0, J, Je1, Jee, b), or vector parameter (A, B, D)
 				smi = "ymm4"                  # s_i, m_i, then (unused)
 				fm1 = "ymm5"                  # f_i, m'_i, then (unused)
 				dsm = "ymm6"                  # (unused), Δs_i, then Δm_i
-				dfi = "ymm7"                  # (unused), Δf_i, then (unused)
+				dfix, dfi = "xmm7", "ymm7"    # (unused), Δf_i, then (unused)
 				sfmjx, sfmj = "xmm8", "ymm8"  # s_j, f_j, or m_j
 				tmpx, tmpy = "xmm9", "ymm9"   # temp/scratch reg. (scalar/vector)
-				tmp2x, tmp2y = "xmm10", "ymm10"  # TODO: (stub) REMOVE! Used by ΔU_J. We can (likely) reorder computations in phase 2 to use smi, fm1, or dfi as temp2
 
 				# state
 				out_init: bool = False  # track if output register has been initialized yet
@@ -1034,51 +1032,51 @@ class Config:
 				if "A" in self.allKeys:
 					src2 += "\t; -deltaU_A calculation\n"
 					# where is A defined?
-					load_insn = None
+					load_insn, load_cmnt = None, None
 					if "A" in self.localNodeParameters.get(node, {}):
-						load_insn = f"\tvmovapd {prmy}, ymmword ptr [nodes + ({index})*SIZEOF_NODE + OFFSETOF_A]  ; load A_{nid} (local)\n"
+						load_insn = f"ymmword ptr [nodes + ({index})*SIZEOF_NODE + OFFSETOF_A]", f"load A_{nid} (local)"
 					else:
 						_, region = self.getUnambiguousRegionNodeParameter(node, "A")  # don't need value, only region
 						if region is not None:
 							rid = self.regionId(region)
-							load_insn = f"\tvmovapd {prmy}, ymmword ptr [{rid} + OFFSETOF_REGION_A]  ; load A_{rid} (region)\n"
+							load_insn, load_cmnt = f"ymmword ptr [{rid} + OFFSETOF_REGION_A]", f"load A_{rid} (region)"
 						elif "A" in self.globalKeys:
-							load_insn = f"\tvmovapd {prmy}, ymmword ptr A  ; load A (global)\n"
+							load_insn, load_cmnt = f"ymmword ptr A", f"load A (global)"
 					if load_insn is None:
 						src2 += f"\t; skip. For this node, A is not defined at any level (local, region, nor global).\n\n"
 					else:
 						phase2 = True
-						src2 += load_insn  # load A into prmy
 						src2 += f"\tvmulpd {tmpy}, {m1i}, {m1i}  ; m' Hadamard squared: m'2\n"
 						src2 += f"\tvfnmadd231pd {tmpy}, {smi}, {smi}  ; {tmpy} -= {smi} * {smi} -> m'2 - m2\n"
 						if not out_init:
-							src2 += f"\t_vdotp {resx}, {resy}, {prmy}, {tmpy}, {sfmjx}  ; ({prmy}, {tmpy})\n\n"  # {sfmj} is unused for local parameters 
+							src2 += f"\t_vdotp {resx}, {resy}, {tmpy}, {load_insn}, {sfmjx}  ; {load_cmnt}\n\n"  # {sfmj} is unused for local parameters 
 							out_init = True
 						else:
-							src2 += f"\t_vdotadd {resx}, {resy}, {prmy}, {tmpy}, {sfmjx}  ; ({prmy}, {tmpy})\n\n"  # {sfmj} is unused for local parameters
+							src2 += f"\t_vdotadd {resx}, {resy}, {tmpy}, {load_insn}, {sfmjx}  ; {load_cmnt}\n\n"  # {sfmj} is unused for local parameters
 				# compute -ΔU_J = Σ_j{J Δs_i·s_j}:
 				if "J" in self.allKeys:
 					src2 += "\t; -deltaU_J calculation\n"
 					# figure out where all neighboring edges load J from, and group the common load instructions
-					load_groups: dict[str, list] = defaultdict(list)  # dict: str load_insn -> list[Edge]
+					load_groups: dict[tuple[str, str], list] = defaultdict(list)  # dict: (str load_insn, str load_cmnt) -> list[Edge]
 					for edge in self.connections(node):
 						if "J" in self.localEdgeParameters.get(edge, {}):
 							eindex = self.edgeIndex[edge]
 							nid0 = self.nodeId(edge[0])
 							nid1 = self.nodeId(edge[1])
-							load_insn = f"\tvmovsd {prmx}, qword ptr [edges + ({eindex})*SIZEOF_EDGE + OFFSETOF_J]  ; load J_{nid0}_{nid1}\n"
+							load_insn, load_cmnt = f"qword ptr [edges + ({eindex})*SIZEOF_EDGE + OFFSETOF_J]", f"load J_{nid0}_{nid1}"
 						else:
 							_, combo = self.getUnambiguousRegionEdgeParameter(edge, "J")  # don't need value, only region
 							if combo is not None:
 								rid0, rid1 = self.regionId(combo[0]), self.regionId(combo[1])
-								load_insn = f"\tvmovsd {prmx}, qword ptr [{rid0}_{rid1} + OFFSETOF_REGION_J]  ; load J_{rid0}_{rid1} (region)\n"
+								load_insn, load_cmnt = f"qword ptr [{rid0}_{rid1} + OFFSETOF_REGION_J]", f"load J_{rid0}_{rid1} (region)"
 							elif "J" in self.globalKeys:
-								load_insn = f"\tvmovsd {prmx}, qword ptr J  ; load J (global)\n"
+								load_insn, load_cmnt = f"qword ptr J", f"load J (global)"
 							else:
-								load_insn = None
-						load_groups[load_insn].append(edge)
+								load_insn, load_cmnt = None, None
+						load_groups[(load_insn, load_cmnt)].append(edge)
 					for i, load_group in enumerate(load_groups.items(), 1):
 						load_insn, edges = load_group
+						load_insn, load_cmnt = load_insn
 						optimization_remove_scalar = False  # TODO: implement optimization. if scalar is const and exactly 1.0
 						optimization_neg_scalar = False     # TODO: implement optimization. if scalar is const and exactly -1.0
 						src2 += f"\t; [load group {i}]\n"
@@ -1119,37 +1117,37 @@ class Config:
 						elif load_insn is None:
 							src2 += "\t; skip parameter loading for the null load group\n"
 						else:
-							src2 += load_insn  # load J into prmx
 							assert tmp_init  # Since each load group must have at least one edge
 							if not out_init:
-								src2 += f"\tvmulsd {resx}, {prmx}, {tmpx}\n"
+								src2 += f"\tvmulsd {resx}, {tmpx}, {load_insn}  ; {load_cmnt}\n"
 								out_init = True
 							else:
-								src2 += f"\tvfmadd231sd {resx}, {prmx}, {tmpx}  ; {resx} += {prmx} * {tmpx}\n"
+								src2 += f"\tvfmadd231sd {resx}, {tmpx}, {load_insn}  ; {load_cmnt}\n"
 					src2 += "\n"
 				# compute -ΔU_Je1 = Σ_j{Je1 (Δs_i·f_j + Δf_i·s_j)}:
 				if "Je1" in self.allKeys:
 					src2 += "\t; -deltaU_Je1 calculation\n"
 					# figure out where all neighboring edges load Je1 from, and group the common load instructions
-					load_groups: dict[str, list] = defaultdict(list)  # dict: str load_insn -> list[Edge]
+					load_groups: dict[tuple[str, str], list] = defaultdict(list)  # dict: (str load_insn, str load_cmnt) -> list[Edge]
 					for edge in self.connections(node):
 						if "Je1" in self.localEdgeParameters.get(edge, {}):
 							eindex = self.edgeIndex[edge]
 							nid0 = self.nodeId(edge[0])
 							nid1 = self.nodeId(edge[1])
-							load_insn = f"\tvmovsd {prmx}, qword ptr [edges + ({eindex})*SIZEOF_EDGE + OFFSETOF_Je1]  ; load Je1_{nid0}_{nid1}\n"
+							load_insn, load_cmnt = f"qword ptr [edges + ({eindex})*SIZEOF_EDGE + OFFSETOF_Je1]", f"load Je1_{nid0}_{nid1}"
 						else:
 							_, combo = self.getUnambiguousRegionEdgeParameter(edge, "Je1")  # don't need value, only region
 							if combo is not None:
 								rid0, rid1 = self.regionId(combo[0]), self.regionId(combo[1])
-								load_insn = f"\tvmovsd {prmx}, qword ptr [{rid0}_{rid1} + OFFSETOF_REGION_Je1]  ; load Je1_{rid0}_{rid1} (region)\n"
+								load_insn, load_cmnt = f"qword ptr [{rid0}_{rid1} + OFFSETOF_REGION_Je1]", f"load Je1_{rid0}_{rid1} (region)"
 							elif "Je1" in self.globalKeys:
-								load_insn = f"\tvmovsd {prmx}, qword ptr Je1  ; load Je1 (global)\n"
+								load_insn, load_cmnt = f"qword ptr Je1", f"load Je1 (global)"
 							else:
-								load_insn = None
-						load_groups[load_insn].append(edge)
+								load_insn, load_cmnt = None, None
+						load_groups[(load_insn, load_cmnt)].append(edge)
 					for i, load_group in enumerate(load_groups.items(), 1):
 						load_insn, edges = load_group
+						load_insn, load_cmnt = load_insn
 						optimization_remove_scalar = False  # TODO: implement optimization. if scalar is const and exactly 1.0
 						optimization_neg_scalar = False     # TODO: implement optimization. if scalar is const and exactly -1.0
 						src2 += f"\t; [load group {i}]\n"
@@ -1202,36 +1200,36 @@ class Config:
 						elif load_insn is None:
 							src2 += "\t; skip parameter loading for the null load group\n"
 						else:
-							src2 += load_insn  # load Je1 into prmx
 							if not out_init:
-								src2 += f"\tvmulsd {resx}, {prmx}, {tmpx}\n"
+								src2 += f"\tvmulsd {resx}, {tmpx}, {load_insn}  ; {load_cmnt}\n"
 								out_init = True
 							else:
-								src2 += f"\tvfmadd231sd {resx}, {prmx}, {tmpx}  ; {resx} += {prmx} * {tmpx}\n"
+								src2 += f"\tvfmadd231sd {resx}, {tmpx}, {load_insn}  ; {load_cmnt}\n"
 					src2 += "\n"
 				# compute -ΔU_Jee = Σ_j{Jee Δf_i·f_j}: 
 				if "Jee" in self.allKeys:
 					src2 += "\t; -deltaU_Jee calculation\n"
 					# figure out where all neighboring edges load Jee from, and group the common load instructions
-					load_groups: dict[str, list] = defaultdict(list)  # dict: str load_insn -> list[Edge]
+					load_groups: dict[tuple[str, str], list] = defaultdict(list)  # dict: (str load_insn, str load_cmnt) -> list[Edge]
 					for edge in self.connections(node):
 						if "Jee" in self.localEdgeParameters.get(edge, {}):
 							eindex = self.edgeIndex[edge]
 							nid0 = self.nodeId(edge[0])
 							nid1 = self.nodeId(edge[1])
-							load_insn = f"\tvmovsd {prmx}, qword ptr [edges + ({eindex})*SIZEOF_EDGE + OFFSETOF_Jee]  ; load Jee_{nid0}_{nid1}\n"
+							load_insn, load_cmnt = f"qword ptr [edges + ({eindex})*SIZEOF_EDGE + OFFSETOF_Jee]", f"load Jee_{nid0}_{nid1}"
 						else:
 							_, combo = self.getUnambiguousRegionEdgeParameter(edge, "Jee")  # don't need value, only region
 							if combo is not None:
 								rid0, rid1 = self.regionId(combo[0]), self.regionId(combo[1])
-								load_insn = f"\tvmovsd {prmx}, qword ptr [{rid0}_{rid1} + OFFSETOF_REGION_Jee]  ; load Jee_{rid0}_{rid1} (region)\n"
+								load_insn, load_cmnt = f"qword ptr [{rid0}_{rid1} + OFFSETOF_REGION_Jee]", f"load Jee_{rid0}_{rid1} (region)"
 							elif "Jee" in self.globalKeys:
-								load_insn = f"\tvmovsd {prmx}, qword ptr Jee  ; load Jee (global)\n"
+								load_insn, load_cmnt = f"qword ptr Jee", "load Jee (global)"
 							else:
-								load_insn = None
-						load_groups[load_insn].append(edge)
+								load_insn, load_cmnt = None, None
+						load_groups[(load_insn, load_cmnt)].append(edge)
 					for i, load_group in enumerate(load_groups.items(), 1):
 						load_insn, edges = load_group
+						load_insn, load_cmnt = load_insn
 						optimization_remove_scalar = False  # TODO: implement optimization. if scalar is const and exactly 1.0
 						optimization_neg_scalar = False     # TODO: implement optimization. if scalar is const and exactly -1.0
 						src2 += f"\t; [load group {i}]\n"
@@ -1272,36 +1270,38 @@ class Config:
 						elif load_insn is None:
 							src2 += "\t; skip parameter loading for the null load group\n"
 						else:
-							src2 += load_insn  # load Jee into prmx
 							if not out_init:
-								src2 += f"\tvmulsd {resx}, {prmx}, {tmpx}\n"
+								src2 += f"\tvmulsd {resx}, {tmpx}, {load_insn}  ; {load_cmnt}\n"
 								out_init = True
 							else:
-								src2 += f"\tvfmadd231sd {resx}, {prmx}, {tmpx}  ; {resx} += {prmx} * {tmpx}\n"
+								src2 += f"\tvfmadd231sd {resx}, {tmpx}, {load_insn}  ; {load_cmnt}\n"
 					src2 += "\n"
 				# compute -ΔU_b = Σ_j{b ((m'_i·m_j)^2 - (m_i·m_j)^2)}:
+				# ASSERT: MUST b the last calculation in phase 2 since it overwrites dfi register
+				tmp2x, tmp2y = dfix, dfi  # since dfi register is not needed for phase 3 calculations, and this is the LAST calculation in phase 2
 				if "b" in self.allKeys:
 					src2 += "\t; -deltaU_b calculation\n"
 					# figure out where all neighboring edges load b from, and group the common load instructions
-					load_groups: dict[str, list] = defaultdict(list)  # dict: str load_insn -> list[Edge]
+					load_groups: dict[tuple[str, str], list] = defaultdict(list)  # dict: (str load_insn, str load_cmnt) -> list[Edge]
 					for edge in self.connections(node):
 						if "b" in self.localEdgeParameters.get(edge, {}):
 							eindex = self.edgeIndex[edge]
 							nid0 = self.nodeId(edge[0])
 							nid1 = self.nodeId(edge[1])
-							load_insn = f"\tvmovsd {prmx}, qword ptr [edges + ({eindex})*SIZEOF_EDGE + OFFSETOF_b]  ; load b_{nid0}_{nid1}\n"
+							load_insn, load_cmnt = f"qword ptr [edges + ({eindex})*SIZEOF_EDGE + OFFSETOF_b]", f"load b_{nid0}_{nid1}"
 						else:
 							_, combo = self.getUnambiguousRegionEdgeParameter(edge, "b")  # don't need value, only region
 							if combo is not None:
 								rid0, rid1 = self.regionId(combo[0]), self.regionId(combo[1])
-								load_insn = f"\tvmovsd {prmx}, qword ptr [{rid0}_{rid1} + OFFSETOF_REGION_b]  ; load b_{rid0}_{rid1} (region)\n"
+								load_insn, load_cmnt = f"qword ptr [{rid0}_{rid1} + OFFSETOF_REGION_b]", f"load b_{rid0}_{rid1} (region)"
 							elif "b" in self.globalKeys:
-								load_insn = f"\tvmovsd {prmx}, qword ptr b  ; load b (global)\n"
+								load_insn, load_cmnt = f"qword ptr b", f"load b (global)"
 							else:
-								load_insn = None
-						load_groups[load_insn].append(edge)
+								load_insn, load_cmnt = None, None
+						load_groups[(load_insn, load_cmnt)].append(edge)
 					for i, load_group in enumerate(load_groups.items(), 1):
 						load_insn, edges = load_group
+						load_insn, load_cmnt = load_insn
 						optimization_remove_scalar = False  # TODO: implement optimization. if scalar is const and exactly 1.0
 						optimization_neg_scalar = False     # TODO: implement optimization. if scalar is const and exactly -1.0
 						src2 += f"\t; [load group {i}] (DEBUG: Line 1308)\n"
@@ -1354,18 +1354,17 @@ class Config:
 										src2 += f"\tvfmadd231sd {tmpx}, {tmp2x}, {tmp2x}        ; += {tmp2x} ** 2\n"
 									src2 += f"\t_vdotp {tmp2x}, {tmp2y}, {smi}, {sfmj}, {prmx}  ; ({smi}, {sfmj}) -> {tmpx}\n"
 									assert tmp_init  # DEBUG: must be initialized here
-									src2 += f"\tvfnmadd231sd {tmpx}, {tmp2x}, {tmp2x}           ; -= {tmpx} ** 2\n"		
+									src2 += f"\tvfnmadd231sd {tmpx}, {tmp2x}, {tmp2x}           ; -= {tmpx} ** 2\n"
 						if optimization_remove_scalar or optimization_neg_scalar:
 							src2 += "\t; optimization (b*=1,-1): skip load\n"
 						elif load_insn is None:
 							src2 += "\t; skip parameter loading for the null load group\n"
 						else:
-							src2 += load_insn  # load b into prmx
 							if not out_init:
-								src2 += f"\tvmulpd {resx}, {prmx}, {tmpx}\n"
+								src2 += f"\tvmulpd {resx}, {tmpx}, {load_insn}  ; {load_cmnt}\n"
 								out_init = True
 							else:
-								src2 += f"\tvfmadd231sd {resx}, {prmx}, {tmpx}\n"
+								src2 += f"\tvfmadd231sd {resx}, {tmpx}, {load_insn}  ; {load_cmnt}\n"
 					src2 += "\n"
 				# Phase 3 compute (Δm_i) -> -ΔU_(B, D):
 				phase3: bool = False  # does phase 3 contain any code?
@@ -1374,26 +1373,25 @@ class Config:
 				if "B" in self.allKeys:
 					src3 += "\t; compute -delta_U_B\n"
 					# where is B defined?
-					load_insn = None  # How should this node be loaded?
+					load_insn, load_cmnt = None, None  # How should this node be loaded?
 					if "B" in self.localNodeParameters.get(node, {}):
-						load_insn = f"\tvmovapd {prmy}, ymmword ptr [nodes + ({index})*SIZEOF_NODE + OFFSETOF_B]  ; load B_{nid} (local)\n"
+						load_insn, load_cmnt = f"ymmword ptr [nodes + ({index})*SIZEOF_NODE + OFFSETOF_B]", f"load B_{nid} (local)"
 					else:
 						_, region = self.getUnambiguousRegionNodeParameter(node, "B")  # don't need value, only region
 						if region is not None:
 							rid = self.regionId(region)
-							load_insn = f"\tvmovapd {prmy}, ymmword ptr [{rid} + OFFSETOF_REGION_B]  ; load B_{rid} (region)\n"
+							load_insn, load_cmnt = f"ymmword ptr [{rid} + OFFSETOF_REGION_B]", f"load B_{rid} (region)"
 						elif "B" in self.globalKeys:
-							load_insn = f"\tvmovapd {prmy}, ymmword ptr B  ; load B (global)\n"
+							load_insn, load_cmnt = f"ymmword ptr B", "load B (global)"
 					if load_insn is None:
 						src3 += f"\t; skip. For this node, B is not defined at any level (local, region, nor global).\n\n"
 					else:
 						phase3 = True
-						src3 += load_insn  # load B into prmy
 						if not out_init:
-							src3 += f"\t_vdotp {resx}, {resy}, {prmy}, {dsm}, {tmpx}  ; ({prmy}, {dsm})\n\n"
+							src3 += f"\t_vdotp {resx}, {resy}, {dsm}, {load_insn}, {tmpx}  ; {load_cmnt}\n\n"
 							out_init = True
 						else:
-							src3 += f"\t_vdotadd {resx}, {resy}, {prmy}, {dsm}, {tmpx}  ; ({prmy}, {dsm})\n\n"
+							src3 += f"\t_vdotadd {resx}, {resy}, {dsm}, {load_insn}, {tmpx}  ; {load_cmnt}\n\n"
 				# compute -ΔU_D:
 				if "D" in self.allKeys:
 					src3 += "\t; -deltaU_D calculation\n"
