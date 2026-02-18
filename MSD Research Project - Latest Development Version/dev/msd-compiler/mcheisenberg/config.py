@@ -1094,24 +1094,24 @@ class Config:
 								nindex = self.nodeIndex[neighbor]
 								nnid = self.nodeId(neighbor)  # neighbor's node id
 								src2 += f"\t; {edgelbl}: {nid0} -> {nid1}\n"
-								src2 += f"\tvmovapd {sfmj}, ymmword ptr [nodes + ({nindex})*SIZEOF_NODE + OFFSETOF_SPIN]  ; load s_{nnid} (neighbor)\n"
+								sj_insn, sj_cmnt = f"ymmword ptr [nodes + ({nindex})*SIZEOF_NODE + OFFSETOF_SPIN]", f"load s_{nnid} (neighbor)"
 								if optimization_remove_scalar:
 									if not out_init:
-										src2 += f"\t_vdotp {resx}, {resy}, {dsm}, {sfmj}, {prmx}  ; optimization (J*=1), ({dsm}, {sfmj})\n"
+										src2 += f"\t_vdotp {resx}, {resy}, {dsm}, {sj_insn}, {prmx}  ; optimization (J*=1), {sj_cmnt}\n"
 										out_init = True
 									else:
-										src2 += f"\t_vdotadd {resx}, {resy}, {dsm}, {sfmj}, {prmx}  ; optimization (J*=1), ({dsm}, {sfmj})\n"
+										src2 += f"\t_vdotadd {resx}, {resy}, {dsm}, {sj_insn}, {prmx}  ; optimization (J*=1), {sj_cmnt}\n"
 								elif optimization_neg_scalar:
 									if not out_init:
 										src2 += f"\t_vput0 {resx}\n"
 										out_init = True
-									src2 += f"\t_vndotadds {resx}, {resy}, {dsm}, {sfmj}, {prmx}  ; optimization (J*=-1), ({dsm}, {sfmj})\n"
+									src2 += f"\t_vndotadds {resx}, {resy}, {dsm}, {sj_insn}, {prmx}  ; optimization (J*=-1), {sj_cmnt}\n"
 								else:
 									if not tmp_init:
-										src2 += f"\t_vdotp {tmpx}, {tmpy}, {dsm}, {sfmj}, {prmx}  ; ({dsm}, {sfmj})\n"
+										src2 += f"\t_vdotp {tmpx}, {tmpy}, {dsm}, {sj_insn}, {prmx}  ; {sj_cmnt}\n"
 										tmp_init = True
 									else:
-										src2 += f"\t_vdotadd {tmpx}, {tmpy}, {dsm}, {sfmj}, {prmx}  ; ({dsm}, {sfmj})\n"
+										src2 += f"\t_vdotadd {tmpx}, {tmpy}, {dsm}, {sj_insn}, {prmx}  ; {sj_cmnt}\n"
 						if optimization_remove_scalar or optimization_neg_scalar:
 							src2 += "\t; optimization (J*=1,-1): skip load\n"
 						elif load_insn is None:
@@ -1166,35 +1166,35 @@ class Config:
 								nnid = self.nodeId(neighbor)  # neighbor's node id
 								src2 += f"\t; {edgelbl}: {nid0} -> {nid1}\n"
 								# Δs_i · f_j:
-								src2 += f"\tvmovapd {sfmj}, ymmword ptr [nodes + ({nindex})*SIZEOF_NODE + OFFSETOF_FLUX]  ; load f_{nnid} (neighbor)\n"
+								fj_isns, fj_cmnt = f"ymmword ptr [nodes + ({nindex})*SIZEOF_NODE + OFFSETOF_FLUX]", f"load f_{nnid} (neighbor)"
 								if optimization_remove_scalar:
 									if not out_init:
-										src2 += f"\t_vdotp {resx}, {resy}, {dsm}, {sfmj}, {prmx}  ; optimization (Je1*=1), ({dsm}, {sfmj})\n"
+										src2 += f"\t_vdotp {resx}, {resy}, {dsm}, {fj_isns}, {prmx}  ; optimization (Je1*=1), {fj_cmnt}\n"
 										out_init = True
 									else:
-										src2 += f"\t_vdotadd {resx}, {resy}, {dsm}, {sfmj}, {prmx}  ; optimization (Je1*=1), ({dsm}, {sfmj})\n"
+										src2 += f"\t_vdotadd {resx}, {resy}, {dsm}, {fj_isns}, {prmx}  ; optimization (Je1*=1), {fj_cmnt}\n"
 								elif optimization_neg_scalar:
 									if not out_init:
 										src2 += f"\t_vput0 {resx}\n"
 										out_init = True
-									src2 += f"\t_vndotadds {resx}, {resy}, {dsm}, {sfmj}, {prmx}  ; optimization (Je1*=-1), ({dsm}, {sfmj})\n"
+									src2 += f"\t_vndotadds {resx}, {resy}, {dsm}, {fj_isns}, {prmx}  ; optimization (Je1*=-1), {fj_cmnt}\n"
 								else:
 									if not tmp_init:
-										src2 += f"\t_vdotp {tmpx}, {tmpy}, {dsm}, {sfmj}, {prmx}  ; ({dsm}, {sfmj})\n"
+										src2 += f"\t_vdotp {tmpx}, {tmpy}, {dsm}, {fj_isns}, {prmx}  ; {fj_cmnt}\n"
 										tmp_init = True
 									else:
-										src2 += f"\t_vdotadd {tmpx}, {tmpy}, {dsm}, {sfmj}, {prmx}  ; ({dsm}, {sfmj})\n"
+										src2 += f"\t_vdotadd {tmpx}, {tmpy}, {dsm}, {fj_isns}, {prmx}  ; {fj_cmnt}\n"
 								# Δf_i · s_j:
-								src2 += f"\tvmovapd {sfmj}, ymmword ptr [nodes + ({nindex})*SIZEOF_NODE + OFFSETOF_SPIN]  ; load s_{nnid} (neighbor)\n"
+								sj_insn, sj_cmnt = f"ymmword ptr [nodes + ({nindex})*SIZEOF_NODE + OFFSETOF_SPIN]", f"load s_{nnid} (neighbor)"
 								if optimization_remove_scalar:
 									assert out_init  # DEBUG: should be impossible for output to not be initialized above under this optimization case
-									src2 += f"\t_vdotadd {resx}, {resy}, {dfi}, {sfmj}, {prmx}  ; optimization (Je1*=1), ({dfi}, {sfmj})\n"
+									src2 += f"\t_vdotadd {resx}, {resy}, {dfi}, {sj_insn}, {prmx}  ; optimization (Je1*=1), {sj_cmnt}\n"
 								elif optimization_neg_scalar:
 									assert out_init  # DEBUG: should be impossible for output to not be initialized above under this optimization case
-									src2 += f"\t_vndotadds {resx}, {resy}, {dfi}, {sfmj}, {prmx}  ; optimization (Je1*=-1), ({dfi}, {sfmj})\n"
+									src2 += f"\t_vndotadds {resx}, {resy}, {dfi}, {sj_insn}, {prmx}  ; optimization (Je1*=-1), {sj_cmnt}\n"
 								else:
 									assert tmp_init  # DEBUG: should be impossible for temp. output to not be initialized above under this unoptimized case
-									src2 += f"\t_vdotadd {tmpx}, {tmpy}, {dfi}, {sfmj}, {prmx}  ; ({dfi}, {sfmj})\n"
+									src2 += f"\t_vdotadd {tmpx}, {tmpy}, {dfi}, {sj_insn}, {prmx}  ; {sj_cmnt}\n"
 						if optimization_remove_scalar or optimization_neg_scalar:
 							src2 += "\t; optimization (Je1*=1,-1): skip load\n"
 						elif load_insn is None:
@@ -1247,24 +1247,24 @@ class Config:
 								nindex = self.nodeIndex[neighbor]
 								nnid = self.nodeId(neighbor)  # neighbor's node id
 								src2 += f"\t; {edgelbl}: {nid0} -> {nid1}\n"
-								src2 += f"\tvmovapd {sfmj}, ymmword ptr [nodes + ({nindex})*SIZEOF_NODE + OFFSETOF_FLUX]  ; load f_{nnid} (neighbor)\n"
+								fj_isns, fj_cmnt = f"ymmword ptr [nodes + ({nindex})*SIZEOF_NODE + OFFSETOF_FLUX]", f"load f_{nnid} (neighbor)"
 								if optimization_remove_scalar:
 									if not out_init:
-										src2 += f"\t_vdotp {resx}, {resy}, {dfi}, {sfmj}, {prmx}  ; optimization (Jee*=1), ({dfi}, {sfmj})\n"
+										src2 += f"\t_vdotp {resx}, {resy}, {dfi}, {fj_isns}, {prmx}  ; optimization (Jee*=1), {fj_cmnt}\n"
 										out_init = True
 									else:
-										src2 += f"\t_vdotadd {resx}, {resy}, {dfi}, {sfmj}, {prmx}  ; optimization (Jee*=1), ({dfi}, {sfmj})\n"
+										src2 += f"\t_vdotadd {resx}, {resy}, {dfi}, {fj_isns}, {prmx}  ; optimization (Jee*=1), {fj_cmnt}\n"
 								elif optimization_neg_scalar:
 									if not out_init:
 										src2 += f"\t_vput0 {resx}\n"
 										out_init = True
-									src2 += f"\t_vndotadds {resx}, {resy}, {dfi}, {sfmj}, {prmx}  ; optimization (Jee*=-1), ({dfi}, {sfmj})\n"
+									src2 += f"\t_vndotadds {resx}, {resy}, {dfi}, {fj_isns}, {prmx}  ; optimization (Jee*=-1), {fj_cmnt}\n"
 								else:
 									if not tmp_init:
-										src2 += f"\t_vdotp {tmpx}, {tmpy}, {dfi}, {sfmj}, {prmx}  ; ({dfi}, {sfmj})\n"
+										src2 += f"\t_vdotp {tmpx}, {tmpy}, {dfi}, {fj_isns}, {prmx}  ; {fj_cmnt}\n"
 										tmp_init = True
 									else:
-										src2 += f"\t_vdotadd {tmpx}, {tmpy}, {dfi}, {sfmj}, {prmx}  ; ({dfi}, {sfmj})\n"
+										src2 += f"\t_vdotadd {tmpx}, {tmpy}, {dfi}, {fj_isns}, {prmx}  ; {fj_cmnt}\n"
 						if optimization_remove_scalar or optimization_neg_scalar:
 							src2 += "\t; optimization (Jee*=1,-1): skip load\n"
 						elif load_insn is None:
@@ -1388,10 +1388,10 @@ class Config:
 					else:
 						phase3 = True
 						if not out_init:
-							src3 += f"\t_vdotp {resx}, {resy}, {dsm}, {load_insn}, {tmpx}  ; {load_cmnt}\n\n"
+							src3 += f"\t_vdotp {resx}, {resy}, {dsm}, {load_insn}, {sfmjx}  ; {load_cmnt}\n\n"  # can use sfmj as temp for local parameters
 							out_init = True
 						else:
-							src3 += f"\t_vdotadd {resx}, {resy}, {dsm}, {load_insn}, {tmpx}  ; {load_cmnt}\n\n"
+							src3 += f"\t_vdotadd {resx}, {resy}, {dsm}, {load_insn}, {sfmjx}  ; {load_cmnt}\n\n"  # can use sfmj as temp for local parameters
 				# compute -ΔU_D:
 				if "D" in self.allKeys:
 					src3 += "\t; -deltaU_D calculation\n"
