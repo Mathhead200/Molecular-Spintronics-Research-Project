@@ -427,6 +427,7 @@ class Config:
 		if "variableParameters"   not in self.__dict__:  self.variableParameters = set()
 		if "programParameters"    not in self.__dict__:  self.programParameters = {}
 		if "constParameters"      not in self.__dict__:  self.constParameters = set()
+		if "debug"                not in self.__dict__:  self.debug = set()
 
 		if "prng" not in self.programParameters:
 			self.programParameters["prng"] = "xoshiro256**"
@@ -434,6 +435,11 @@ class Config:
 		# aliases
 		prng = self.programParameters["prng"]
 		seed = self.programParameters.get("seed", None)
+
+		DEBUG_OPTIONS = { "deltaU_ret_dump" }
+		_unrecognized_debug_options = self.debug - DEBUG_OPTIONS
+		if len(_unrecognized_debug_options) != 0:
+			raise ValueError(f"Urecognized debug options: {_unrecognized_debug_options}")
 
 		# CHECK: No duplicate nodes or edges (TODO: allow duplicate edges?)
 		if len(set(self.nodes)) != len(self.nodes):
@@ -567,7 +573,8 @@ class Config:
 		# options
 		src += "OPTION CASEMAP:NONE\n\n"
 		# includes
-		src += "include dumpreg.inc\n"  # DEBUG
+		if len(self.debug) != 0:
+			src += "include dumpreg.inc\n"  # DEBUG
 		src += "include vec.inc  ; _vdotp, etc.\n"
 		src += "include prng.inc  ; splitmix64, xoshiro256ss, etc. \n"
 		src += "include ln.inc  ; _vln\n\n"
@@ -1187,13 +1194,13 @@ class Config:
 								# Δf_i · s_j:
 								sj_insn, sj_cmnt = f"ymmword ptr [nodes + ({nindex})*SIZEOF_NODE + OFFSETOF_SPIN]", f"load s_{nnid} (neighbor)"
 								if optimization_remove_scalar:
-									assert out_init  # DEBUG: should be impossible for output to not be initialized above under this optimization case
+									assert out_init  # should be impossible for output to not be initialized above under this optimization case
 									src2 += f"\t_vdotadd {resx}, {resy}, {dfi}, {sj_insn}, {prmx}  ; optimization (Je1*=1), {sj_cmnt}\n"
 								elif optimization_neg_scalar:
-									assert out_init  # DEBUG: should be impossible for output to not be initialized above under this optimization case
+									assert out_init  # should be impossible for output to not be initialized above under this optimization case
 									src2 += f"\t_vndotadds {resx}, {resy}, {dfi}, {sj_insn}, {prmx}  ; optimization (Je1*=-1), {sj_cmnt}\n"
 								else:
-									assert tmp_init  # DEBUG: should be impossible for temp. output to not be initialized above under this unoptimized case
+									assert tmp_init  # should be impossible for temp. output to not be initialized above under this unoptimized case
 									src2 += f"\t_vdotadd {tmpx}, {tmpy}, {dfi}, {sj_insn}, {prmx}  ; {sj_cmnt}\n"
 						if optimization_remove_scalar or optimization_neg_scalar:
 							src2 += "\t; optimization (Je1*=1,-1): skip load\n"
@@ -1304,7 +1311,7 @@ class Config:
 						load_insn, load_cmnt = load_insn
 						optimization_remove_scalar = False  # TODO: implement optimization. if scalar is const and exactly 1.0
 						optimization_neg_scalar = False     # TODO: implement optimization. if scalar is const and exactly -1.0
-						src2 += f"\t; [load group {i}] (DEBUG: Line 1308)\n"
+						src2 += f"\t; [load group {i}]\n"
 						tmp_init = False  # tmpx is used as an intermidate for this load group
 						for edge in edges:
 							# Note: edge in self.edgeIndex may be false if ASM edge array is empty or missing local variables for this edge. This is fine.
@@ -1353,7 +1360,7 @@ class Config:
 									else:
 										src2 += f"\tvfmadd231sd {tmpx}, {tmp2x}, {tmp2x}        ; += {tmp2x} ** 2\n"
 									src2 += f"\t_vdotp {tmp2x}, {tmp2y}, {smi}, {sfmj}, {prmx}  ; ({smi}, {sfmj}) -> {tmpx}\n"
-									assert tmp_init  # DEBUG: must be initialized here
+									assert tmp_init  # must be initialized here
 									src2 += f"\tvfnmadd231sd {tmpx}, {tmp2x}, {tmp2x}           ; -= {tmpx} ** 2\n"
 						if optimization_remove_scalar or optimization_neg_scalar:
 							src2 += "\t; optimization (b*=1,-1): skip load\n"
@@ -1434,7 +1441,8 @@ class Config:
 				# return:
 				if not out_init:
 					src += f"\tvxorpd {resx}, {resx}, {resx}  ; return 0.0\n"  # fall back in case there are no parameters set for this node
-				src += "\t_dumpreg\n"  # DEBUG: make sure xmm0 (ΔU) matches python calculated "u" for each parameter
+				if "deltaU_ret_dump" in self.debug:
+					src += "\t_dumpreg\n"  # DEBUG: make sure xmm0 (ΔU) matches python calculated "u" for each parameter
 				src += "\tret\n"
 				src += f"{proc_id} ENDP\n\n"
 				exports.append((proc_id, False))
@@ -1823,8 +1831,10 @@ class Config:
 		with resources.as_file(resources.files(__package__)) as package_path:
 			try:
 				tool.assemble(asm, out=obj, include=[str(package_path)])
-				# tool.dlink(obj, out=dll, entry="DllMain", exports=_def)
-				tool.dlink(obj, "ucrt.lib", "legacy_stdio_definitions.lib", out=dll, entry="DllMain", exports=_def)  # DEBUG
+				if len(self.debug) == 0:
+					tool.dlink(obj, out=dll, entry="DllMain", exports=_def)
+				else:
+					tool.dlink(obj, "ucrt.lib", "legacy_stdio_definitions.lib", out=dll, entry="DllMain", exports=_def)  # DEBUG
 			except CalledProcessError as ex:
 				raise  # TODO: (stub) Re-raise exception
 		

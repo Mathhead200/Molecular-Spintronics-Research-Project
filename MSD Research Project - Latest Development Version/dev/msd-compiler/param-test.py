@@ -20,6 +20,7 @@ if __name__ == "__main__":
 		# D
 		"B": (1.0, 0.0, 0.0)  # B working
 	}
+	config.debug = { "deltaU_ret_dump" }
 	with config.compile(dir=".", asm="param-test.asm") as rt:
 		sim = mc.Simulation(rt)
 		for i in sim.nodes:
