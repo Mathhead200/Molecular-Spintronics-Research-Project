@@ -1000,16 +1000,16 @@ class Config:
 				if "Je0" in self.allKeys:
 					src1 += "\t; -deltaU_Je0 calculation\n"
 					# where is Je0 defined?
-					load_insn = None
+					load_insn, load_cmnt = None, None
 					if "Je0" in self.localNodeParameters.get(node, {}):
-						load_insn = f"\tvmovsd {prmx}, qword ptr [nodes + ({index})*SIZEOF_NODE + OFFSETOF_Je0]  ; load Je0_{nid} (local)\n"
+						load_insn, load_cmnt = f"qword ptr [nodes + ({index})*SIZEOF_NODE + OFFSETOF_Je0]", f"load Je0_{nid} (local)"
 					else:
 						_, region = self.getUnambiguousRegionNodeParameter(node, "Je0")  # we don't need value, only region
 						if region is not None:
 							rid = self.regionId(region)
-							load_insn = f"\tvmovsd {prmx}, qword ptr [{rid} + OFFSETOF_REGION_Je0]  ; load Je0_{rid} (region)\n"
+							load_insn, load_cmnt = f"qword ptr [{rid} + OFFSETOF_REGION_Je0]", f"load Je0_{rid} (region)"
 						elif "Je0" in self.globalKeys:
-							load_insn = f"\tvmovsd {prmx}, qword ptr Je0  ; load Je0 (global)\n"
+							load_insn, load_cmnt = f"qword ptr Je0", f"load Je0 (global)"
 					# TODO: add optimization_remove_scalar
 					# TODO: add optimization_neg_scalar
 					if load_insn is None:
@@ -1021,12 +1021,11 @@ class Config:
 						# compute s_i'·f_i' - s_i·f_i (difference between new and current dot products for local spin·flux)
 						src1 += f"\t_vdotp {tmpx}, {tmpy}, {s1i}, {f1i}, {prmx}      ; ({s1i}, {f1i}) = (s'f')\n"
 						src1 += f"\t_vndotadd {tmpx}, {tmpy}, {smi}, {fm1}, {prmx}   ; ({smi}, {fm1}) = (s'f' - sf)\n"
-						src1 += load_insn  # load Je0 into prmx
 						if not out_init:
-							src1 += f"\tvmulsd {resx}, {prmx}, {tmpx}\n\n"
+							src1 += f"\tvmulsd {resx}, {tmpx}, {load_insn}  ; {load_cmnt}\n\n"
 							out_init = True
 						else:
-							src1 += f"\tvfmadd231sd {resx}, {prmx}, {tmpx}  ; {resx} += {prmx} * {tmpx}\n\n"
+							src1 += f"\tvfmadd231sd {resx}, {tmpx}, {load_insn}  ; {load_cmnt}\n\n"
 				# Phase 2: compute (m_i, m'_i, Δs_i, Δf_i) -> -ΔU_(A, J, Je1, Jee, b):
 				phase2: bool = False  # does phase 2 contain any code?
 				src2 = StrJoiner()    # buffer phase 2 src to emit after load
