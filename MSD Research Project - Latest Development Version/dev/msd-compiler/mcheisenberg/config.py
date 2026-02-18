@@ -1154,10 +1154,7 @@ class Config:
 						optimization_remove_scalar = False  # TODO: implement optimization. if scalar is const and exactly 1.0
 						optimization_neg_scalar = False     # TODO: implement optimization. if scalar is const and exactly -1.0
 						src2 += f"\t; [load group {i}]\n"
-						if optimization_remove_scalar or optimization_neg_scalar:
-							src2 += "\t; optimization (Je1*=1,-1): skip load\n"
-						else:
-							src2 += load_insn  # load Je1 into prmx
+						tmp_init = False  # tmpx is used as an intermidate for this load group
 						for edge in edges:
 							# Note: edge in self.edgeIndex may be false if ASM edge array is empty or missing local variables for this edge. This is fine.
 							edgelbl = f"edges[{self.edgeIndex[edge]}]" if edge in self.edgeIndex else "edge"
@@ -1185,7 +1182,11 @@ class Config:
 										out_init = True
 									src2 += f"\t_vndotadds {resx}, {resy}, {dsm}, {sfmj}, {prmx}  ; optimization (Je1*=-1), ({dsm}, {sfmj})\n"
 								else:
-									src2 += f"\t_vdotp {tmpx}, {tmpy}, {dsm}, {sfmj}, {tmp2x}  ; ({dsm}, {sfmj})\n"
+									if not tmp_init:
+										src2 += f"\t_vdotp {tmpx}, {tmpy}, {dsm}, {sfmj}, {prmx}  ; ({dsm}, {sfmj})\n"
+										tmp_init = True
+									else:
+										src2 += f"\t_vdotadd {tmpx}, {tmpy}, {dsm}, {sfmj}, {prmx}  ; ({dsm}, {sfmj})\n"
 								# Δf_i · s_j:
 								src2 += f"\tvmovapd {sfmj}, ymmword ptr [nodes + ({nindex})*SIZEOF_NODE + OFFSETOF_SPIN]  ; load s_{nnid} (neighbor)\n"
 								if optimization_remove_scalar:
@@ -1195,12 +1196,19 @@ class Config:
 									assert out_init  # DEBUG: should be impossible for output to not be initialized above under this optimization case
 									src2 += f"\t_vndotadds {resx}, {resy}, {dfi}, {sfmj}, {prmx}  ; optimization (Je1*=-1), ({dfi}, {sfmj})\n"
 								else:
-									src2 += f"\t_vdotadd {tmpx}, {tmpy}, {dfi}, {sfmj}, {tmp2x}  ; ({dfi}, {sfmj})\n"
-									if not out_init:
-										src2 += f"\tvmulsd {resx}, {prmx}, {tmpx}\n"
-										out_init = True
-									else:
-										src2 += f"\tvfmadd231sd {resx}, {prmx}, {tmpx}  ; {resx} += {prmx} * {tmpx}\n"
+									assert tmp_init  # DEBUG: should be impossible for temp. output to not be initialized above under this unoptimized case
+									src2 += f"\t_vdotadd {tmpx}, {tmpy}, {dfi}, {sfmj}, {prmx}  ; ({dfi}, {sfmj})\n"
+						if optimization_remove_scalar or optimization_neg_scalar:
+							src2 += "\t; optimization (Je1*=1,-1): skip load\n"
+						elif load_insn is None:
+							src2 += "\t; skip parameter loading for the null load group\n"
+						else:
+							src2 += load_insn  # load Je1 into prmx
+							if not out_init:
+								src2 += f"\tvmulsd {resx}, {prmx}, {tmpx}\n"
+								out_init = True
+							else:
+								src2 += f"\tvfmadd231sd {resx}, {prmx}, {tmpx}  ; {resx} += {prmx} * {tmpx}\n"
 					src2 += "\n"
 				# compute -ΔU_Jee = Σ_j{Jee Δf_i·f_j}: 
 				if "Jee" in self.allKeys:
@@ -1228,10 +1236,7 @@ class Config:
 						optimization_remove_scalar = False  # TODO: implement optimization. if scalar is const and exactly 1.0
 						optimization_neg_scalar = False     # TODO: implement optimization. if scalar is const and exactly -1.0
 						src2 += f"\t; [load group {i}]\n"
-						if optimization_remove_scalar or optimization_neg_scalar:
-							src2 += "\t; optimization (Jee*=1,-1): skip load\n"
-						else:
-							src2 += load_insn  # load Jee into prmx
+						tmp_init = False  # tmpx is used as an intermidate for this load group
 						for edge in edges:
 							# Note: edge in self.edgeIndex may be false if ASM edge array is empty or missing local variables for this edge. This is fine.
 							edgelbl = f"edges[{self.edgeIndex[edge]}]" if edge in self.edgeIndex else "edge"
@@ -1258,12 +1263,22 @@ class Config:
 										out_init = True
 									src2 += f"\t_vndotadds {resx}, {resy}, {dfi}, {sfmj}, {prmx}  ; optimization (Jee*=-1), ({dfi}, {sfmj})\n"
 								else:
-									src2 += f"\t_vdotp {tmpx}, {tmpy}, {dfi}, {sfmj}, {tmp2x}  ; ({dfi}, {sfmj})\n"
-									if not out_init:
-										src2 += f"\tvmulsd {resx}, {prmx}, {tmpx}\n"
-										out_init = True
+									if not tmp_init:
+										src2 += f"\t_vdotp {tmpx}, {tmpy}, {dfi}, {sfmj}, {prmx}  ; ({dfi}, {sfmj})\n"
+										tmp_init = True
 									else:
-										src2 += f"\tvfmadd231sd {resx}, {prmx}, {tmpx}  ; {resx} += {prmx} * {tmpx}\n"
+										src2 += f"\t_vdotadd {tmpx}, {tmpy}, {dfi}, {sfmj}, {prmx}  ; ({dfi}, {sfmj})\n"
+						if optimization_remove_scalar or optimization_neg_scalar:
+							src2 += "\t; optimization (Jee*=1,-1): skip load\n"
+						elif load_insn is None:
+							src2 += "\t; skip parameter loading for the null load group\n"
+						else:
+							src2 += load_insn  # load Jee into prmx
+							if not out_init:
+								src2 += f"\tvmulsd {resx}, {prmx}, {tmpx}\n"
+								out_init = True
+							else:
+								src2 += f"\tvfmadd231sd {resx}, {prmx}, {tmpx}  ; {resx} += {prmx} * {tmpx}\n"
 					src2 += "\n"
 				# compute -ΔU_b = Σ_j{b ((m'_i·m_j)^2 - (m_i·m_j)^2)}:
 				if "b" in self.allKeys:
@@ -1286,61 +1301,72 @@ class Config:
 							else:
 								load_insn = None
 						load_groups[load_insn].append(edge)
-						for i, load_group in enumerate(load_groups.items(), 1):
-							load_insn, edges = load_group
-							optimization_remove_scalar = False  # TODO: implement optimization. if scalar is const and exactly 1.0
-							optimization_neg_scalar = False     # TODO: implement optimization. if scalar is const and exactly -1.0
-							src2 += f"\t; [load group {i}]\n"
-							if optimization_remove_scalar or optimization_neg_scalar:
-								src2 += "\t; optimization (b*=1,-1): skip load\n"
+					for i, load_group in enumerate(load_groups.items(), 1):
+						load_insn, edges = load_group
+						optimization_remove_scalar = False  # TODO: implement optimization. if scalar is const and exactly 1.0
+						optimization_neg_scalar = False     # TODO: implement optimization. if scalar is const and exactly -1.0
+						src2 += f"\t; [load group {i}] (DEBUG: Line 1308)\n"
+						tmp_init = False  # tmpx is used as an intermidate for this load group
+						for edge in edges:
+							# Note: edge in self.edgeIndex may be false if ASM edge array is empty or missing local variables for this edge. This is fine.
+							edgelbl = f"edges[{self.edgeIndex[edge]}]" if edge in self.edgeIndex else "edge"
+							if load_insn is None:
+								src2 += f"; skip. For {edgelbl}, b is not defined at any level (local, region, nor global).\n"
 							else:
-								src2 += load_insn  # load b into prmx
-							for edge in edges:
-								# Note: edge in self.edgeIndex may be false if ASM edge array is empty or missing local variables for this edge. This is fine.
-								edgelbl = f"edges[{self.edgeIndex[edge]}]" if edge in self.edgeIndex else "edge"
-								if load_insn is None:
-									src2 += f"; skip. For {edgelbl}, b is not defined at any level (local, region, nor global).\n"
-								else:
-									phase2 = True
-									nid0 = self.nodeId(edge[0])
-									nid1 = self.nodeId(edge[1])
-									neighbor, _ = Config.neighbor(node, edge)  # just need neighbor. communative operation: doesn't care about direction.
-									nindex = self.nodeIndex[neighbor]
-									nnid = self.nodeId(neighbor)  # neighbor's node id
-									src2 += f"\t; {edgelbl}: {nid0} -> {nid1}\n"
-									src2 += f"\tvmovapd {sfmj}, ymmword ptr [nodes + ({nindex})*SIZEOF_NODE + OFFSETOF_SPIN]  ; load s_{nnid} (neighbor)\n"
-									src2 += f"\tvaddpd {sfmj}, {sfmj}, ymmword ptr [nodes + ({nindex})*SIZEOF_NODE + OFFSETOF_FLUX]   ; m_{nnid} = s_{nnid} + f_{nnid}\n"
-									if optimization_remove_scalar:
-										if not out_init:
-											src2 += f"\t_vdotp {resx}, {resy}, {m1i}, {sfmj}, {prmx}  ; optimization (b*=1), ({m1i}, {sfmj}) -> {resx}\n"
-											src2 += f"\tvmulsd {resx}, {resx}, {resx}                 ; {resx}**2\n"
-											src2 += f"\t_vdotp {tmpx}, {tmpy}, {smi}, {sfmj}, {prmx}  ; ({smi}, {sfmj}) -> {tmpx}\n"
-											src2 += f"\tvfnmadd231sd {resx}, {tmpx}, {tmpx}           ; {resx}**2 - {tmpx}**2\n"
-											out_init = True
-										else:
-											src2 += f"\t_vdotp {tmpx}, {tmpy}, {m1i}, {sfmj}, {prmx}  ; optimization (b*=1), ({m1i}, {sfmj}) -> {tmpx}\n"
-											src2 += f"\tvfmadd231sd {resx}, {tmpx}, {tmpx}            ; + {tmpx}**2\n"
-											src2 += f"\t_vdotp {tmpx}, {tmpy}, {smi}, {sfmj}, {prmx}  ; ({smi}, {sfmj}) -> {tmpx}\n"
-											src2 += f"\tvfnmadd231sd {resx}, {tmpx}, {tmpx}           ; - {tmpx}**2\n"
-									elif optimization_neg_scalar:
-										if not out_init:
-											src2 += f"\t_vdotp {resx}, {resy}, {smi}, {sfmj}, {prmx}  ; optimization (b*=-1), ({smi}, {sfmj}) -> {resx}\n"
-											src2 += f"\tvmulsd {resx}, {resx}, {resx}                 ; {resx}**2\n"
-											src2 += f"\t_vdotp {tmpx}, {tmpy}, {m1i}, {sfmj}, {prmx}  ; ({m1i}, {sfmj}) -> {tmpx}\n"
-											src2 += f"\tvfnmadd231sd {resx}, {tmpx}, {tmpx}           ; {resx}**2 - {tmpx}**2\n"
-											out_init = True
-										else:
-											src2 += f"\t_vdotp {tmpx}, {tmpy}, {m1i}, {sfmj}, {prmx}  ; optimization (b*=-1), ({m1i}, {sfmj}) -> {tmpx}\n"
-											src2 += f"\tvfnmadd231sd {resx}, {tmpx}, {tmpx}           ; - {tmpx}**2\n"
-											src2 += f"\t_vdotp {tmpx}, {tmpy}, {smi}, {sfmj}, {prmx}  ; ({smi}, {sfmj}) -> {tmpx}\n"
-											src2 += f"\tvfmadd231sd {resx}, {tmpx}, {tmpx}            ; + {tmpx}**2\n"
+								phase2 = True
+								nid0 = self.nodeId(edge[0])
+								nid1 = self.nodeId(edge[1])
+								neighbor, _ = Config.neighbor(node, edge)  # just need neighbor. communative operation: doesn't care about direction.
+								nindex = self.nodeIndex[neighbor]
+								nnid = self.nodeId(neighbor)  # neighbor's node id
+								src2 += f"\t; {edgelbl}: {nid0} -> {nid1}\n"
+								src2 += f"\tvmovapd {sfmj}, ymmword ptr [nodes + ({nindex})*SIZEOF_NODE + OFFSETOF_SPIN]          ; load s_{nnid} (neighbor)\n"
+								src2 += f"\tvaddpd {sfmj}, {sfmj}, ymmword ptr [nodes + ({nindex})*SIZEOF_NODE + OFFSETOF_FLUX]   ; m_{nnid} = s_{nnid} + f_{nnid}\n"
+								if optimization_remove_scalar:
+									if not out_init:
+										src2 += f"\t_vdotp {resx}, {resy}, {m1i}, {sfmj}, {prmx}  ; optimization (b*=1), ({m1i}, {sfmj}) -> {resx}\n"
+										src2 += f"\tvmulsd {resx}, {resx}, {resx}                 ; {resx}**2\n"
+										src2 += f"\t_vdotp {tmpx}, {tmpy}, {smi}, {sfmj}, {prmx}  ; ({smi}, {sfmj}) -> {tmpx}\n"
+										src2 += f"\tvfnmadd231sd {resx}, {tmpx}, {tmpx}           ; {resx}**2 - {tmpx}**2\n"
+										out_init = True
 									else:
-										src2 += f"\t_vdotp {tmpx}, {tmpy}, {m1i}, {sfmj}, {tmp2x}  ; ({m1i}, {sfmj}) -> {tmpx}\n"
-										src2 += f"\tvmulsd {tmpx}, {tmpx}, {tmpx}                  ; {tmpx}**2\n"
-										src2 += f"\tvfmadd231sd {resx}, {tmpx}, {prmx}\n"  # TODO: must multiple by parameter twice since we don't have another register
-										src2 += f"\t_vdotp {tmpx}, {tmpy}, {smi}, {sfmj}, {tmp2x}  ; ({smi}, {sfmj}) -> {tmpx}\n"
-										src2 += f"\tvmulsd {tmpx}, {tmpx}, {tmpx}                  ; {tmpx}**2\n"
-										src2 += f"\tvfnmadd231sd {resx}, {tmpx}, {prmx}\n"
+										src2 += f"\t_vdotp {tmpx}, {tmpy}, {m1i}, {sfmj}, {prmx}  ; optimization (b*=1), ({m1i}, {sfmj}) -> {tmpx}\n"
+										src2 += f"\tvfmadd231sd {resx}, {tmpx}, {tmpx}            ; + {tmpx}**2\n"
+										src2 += f"\t_vdotp {tmpx}, {tmpy}, {smi}, {sfmj}, {prmx}  ; ({smi}, {sfmj}) -> {tmpx}\n"
+										src2 += f"\tvfnmadd231sd {resx}, {tmpx}, {tmpx}           ; - {tmpx}**2\n"
+								elif optimization_neg_scalar:
+									if not out_init:
+										src2 += f"\t_vdotp {resx}, {resy}, {smi}, {sfmj}, {prmx}  ; optimization (b*=-1), ({smi}, {sfmj}) -> {resx}\n"
+										src2 += f"\tvmulsd {resx}, {resx}, {resx}                 ; {resx}**2\n"
+										src2 += f"\t_vdotp {tmpx}, {tmpy}, {m1i}, {sfmj}, {prmx}  ; ({m1i}, {sfmj}) -> {tmpx}\n"
+										src2 += f"\tvfnmadd231sd {resx}, {tmpx}, {tmpx}           ; {resx}**2 - {tmpx}**2\n"
+										out_init = True
+									else:
+										src2 += f"\t_vdotp {tmpx}, {tmpy}, {m1i}, {sfmj}, {prmx}  ; optimization (b*=-1), ({m1i}, {sfmj}) -> {tmpx}\n"
+										src2 += f"\tvfnmadd231sd {resx}, {tmpx}, {tmpx}           ; - {tmpx}**2\n"
+										src2 += f"\t_vdotp {tmpx}, {tmpy}, {smi}, {sfmj}, {prmx}  ; ({smi}, {sfmj}) -> {tmpx}\n"
+										src2 += f"\tvfmadd231sd {resx}, {tmpx}, {tmpx}            ; + {tmpx}**2\n"
+								else:
+									src2 += f"\t_vdotp {tmp2x}, {tmp2y}, {m1i}, {sfmj}, {prmx}  ; ({m1i}, {sfmj}) -> {tmpx}\n"
+									if not tmp_init:
+										src2 += f"\tvmulsd {tmpx}, {tmp2x}, {tmp2x}             ; = {tmpx} ** 2\n"
+										tmp_init = True
+									else:
+										src2 += f"\tvfmadd231sd {tmpx}, {tmp2x}, {tmp2x}        ; += {tmp2x} ** 2\n"
+									src2 += f"\t_vdotp {tmp2x}, {tmp2y}, {smi}, {sfmj}, {prmx}  ; ({smi}, {sfmj}) -> {tmpx}\n"
+									assert tmp_init  # DEBUG: must be initialized here
+									src2 += f"\tvfnmadd231sd {tmpx}, {tmp2x}, {tmp2x}           ; -= {tmpx} ** 2\n"		
+						if optimization_remove_scalar or optimization_neg_scalar:
+							src2 += "\t; optimization (b*=1,-1): skip load\n"
+						elif load_insn is None:
+							src2 += "\t; skip parameter loading for the null load group\n"
+						else:
+							src2 += load_insn  # load b into prmx
+							if not out_init:
+								src2 += f"\tvmulpd {resx}, {prmx}, {tmpx}\n"
+								out_init = True
+							else:
+								src2 += f"\tvfmadd231sd {resx}, {prmx}, {tmpx}\n"
 					src2 += "\n"
 				# Phase 3 compute (Δm_i) -> -ΔU_(B, D):
 				phase3: bool = False  # does phase 3 contain any code?

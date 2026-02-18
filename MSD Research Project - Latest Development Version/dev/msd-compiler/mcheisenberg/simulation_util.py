@@ -23,7 +23,7 @@ type Parameter = str
 VEC_ZERO = np.zeros(3, dtype=float)
 VEC_I = np.array([1.0, 0.0, 0.0])
 VEC_J = np.array([0.0, 1.0, 0.0])
-VEC_K = np.array([0.0, 0.0, 10])
+VEC_K = np.array([0.0, 0.0, 1.0])
 
 
 def simvec(v: vec|numpy_vec|None) -> numpy_vec:
@@ -184,6 +184,12 @@ class Array(Numeric[NDArray]):
 	# 	args = tuple(x.value if isinstance(x, Numeric) else x for x in args)
 	# 	print(str(func), *(type(arg) for arg in args))
 	# 	return self.value.__array_function__(func, types, args, kwargs)
+
+	# Override numpy's default TypeError: unsupported format string passed to numpy.ndarray.__format__
+	# This way we can print numpy proxies as strings
+	@override
+	def __format__(self, spec):
+		return format(str(self.value), spec)
 
 type Vector = Array  # except __array__ -> numpy_vec
 Vector = Array  # So we can use Vector at runtime as parent type, etc.

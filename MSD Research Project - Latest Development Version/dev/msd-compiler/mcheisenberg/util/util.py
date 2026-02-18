@@ -137,6 +137,8 @@ class Numeric[T]:
 	def __repr__(self):  return repr(self.value)
 	def __hash__(self):  return hash(self.value)
 
+	def __format__(self, spec):  return format(self.value, spec)
+
 # [inteface] Behaves as int
 class IInt(Numeric[int]):
 	def __int__(self)   -> int:  return self.value

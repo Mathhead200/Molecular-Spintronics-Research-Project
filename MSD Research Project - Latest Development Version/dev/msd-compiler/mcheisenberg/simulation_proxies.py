@@ -394,8 +394,7 @@ class UProxy(UTypeProxy):
 				Je1 = sim.Je1.sub(edges).values(buf_list)
 				dotp1 = dot(s_i, f_j, temp=buf_mat)
 				dotp2 = dot(f_i, s_j, temp=buf_mat)
-				np.add(dotp1, dotp2, out=buf_list)
-				out[N:L] -= np.multiply(Je1, buf_list, out=buf_list)
+				out[N:L] -= np.multiply(Je1, np.add(dotp1, dotp2), out=buf_list)
 
 			if "Jee" in parameters:
 				if f_i is None:  f_i = sim.f.get(i for i, _ in edges).values(None)  # new buffer
@@ -407,7 +406,7 @@ class UProxy(UTypeProxy):
 				m_i = sim.m.get(i for i, _ in edges).values(None)  # new buffer
 				m_j = sim.m.get(j for _, j in edges).values(None)  # new buffer
 				b = sim.b.sub(edges).values(buf_list)
-				out[N:L] -= np.multiply(b, dot(m_i, m_j, temp=buf_mat), out=buf_list)
+				out[N:L] -= np.multiply(b, dot(m_i, m_j, temp=buf_mat)**2, out=buf_list)
 
 			if "D" in parameters:
 				if m_i is None:  m_i = sim.m.get(i for i, _ in edges).values(None)  # new buffer
