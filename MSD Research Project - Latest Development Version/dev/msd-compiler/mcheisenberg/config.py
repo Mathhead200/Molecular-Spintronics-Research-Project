@@ -1402,7 +1402,68 @@ class Config:
 				# compute -ΔU_D:
 				if "D" in self.allKeys:
 					src3 += "\t; -deltaU_D calculation\n"
-					src3 += "\t; TODO ...\n\n" # TODO (stub)
+					# figure out where all neighboring edges load D from, and group the common load instructions
+					load_groups: dict[tuple[str, str], list] = defaultdict(list)  # dict: (str load_insn, str load_cmnt) -> list[Edge]
+					for edge in self.connections(node):
+						if "D" in self.localEdgeParameters.get(edge, {}):
+							eindex = self.edgeIndex[edge]
+							nid0 = self.nodeId(edge[0])
+							nid1 = self.nodeId(edge[1])
+							load_insn, load_cmnt = f"ymmword ptr [edges + ({eindex})*SIZEOF_EDGE + OFFSETOF_D]", f"load D_{nid0}_{nid1}"
+						else:
+							_, combo = self.getUnambiguousRegionEdgeParameter(edge, "D")  # don't need value, only region
+							if combo is not None:
+								rid0, rid1 = self.regionId(combo[0]), self.regionId(combo[1])
+								load_insn, load_cmnt = f"ymmword ptr [{rid0}_{rid1} + OFFSETOF_REGION_D]", f"load D_{rid0}_{rid1} (region)"
+							elif "D" in self.globalKeys:
+								load_insn, load_cmnt = f"ymmword ptr D", f"load D (global)"
+							else:
+								load_insn, load_cmnt = None, None
+						load_groups[(load_insn, load_cmnt)].append(edge)
+					for i, load_group in enumerate(load_groups.items(), 1):
+						load_insn, edges = load_group
+						load_insn, load_cmnt = load_insn
+						src3 += f"\t; [load group {i}]\n"
+						tmp_init = False  # tmpx is used as an intermidate for this load group
+						for edge in edges:
+							# Note: edge in self.edgeIndex may be false if ASM edge array is empty or missing local variables for this edge. This is fine.
+							edgelbl = f"edges[{self.edgeIndex[edge]}]" if edge in self.edgeIndex else "edge"
+							if load_insn is None:
+								src3 += f"\t; skip. For {edgelbl}, D is not defined at any level (local, region, nor global).\n"
+							else:
+								phase3 = True
+								nid0 = self.nodeId(edge[0])
+								nid1 = self.nodeId(edge[1])
+								neighbor, direction = Config.neighbor(node, edge)  # non-communative operation: need direction!
+								nindex = self.nodeIndex[neighbor]
+								nnid = self.nodeId(neighbor)  # neighbor's node id
+								src3 += f"\t; {edgelbl}: {nid0} -> {nid1}\n"
+								if direction == 0:
+									src3 += "; skipping self-loop since cross product is 0\n"
+								else:
+									src3 += f"\tvmovapd {sfmj}, ymmword ptr [nodes + ({nindex})*SIZEOF_NODE + OFFSETOF_SPIN]          ; load s_{nnid} (neighbor)\n"
+									src3 += f"\tvaddpd {sfmj}, {sfmj}, ymmword ptr [nodes + ({nindex})*SIZEOF_NODE + OFFSETOF_FLUX]   ; m_{nnid} = s_{nnid} + f_{nnid}\n"
+									if not tmp_init:
+										if direction > 0:  # forward edge: node == edge[0]
+											src3 += f"\t_vcrossp {tmpy}, {dsm}, {sfmj}, {smi}, {fm1}\n"  # smi and fm1 are unused durring phase 3
+										else:
+											assert direction < 0
+											src3 += f"\t_vcrossp {tmpy}, {dsm}, {sfmj}, {smi}, {fm1}\n"  # smi and fm1 are unused durring phase 3
+										tmp_init = True
+									else:
+										if direction > 0:  # forward edge: node == edge[0]
+											src3 += f"\t_vcrossadd {tmpy}, {dsm}, {sfmj}, {smi}, {fm1}\n"  # smi and fm1 are unused durring phase 3
+										else:
+											assert direction < 0
+											src3 += f"\t_vcrossadd {tmpy}, {dsm}, {sfmj}, {smi}, {fm1}\n"  # smi and fm1 are unused durring phase 3
+										tmp_init = True
+						if tmp_init:
+							if not out_init:
+								src3 += f"\t_vdotp {resx}, {resy}, {tmpy}, {load_insn}, {smi}  ; {load_cmnt}\n"
+								out_init = True
+							else:
+								src3 += f"\t_vdotadd {resx}, {resy}, {tmpy}, {load_insn}, {smi}  ; {load_cmnt}\n"
+					src3 += "\n"
 				# commit phase 1
 				if phase1 or phase2 or phase3:
 					src += "\t; Phase 1:\n"

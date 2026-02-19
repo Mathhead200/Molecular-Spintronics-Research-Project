@@ -18,15 +18,35 @@ _vpermk MACRO dest, src
 	; e.g.
 	;	vperm2f128 ymm0, ymm1 = (a,b,c,d), ymm2 = (x,y,z,w), 12h
 	;	sources = [
-	;		ymm1.low = (a,b),
+	;		ymm1.low  = (a,b),
 	;		ymm1.high = (c,d),
-	;		ymm2.low = (x,y),
+	;		ymm2.low  = (x,y),
 	;		ymm2.high = (z,w)
 	;	]
 	;	HH = 1 -> dest.high = sources[1] = ymm1.high = (c,d)
 	;	LL = 2 -> dest.low  = sources[2] = ymm2.low  = (x,y)
 	;	=> dest = ymm1.high | (ymm2.low << 128/8) = (x,y,c,d)
 	vperm2f128 dest, src, src, 01h  ; swaps low and high 128-bit lanes
+ENDM
+
+; src = [x0, x1, x2, 0] -> dest = [x1, x2, x0, 0]
+_vrotl MACRO dest, src
+	; dest[0] = src[ imm8[1:0] ] = src[1]
+	; dest[1] = src[ imm8[3:2] ] = src[2]
+	; dest[2] = src[ imm8[5:4] ] = src[0]
+	; dest[3] = src[ imm8[7:6] ] = src[3]
+	; -> imm8 = 11 00 10 01 == C9h
+	vpermq dest, src, 0C9h
+ENDM
+
+; src = [x0, x1, x2, 0] -> dest = [x2, x0, x1, 0]
+_vrotr MACRO dest, src
+	; dest[0] = src[ imm8[1:0] ] = src[2]
+	; dest[1] = src[ imm8[3:2] ] = src[0]
+	; dest[2] = src[ imm8[5:4] ] = src[1]
+	; dest[3] = src[ imm8[7:6] ] = src[3]
+	; -> imm8 = 11 01 00 10 == D2h
+	vpermq dest, src, 0D2h
 ENDM
 
 ; macros to load common vector, e.g. zero vector, unit vectors
@@ -171,6 +191,39 @@ ENDM
 _vndotp MACRO destX, destY, src1Y, src2Y, tempX
 	_vput0 destX
 	_vndotadd destX, destY, src1Y, src2Y, tempX
+ENDM
+
+; PRECONDITIONS:
+;	1. dest can overlap with src
+;	2. src can overlap with temp
+;	3. dest can NOT overlap with temp!
+;	4. src1 can be same as src2
+;	5. temp1 and temp2 MUST be distinct!
+_vcrossp MACRO dest, src1, src2, temp1, temp2:
+	_vrotl temp1, src1  ; read src only once (each) at the begining
+	_vrotr temp2, src2
+	vmulpd dest, temp1, temp2
+	_vrotl temp1, temp1
+	_vrotr temp2, temp2
+	vfnmadd231 dest, temp1, temp2
+ENDM
+
+_vcrossadd MACRO dest, src1, src2, temp1, temp2:
+	_vrotl temp1, src1  ; read src only once (each) at the begining
+	_vrotr temp2, src2
+	vfmadd231 dest, temp1, temp2
+	_vrotl temp1, temp1
+	_vrotr temp2, temp2
+	vfnmadd231 dest, temp1, temp2
+ENDM
+
+_vncrossadd MACRO dest, src1, src2, temp1, temp2:
+	_vrotl temp1, src1  ; read src only once (each) at the begining
+	_vrotr temp2, src2
+	vfnmadd231 dest, temp1, temp2
+	_vrotl temp1, temp1
+	_vrotr temp2, temp2
+	vfmadd231 dest, temp1, temp2
 ENDM
 
 ; Adds all lanes into duplicated scalar, i.e. (s, s, s, s)
