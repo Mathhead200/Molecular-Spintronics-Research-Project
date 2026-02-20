@@ -1,9 +1,10 @@
+from . import csv
 from ..config import Config
 from ..model import MSD
 from ..runtime import Runtime
 from ..simulation import Simulation
-from collections.abc import Sequence
-from typing import Any
+from ..util import TypeCheckedSequence as Sequence, TypeCheckedAny as Any
+from datetime import date
 
 type vec = tuple[float, float, float]
 
@@ -92,17 +93,18 @@ class IterateParameters:
 	__slots__ = tuple(_fields)
 
 	def __init__(self):
-		for field, (default, type) in self._fields.items():
+		for field, (default, T) in self._fields.items():
 			setattr(self, field, default)
-	
-	def __setitem__(self, key, value):
+
+	def __setattr__(self, key, value):
 		T = IterateParameters._fields[key][1]
 		if not isinstance(value, T):
 			raise TypeError(f"{key} must be type {T}, got {type(value)}")
+		print(f"DEBUG: {T}; {type(key)} {key}; {type(value)} {value}")
 		object.__setattr__(self, key, value)
 
 	@staticmethod
-	def load(file: str) -> IterateParameters:
+	def load(file: str, verbose: bool=False) -> IterateParameters:
 		obj = IterateParameters()
 		with open(file, "r") as f:
 			for line in f:
@@ -111,12 +113,15 @@ class IterateParameters:
 					continue
 				key, value = line.split("=", 2)
 				key = key.strip()
-				value = value.split(" ", 3)
+				value = value.strip().split(" ", 3)
 				if len(value) > 1:
+					if verbose:  print(f"Parsing vector, {key} = {value}")
 					value = tuple(float(v) for v in value)
 				else:
+					if verbose:  print(f"Parsing scalar, {key} = {value}")
 					value = float(value[0])
 				setattr(obj, key, value)
+		return obj
 	
 	def save(self, file: str) -> None:
 		with open(file, "w", encoding="utf-8") as f:
@@ -147,10 +152,14 @@ class IterateParameters:
 		sim.metropolis(self.simCount, self.freq)
 		return sim
 
-	def run(self, tool=None, asm: str=None, _def: str=None, obj: str=None, dll: str=None, dir: str=None, copy_config: bool=None) -> None:
+	def run(self, tool=None, asm: str=None, _def: str=None, obj: str=None, dll: str=None, dir: str=None, copy_config: bool=None, out: str=None, prefix: str=None) -> str:
+		if prefix is None:
+			d = date.today().strftime("%m-%d-%Y")
+			prefix = f"iteration, {d}, "
 		sim = None
 		try:
 			sim = self.sim(tool, asm, _def, obj, dll, dir, copy_config)
+			return csv(sim, dir=dir, out=out, prefix=prefix, params={ p: getattr(self, p) for p in IterateParameters._fields })
 		finally:
 			if sim is not None:
 				sim.rt.shutdown()

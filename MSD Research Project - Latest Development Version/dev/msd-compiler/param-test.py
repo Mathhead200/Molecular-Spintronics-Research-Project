@@ -17,8 +17,8 @@ if __name__ == "__main__":
 		"Je1": 1.0,            # Je1 working
 		"Jee": 1.0,            # Jee working
 		"b": 1.0,              # b working
-		"D": (1.0, 1.0, 1.0),
-		"B": (1.0, 0.0, 0.0)  # B working
+		"D": (1.0, 1.0, 1.0),  # D working
+		"B": (1.0, 0.0, 0.0)   # B working
 	}
 	config.debug = { "deltaU_ret_dump" }
 	with config.compile(dir=".", asm="param-test.asm") as rt:

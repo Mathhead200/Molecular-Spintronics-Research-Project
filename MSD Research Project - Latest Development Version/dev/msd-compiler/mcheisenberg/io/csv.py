@@ -3,13 +3,13 @@ from ..simulation import Simulation
 from ..util import StrJoiner
 from collections.abc import Mapping, Sequence
 from itertools import chain
-from tempfile import NamedTempfile
+from tempfile import NamedTemporaryFile
 from typing import Any
 import numpy as np
 
 def csv(sim: Simulation, out: str=None, dir: str=".", prefix: str=None, params: Mapping[str, Any]=None) -> str:
 	if out is None:
-		file = NamedTempfile(mode="w", encoding="utf-8", prefix=prefix, suffix=".csv", dir=dir)
+		file = NamedTemporaryFile(mode="w", encoding="utf-8", prefix=prefix, suffix=".csv", dir=dir)
 	else:
 		file = open(out, "w", encoding="utf-8")
 	with file:
