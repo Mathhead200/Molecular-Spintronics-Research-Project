@@ -199,31 +199,31 @@ ENDM
 ;	3. dest can NOT overlap with temp!
 ;	4. src1 can be same as src2
 ;	5. temp1 and temp2 MUST be distinct!
-_vcrossp MACRO dest, src1, src2, temp1, temp2:
+_vcrossp MACRO dest, src1, src2, temp1, temp2
 	_vrotl temp1, src1  ; read src only once (each) at the begining
 	_vrotr temp2, src2
 	vmulpd dest, temp1, temp2
 	_vrotl temp1, temp1
 	_vrotr temp2, temp2
-	vfnmadd231 dest, temp1, temp2
+	vfnmadd231pd dest, temp1, temp2
 ENDM
 
-_vcrossadd MACRO dest, src1, src2, temp1, temp2:
+_vcrossadd MACRO dest, src1, src2, temp1, temp2
 	_vrotl temp1, src1  ; read src only once (each) at the begining
 	_vrotr temp2, src2
-	vfmadd231 dest, temp1, temp2
+	vfmadd231pd dest, temp1, temp2
 	_vrotl temp1, temp1
 	_vrotr temp2, temp2
-	vfnmadd231 dest, temp1, temp2
+	vfnmadd231pd dest, temp1, temp2
 ENDM
 
-_vncrossadd MACRO dest, src1, src2, temp1, temp2:
+_vncrossadd MACRO dest, src1, src2, temp1, temp2
 	_vrotl temp1, src1  ; read src only once (each) at the begining
 	_vrotr temp2, src2
-	vfnmadd231 dest, temp1, temp2
+	vfnmadd231pd dest, temp1, temp2
 	_vrotl temp1, temp1
 	_vrotr temp2, temp2
-	vfmadd231 dest, temp1, temp2
+	vfmadd231pd dest, temp1, temp2
 ENDM
 
 ; Adds all lanes into duplicated scalar, i.e. (s, s, s, s)

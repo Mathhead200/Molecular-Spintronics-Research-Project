@@ -974,7 +974,7 @@ class Config:
 				s1i = "ymm1"                  # s'_i (param: new spin)
 				f1i = "ymm2"                  # f'_i (param: new flux)
 				prmx, prmy = "xmm3", "ymm3"   # TODO: rename. Now just used as temp. scalar parameter (Je0, J, Je1, Jee, b), or vector parameter (A, B, D)
-				smi = "ymm4"                  # s_i, m_i, then (unused)
+				smix, smi = "xmm4", "ymm4"    # s_i, m_i, then (unused)
 				fm1 = "ymm5"                  # f_i, m'_i, then (unused)
 				dsm = "ymm6"                  # (unused), Δs_i, then Δm_i
 				dfix, dfi = "xmm7", "ymm7"    # (unused), Δf_i, then (unused)
@@ -1441,28 +1441,28 @@ class Config:
 								if direction == 0:
 									src3 += "; skipping self-loop since cross product is 0\n"
 								else:
-									src3 += f"\tvmovapd {sfmj}, ymmword ptr [nodes + ({nindex})*SIZEOF_NODE + OFFSETOF_SPIN]          ; load s_{nnid} (neighbor)\n"
+									src3 += f"\tvmovapd {sfmj}, ymmword ptr [nodes + ({nindex})*SIZEOF_NODE + OFFSETOF_SPIN]        ; load s_{nnid} (neighbor)\n"
 									src3 += f"\tvaddpd {sfmj}, {sfmj}, ymmword ptr [nodes + ({nindex})*SIZEOF_NODE + OFFSETOF_FLUX]   ; m_{nnid} = s_{nnid} + f_{nnid}\n"
 									if not tmp_init:
 										if direction > 0:  # forward edge: node == edge[0]
 											src3 += f"\t_vcrossp {tmpy}, {dsm}, {sfmj}, {smi}, {fm1}\n"  # smi and fm1 are unused durring phase 3
 										else:
 											assert direction < 0
-											src3 += f"\t_vcrossp {tmpy}, {dsm}, {sfmj}, {smi}, {fm1}\n"  # smi and fm1 are unused durring phase 3
+											src3 += f"\t_vcrossp {tmpy}, {sfmj}, {dsm}, {smi}, {fm1}\n"  # smi and fm1 are unused durring phase 3
 										tmp_init = True
 									else:
 										if direction > 0:  # forward edge: node == edge[0]
 											src3 += f"\t_vcrossadd {tmpy}, {dsm}, {sfmj}, {smi}, {fm1}\n"  # smi and fm1 are unused durring phase 3
 										else:
 											assert direction < 0
-											src3 += f"\t_vcrossadd {tmpy}, {dsm}, {sfmj}, {smi}, {fm1}\n"  # smi and fm1 are unused durring phase 3
+											src3 += f"\t_vcrossadd {tmpy}, {sfmj}, {dsm}, {smi}, {fm1}\n"  # smi and fm1 are unused durring phase 3
 										tmp_init = True
 						if tmp_init:
 							if not out_init:
-								src3 += f"\t_vdotp {resx}, {resy}, {tmpy}, {load_insn}, {smi}  ; {load_cmnt}\n"
+								src3 += f"\t_vdotp {resx}, {resy}, {tmpy}, {load_insn}, {smix}  ; {load_cmnt}\n"
 								out_init = True
 							else:
-								src3 += f"\t_vdotadd {resx}, {resy}, {tmpy}, {load_insn}, {smi}  ; {load_cmnt}\n"
+								src3 += f"\t_vdotadd {resx}, {resy}, {tmpy}, {load_insn}, {smix}  ; {load_cmnt}\n"
 					src3 += "\n"
 				# commit phase 1
 				if phase1 or phase2 or phase3:

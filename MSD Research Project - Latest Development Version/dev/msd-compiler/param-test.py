@@ -11,20 +11,20 @@ if __name__ == "__main__":
 		"S": 1.0,
 		"F": 1.0,
 		"kT": 10.0,
-		"Je0": 1.0,          # Je0 working
+		"Je0": 1.0,            # Je0 working
 		"A": (1.0, 0.0, 0.0),  # A working
 		"J": 1.0,              # J working
 		"Je1": 1.0,            # Je1 working
 		"Jee": 1.0,            # Jee working
-		"b": 1.0,            # b working??
-		# D
+		"b": 1.0,              # b working
+		"D": (1.0, 1.0, 1.0),
 		"B": (1.0, 0.0, 0.0)  # B working
 	}
 	config.debug = { "deltaU_ret_dump" }
 	with config.compile(dir=".", asm="param-test.asm") as rt:
 		sim = mc.Simulation(rt)
 		for i in sim.nodes:
-			sim.s[i] = (VEC_I, VEC_J, VEC_K)[i % 3]
+			sim.s[i] = [VEC_I, VEC_J, VEC_K][i % 3]
 			sim.f[i] = VEC_ZERO
 		
 		def print_state():
