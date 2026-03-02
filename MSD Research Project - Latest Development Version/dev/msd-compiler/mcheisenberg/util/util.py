@@ -1,5 +1,5 @@
 from __future__ import annotations
-from datetime import date
+from datetime import date, datetime
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
 	from collections.abc import Iterable
@@ -34,10 +34,10 @@ def report_date(t: date=None) -> str:
 
 def report_time(t: date=None) -> str:
 	if t is None:
-		t = date.today()
+		t = datetime.now()
 	return t.strftime("%I:%M:%S %p").strip("0").casefold()
 
 def report_datetime(t: date=None) -> str:
 	if t is None:
-		t = date.today()
+		t = datetime.now()
 	return f"{report_date(t)} @ {report_time(t)}"

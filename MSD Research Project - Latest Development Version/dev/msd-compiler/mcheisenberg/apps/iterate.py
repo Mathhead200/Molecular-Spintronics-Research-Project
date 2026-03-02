@@ -1,8 +1,11 @@
 import sys
+from datetime import datetime
 from mcheisenberg.io import IterateParameters
 from mcheisenberg.util import report_datetime
 
 def main(argv=sys.argv):
+	t = datetime.now()
+
 	in_file = "parameters-iterate.txt"
 	if len(argv) > 1:
 		in_file = argv[1]
@@ -16,6 +19,8 @@ def main(argv=sys.argv):
 	output_filename = p.run(dir=".", asm="iterate.asm", sim_progress_bar="iterate", out_progress_bar="Writing CSV")
 
 	print(f"({report_datetime()}) Done: {output_filename}")
+	t = datetime.now() - t
+	print(f"Total time: {t}")
 
 if __name__ == "__main__":
 	main()
