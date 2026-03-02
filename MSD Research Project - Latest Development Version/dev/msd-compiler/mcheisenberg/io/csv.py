@@ -5,11 +5,14 @@ from collections.abc import Mapping, Sequence
 from itertools import chain
 from tempfile import NamedTemporaryFile
 from typing import Any
+from tqdm import tqdm
 import numpy as np
 
-def csv(sim: Simulation, out: str=None, dir: str=".", prefix: str=None, params: Mapping[str, Any]=None) -> str:
+def csv(sim: Simulation, out: str=None, dir: str=".", prefix: str=None, params: Mapping[str, Any]=None, progress_bar: str=None) -> str:
+	# header: 1 row
+	if progress_bar is not None:  progress_bar = tqdm(total=1 + max(len(sim.nodes), len(sim.history)), desc=progress_bar)
 	if out is None:
-		file = NamedTemporaryFile(mode="w", encoding="utf-8", prefix=prefix, suffix=".csv", dir=dir)
+		file = NamedTemporaryFile(mode="w", encoding="utf-8", prefix=prefix, suffix=".csv", dir=dir)  # TODO: We don't want a temp file, we want a unique filename
 	else:
 		file = open(out, "w", encoding="utf-8")
 	with file:
@@ -56,50 +59,61 @@ def csv(sim: Simulation, out: str=None, dir: str=".", prefix: str=None, params: 
 				headers += f'{p} = {v},'
 		# version
 		headers += f',,mcheisenberg_version = {__version__}\n'
-		file.write(headers.str())
+		file.write(str(headers))
+		if progress_bar is not None:  progress_bar.update(1)
 
 		# data rows
+		# TODO: Add numpy buffers to improve efficiency!! Not lazy?? sim.m.history may be calculating full history before [t] subscript?
+		# 	We need to make history a proxy as well, I think.
+		m_history = sim.m.history  # Fo now, avoid rebuilding the full histories at each iteration
+		s_history = sim.s.history
+		f_history = sim.f.history
+		u_history = sim.u.history
+		m_region_history = { r: sim.m[r].history for r in sim.regions }
+		s_region_history = { r: sim.s[r].history for r in sim.regions }
+		f_region_history = { r: sim.f[r].history for r in sim.regions }
+		u_region_history = { r: sim.u[r].history for r in chain(sim.regions, sim.eregions) }
 		node_iter = iter(sim.nodes)
 		for t in [ss.t for ss in sim.history]:
 			line = StrJoiner()
 			line += f'{t},,'
-			m = sim.m.history[t]
-			m_norm = np.linalg.norm(m)
+			m = m_history[t]  # sim.m.history[t]
+			m_norm  = np.linalg.norm(m)
 			m_theta = np.arccos(m[2]/m_norm) if m_norm != 0 else 0.0  # TODO: double check calculations
-			m_phi = np.arctan2(m[1], m[0]) if m_norm != 0 else 0.0
+			m_phi   = np.arctan2(m[1], m[0]) if m_norm != 0 else 0.0
 			line += f'{m[0]},{m[1]},{m[2]},{m_norm},{m_theta},{m_phi},,'
 			for r in sim.regions:
-				m = sim.m[r].history[t]
-				m_norm = np.linalg.norm(m)
+				m = m_region_history[r][t]  # sim.m[r].history[t]
+				m_norm  = np.linalg.norm(m)
 				m_theta = np.arccos(m[2]/m_norm) if m_norm != 0 else 0.0
-				m_phi = np.arctan2(m[1], m[0]) if m_norm != 0 else 0.0
+				m_phi   = np.arctan2(m[1], m[0]) if m_norm != 0 else 0.0
 				line += f'{m[0]},{m[1]},{m[2]},{m_norm},{m_theta},{m_phi},,'
-			s = sim.s.history[t]
-			s_norm = np.linalg.norm(s)
+			s = s_history[t]  # sim.s.history[t]
+			s_norm  = np.linalg.norm(s)
 			s_theta = np.arccos(s[2]/s_norm) if s_norm != 0 else 0.0
-			s_phi = np.arctan2(s[1], s[0]) if s_norm != 0 else 0.0
+			s_phi   = np.arctan2(s[1], s[0]) if s_norm != 0 else 0.0
 			line += f'{s[0]},{s[1]},{s[2]},{s_norm},{s_theta},{s_phi},,'
 			for r in sim.regions:
-				s = sim.s[r].history[t]
-				s_norm = np.linalg.norm(s)
+				s = s_region_history[r][t]  # sim.s[r].history[t]
+				s_norm  = np.linalg.norm(s)
 				s_theta = np.arccos(s[2]/s_norm) if s_norm != 0 else 0.0
-				s_phi = np.arctan2(s[1], s[0]) if s_norm != 0 else 0.0
+				s_phi   = np.arctan2(s[1], s[0]) if s_norm != 0 else 0.0
 				line += f'{s[0]},{s[1]},{s[2]},{s_norm},{s_theta},{s_phi},,'
-			f = sim.f.history[t]
-			f_norm = np.linalg.norm(f)
+			f = f_history[t]  # sim.f.history[t]
+			f_norm  = np.linalg.norm(f)
 			f_theta = np.arccos(f[2]/f_norm) if f_norm != 0 else 0.0
-			f_phi = np.arctan2(f[1], f[0]) if f_norm != 0 else 0.0
+			f_phi   = np.arctan2(f[1], f[0]) if f_norm != 0 else 0.0
 			line += f'{f[0]},{f[1]},{f[2]},{f_norm},{f_theta},{f_phi},,'
 			for r in sim.regions:
-				f = sim.f[r].history[t]
-				f_norm = np.linalg.norm(f)
+				f = f_region_history[r][t]  # sim.f[r].history[t]
+				f_norm  = np.linalg.norm(f)
 				f_theta = np.arccos(f[2]/f_norm) if f_norm != 0 else 0.0
-				f_phi = np.arctan2(f[1], f[0]) if f_norm != 0 else 0.0
+				f_phi   = np.arctan2(f[1], f[0]) if f_norm != 0 else 0.0
 				line += f'{f[0]},{f[1]},{f[2]},{f_norm},{f_theta},{f_phi},,'
-			u = sim.u.history[t]
+			u = u_history[t]  # sim.u.history[t]
 			line += f'{u},'
 			for r in chain(sim.regions, sim.eregions):
-				u = sim.u[r].history[t]
+				u = u_region_history[r][t]  # sim.u[r].history[t]
 				line += f'{u},'
 			line += ',,'
 			try:
@@ -111,14 +125,27 @@ def csv(sim: Simulation, out: str=None, dir: str=".", prefix: str=None, params: 
 				else:
 					line += f'{n},'
 					for _ in range(1, n_index_len):  line += ','
-				m = sim.m[n]
+				m = sim.m[n].value
 				line += f'{m[0]},{m[1]},{m[2]},'
-				s = sim.s[n]
+				s = sim.s[n].value
 				line += f'{s[0]},{s[1]},{s[2]},'
-				f = sim.f[n]
+				f = sim.f[n].value
 				line += f'{f[0]},{f[1]},{f[2]},,,'
 			except StopIteration:
 				for _ in range(n_index_len):  line += ','  # blank lines
 			line += '\n'
-			file.write(line.str())
+			file.write(str(line))
+			if progress_bar is not None:  progress_bar.update(1)
+		
+		# any remaining state rows
+		while True:
+			try:
+				line = StrJoiner()
+				n = next(node_iter)
+				# TODO: ... (implement)
+				file.write(str(line))
+				if progress_bar is not None:  progress_bar.update(1)
+			except StopIteration:
+				break
+	if progress_bar is not None:  progress_bar.close()
 	return file.name

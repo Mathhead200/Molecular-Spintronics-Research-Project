@@ -68,6 +68,10 @@ def MSD(width: int, height: int, depth: int,
 			if x_neighbor in msd.nodes:  msd.edges.append((i, x_neighbor))
 			if y_neighbor in msd.nodes:  msd.edges.append((i, y_neighbor))
 			if z_neighbor in msd.nodes:  msd.edges.append((i, z_neighbor))
+		
+		if x == molPosL - 1 and molPosL <= molPosR:  # FML-FMR direct coupling
+			dc_neighbor = (molPosR + 1, y, z)
+			if dc_neighbor in msd.nodes:  msd.edges.append((i, dc_neighbor))
 
 	# default parameters
 	msd.globalParameters = {

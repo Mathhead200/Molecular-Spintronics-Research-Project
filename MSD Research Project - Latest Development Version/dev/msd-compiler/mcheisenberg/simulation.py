@@ -6,6 +6,7 @@ from .simulation_util import VEC_J, VEC_ZERO, simscal, simvec
 from .util import *
 from itertools import chain
 from typing import TYPE_CHECKING
+from tqdm import tqdm
 import numpy as np
 if TYPE_CHECKING:
 	from .simulation_util import *
@@ -134,7 +135,7 @@ class Simulation:
 		self.rt.randomize(*seed)
 		self.clear_history()
 
-	def metropolis(self, iterations: int, freq: int=0, bookend: bool=True) -> None:
+	def metropolis(self, iterations: int, freq: int=0, bookend: bool=True, progress_bar: str=None) -> None:
 		"""
 		Run the metropolis algorithm on this model for the given number of iterations.
 		May specify a recording/sampling period (freq), i.e. record a snapshot every freq iterations.
@@ -144,9 +145,11 @@ class Simulation:
 				The algorithm will still run for 100 iterations.
 			sim.metropolis(100, freq=11, bookend=True) will generate 11 snapshots at times, t=0, 11, 22, ..., 99, 100.
 		"""
+		if progress_bar is not None:  progress_bar = tqdm(total=iterations, desc=progress_bar)
 		if not freq:
 			self.rt.metropolis(iterations)
 			self.t += iterations
+			if progress_bar is not None:  progress_bar.update(iterations)
 		else:
 			self.record()
 			while iterations > freq:
@@ -154,11 +157,14 @@ class Simulation:
 				self.t += freq
 				self.record()
 				iterations -= freq
+				if progress_bar is not None:  progress_bar.update(freq)
 			if iterations != 0:
 				self.rt.metropolis(iterations)
 				self.t += iterations
+				if progress_bar is not None:  progress_bar.update(iterations)
 			if bookend:
 				self.record()
+		if progress_bar is not None:  progress_bar.close()
 	
 	def record(self) -> Snapshot:
 		sample = Snapshot(self)
