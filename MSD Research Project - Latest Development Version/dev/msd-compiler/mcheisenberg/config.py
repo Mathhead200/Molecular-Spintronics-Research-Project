@@ -413,7 +413,7 @@ class Config:
 			return v
 		return self.globalParameters.get(k, None)
 	
-	def compile(self, tool=VisualStudio(), asm: str=None, _def: str=None, obj: str=None, dll: str=None, dir: str=None, copy_config: bool=True) -> Runtime:
+	def compile(self, tool=VisualStudio(), asm: str=None, def_: str=None, obj: str=None, dll: str=None, dir: str=None, copy_config: bool=True) -> Runtime:
 		# Check for and fix missing required attributes;
 		if "nodes"                not in self.__dict__:  self.nodes = []
 		if "mutableNodes"         not in self.__dict__:  self.mutableNodes = self.nodes
@@ -1865,22 +1865,22 @@ class Config:
 			os.close(fd)
 			return path
 
-		asm_temp, obj_temp, _def_temp, dll_temp = False, False, False, False  # bool flags for cleanup
-		if  asm is None:  asm = reserve_tempfile(".asm");  asm_temp = True
-		if  obj is None:  obj = reserve_tempfile(".obj");  obj_temp = True
-		if _def is None: _def = reserve_tempfile(".def"); _def_temp = True
-		if  dll is None:  dll = reserve_tempfile(".dll");  dll_temp = True
+		asm_temp, obj_temp, def_temp, dll_temp = False, False, False, False  # bool flags for cleanup
+		if asm is None:  asm  = reserve_tempfile(".asm");  asm_temp = True
+		if obj is None:  obj  = reserve_tempfile(".obj");  obj_temp = True
+		if def_ is None: def_ = reserve_tempfile(".def");  def_temp = True
+		if dll is None:  dll  = reserve_tempfile(".dll");  dll_temp = True
 		
 		# DEBUG
 		print("ASM:", asm)
 		print("OBJ:", obj)
-		print("DEF:", _def)
+		print("DEF:", def_)
 		print("DLL:", dll)
 		
 		with open(asm, "w", encoding="utf-8") as file:
 			file.write(str(src))
 		
-		with open(_def, "w", encoding="utf-8") as file:
+		with open(def_, "w", encoding="utf-8") as file:
 			file.write("EXPORTS\n")
 			for symbol, data in exports:
 				file.write(symbol)
@@ -1893,16 +1893,16 @@ class Config:
 			try:
 				tool.assemble(asm, out=obj, include=[str(package_path)])
 				if len(self.debug) == 0:
-					tool.dlink(obj, out=dll, entry="DllMain", exports=_def)
+					tool.dlink(obj, out=dll, entry="DllMain", exports=def_)
 				else:
-					tool.dlink(obj, "ucrt.lib", "legacy_stdio_definitions.lib", out=dll, entry="DllMain", exports=_def)  # DEBUG
+					tool.dlink(obj, "ucrt.lib", "legacy_stdio_definitions.lib", out=dll, entry="DllMain", exports=def_)  # DEBUG
 			except CalledProcessError as ex:
 				raise  # TODO: (stub) Re-raise exception
 		
 		# clean up temp files
-		if  asm_temp:  os.remove( asm)
-		if  obj_temp:  os.remove( obj)
-		if _def_temp:  os.remove(_def)
+		if asm_temp:  os.remove(asm)
+		if obj_temp:  os.remove(obj)
+		if def_temp:  os.remove(def_)
 
 		# dynamically link to python
 		c = self

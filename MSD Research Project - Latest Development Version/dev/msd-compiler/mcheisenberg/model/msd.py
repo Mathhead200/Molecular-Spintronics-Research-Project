@@ -1,9 +1,10 @@
 from ..config import Config
+from ..util import clamp
 
-def clamp(value, a, b):
-	if b is not None:  value = min(value, b)
-	if a is not None:  value = max(value, a)
-	return value
+# region names
+__FML__ = "L"
+__FMR__ = "R"
+__mol__ = "m"
 
 def MSD(width: int, height: int, depth: int,
 		molPosL: int=None, molPosR: int=None,
@@ -23,7 +24,7 @@ def MSD(width: int, height: int, depth: int,
 	msd = Config()
 	msd.nodes = {}  # ordered set (as dict)
 	msd.edges = []
-	msd.regions = { "FML": [], "FMR": [], "mol": [] }
+	msd.regions = { __FML__: [], __FMR__: [], __mol__: [] }
 
 	# TODO: build nodes chucks to optimize for L1 cache
 	# add all nodes
@@ -32,7 +33,7 @@ def MSD(width: int, height: int, depth: int,
 			for x in range(0, molPosL):
 				i = (x, y, z)
 				msd.nodes[i] = None  # add to ordered set
-				msd.regions["FML"].append(i)
+				msd.regions[__FML__].append(i)
 	
 	for z in range(frontR, backR + 1):
 		for y in range(topL, bottomL + 1):
@@ -40,14 +41,14 @@ def MSD(width: int, height: int, depth: int,
 				for x in range(molPosL, molPosR + 1):
 					i = (x, y, z)
 					msd.nodes[i] = None
-					msd.regions["mol"].append(i)
+					msd.regions[__mol__].append(i)
 	
 	for z in range(frontR, backR + 1):
 		for y in range(0, height):
 			for x in range(molPosR + 1, width):
 				i = (x, y, z)
 				msd.nodes[i] = None
-				msd.regions["FMR"].append(i)
+				msd.regions[__FMR__].append(i)
 	
 	# connect nodes
 	for i in msd.nodes:

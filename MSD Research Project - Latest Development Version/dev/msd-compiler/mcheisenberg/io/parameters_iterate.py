@@ -1,17 +1,20 @@
 from . import csv
 from ..build import VisualStudio
 from ..config import Config
-from ..model import MSD
+from ..model import MSD, __FML__, __FMR__, __mol__
 from ..runtime import Runtime
 from ..simulation import Simulation
 from ..util import report_date, TypeCheckedAny as Any, TypeCheckedSequence as Sequence, TypeCheckedTuple as TTuple
+from collections import defaultdict
 
 real = int|float
 vec = TTuple[real, real, real]  # class
 
 CONTINUOUS_SPIN_MODEL = "CONTINUOUS_SPIN_MODEL"  # enum
+UP_DOWN_MODEL = "UP_DOWN_MODEL"  # enum
 
 LINEAR = "LINEAR"  # special values
+CIRCULAR = "CIRCULAR"
 
 DEFAULT_TOOL = VisualStudio()  # for assembling and linking
 
@@ -118,10 +121,9 @@ class IterateParameters:
 				key = key.strip()
 				value = value.strip().split(" ", 3)
 				if len(value) > 1:
-					if verbose:  print(f"Parsing vector, {key} = {value}")
 					value = tuple(float(v) for v in value)
+					if verbose:  print(f"Parsed vector ({type(value).__name__}), {key} = {value}")
 				else:
-					if verbose:  print(f"Parsing scalar, {key} = {value}")
 					if value[0].lower() == "true":
 						value = True
 					elif value[0].lower() == "false":
@@ -134,9 +136,11 @@ class IterateParameters:
 								value = float(value[0])
 							except ValueError:
 								value = value[0]  # keep value[0] as str
+					if verbose:  print(f"Parsed scalar ({type(value).__name__}), {key} = {value}")
 				setattr(obj, key, value)
 		return obj
 	
+	# TODO: test
 	def save(self, file: str) -> None:
 		with open(file, "w", encoding="utf-8") as f:
 			for key in self._fields:
@@ -148,31 +152,64 @@ class IterateParameters:
 				f.write(f"{key} = {value}\n")
 
 	def config(self) -> Config:
+		if self.model != CONTINUOUS_SPIN_MODEL:
+			if self.model == UP_DOWN_MODEL:  raise NotImplementedError("UP_DOWN_MODEL is not yet implemented")
+			else:                            raise ValueError(f"Unsupported model: {self.model}")
+		
 		msd = MSD(self.width, self.height, self.depth, \
 			self.molPosL, self.molPosR, \
 			self.topL, self.bottomL, self.frontR, self.backR)
 		msd.programParameters = { "seed": self.seed }
+
 		# TODO: parse self.mol_type
+
+		# Required parameters:
+		msd.globalParameters = { "kT": self.kT }
+		msd.regionNodeParameters = {
+			__FML__: { "S": self.SL },
+			__FMR__: { "S": self.SR },
+			__mol__: { "S": self.Sm }
+		}
+		msd.regionEdgeParameters = defaultdict(dict)
+
+		# Optional parameters:
+		if self.B  is not None:
+			msd.globalParameters["B"] = self.B
+
+		for region_suffix, region in [("L", __FML__), ("R", __FMR__), ("m", __mol__)]:
+			for param_prefix in ["F", "A", "Je0"]:
+				# e.g. if self.AL is not None:  msd.regionNodeParameters["FML"]["A"] = self.AL
+				value = getattr(self, f"{param_prefix}{region_suffix}")
+				if value is not None:
+					msd.regionNodeParameters[region][param_prefix] = value
+		
+		for region_suffix, region0, region1 in [("L", __FML__, __FML__), ("R", __FMR__, __FMR__), ("m", __mol__, __mol__), ("mL", __FML__, __mol__, ), ("mR", __mol__, __FMR__), ("LR", __FML__, __FMR__)]:
+			for param_prefix in ["J", "Je1", "Jee", "b", "D"]:
+				# e.g. if self.JmL is not None:  msd.regionEdgeParameters["FML", "mol"]["J"] = self.JmL
+				value = getattr(self, f"{param_prefix}{region_suffix}")
+				if value is not None:
+					msd.regionEdgeParameters[region0, region1][param_prefix] = value
+
 		return msd
 	
-	def compile(self, tool=DEFAULT_TOOL, asm: str=None, _def: str=None, obj: str=None, dll: str=None, dir: str=None, copy_config: bool=True) -> Runtime:
-		return self.config().compile(tool, asm, _def, obj, dll, dir, copy_config)
+	def compile(self, tool=DEFAULT_TOOL, asm: str=None, def_: str=None, obj: str=None, dll: str=None, dir: str=None, copy_config: bool=True) -> Runtime:
+		return self.config().compile(tool, asm, def_, obj, dll, dir, copy_config)
 
-	def sim(self, tool=DEFAULT_TOOL, asm: str=None, _def: str=None, obj: str=None, dll: str=None, dir: str=None, copy_config: bool=True, progress_bar: str=None) -> Simulation:
-		rt = self.compile(tool, asm, _def, obj, dll, dir, copy_config)
+	def sim(self, tool=DEFAULT_TOOL, asm: str=None, def_: str=None, obj: str=None, dll: str=None, dir: str=None, copy_config: bool=True, progress_bar: str=None) -> Simulation:
+		rt = self.compile(tool, asm, def_, obj, dll, dir, copy_config)
 		sim = Simulation(rt)
 		if self.randomize:
 			sim.randomize()
 		sim.metropolis(self.simCount, self.freq, progress_bar=progress_bar)
 		return sim
 
-	def run(self, tool=DEFAULT_TOOL, asm: str=None, _def: str=None, obj: str=None, dll: str=None, dir: str=None, copy_config: bool=True, out: str=None, prefix: str=None, sim_progress_bar: str=None, out_progress_bar: str=None) -> str:
+	def run(self, tool=DEFAULT_TOOL, asm: str=None, def_: str=None, obj: str=None, dll: str=None, temp_dir: str=None, copy_config: bool=True, out: str=None, out_dir: str=None, prefix: str=None, sim_progress_bar: str=None, out_progress_bar: str=None) -> str:
 		if prefix is None:
-			prefix = f"iteration, {report_date()}, "
+			prefix = f"iteration, {report_date()}"
 		sim = None
 		try:
-			sim = self.sim(tool, asm, _def, obj, dll, dir, copy_config, sim_progress_bar)
-			return csv(sim, dir=dir, out=out, prefix=prefix, params={ p: getattr(self, p) for p in IterateParameters._fields }, progress_bar=out_progress_bar)
+			sim = self.sim(tool, asm, def_, obj, dll, temp_dir, copy_config, sim_progress_bar)
+			return csv(sim, dir=out_dir, out=out, prefix=prefix, params={ p: getattr(self, p) for p in IterateParameters._fields }, progress_bar=out_progress_bar)
 		finally:
 			if sim is not None:
 				sim.rt.shutdown()

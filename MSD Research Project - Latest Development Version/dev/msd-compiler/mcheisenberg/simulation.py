@@ -85,12 +85,19 @@ class Simulation:
 			region: ReadOnlyOrderedSet(nodes)
 			for region, nodes in rnodes.items()
 		})
-		self._eregions = ReadOnlyDict({
-			eregion: ReadOnlyOrderedSet([
+		for region in rnodes:  rnodes[region] = set(rnodes[region])  # faster lookup for eregions
+		rnodes[None] = set(config.nodes) - set(chain(*rnodes.values()))  # "None" region for eregion lookup
+		self._eregions = {
+			eregion: [
 				edge
 				for edge in edges
 				if edge[0] in rnodes[eregion[0]] and edge[1] in rnodes[eregion[1]]
-			]) for eregion in config.regionEdgeParameters.keys()
+			] for eregion in config.regionCombos
+		}
+		self._eregions = ReadOnlyDict({
+			eregion: ReadOnlyOrderedSet(edges)
+			for eregion, edges in self._eregions.items()
+			if len(edges) != 0
 		})
 		# set of defined parameters, preserving order defined in Config:
 		node_p =    [ p for params in config.localNodeParameters.values()  for p in params ]

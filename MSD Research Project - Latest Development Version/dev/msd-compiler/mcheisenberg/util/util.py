@@ -17,6 +17,12 @@ class StrJoiner:
 		return "".join(self.pieces)
 
 
+def quote(s: str) -> str:
+	if len(s) >= 2 and s[0] == '"' and s[-1] == '"':
+		return s  # already quoted
+	return f'"{s}"'
+
+
 def floats(values: Iterable) -> tuple[float]:
 	return (float(x) for x in values)
 
@@ -25,6 +31,11 @@ def is_pow2(n: int) -> bool:
 
 def div8(n: int) -> int:
 	return int(n // 8) if n is not None else None
+
+def clamp(value, a, b):
+	if b is not None:  value = min(value, b)
+	if a is not None:  value = max(value, a)
+	return value
 
 
 def report_date(t: date=None) -> str:

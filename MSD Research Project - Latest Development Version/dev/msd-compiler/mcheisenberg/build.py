@@ -1,9 +1,5 @@
 import subprocess
-
-def quote(s: str) -> str:
-	if len(s) >= 2 and s[0] == '"' and s[-1] == '"':
-		return s  # already quoted
-	return f'"{s}"'
+from .util import quote
 
 class Assembler:
 	def assemble(*src, out=None, include=[]) -> list[str]:
