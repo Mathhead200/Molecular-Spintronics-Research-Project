@@ -82,7 +82,7 @@ class Simulation:
 		self._nodes = ReadOnlyOrderedSet(ordered_set(config.nodes))
 		self._edges = ReadOnlyOrderedSet(ordered_set(edges))
 		self._regions = ReadOnlyDict({
-			region: ReadOnlyOrderedSet(nodes)
+			region: ReadOnlyOrderedSet(ordered_set(nodes))
 			for region, nodes in rnodes.items()
 		})
 		for region in rnodes:  rnodes[region] = set(rnodes[region])  # faster lookup for eregions
@@ -95,7 +95,7 @@ class Simulation:
 			] for eregion in config.regionCombos
 		}
 		self._eregions = ReadOnlyDict({
-			eregion: ReadOnlyOrderedSet(edges)
+			eregion: ReadOnlyOrderedSet(ordered_set(edges))
 			for eregion, edges in self._eregions.items()
 			if len(edges) != 0
 		})

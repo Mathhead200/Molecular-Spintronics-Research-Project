@@ -3,7 +3,7 @@ from .constants import __EDGES__, __NODES__
 from .simulation_util import *
 from .simulation_util import _cov_list, _var_list
 from .util import *
-from collections.abc import Mapping, KeysView
+from collections.abc import KeysView
 from copy import copy
 from itertools import chain
 from typing import Any, override, TYPE_CHECKING
@@ -17,29 +17,48 @@ if TYPE_CHECKING:
 type vec = tuple[float, float, float]  # TODO: refactor type system. This is redefiniton from config.py
 
 type Filter = Callable[[Simulation, str, Any], Iterable]  # (Proxy.simulation, Proxy.name, key) -> candidate_elements
-class History[H](NumericArrangeable, Mapping[int, H]):  pass
 
 class ProxyKeysView(KeysView):
 	def __repr__(self) -> str:
 		return f"{ self.__class__.__name__ }({ list(self) })"
 
-class Proxy[E, K, H]:
+class _Proxy_get[E, K, V]:
+	def __init__(self, proxy: Proxy[E, K, V]):
+		self._obj = proxy
+
+	def __call__(self, elements: Iterable[E]) -> Proxy[E, K, V]:
+		""" Wrapper extending functionality to general Iterables, e.g. generators. """
+		return self._obj.sub(ordered_set(elements))
+	
+	def __getitem__(self, elements) -> Proxy[E, K, V]:
+		""" Wrapper extending functionality to slices. """
+		if isinstance(elements, slice):
+			a, b = elements.start, elements.stop
+			if any(bound is None for bound in [a, b]):
+				raise ValueError(f"Proxy slice must include both a start and stop: get[{a}:{b}]")
+			if any(not isinstance(bound, int) for bound in [a, b]):
+				raise ValueError(f"Proxy slice currently only supports int type: get[{type(a).__name__} {a}:{type(b).__name__} {b}]")
+			if elements.step is not None:
+				return self._obj.sub(range(a, b, elements.step))
+			return self._obj.sub(range(a, b))
+		if isinstance(elements, tuple):
+			return self(elements)   # shorthand syntax: proxy.get([1, 2, 3]) becomes proxy.get[1, 2, 3]
+		return self._obj[elements]  # treat as singular element as redirect to core self._obj.__getitem__ behaviour
+
+class Proxy[E, K, V]:
 	def __init__(self, simulation: Simulation, sim_name: str, elements: Collection[E], filter: Filter, subscripts: list=[]):
 		self._sim: Simulation = simulation
 		self._name = sim_name
 		self._elements: Collection[E] = elements
 		self._filter = filter
 		self._subscripts: list = subscripts
-
-	@property
-	def history(self) -> History[H]:
-		raise NotImplementedError()  # abstract
+		self._get = _Proxy_get(self)
 	
 	def __len__(self) -> int:             return len(self._elements)
 	def __iter__(self) -> Iterator[E]:    return iter(self._elements)
 	def __contains__(self, key) -> bool:  return key in self._elements
 
-	def __getitem__(self, key: K) -> Proxy[E, H]:
+	def __getitem__(self, key: K) -> Proxy[E, K, V]:
 		proxy = copy(self)
 		candidate_elements = self._filter(self._sim, self._name, key)
 		proxy._elements = { x: None for x in candidate_elements if x in self._elements }  # (ordered set) itersection of candidate_elements and self._elements
@@ -48,14 +67,22 @@ class Proxy[E, K, H]:
 		proxy._subscripts = self._subscripts + [key]
 		return proxy
 
-	def sub(self, elements: Collection[E]) -> Proxy[E, H]:
+	def sub(self, elements: Collection[E]) -> Proxy[E, K, V]:
 		clone = copy(self)
 		clone._elements = elements
 		return clone
 
-	def get(self, elements: Iterable[E]) -> Proxy[E, H]:
-		""" Wrapper extending functionality to general Iterables, e.g. generators. """
-		return self.sub([*elements])
+	@ property
+	def get(self) -> _Proxy_get[E, K, V]:
+		"""
+			Wrapper extending functionality to general Iterables, e.g. generators; and slices.
+			Call like function for Iterables. Index with slice like list for slices. e.g.
+				proxy.get(range(1, 11))
+				proxy.get[1:11]
+			Slices can not omit start or stop becasue the simulation makes no assumptions about (int) nodes being contiguous.
+			Slice syntax can also be used to get specific elements, e.g. proxy.get[n0, n1, n2]
+		"""
+		return self._get
 
 	@property
 	def name(self) -> str:
@@ -72,8 +99,8 @@ class Proxy[E, K, H]:
 	def keys(self) -> KeysView:
 		return ProxyKeysView(self)
 
-class NumericProxy[E, K, H](Proxy[E, K, H], NumericArrangeable):
-	def __setitem__(self, key: K, value: H) -> None:
+class NumericProxy[E, K, V](Proxy[E, K, V], NumericArrangeable):
+	def __setitem__(self, key: K, value: V) -> None:
 		self[key].value = value
 
 def _node_filter(sim: Simulation, param: str, key: Node|Region) -> Collection[Node]:
@@ -86,8 +113,8 @@ def _edge_filter(sim: Simulation, param: str, key: Edge|ERegion) -> Collection[E
 	if key in sim.eregions:  return sim.eregions[key]  # key is interpreted as an edge-region
 	raise KeyError(f"Subscript [{key}] is undefined for parameter {param}: not an edge nor edge-region in Config")
 
-# Allow parameter keys, but only stores Node|Edge keys as elements
-def _ntype_filter(sim: Simulation, param: str, key: Node|Edge|Region|ERegion|Parameter) -> Collection[Node|Edge]:
+# Allow parameter (and literal) keys, but only stores Node|Edge keys as elements
+def _ntype_filter(sim: Simulation, param: str, key: Node|Edge|Region|ERegion|Parameter|Literal) -> Collection[Node|Edge]:
 	if key == __NODES__:       return sim.nodes  # interpreted as the set of all nodes
 	if key == __EDGES__:       return sim.edges  # interpreted as the set of all edges
 	if key in sim.nodes:       return [key]      # interpreted as a (local) node
@@ -97,8 +124,8 @@ def _ntype_filter(sim: Simulation, param: str, key: Node|Edge|Region|ERegion|Par
 	if key in sim.parameters:  return sim.parameters[key]  # interpreted as a (node or edge) parameter
 	raise KeyError(f"For parameter {param}, undefined subscript: [{key}]")
 
-# Allows parameter keys, and stores Node|Edge|Parameter keys are elements
-def _utype_filter(sim: Simulation, param: str, key: Node|Edge|Region|ERegion|Parameter) -> Collection[Node|Edge|Parameter]:
+# Allows parameter (and literal) keys, and stores Node|Edge|Parameter keys are elements
+def _utype_filter(sim: Simulation, param: str, key: Node|Edge|Region|ERegion|Parameter|Literal) -> Iterable[Node|Edge|Parameter]:
 	if key == __NODES__:       return chain(sim.nodes, sim.parameters)
 	if key == __EDGES__:       return chain(sim.edges, sim.parameters)
 	if key in sim.nodes:       return chain([key], sim.parameters)
@@ -108,19 +135,45 @@ def _utype_filter(sim: Simulation, param: str, key: Node|Edge|Region|ERegion|Par
 	if key in sim.parameters:  return chain(sim.nodes, sim.edges, [key])
 	raise KeyError(f"For parameter {param}, Unrecognized subscript: [{key}]")
 
+def _history_filter(sim: Simulation, param: str, key: int|slice|tuple) -> Iterable[int]:
+	if isinstance(key, int):    return [key]
+	if isinstance(key, slice):  return key.indices(len(sim.history))
+	if isinstance(key, tuple):  return key
+	raise KeyError(f"For parameter {param}, History subscript must be int, slice, or tuple: {type(key).__name__} [{key}]")
+
+
+class HistoryProxy[H](NumericProxy[int, int|slice|tuple, H]):
+	def __init__(self, simulation: Simulation, sim_name: str, evaluate: Callable[[Snapshot], H]):
+		super().__init__(simulation, sim_name, elements=ordered_set(range(len(simulation.history))), filter=_history_filter)
+		self._evaluate = evaluate
+	
+	@override
+	@property
+	def value(self) -> H:
+		if len(self._elements) != 1:
+			raise ValueError(f"History can not be evaluated unless fully specified: len(indices)={len(self._elements)}")
+		return self._evaluate(self._sim.history[self._elements[0]])
+
+class Historical[H]:
+	@property
+	def history(self) -> HistoryProxy[H]:
+		raise NotImplementedError()  # abstract
+
+class HistoricalNumericProxy[E, K, V](NumericProxy[E, K, V], Historical[V]):  pass
+
 
 # Proxy for parameters, e.g. J, B, kT, n, etc. Parameters do not aggrigate like
 #	"states", e.g. n, s, f, m, u. Instead they access location specific
 #	information, e.g. J["FML"] would get the J value used in region "FML", and
 #	not the sum of J values used across the region.
-class ParameterProxy[E: Node|Edge, K: Node|Edge|Region|ERegion, H: numpy_vec|float, R: vec|float](NumericProxy[E, K, H]):
+class ParameterProxy[E: Node|Edge, K: Node|Edge|Region|ERegion, V: numpy_vec|float, R: vec|float](HistoricalNumericProxy[E, K, V]):
 	def __init__(self,
 		simulation: Simulation,
 		param: str,
 		elements: Collection[E],
 		filter: Filter,
-		to_sim: Callable[[R], H],      # for getting simulation value from runtime
-		to_rt: Callable[[H], R],       # for updating runtime value from simualtion
+		to_sim: Callable[[R], V],      # for getting simulation value from runtime
+		to_rt: Callable[[V], R],       # for updating runtime value from simualtion
 		shape: Callable[[int], tuple]  # for values shape (given len(_elements))
 	):
 		super().__init__(simulation, param, elements, filter)
@@ -135,7 +188,7 @@ class ParameterProxy[E: Node|Edge, K: Node|Edge|Region|ERegion, H: numpy_vec|flo
 	
 	@override
 	@property
-	def value(self) -> H:
+	def value(self) -> V:
 		if len(self._subscripts) == 0:
 			value = self._runtime_proxy.value  # global parameter
 		else:
@@ -143,7 +196,7 @@ class ParameterProxy[E: Node|Edge, K: Node|Edge|Region|ERegion, H: numpy_vec|flo
 		return self._to_sim(value)
 
 	@value.setter
-	def value(self, value: H) -> None:
+	def value(self, value: V) -> None:
 		value = self._to_rt(value)
 		if len(self._subscripts) == 0:
 			self._runtime_proxy.value = value  # global parameter
@@ -159,10 +212,10 @@ class ParameterProxy[E: Node|Edge, K: Node|Edge|Region|ERegion, H: numpy_vec|flo
 			out[idx] = self._to_sim(self._runtime_proxy[key])
 		return out
 	
-	def _get_consistant_value(self, snapshot: Snapshot):
+	def _get_consistant_value(self, snapshot: Snapshot) -> V:
 		result = None
 		for key in self._elements:
-			value = getattr(snapshot, self.name)[key]
+			value: V = getattr(snapshot, self.name)[key]
 			if result is None:     # store first value
 				result = value
 			elif result != value:  # for global or region selections, make sure all values are equal
@@ -171,8 +224,8 @@ class ParameterProxy[E: Node|Edge, K: Node|Edge|Region|ERegion, H: numpy_vec|flo
 
 	@override
 	@property
-	def history(self) -> ArrangeableDict[int, float|numpy_vec]:
-		return ArrangeableDict({ snapshot.t: self._get_consistant_value(snapshot) for snapshot in self._sim.history })
+	def history(self) -> HistoryProxy[V]:
+		return HistoryProxy(self._sim, self._name, lambda snapshot: self._get_consistant_value(snapshot))
 
 
 class VectorNodeParameterProxy(ParameterProxy[Node, Node|Region, numpy_vec, vec], Vector):
@@ -192,12 +245,18 @@ class ScalarEdgeParameterProxy(ParameterProxy[Edge, Edge|ERegion, float, float],
 		super().__init__(sim, param, elements=sim.edges, filter=_edge_filter, to_sim=simscal, to_rt=rtscal, shape=lambda n: (n,))
 
 
-def _sum(snapshot: Snapshot, hist_name: str):
-	# sum of values from dict: _elements (e.g. nodes) -> values
-	return np.sum(np.array([ *getattr(snapshot, hist_name).values() ]), axis=0)
+def _sum(proxy: Proxy, snapshot: Snapshot):
+		# sum of values from dict: _elements (e.g. nodes) -> values
+		return np.sum(np.array([value for key, value in getattr(snapshot, proxy._name).item() if key in proxy]), axis=0)
+
+class SumProxy[E, K, H](HistoricalNumericProxy[E, K, H]):
+	@override
+	@property
+	def history(self) -> HistoryProxy[numpy_vec]:
+		return HistoryProxy(self._sim, self._name, lambda snapshot: _sum(self, snapshot))
 
 # For spin and flux
-class StateProxy(NumericProxy[Node, Node|Region, numpy_vec], Vector):
+class StateProxy(SumProxy[Node, Node|Region, numpy_vec], Vector):
 	def __init__(self, sim: Simulation, rt_attr: str, sim_name: str):
 		super().__init__(sim, sim_name, elements=sim.nodes, filter=_node_filter)
 		self._runtime_proxy = getattr(sim.rt, rt_attr)
@@ -226,16 +285,8 @@ class StateProxy(NumericProxy[Node, Node|Region, numpy_vec], Vector):
 		for idx, i in enumerate(nodes):
 			out[idx] = simvec(self._runtime_proxy[i])
 		return out
-	
-	@override
-	@property
-	def history(self) -> ArrangeableDict[int, numpy_vec]:
-		return ArrangeableDict({
-			snapshot.t: _sum(snapshot, self._name)
-			for snapshot in self._sim.history
-		})
 
-class MProxy(NumericProxy[Node, Node|Region, numpy_vec], Vector):
+class MProxy(SumProxy[Node, Node|Region, numpy_vec], Vector):
 	def __init__(self, sim: Simulation, sim_name: str="m"):
 		super().__init__(sim, sim_name, elements=sim.nodes, filter=_node_filter)
 
@@ -258,15 +309,10 @@ class MProxy(NumericProxy[Node, Node|Region, numpy_vec], Vector):
 		for idx, i in enumerate(nodes):
 			out[idx] = simvec(runtime.spin[i]) + simvec(runtime.flux[i])
 		return out
-	
-	@override
-	@property
-	def history(self) -> ArrangeableDict[int, numpy_vec]:
-		return ArrangeableDict({ snapshot.t: _sum(snapshot, self._name) for snapshot in self._sim.history })
 
 
 # Number of nodes in selection
-class NProxy(NumericProxy[Node|Edge, Node|Edge, Region|ERegion], IInt):
+class NProxy(HistoricalNumericProxy[Node|Edge, Node|Edge|Region|ERegion, int], IInt):
 	def __init__(self, sim: Simulation, sim_name: str="n"):
 		super().__init__(sim, sim_name, elements=ordered_set(chain(sim.nodes, sim.edges)), filter=_ntype_filter)
 	
@@ -287,9 +333,9 @@ class NProxy(NumericProxy[Node|Edge, Node|Edge, Region|ERegion], IInt):
 	
 	@override
 	@property
-	def history(self) -> ArrangeableDict[int, int]:
+	def history(self) -> HistoryProxy[int]:
 		# n can't change over time
-		return ArrangeableDict({ snapshot.t: self.value for snapshot in self._sim.history }, dtype=int)
+		return HistoryProxy(self._sim, self._name, lambda snapshot: self.value)
 
 
 class UTypeProxy(NumericProxy[Node|Edge|Parameter, Node|Edge|Region|ERegion|Parameter, float], Scalar):
@@ -318,7 +364,7 @@ class UTypeProxy(NumericProxy[Node|Edge|Parameter, Node|Edge|Region|ERegion|Para
 		return len(self.nodes) + len(self.edges)
 
 # Internal Energy in selection
-class UProxy(UTypeProxy):
+class UProxy(UTypeProxy, Historical[float]):
 	def __init__(self, sim: Simulation, sim_name: str="u"):
 		super().__init__(sim, sim_name)
 	
@@ -418,9 +464,8 @@ class UProxy(UTypeProxy):
 	
 	@override
 	@property
-	def history(self) -> ArrangeableDict[int, float]:
-		return ArrangeableDict({ snapshot.t: float(_sum(snapshot, self._name)) for snapshot in self._sim.history })
-
+	def history(self) -> HistoryProxy[float]:
+		return HistoryProxy(self._sim, self._name, lambda snapshot: float(_sum(self, snapshot)))  # float(...) converts numpy float to python float
 
 class CProxy(UTypeProxy):
 	def __init__(self, sim: Simulation, sim_name="c"):

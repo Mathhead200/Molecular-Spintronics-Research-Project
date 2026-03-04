@@ -18,6 +18,7 @@ type Region = Any  # type parameter
 type Edge = tuple[Node, Node]
 type ERegion = tuple[Region, Region]
 type Parameter = str
+type Literal = str  # == type(__NODES__)|type(__EDGES__), both defined in .constants
 
 
 VEC_ZERO = np.zeros(3, dtype=float)

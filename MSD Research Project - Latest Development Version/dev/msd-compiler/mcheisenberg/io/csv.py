@@ -69,7 +69,7 @@ def csv(sim: Simulation, out: str=None, dir: Path|str=".", prefix: str=None, par
 		# data rows
 		# TODO: Add numpy buffers to improve efficiency!! Not lazy?? sim.m.history may be calculating full history before [t] subscript?
 		# 	We need to make history a proxy as well, I think.
-		m_history = sim.m.history  # Fo now, avoid rebuilding the full histories at each iteration
+		m_history = sim.m.history  # For now, avoid rebuilding the full histories at each iteration
 		s_history = sim.s.history
 		f_history = sim.f.history
 		u_history = sim.u.history

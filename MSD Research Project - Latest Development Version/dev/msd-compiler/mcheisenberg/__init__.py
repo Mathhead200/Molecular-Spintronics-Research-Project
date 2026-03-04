@@ -14,7 +14,8 @@ from .simulation import \
 
 from .simulation_proxies import \
 	Proxy, NumericProxy, \
-	History
+	StateProxy, MProxy, NProxy, UProxy, ChiProxy, CProxy, \
+	HistoryProxy
 
 from .constants import \
 	__EDGES__, __NODES__, \
