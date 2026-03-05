@@ -13,8 +13,9 @@ from .simulation import \
 	Simulation, Snapshot
 
 from .simulation_proxies import \
-	Proxy, NumericProxy, \
-	StateProxy, MProxy, NProxy, UProxy, ChiProxy, CProxy, \
+	Proxy, Historical, NumericProxy, HistoricalNumericProxy, \
+	ParameterProxy, ScalarEdgeParameterProxy, ScalarNodeParameterProxy, VectorEdgeParameterProxy, VectorNodeParameterProxy, \
+	StateProxy, MProxy, NProxy, UTypeProxy, UProxy, ChiProxy, CProxy, \
 	HistoryProxy
 
 from .constants import \

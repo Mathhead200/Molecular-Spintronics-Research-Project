@@ -67,57 +67,47 @@ def csv(sim: Simulation, out: str=None, dir: Path|str=".", prefix: str=None, par
 		if progress_bar is not None:  progress_bar.update(1)
 
 		# data rows
-		# TODO: Add numpy buffers to improve efficiency!! Not lazy?? sim.m.history may be calculating full history before [t] subscript?
-		# 	We need to make history a proxy as well, I think.
-		m_history = sim.m.history  # For now, avoid rebuilding the full histories at each iteration
-		s_history = sim.s.history
-		f_history = sim.f.history
-		u_history = sim.u.history
-		m_region_history = { r: sim.m[r].history for r in sim.regions }
-		s_region_history = { r: sim.s[r].history for r in sim.regions }
-		f_region_history = { r: sim.f[r].history for r in sim.regions }
-		u_region_history = { r: sim.u[r].history for r in chain(sim.regions, sim.eregions) }
 		node_iter = iter(sim.nodes)
-		for t in [ss.t for ss in sim.history]:
+		for t in sim.history:
 			line = StrJoiner()
 			line += f'{t},,'
-			m = m_history[t]  # sim.m.history[t]
+			m = sim.m.history[t].value
 			m_norm  = np.linalg.norm(m)
 			m_theta = np.arccos(m[2]/m_norm) if m_norm != 0 else 0.0  # TODO: double check calculations
 			m_phi   = np.arctan2(m[1], m[0]) if m_norm != 0 else 0.0
 			line += f'{m[0]},{m[1]},{m[2]},{m_norm},{m_theta},{m_phi},,'
 			for r in sim.regions:
-				m = m_region_history[r][t]  # sim.m[r].history[t]
+				m = sim.m[r].history[t].value
 				m_norm  = np.linalg.norm(m)
 				m_theta = np.arccos(m[2]/m_norm) if m_norm != 0 else 0.0
 				m_phi   = np.arctan2(m[1], m[0]) if m_norm != 0 else 0.0
 				line += f'{m[0]},{m[1]},{m[2]},{m_norm},{m_theta},{m_phi},,'
-			s = s_history[t]  # sim.s.history[t]
+			s = sim.s.history[t].value
 			s_norm  = np.linalg.norm(s)
 			s_theta = np.arccos(s[2]/s_norm) if s_norm != 0 else 0.0
 			s_phi   = np.arctan2(s[1], s[0]) if s_norm != 0 else 0.0
 			line += f'{s[0]},{s[1]},{s[2]},{s_norm},{s_theta},{s_phi},,'
 			for r in sim.regions:
-				s = s_region_history[r][t]  # sim.s[r].history[t]
+				s = sim.s[r].history[t].value
 				s_norm  = np.linalg.norm(s)
 				s_theta = np.arccos(s[2]/s_norm) if s_norm != 0 else 0.0
 				s_phi   = np.arctan2(s[1], s[0]) if s_norm != 0 else 0.0
 				line += f'{s[0]},{s[1]},{s[2]},{s_norm},{s_theta},{s_phi},,'
-			f = f_history[t]  # sim.f.history[t]
+			f = sim.f.history[t].value
 			f_norm  = np.linalg.norm(f)
 			f_theta = np.arccos(f[2]/f_norm) if f_norm != 0 else 0.0
 			f_phi   = np.arctan2(f[1], f[0]) if f_norm != 0 else 0.0
 			line += f'{f[0]},{f[1]},{f[2]},{f_norm},{f_theta},{f_phi},,'
 			for r in sim.regions:
-				f = f_region_history[r][t]  # sim.f[r].history[t]
+				f = sim.f[r].history[t].value
 				f_norm  = np.linalg.norm(f)
 				f_theta = np.arccos(f[2]/f_norm) if f_norm != 0 else 0.0
 				f_phi   = np.arctan2(f[1], f[0]) if f_norm != 0 else 0.0
 				line += f'{f[0]},{f[1]},{f[2]},{f_norm},{f_theta},{f_phi},,'
-			u = u_history[t]  # sim.u.history[t]
+			u = sim.u.history[t].value
 			line += f'{u},'
 			for r in chain(sim.regions, sim.eregions):
-				u = u_region_history[r][t]  # sim.u[r].history[t]
+				u = sim.u[r].history[t].value
 				line += f'{u},'
 			line += ',,'
 			try:

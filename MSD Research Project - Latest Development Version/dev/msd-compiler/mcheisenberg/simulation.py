@@ -18,30 +18,48 @@ class Snapshot:
 	SAVES = [ *NODE_PARAMETERS, *EDGE_PARAMETERS, "s", "f", "m" ]  # "u"
 
 	def __init__(self, sim: Simulation):
-		self.t = sim.t
-		rt = sim.rt
-		nodes = sim.nodes
-		edges = sim.edges
-		self.B   = { i:  simvec(rt.B[i])   for i in nodes }
-		self.A   = { i:  simvec(rt.A[i])   for i in nodes }
-		self.S   = { i:  simvec(rt.S[i])   for i in nodes }
-		self.F   = { i: simscal(rt.F[i])   for i in nodes }
-		self.kT  = { i: simscal(rt.kT[i])  for i in nodes }
-		self.Je0 = { i: simscal(rt.Je0[i]) for i in nodes }
-
-		self.J   = { e: simscal(rt.J[e])   for e in edges }
-		self.Je1 = { e: simscal(rt.Je1[e]) for e in edges }
-		self.Jee = { e: simscal(rt.Jee[e]) for e in edges }
-		self.b   = { e: simscal(rt.b[e])   for e in edges }
-		self.D   = { e:  simvec(rt.D[e])   for e in edges }
+		mat_n, mat_n2, list_n = sim._buf_mat_node, sim._buf_mat_node2, sim._buf_list_node
+		mat_e, list_e = sim._buf_mat_edge, sim._buf_list_edge
+		s_i, s_j = sim._buf_s_i, sim._buf_s_j
+		f_i, f_j = sim._buf_f_i, sim._buf_f_j
+		m_i, m_j = sim._buf_m_i, sim._buf_m_j
+		Je0, J, Je1, Jee, b = sim._buf_Je0, sim._buf_J, sim._buf_Je1, sim._buf_Jee, sim._buf_b
 		
-		self.s = { e: simvec(rt.spin[e])    for e in nodes }
-		self.f = { e: simvec(rt.flux[e])    for e in nodes }
-		self.m = { e: self.s[e] + self.f[e] for e in nodes }
+		self.t = sim.t
 
-		u = sim.u.values()  # compute energies in paralell with numpy
-		u_keys = chain(nodes, edges)
-		self.u = { key: float(u[idx]) for idx, key in enumerate(u_keys) }
+		nodes = sim.nodes
+		B = sim.B.values(None)  # must make copy to avoid shallow copying rows
+		A = sim.A.values(None)  # must make copy to avoid shallow copying rows
+		self.B   = dict(zip(nodes, B))
+		self.A   = dict(zip(nodes, A))
+		self.S   = dict(zip(nodes, sim.S.values(list_n)))   # don't need to save NDArray, not used in u calc. & don't need copy since is 1D and iter -> scalars
+		self.F   = dict(zip(nodes, sim.F.values(list_n)))   # don't need to save NDArray, not used in u calc. & don't need copy since is 1D and iter -> scalars
+		self.kT  = dict(zip(nodes, sim.kT.values(list_n)))  # don't need to save NDArray, not used in u calc. & don't need copy since is 1D and iter -> scalars
+		self.Je0 = dict(zip(nodes, sim.Je0.values(Je0)))  # don't need copy since is 1D and iter -> scalars
+
+		edges = sim.edges
+		D   = sim.D.values(None)  # must make copy to avoid shallow copying rows
+		self.J   = dict(zip(edges, sim.J.values(J)))      # don't need copy since is 1D and iter -> scalars
+		self.Je1 = dict(zip(edges, sim.Je1.values(Je1)))  # don't need copy since is 1D and iter -> scalars
+		self.Jee = dict(zip(edges, sim.Jee.values(Jee)))  # don't need copy since is 1D and iter -> scalars
+		self.b   = dict(zip(edges, sim.b.values(b)))      # don't need copy since is 1D and iter -> scalars
+		self.D   = dict(zip(edges, D))
+		
+		s = sim.s.values(None)  # must make copy to avoid shallow copying rows
+		f = sim.f.values(None)  # must make copy to avoid shallow copying rows
+		self.s = dict(zip(nodes, s))
+		self.f = dict(zip(nodes, f))
+		
+		# compute magnetizations in paralell with numpy
+		m = sim.m.values(out=None, s=s, f=f, buf_mat=mat_n)  # must make copy to avoid shallow copying rows
+		self.m = dict(zip(nodes, m))
+
+		# compute energies in paralell with numpy
+		u = sim.u.values(out=None,
+			buf_mat_node=mat_n, buf_mat_node2=mat_n2, buf_list_node=list_n, buf_mat_edge=mat_e, buf_list_edge=list_e,
+			buf_s_i=s_i, buf_s_j=s_j, buf_f_i=f_i, buf_f_j=f_j, buf_m_i=m_i, buf_m_j=m_j,
+			s=s, f=f, m=m, B=B, A=A, Je0=Je0, J=J, Je1=Je1, Jee=Jee, b=b, D=D)  # copy m again since it may be clobbered by anisotropy calc.
+		self.u = dict(zip(chain(nodes, edges), u))
 
 # Runtime wrapper which converts everything to numpy float arrays and adds
 #	simulation logic like recording snapshots, aggregates (e.g. m, U, n, etc.), etc.
@@ -73,7 +91,7 @@ class Simulation:
 	def __init__(self, rt: Runtime):
 		self.rt: Runtime = rt
 		self.t: int = 0  # current simulation time since last restart (i.e. reinitialization, or randomization)
-		self.history: Sequence[Snapshot] = []
+		self.history: dict[int, Snapshot] = {}
 
 		config = rt.config
 		# Just need to configure nodes, edges, regions, and eregions once and cache
@@ -95,9 +113,9 @@ class Simulation:
 			] for eregion in config.regionCombos
 		}
 		self._eregions = ReadOnlyDict({
-			eregion: ReadOnlyOrderedSet(ordered_set(edges))
-			for eregion, edges in self._eregions.items()
-			if len(edges) != 0
+			eregion: ReadOnlyOrderedSet(ordered_set(redges))
+			for eregion, redges in self._eregions.items()
+			if len(redges) != 0
 		})
 		# set of defined parameters, preserving order defined in Config:
 		node_p =    [ p for params in config.localNodeParameters.values()  for p in params ]
@@ -130,6 +148,27 @@ class Simulation:
 		self._u_proxy = UProxy(self)
 		self._x_proxy = ChiProxy(self)
 		self._c_proxy = CProxy(self)
+
+		# pre-allocated buffers for snapshots (i.e. recordings)
+		N = len(config.nodes)
+		M = len(config.edges)
+		L = N + M
+		self._buf_mat_node  = np.empty((N, 3), dtype=float)
+		self._buf_mat_node2 = np.empty((N, 3), dtype=float)
+		self._buf_mat_edge  = np.empty((M, 3), dtype=float)
+		self._buf_list_node = np.empty((N,), dtype=float)
+		self._buf_list_edge = np.empty((M,), dtype=float)
+		self._buf_s_i = np.empty((M, 3), dtype=float)
+		self._buf_s_j = np.empty((M, 3), dtype=float)
+		self._buf_f_i = np.empty((M, 3), dtype=float)
+		self._buf_f_j = np.empty((M, 3), dtype=float)
+		self._buf_m_i = np.empty((M, 3), dtype=float)
+		self._buf_m_j = np.empty((M, 3), dtype=float)
+		self._buf_Je0 = np.empty((N,), dtype=float)
+		self._buf_J   = np.empty((M,), dtype=float)
+		self._buf_Je1 = np.empty((M,), dtype=float)
+		self._buf_Jee = np.empty((M,), dtype=float)
+		self._buf_b   = np.empty((M,), dtype=float)
 
 	def seed(self, *seed: int) -> None:
 		self.rt.seed(seed)
@@ -175,12 +214,12 @@ class Simulation:
 	
 	def record(self) -> Snapshot:
 		sample = Snapshot(self)
-		self.history.append(sample)
+		self.history[sample.t] = sample
 		return sample
 
 	def clear_history(self) -> None:
 		self.t = 0
-		self.history = []
+		self.history = {}
 	
 	@property
 	def nodes(self) -> ReadOnlyOrderedSet[Node]:

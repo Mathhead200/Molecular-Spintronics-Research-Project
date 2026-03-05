@@ -27,21 +27,27 @@ VEC_J = np.array([0.0, 1.0, 0.0])
 VEC_K = np.array([0.0, 0.0, 1.0])
 
 
-def simvec(v: vec|numpy_vec|None) -> numpy_vec:
+def simvec(v: vec|numpy_vec|None, out: NDArray=None) -> numpy_vec:
 	""" Convert a Runtime tuple vec to a Simulation numpy ndarray. """
 	if v is None:
-		return VEC_ZERO
-	return np.asarray(v, dtype=float)
+		v = VEC_ZERO
+	if out is None:
+		return np.asarray(v, dtype=float)
+	out[0:len(v)] = v
+	return out
 
 def rtvec(v: vec|numpy_vec|None) -> vec:
 	""" Converts a Simulation numpy ndarray to a Runtime tuple vec. """
 	return tuple(simvec(v).astype(float).tolist())
 
-def simscal(x: float|None) -> float:
+def simscal(x: float|None, out: NDArray=None) -> float:
 	""" Convert a Runtime float|None to a Simulation float. """
 	if x is None:
-		return 0.0
-	return x
+		x = 0.0
+	if out is None:
+		return x
+	out[0] = x
+	return out
 
 def rtscal(x: float|None) -> float:
 	""" Convert a Simulation float to a Runtime float. """

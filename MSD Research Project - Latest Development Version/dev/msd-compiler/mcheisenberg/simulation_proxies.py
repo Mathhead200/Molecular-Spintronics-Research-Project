@@ -28,7 +28,7 @@ class _Proxy_get[E, K, V]:
 
 	def __call__(self, elements: Iterable[E]) -> Proxy[E, K, V]:
 		""" Wrapper extending functionality to general Iterables, e.g. generators. """
-		return self._obj.sub(ordered_set(elements))
+		return self._obj.sub(list(elements))
 	
 	def __getitem__(self, elements) -> Proxy[E, K, V]:
 		""" Wrapper extending functionality to slices. """
@@ -144,7 +144,7 @@ def _history_filter(sim: Simulation, param: str, key: int|slice|tuple) -> Iterab
 
 class HistoryProxy[H](NumericProxy[int, int|slice|tuple, H]):
 	def __init__(self, simulation: Simulation, sim_name: str, evaluate: Callable[[Snapshot], H]):
-		super().__init__(simulation, sim_name, elements=ordered_set(range(len(simulation.history))), filter=_history_filter)
+		super().__init__(simulation, sim_name, elements=ordered_set(simulation.history), filter=_history_filter)
 		self._evaluate = evaluate
 	
 	@override
@@ -152,7 +152,8 @@ class HistoryProxy[H](NumericProxy[int, int|slice|tuple, H]):
 	def value(self) -> H:
 		if len(self._elements) != 1:
 			raise ValueError(f"History can not be evaluated unless fully specified: len(indices)={len(self._elements)}")
-		return self._evaluate(self._sim.history[self._elements[0]])
+		t = next(iter(self._elements))  # self._elements may not be any Collection type (e.g. ordered_set)
+		return self._evaluate(self._sim.history[t])
 
 class Historical[H]:
 	@property
@@ -207,9 +208,10 @@ class ParameterProxy[E: Node|Edge, K: Node|Edge|Region|ERegion, V: numpy_vec|flo
 	def values(self, out: NDArray) -> NDArray:
 		keys = self._elements
 		if out is None:
-			out = np.array(self._shape(len(keys)), dtype=float)
+			out = np.empty(self._shape(len(keys)), dtype=float)
+		_mat = out.ndim > 1  # bool. e.g. parameter D would be shape=(3, M), _mat=True; J would be (M,), False; and B would be (3, N), True
 		for idx, key in enumerate(keys):
-			out[idx] = self._to_sim(self._runtime_proxy[key])
+			self._to_sim(self._runtime_proxy[key], out=out[idx] if _mat else out[idx:idx+1])
 		return out
 	
 	def _get_consistant_value(self, snapshot: Snapshot) -> V:
@@ -247,7 +249,7 @@ class ScalarEdgeParameterProxy(ParameterProxy[Edge, Edge|ERegion, float, float],
 
 def _sum(proxy: Proxy, snapshot: Snapshot):
 		# sum of values from dict: _elements (e.g. nodes) -> values
-		return np.sum(np.array([value for key, value in getattr(snapshot, proxy._name).item() if key in proxy]), axis=0)
+		return np.sum(np.array([value for key, value in getattr(snapshot, proxy._name).items() if key in proxy]), axis=0)
 
 class SumProxy[E, K, H](HistoricalNumericProxy[E, K, H]):
 	@override
@@ -283,7 +285,7 @@ class StateProxy(SumProxy[Node, Node|Region, numpy_vec], Vector):
 		if out is None:
 			out = np.empty((len(nodes), 3), dtype=float)
 		for idx, i in enumerate(nodes):
-			out[idx] = simvec(self._runtime_proxy[i])
+			simvec(self._runtime_proxy[i], out=out[idx])  # copy rt values directly into row view of pre-allocated output matrix
 		return out
 
 class MProxy(SumProxy[Node, Node|Region, numpy_vec], Vector):
@@ -298,17 +300,18 @@ class MProxy(SumProxy[Node, Node|Region, numpy_vec], Vector):
 		else:
 			runtime = self._sim.rt
 			node = [*self._elements][0]
-			return simvec(runtime.spin[node]) + simvec(runtime.flux[node])
+			s = simvec(runtime.spin[node])
+			return np.add(s, simvec(runtime.flux[node]), out=s)
 	
 	@override
-	def values(self, out: NDArray=None) -> numpy_mat:
+	def values(self, out: NDArray=None, buf_mat: NDArray=None, s: NDArray=None, f: NDArray=None) -> numpy_mat:
 		nodes = self._elements
 		if out is None:
 			out = np.empty((len(nodes), 3), dtype=float)
-		runtime = self._sim.rt
-		for idx, i in enumerate(nodes):
-			out[idx] = simvec(runtime.spin[i]) + simvec(runtime.flux[i])
-		return out
+		sim = self._sim
+		if s is None:  s = sim.s.sub(nodes).values(out)
+		if f is None:  f = sim.f.sub(nodes).values(buf_mat)
+		return np.add(s, f, out=out)
 
 
 # Number of nodes in selection
@@ -378,7 +381,16 @@ class UProxy(UTypeProxy, Historical[float]):
 		return float(np.sum(self.values(), axis=0))
 
 	@override
-	def values(self, out: NDArray=None) -> numpy_list:
+	def values(self, out: NDArray=None,
+		# volitile (i.e. clobbered!):
+		buf_mat_node: NDArray=None, buf_mat_node2: NDArray=None, buf_list_node: NDArray=None,
+		buf_mat_edge: NDArray=None, buf_list_edge: NDArray=None,
+		buf_s_i: NDArray=None, buf_s_j: NDArray=None, buf_f_i: NDArray=None, buf_f_j: NDArray=None, buf_m_i: NDArray=None, buf_m_j: NDArray=None,
+		# non-volitile:
+		s: numpy_mat=None, f: numpy_mat=None, m: numpy_mat=None,     # pre-calculated s, f, m values
+		B: numpy_mat=None, A: numpy_mat=None, Je0: numpy_list=None,  # pre-calculated node parameter
+		J: numpy_list=None, Je1: numpy_list=None, Jee: numpy_list=None, b: numpy_list=None, D: numpy_mat=None  # pre-calculated edge parameters
+	) -> numpy_list:
 		sim = self._sim
 		parameters = self.parameters
 		nodes = self.nodes
@@ -395,25 +407,26 @@ class UProxy(UTypeProxy, Historical[float]):
 			out[0:L] = 0  # clear (zero) slice of output where results will be calculated and stored
 
 		if N != 0:
-			m = None    # cache (used for calculations: B, A); shape=(N, 3)
-			buf_mat = np.empty((N, 3), dtype=float)  # temporary buffers
-			buf_list = np.empty((N,), dtype=float)
+			# m = ...  # is cache (used for calculations: B, A); shape=(N, 3)
+			buf_mat = np.empty((N, 3), dtype=float) if buf_mat_node is None else buf_mat_node
+			buf_list = np.empty((N,), dtype=float) if buf_list_node is None else buf_list_node
+			buf_mat2 = m if m is None else np.empty((N, 3), dtype=float) if buf_mat_node2 is None else buf_mat_node2
 
 			if "B" in parameters:
-				m = sim.m.sub(nodes).values(None)  # (new buffer)
-				B = sim.B.sub(nodes).values(buf_mat)
+				if m is None:  m = sim.m.sub(nodes).values(None)  # (new buffer)
+				if B is None:  B = sim.B.sub(nodes).values(buf_mat)
 				out[0:N] -= dot(B, m, temp=buf_mat)
 			
 			if "A" in parameters:
 				if m is None:  m = sim.m.sub(nodes).values(None)  # (new buffer)
-				A = sim.A.sub(nodes).values(buf_mat)
-				np.multiply(m, m, out=m)  # (!) Hadamard product: [[mx * mx, my * my, mz * mz], ...]; don't need m anymore
+				if A is None:  A = sim.A.sub(nodes).values(buf_mat)
+				np.multiply(m, m, out=buf_mat2)  # Hadamard product: [[mx * mx, my * my, mz * mz], ...]
 				out[0:N] -= dot(A, m, temp=buf_mat)
 			
 			if "Je0" in parameters:
-				s = sim.s.sub(nodes).values(m)  # (!) don't need m anymore
-				f = sim.f.sub(nodes).values(buf_mat)  # (!) don't need f after this
-				Je0 = sim.Je0.sub(nodes).values(buf_list)
+				if s is None:  s = sim.s.sub(nodes).values(buf_mat)   # (!) don't need m anymore
+				if f is None:  f = sim.f.sub(nodes).values(buf_mat2)  # (!) don't need f after this
+				if Je0 is None:  Je0 = sim.Je0.sub(nodes).values(buf_list)
 				out[0:N] -= np.multiply(Je0, dot(s, f, temp=buf_mat), out=buf_list)
 		
 		if M != 0:
@@ -423,41 +436,41 @@ class UProxy(UTypeProxy, Historical[float]):
 			f_j = None  # cache (used for calculations: Je1, Jee); shape=(M, 3)
 			m_i = None  # cache (used for calculations: b, D); shape=(M, 3)
 			m_j = None  # cache (used for calculations: b, D); shape=(M, 3)
-			buf_mat = np.empty((M, 3), dtype=float)
-			buf_list = np.empty((M,), dtype=float)
+			buf_mat = np.empty((M, 3), dtype=float) if buf_mat_edge is None else buf_mat_edge
+			buf_list = np.empty((M,), dtype=float) if buf_list_edge is None else buf_list_edge
 
 			if "J" in parameters:
-				s_i = sim.s.get(i for i, _ in edges).values(None)  # new buffer
-				s_j = sim.s.get(j for _, j in edges).values(None)  # new buffer
-				J = sim.J.sub(edges).values(buf_list)
+				s_i = sim.s.get(i for i, _ in edges).values(buf_s_i)  # new buffer?
+				s_j = sim.s.get(j for _, j in edges).values(buf_s_j)  # new buffer?
+				if J is None:  J = sim.J.sub(edges).values(buf_list)
 				out[N:L] -= np.multiply(J, dot(s_i, s_j, temp=buf_mat), out=buf_list)
 
 			if "Je1" in parameters:
-				if s_i is None:  s_i = sim.s.get(i for i, _ in edges).values(None)  # new buffer
-				if s_j is None:  s_j = sim.s.get(j for _, j in edges).values(None)  # new buffer
-				f_i = sim.f.get(i for i, _ in edges).values(None)  # new buffer
-				f_j = sim.f.get(j for _, j in edges).values(None)  # new buffer
-				Je1 = sim.Je1.sub(edges).values(buf_list)
+				if s_i is None:  s_i = sim.s.get(i for i, _ in edges).values(buf_s_i)  # new buffer?
+				if s_j is None:  s_j = sim.s.get(j for _, j in edges).values(buf_s_j)  # new buffer?
+				f_i = sim.f.get(i for i, _ in edges).values(buf_f_i)  # new buffer?
+				f_j = sim.f.get(j for _, j in edges).values(buf_f_j)  # new buffer?
+				if Je1 is None:  Je1 = sim.Je1.sub(edges).values(buf_list)
 				dotp1 = dot(s_i, f_j, temp=buf_mat)
 				dotp2 = dot(f_i, s_j, temp=buf_mat)
 				out[N:L] -= np.multiply(Je1, np.add(dotp1, dotp2), out=buf_list)
 
 			if "Jee" in parameters:
-				if f_i is None:  f_i = sim.f.get(i for i, _ in edges).values(None)  # new buffer
-				if f_j is None:  f_j = sim.f.get(j for _, j in edges).values(None)  # new buffer
-				Jee = sim.Jee.sub(edges).values(buf_list)
+				if f_i is None:  f_i = sim.f.get(i for i, _ in edges).values(buf_f_i)  # new buffer?
+				if f_j is None:  f_j = sim.f.get(j for _, j in edges).values(buf_f_j)  # new buffer?
+				if Jee is None:  Jee = sim.Jee.sub(edges).values(buf_list)
 				out[N:L] -= np.multiply(Jee, dot(f_i, f_j, temp=buf_mat), out=buf_list)
 
 			if "b" in parameters:
-				m_i = sim.m.get(i for i, _ in edges).values(None)  # new buffer
-				m_j = sim.m.get(j for _, j in edges).values(None)  # new buffer
-				b = sim.b.sub(edges).values(buf_list)
+				m_i = sim.m.get(i for i, _ in edges).values(buf_m_i)  # new buffer?
+				m_j = sim.m.get(j for _, j in edges).values(buf_m_j)  # new buffer?
+				if b is None:  b = sim.b.sub(edges).values(buf_list)
 				out[N:L] -= np.multiply(b, dot(m_i, m_j, temp=buf_mat)**2, out=buf_list)
 
 			if "D" in parameters:
-				if m_i is None:  m_i = sim.m.get(i for i, _ in edges).values(None)  # new buffer
-				if m_j is None:  m_j = sim.m.get(j for _, j in edges).values(None)  # new buffer
-				D = sim.D.sub(edges).values(buf_mat)
+				if m_i is None:  m_i = sim.m.get(i for i, _ in edges).values(buf_m_i)  # new buffer?
+				if m_j is None:  m_j = sim.m.get(j for _, j in edges).values(buf_m_j)  # new buffer?
+				if D is None:    D = sim.D.sub(edges).values(buf_mat)
 				out[N:L] -= dot(D, np.cross(m_i, m_j), temp=buf_mat)
 
 		return out
