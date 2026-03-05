@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<book xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_index" xml:lang="en-US">
+    <info>
+    <title>MSD</title>
+    </info>
+<chapter>
+    <title>Namespace Documentation</title>
+<xi:include href="d7/d52/namespace_m_s_d.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+<xi:include href="d5/d44/namespaceudc.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+</chapter>
+<chapter>
+    <title>Class Documentation</title>
+    <xi:include href="dc/d92/class_m_s_d_1_1_molecule_1_1___edge.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="d7/d48/class_m_s_d_1_1_molecule_1_1___edge_iterable.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="d5/dce/class_m_s_d_1_1_m_s_d_1_1___iterator.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="d6/de6/class_m_s_d_1_1___m_m_t_struct.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="d3/d9c/class_m_s_d_1_1_molecule_1_1___node.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="d9/d19/class_m_s_d_1_1_molecule_1_1___node_iterable.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="d3/d3c/class_m_s_d_1_1___struct_with_dict.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="d5/df1/classudc_1_1_molecule_1_1_deserialization_exception.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="d9/d00/classudc_1_1_molecule_1_1_edge_iterable.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="d0/d94/classudc_1_1_molecule_1_1_edge_iterator.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="d5/dbb/class_m_s_d_1_1_molecule_1_1_edge_parameters.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="d7/de8/structudc_1_1_molecule_1_1_edge_parameters.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="dc/de7/classudc_1_1_m_s_d_1_1_iterator.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="d4/deb/class_m_s_d_1_1_molecule.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="dd/d09/classudc_1_1_molecule.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="de/da1/classudc_1_1_m_s_d_1_1_molecule_exception.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="d7/d2d/class_m_s_d_1_1_m_s_d.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="d1/d55/classudc_1_1_m_s_d.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="da/d97/classudc_1_1_molecule_1_1_node_iterable.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="d4/d86/classudc_1_1_molecule_1_1_node_iterator.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="d1/d6e/class_m_s_d_1_1_molecule_1_1_node_parameters.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="d6/d1d/structudc_1_1_molecule_1_1_node_parameters.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="de/d89/class_m_s_d_1_1_m_s_d_1_1_parameters.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="db/d11/structudc_1_1_m_s_d_1_1_parameters.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="d4/dba/class_m_s_d_1_1_m_s_d_1_1_results.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="d4/d1b/structudc_1_1_m_s_d_1_1_results.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="db/d21/classudc_1_1_sparse_array.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="db/d6c/structudc_1_1_sparse_array_value.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="d7/d91/classudc_1_1_u_d_c_exception.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="d2/d3a/class_m_s_d_1_1_vector.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="d8/dd4/classudc_1_1_vector.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+</chapter>
+<chapter>
+    <title>File Documentation</title>
+    <xi:include href="d5/d8b/_m_s_d_8py.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="d3/dcc/mmt_8h.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="d3/dcc/mmt_8h_source.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="dc/d90/_m_s_d-export_8cpp.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="db/db5/_m_s_d_8h.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="db/db5/_m_s_d_8h_source.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="d5/d72/_sparse_array_8h.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="d5/d72/_sparse_array_8h_source.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="db/d72/udc_8h.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="db/d72/udc_8h_source.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="d4/d7f/_vector_8h.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="d4/d7f/_vector_8h_source.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+</chapter>
+<index/>
+</book>

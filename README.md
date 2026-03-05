@@ -11,13 +11,14 @@ Special thanks to my student Robert J. for his recent contributions to the code 
 
 <hr>
 
-Version 6.3.0 is the current & latest version as of 1-4-2024
+Version 7.0.0 is the current & latest version as of 3-5-2026
 
 Testing needed:
 	v6.0.0: The custom molecule features have not yet been fully tested, but preliminary results are promising.
 	v6.1.0: MSD.py python binding.
 	v6.2.0: Molecule Iterators, and Iterator support in MSD.py
 	v6.3.0: Unit tests for MSDServer and JS
+	v7.0.0: Everything (full rebuild)
 
 Planned additions:
 	1. Changes to simulation to measure and control the Electric Field.
@@ -50,3 +51,4 @@ Version history (see ~/change-log.txt for more details):
 (2-8-2023) Version 6.2.3 Fixed bug in mmt_compiler
 (2-17-2023) Version 6.2.4 Added MMT support to all apps
 (1-4-2024) Version 6.3.0 Created HTTP Server to run simulations concurrently
+(3-5-2026) Version 7.0.0 mcheisenberg Python/x64 rebuild

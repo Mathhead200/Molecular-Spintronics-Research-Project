@@ -1,0 +1,19 @@
+Mising Features:
+* Add post-processing graphs
+	** Magnetization over time, Energy over time, autocorrelation(?)
+	** Ability to save gaphs
+* Add more lenses (i.e., "View Types"): e.g., energy, spin vs. flux.
+* Abilty to run multiple simulations simultaniously. (Ensemble or Experiment)
+	** Create (left) side pane to house all open simulations.
+	** Selecting an open simulation from the side pane should update parameters, 3D, and timeline.
+	** Create ability to add post-processing graph that look at the full list of open simulations.
+
+UI/UX fixes:
+* Input fields should auto-highlight on focus so they can be easily modifed.
+* Save pane size and camera position on refreash.
+
+* File name for "Download CSV" output is wrong.
+* We noticed a problem with the view methods currently being used and the output data.
+	Try to reproduce and fix this issue.
+* Change UI for show/hide parameters & timeline.
+* Custom colors for regions and match them with parameters pane.

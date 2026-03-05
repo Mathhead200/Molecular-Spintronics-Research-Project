@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_class_m_s_d_1_1_molecule_1_1___node_iterable" xml:lang="en-US">
+<title>MSD.Molecule._NodeIterable Class Reference</title>
+<indexterm><primary>MSD.Molecule._NodeIterable</primary></indexterm>
+<para>
+
+<para>Represents an iterable collection of molecule nodes. </para>
+ 
+</para>
+<simplesect>
+    <title>Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_molecule_1_1___node_iterable_1abe771db4b20eee483324656a53c749fe">__init__</link> (self, <link linkend="_class_m_s_d_1_1_molecule_1ac2da6ac139c0eaa0766e362d457be3a6">nodes</link>)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_molecule_1_1___node_iterable_1a3548d71916cb9be0e86fc050a9b8b631">__del__</link> (self)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_molecule_1_1___node_iterable_1a6024ebde2d8aaec173be64fe397c0a4a">__iter__</link> (self)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_molecule_1_1___node_iterable_1a1a2b31d41c2eb620e177e5c91c43c0d4">__reversed__</link> (self)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_molecule_1_1___node_iterable_1a09c4a7ca11c2aaa07398b4d8545f1f79">__len__</link> (self)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_molecule_1_1___node_iterable_1ae62132ce734bfca34372e095eabd1fd2">__getitem__</link> (self, index)</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Properties    </title>
+        <itemizedlist>
+            <listitem><para><link linkend="_class_m_s_d_1_1_molecule_1_1___node_iterable_1a07fdf509115c90c158df9ba9e6d709fa">begin</link> = property(fget = lambda self: <link linkend="_class_m_s_d_1_1_molecule_1_1___node">Molecule._Node</link>(iterable = self))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_molecule_1_1___node_iterable_1a1622e5f8c20277fe79db7939d6e86504">end</link> = property(fget = lambda self: <link linkend="_class_m_s_d_1_1_molecule_1_1___node">Molecule._Node</link>(iterable = self, start = (self._end, len(self))))</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Detailed Description</title>
+
+<para>Represents an iterable collection of molecule nodes. </para>
+
+
+
+<para>Do not construct directly! Should be constructed using <link linkend="_class_m_s_d_1_1_molecule">Molecule</link> methods/properties, namely: <link linkend="_class_m_s_d_1_1_molecule_1ac2da6ac139c0eaa0766e362d457be3a6">Molecule.nodes</link> </para>
+</section>
+<section>
+<title>Constructor &amp; Destructor Documentation</title>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___node_iterable_1abe771db4b20eee483324656a53c749fe"/><section>
+    <title>__init__()</title>
+<indexterm><primary>__init__</primary><secondary>MSD.Molecule._NodeIterable</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._NodeIterable</primary><secondary>__init__</secondary></indexterm>
+<para><computeroutput>def MSD.Molecule._NodeIterable.__init__ ( self,  nodes)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___node_iterable_1a3548d71916cb9be0e86fc050a9b8b631"/><section>
+    <title>__del__()</title>
+<indexterm><primary>__del__</primary><secondary>MSD.Molecule._NodeIterable</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._NodeIterable</primary><secondary>__del__</secondary></indexterm>
+<para><computeroutput>def MSD.Molecule._NodeIterable.__del__ ( self)</computeroutput></para></section>
+</section>
+<section>
+<title>Member Function Documentation</title>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___node_iterable_1ae62132ce734bfca34372e095eabd1fd2"/><section>
+    <title>__getitem__()</title>
+<indexterm><primary>__getitem__</primary><secondary>MSD.Molecule._NodeIterable</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._NodeIterable</primary><secondary>__getitem__</secondary></indexterm>
+<para><computeroutput>def MSD.Molecule._NodeIterable.__getitem__ ( self,  index)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___node_iterable_1a6024ebde2d8aaec173be64fe397c0a4a"/><section>
+    <title>__iter__()</title>
+<indexterm><primary>__iter__</primary><secondary>MSD.Molecule._NodeIterable</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._NodeIterable</primary><secondary>__iter__</secondary></indexterm>
+<para><computeroutput>def MSD.Molecule._NodeIterable.__iter__ ( self)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___node_iterable_1a09c4a7ca11c2aaa07398b4d8545f1f79"/><section>
+    <title>__len__()</title>
+<indexterm><primary>__len__</primary><secondary>MSD.Molecule._NodeIterable</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._NodeIterable</primary><secondary>__len__</secondary></indexterm>
+<para><computeroutput>def MSD.Molecule._NodeIterable.__len__ ( self)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___node_iterable_1a1a2b31d41c2eb620e177e5c91c43c0d4"/><section>
+    <title>__reversed__()</title>
+<indexterm><primary>__reversed__</primary><secondary>MSD.Molecule._NodeIterable</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._NodeIterable</primary><secondary>__reversed__</secondary></indexterm>
+<para><computeroutput>def MSD.Molecule._NodeIterable.__reversed__ ( self)</computeroutput></para></section>
+</section>
+<section>
+<title>Property Documentation</title>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___node_iterable_1a07fdf509115c90c158df9ba9e6d709fa"/><section>
+    <title>begin</title>
+<indexterm><primary>begin</primary><secondary>MSD.Molecule._NodeIterable</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._NodeIterable</primary><secondary>begin</secondary></indexterm>
+<para><computeroutput>MSD.Molecule._NodeIterable.begin = property(fget = lambda self: <link linkend="_class_m_s_d_1_1_molecule_1_1___node">Molecule._Node</link>(iterable = self))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___node_iterable_1a1622e5f8c20277fe79db7939d6e86504"/><section>
+    <title>end</title>
+<indexterm><primary>end</primary><secondary>MSD.Molecule._NodeIterable</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._NodeIterable</primary><secondary>end</secondary></indexterm>
+<para><computeroutput>MSD.Molecule._NodeIterable.end = property(fget = lambda self: <link linkend="_class_m_s_d_1_1_molecule_1_1___node">Molecule._Node</link>(iterable = self, start = (self._end, len(self))))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<para>
+The documentation for this class was generated from the following file:</para>
+C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/lib/python/<link linkend="__m_s_d_8py">MSD.py</link></section>
+</section>

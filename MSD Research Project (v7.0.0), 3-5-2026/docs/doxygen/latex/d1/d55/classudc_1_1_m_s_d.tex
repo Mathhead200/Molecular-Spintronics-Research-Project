@@ -1,0 +1,890 @@
+\hypertarget{classudc_1_1_m_s_d}{}\doxysection{udc\+::MSD Class Reference}
+\label{classudc_1_1_m_s_d}\index{udc::MSD@{udc::MSD}}
+
+
+An abstract Molecular Spintronic Device.  
+
+
+
+
+{\ttfamily \#include $<$MSD.\+h$>$}
+
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classudc_1_1_m_s_d_1_1_iterator}{Iterator}}
+\item 
+class \mbox{\hyperlink{classudc_1_1_m_s_d_1_1_molecule_exception}{Molecule\+Exception}}
+\item 
+struct \mbox{\hyperlink{structudc_1_1_m_s_d_1_1_parameters}{Parameters}}
+\item 
+struct \mbox{\hyperlink{structudc_1_1_m_s_d_1_1_results}{Results}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \mbox{\hyperlink{classudc_1_1_molecule}{Molecule}} \mbox{\hyperlink{classudc_1_1_m_s_d_a7266f08d021d5a06960b152c95a9213e}{Mol\+Proto}}
+\item 
+typedef Molecule\+::\+Instance \mbox{\hyperlink{classudc_1_1_m_s_d_ab3c0b3e8474e18cb213f79d66f221b67}{Mol}}
+\item 
+typedef function$<$ \mbox{\hyperlink{classudc_1_1_m_s_d_a7266f08d021d5a06960b152c95a9213e}{Mol\+Proto}}(unsigned int)$>$ \mbox{\hyperlink{classudc_1_1_m_s_d_aa5aef25b88fee8190e1ac32070d06d66}{Mol\+Proto\+Factory}}
+\item 
+typedef function$<$ \mbox{\hyperlink{classudc_1_1_vector}{Vector}}(const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&, function$<$ double()$>$)$>$ \mbox{\hyperlink{classudc_1_1_m_s_d_a3d235795ecc459cc0c2069c3f05d089d}{Flipping\+Algorithm}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classudc_1_1_m_s_d_a8bb6667fb7bc003abe0fc6af8793ed12}{MSD}} (unsigned int width, unsigned int height, unsigned int depth, const \mbox{\hyperlink{classudc_1_1_m_s_d_a7266f08d021d5a06960b152c95a9213e}{Mol\+Proto}} \&mol\+Proto, unsigned int mol\+PosL, unsigned int topL, unsigned int bottomL, unsigned int frontR, unsigned int backR)
+\item 
+\mbox{\hyperlink{classudc_1_1_m_s_d_a1d6135b424fccae0e69d8eece84672ea}{MSD}} (unsigned int width, unsigned int height, unsigned int depth, const \mbox{\hyperlink{classudc_1_1_m_s_d_aa5aef25b88fee8190e1ac32070d06d66}{Mol\+Proto\+Factory}} \&mol\+Type, unsigned int mol\+PosL, unsigned int mol\+PosR, unsigned int topL, unsigned int bottomL, unsigned int frontR, unsigned int backR)
+\item 
+\mbox{\hyperlink{classudc_1_1_m_s_d_a9f4d8ca0e3bf597898705d6784155f75}{MSD}} (unsigned int width, unsigned int height, unsigned int depth, unsigned int mol\+PosL, unsigned int mol\+PosR, unsigned int topL, unsigned int bottomL, unsigned int frontR, unsigned int backR)
+\item 
+\mbox{\hyperlink{classudc_1_1_m_s_d_a4014b4eaa8dffbd9799aebccf3fdb842}{MSD}} (unsigned int width, unsigned int height, unsigned int depth, unsigned int heightL, unsigned depthR)
+\item 
+\mbox{\hyperlink{classudc_1_1_m_s_d_a337868649574cfba54a1d779483a47c8}{MSD}} (unsigned int width, unsigned int height, unsigned int depth)
+\item 
+\mbox{\hyperlink{structudc_1_1_m_s_d_1_1_parameters}{Parameters}} \mbox{\hyperlink{classudc_1_1_m_s_d_abfa4f6883d0b4677ab7b70c1adf06066}{get\+Parameters}} () const
+\item 
+void \mbox{\hyperlink{classudc_1_1_m_s_d_aa1513f639c10ca29773ea287ae104121}{set\+Parameters}} (const \mbox{\hyperlink{structudc_1_1_m_s_d_1_1_parameters}{Parameters}} \&)
+\item 
+\mbox{\hyperlink{structudc_1_1_m_s_d_1_1_results}{Results}} \mbox{\hyperlink{classudc_1_1_m_s_d_ae1bee2a207b40720156243ed19eed671}{get\+Results}} () const
+\item 
+void \mbox{\hyperlink{classudc_1_1_m_s_d_a5c1d308f90d10072e5288685ba4d58db}{set\+\_\+kT}} (double kT)
+\item 
+void \mbox{\hyperlink{classudc_1_1_m_s_d_a18aa13537e0deda7d1263c1fd8d8228a}{setB}} (const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&B)
+\item 
+\mbox{\hyperlink{classudc_1_1_m_s_d_a7266f08d021d5a06960b152c95a9213e}{Mol\+Proto}} \mbox{\hyperlink{classudc_1_1_m_s_d_a77dce5d8c1a874c47acfbc69d5a867ab}{get\+Mol\+Proto}} () const
+\item 
+void \mbox{\hyperlink{classudc_1_1_m_s_d_aa8ed0dab0705b810e4d14215b488fb43}{set\+Mol\+Proto}} (const \mbox{\hyperlink{classudc_1_1_m_s_d_a7266f08d021d5a06960b152c95a9213e}{Mol\+Proto}} \&proto)
+\item 
+void \mbox{\hyperlink{classudc_1_1_m_s_d_aade85204d30f826444572e41f27613aa}{set\+Mol\+Parameters}} (const \mbox{\hyperlink{structudc_1_1_molecule_1_1_node_parameters}{Mol\+Proto\+::\+Node\+Parameters}} \&, const \mbox{\hyperlink{structudc_1_1_molecule_1_1_edge_parameters}{Mol\+Proto\+::\+Edge\+Parameters}} \&)
+\item 
+\mbox{\hyperlink{classudc_1_1_vector}{Vector}} \mbox{\hyperlink{classudc_1_1_m_s_d_a9719db02665a291111d9dd887be6538f}{get\+Spin}} (unsigned int a) const
+\item 
+\mbox{\hyperlink{classudc_1_1_vector}{Vector}} \mbox{\hyperlink{classudc_1_1_m_s_d_aea1f8af9db8cc945eb35a809e923051d}{get\+Spin}} (unsigned int x, unsigned int y, unsigned int z) const
+\item 
+\mbox{\hyperlink{classudc_1_1_vector}{Vector}} \mbox{\hyperlink{classudc_1_1_m_s_d_a5296876f3e8cc8b963c0daa773f9f3a7}{get\+Flux}} (unsigned int a) const
+\item 
+\mbox{\hyperlink{classudc_1_1_vector}{Vector}} \mbox{\hyperlink{classudc_1_1_m_s_d_a230dd5c4101b1bbb5cf5e2fa533d0a3f}{get\+Flux}} (unsigned int x, unsigned int y, unsigned int z) const
+\item 
+\mbox{\hyperlink{classudc_1_1_vector}{Vector}} \mbox{\hyperlink{classudc_1_1_m_s_d_af0cad12dfc8de11dfbbb600672b94a53}{get\+LocalM}} (unsigned int a) const
+\item 
+\mbox{\hyperlink{classudc_1_1_vector}{Vector}} \mbox{\hyperlink{classudc_1_1_m_s_d_a45ff1def40c97d90ee19e29ae663efcc}{get\+LocalM}} (unsigned int x, unsigned int y, unsigned int z) const
+\item 
+void \mbox{\hyperlink{classudc_1_1_m_s_d_adfe9f3e16d498e4b9b304a90a1f11498}{set\+Spin}} (unsigned int a, const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&)
+\item 
+void \mbox{\hyperlink{classudc_1_1_m_s_d_aef79f4457c2a5a982a3bc346e32d6c34}{set\+Spin}} (unsigned int x, unsigned int y, unsigned int z, const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&)
+\item 
+void \mbox{\hyperlink{classudc_1_1_m_s_d_a7edb86e5541e98220246fc0e44e2ecea}{set\+Flux}} (unsigned int a, const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&)
+\item 
+void \mbox{\hyperlink{classudc_1_1_m_s_d_ae73524ada6db950bef483d9de3a55dc5}{set\+Flux}} (unsigned int x, unsigned int y, unsigned int z, const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&)
+\item 
+void \mbox{\hyperlink{classudc_1_1_m_s_d_a009217401a76ea2f94d5bab24c978e1c}{set\+LocalM}} (unsigned int a, const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&, const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&)
+\item 
+void \mbox{\hyperlink{classudc_1_1_m_s_d_a669c3742346be01d961fff30768e09b4}{set\+LocalM}} (unsigned int x, unsigned int y, unsigned int z, const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&, const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&)
+\item 
+unsigned int \mbox{\hyperlink{classudc_1_1_m_s_d_a762738c5f2b8e17f526c6138fcf89872}{getN}} () const
+\item 
+unsigned int \mbox{\hyperlink{classudc_1_1_m_s_d_adc9f743ee13e82becfe0a2c50ee52ec1}{get\+NL}} () const
+\item 
+unsigned int \mbox{\hyperlink{classudc_1_1_m_s_d_ae18b1502712c3ac5314dbb6130c354ed}{get\+NR}} () const
+\item 
+unsigned int \mbox{\hyperlink{classudc_1_1_m_s_d_a100e8176f61523c520c546149d9014a6}{get\+Nm}} () const
+\item 
+unsigned int \mbox{\hyperlink{classudc_1_1_m_s_d_a3a90533d4764c960d421ccf254696133}{get\+NmL}} () const
+\item 
+unsigned int \mbox{\hyperlink{classudc_1_1_m_s_d_ad5c8743bd63fd3cdbb0361233e405c0b}{get\+NmR}} () const
+\item 
+unsigned int \mbox{\hyperlink{classudc_1_1_m_s_d_a7add4bc60686c62e73343afa6092b017}{get\+NLR}} () const
+\item 
+unsigned int \mbox{\hyperlink{classudc_1_1_m_s_d_a3ece5c5f34abcc06fef11fc96189895d}{get\+Width}} () const
+\item 
+unsigned int \mbox{\hyperlink{classudc_1_1_m_s_d_a536ab447508f890fd16272995c6fae8b}{get\+Height}} () const
+\item 
+unsigned int \mbox{\hyperlink{classudc_1_1_m_s_d_aefb9f78944562ded126ec46485319557}{get\+Depth}} () const
+\item 
+void \mbox{\hyperlink{classudc_1_1_m_s_d_a939846baeed48015266b707a703ef15f}{get\+Dimensions}} (unsigned int \&width, unsigned int \&height, unsigned int \&depth) const
+\item 
+unsigned int \mbox{\hyperlink{classudc_1_1_m_s_d_a2c5e7ed01ae1e5e5e6157e76748f88ab}{get\+Mol\+PosL}} () const
+\item 
+unsigned int \mbox{\hyperlink{classudc_1_1_m_s_d_a158fcf1df8fc10e66257138df6e4a60e}{get\+Mol\+PosR}} () const
+\item 
+void \mbox{\hyperlink{classudc_1_1_m_s_d_a52a344961c0464197bc0936e24ec1107}{get\+Mol\+Pos}} (unsigned int \&mol\+PosL, unsigned int \&mol\+PosR) const
+\item 
+unsigned int \mbox{\hyperlink{classudc_1_1_m_s_d_a9d5727849f685e6cccb5e5a0a3818cb3}{get\+TopL}} () const
+\item 
+unsigned int \mbox{\hyperlink{classudc_1_1_m_s_d_a66200786b332ed413fa3e29a7ecedad3}{get\+BottomL}} () const
+\item 
+unsigned int \mbox{\hyperlink{classudc_1_1_m_s_d_a7de138059fe647ec24a50d3b98ecdfe8}{get\+FrontR}} () const
+\item 
+unsigned int \mbox{\hyperlink{classudc_1_1_m_s_d_a368da5ea0c007b29f0c18a4415b2d1f6}{get\+BackR}} () const
+\item 
+void \mbox{\hyperlink{classudc_1_1_m_s_d_a54c6db2f1ffe3cb9de31b2e278ae2335}{get\+Inner\+Bounds}} (unsigned int \&topL, unsigned int \&bottomL, unsigned int \&frontR, unsigned int \&backR) const
+\item 
+bool \mbox{\hyperlink{classudc_1_1_m_s_d_af17782522b81ac6827d6874ae6aa5018}{get\+FM\+\_\+\+L\+\_\+exists}} () const
+\item 
+bool \mbox{\hyperlink{classudc_1_1_m_s_d_ac7b197dca279f02512882dc173a70aaf}{get\+FM\+\_\+\+R\+\_\+exists}} () const
+\item 
+bool \mbox{\hyperlink{classudc_1_1_m_s_d_a87c3cff4cf2db6a08fa6d7f184500eea}{get\+Mol\+\_\+exists}} () const
+\item 
+void \mbox{\hyperlink{classudc_1_1_m_s_d_a61db2cb3389641129ce97c0613917ec5}{get\+Regions}} (bool \&FM\+\_\+\+L\+\_\+exists, bool \&FM\+\_\+\+R\+\_\+exists, bool \&mol\+\_\+exists) const
+\item 
+void \mbox{\hyperlink{classudc_1_1_m_s_d_a3cb49ad4ca11278ed81998a8efd3ce68}{set\+Seed}} (unsigned long seed)
+\item 
+unsigned long \mbox{\hyperlink{classudc_1_1_m_s_d_adedd5f97461ea96c685923b45b49d91b}{get\+Seed}} () const
+\item 
+void \mbox{\hyperlink{classudc_1_1_m_s_d_a82b75829d72149de1992f198ad3c73b6}{reinitialize}} (bool reseed=true)
+\item 
+void \mbox{\hyperlink{classudc_1_1_m_s_d_a9b89ead4fcfc2c0ead59dcb33538a334}{randomize}} (bool reseed=true)
+\item 
+void \mbox{\hyperlink{classudc_1_1_m_s_d_a3da3a656fdd0a10f6bbc819935c9fa1d}{metropolis}} (unsigned long long N)
+\item 
+void \mbox{\hyperlink{classudc_1_1_m_s_d_ad9f8ab6d5766749f3f763f2ebb13ce6d}{metropolis}} (unsigned long long N, unsigned long long freq)
+\item 
+double \mbox{\hyperlink{classudc_1_1_m_s_d_aca1fecf2568de928a441aa031280fc49}{specific\+Heat}} () const
+\item 
+double \mbox{\hyperlink{classudc_1_1_m_s_d_a0b14f09fe74231e5f9981b1571666ce5}{specific\+Heat\+\_\+L}} () const
+\item 
+double \mbox{\hyperlink{classudc_1_1_m_s_d_a8c62ebc53fe5f1d620785ad492b27414}{specific\+Heat\+\_\+R}} () const
+\item 
+double \mbox{\hyperlink{classudc_1_1_m_s_d_abb96b180a4960bf101178aa01701b3cc}{specific\+Heat\+\_\+m}} () const
+\item 
+double \mbox{\hyperlink{classudc_1_1_m_s_d_a2d9850c33757ced8ae7c7b4b5de5afb2}{specific\+Heat\+\_\+mL}} () const
+\item 
+double \mbox{\hyperlink{classudc_1_1_m_s_d_a162b9154b562fb1f70e128eb9f0b9c46}{specific\+Heat\+\_\+mR}} () const
+\item 
+double \mbox{\hyperlink{classudc_1_1_m_s_d_ab0205d423d26ab312fe9d612eb6b82e4}{specific\+Heat\+\_\+\+LR}} () const
+\item 
+double \mbox{\hyperlink{classudc_1_1_m_s_d_ac8f8afe5da02b14af09b1b4861a274e1}{magnetic\+Susceptibility}} () const
+\item 
+double \mbox{\hyperlink{classudc_1_1_m_s_d_a3a7e3fa4340af6fe33cf2daceb37f656}{magnetic\+Susceptibility\+\_\+L}} () const
+\item 
+double \mbox{\hyperlink{classudc_1_1_m_s_d_acb90487ccf1985ac1045c7762fa4f42f}{magnetic\+Susceptibility\+\_\+R}} () const
+\item 
+double \mbox{\hyperlink{classudc_1_1_m_s_d_a215acad84017f65c72a1abcb504b12ea}{magnetic\+Susceptibility\+\_\+m}} () const
+\item 
+\mbox{\hyperlink{classudc_1_1_vector}{Vector}} \mbox{\hyperlink{classudc_1_1_m_s_d_a4b9e7018e4245eaf23d4e01d0b582cc3}{meanM}} () const
+\item 
+\mbox{\hyperlink{classudc_1_1_vector}{Vector}} \mbox{\hyperlink{classudc_1_1_m_s_d_a8fe5c6f539ba5f128d89f6c32e42a81b}{mean\+ML}} () const
+\item 
+\mbox{\hyperlink{classudc_1_1_vector}{Vector}} \mbox{\hyperlink{classudc_1_1_m_s_d_a75a2a166c7a100d23729914893024e8b}{mean\+MR}} () const
+\item 
+\mbox{\hyperlink{classudc_1_1_vector}{Vector}} \mbox{\hyperlink{classudc_1_1_m_s_d_a7b1361f8f8a4c2782e16f4885860160d}{mean\+Mm}} () const
+\item 
+\mbox{\hyperlink{classudc_1_1_vector}{Vector}} \mbox{\hyperlink{classudc_1_1_m_s_d_a4c23d2ce55dbe92303a93b0f04247d6a}{mean\+MS}} () const
+\item 
+\mbox{\hyperlink{classudc_1_1_vector}{Vector}} \mbox{\hyperlink{classudc_1_1_m_s_d_a6c769149852b83b104041036684cc3b5}{mean\+MSL}} () const
+\item 
+\mbox{\hyperlink{classudc_1_1_vector}{Vector}} \mbox{\hyperlink{classudc_1_1_m_s_d_af32676ff5839b6a89cae38003cf392a5}{mean\+MSR}} () const
+\item 
+\mbox{\hyperlink{classudc_1_1_vector}{Vector}} \mbox{\hyperlink{classudc_1_1_m_s_d_a0d9c252051a14d75fbfdab2e3ba0f1e5}{mean\+MSm}} () const
+\item 
+\mbox{\hyperlink{classudc_1_1_vector}{Vector}} \mbox{\hyperlink{classudc_1_1_m_s_d_a195fcd710a651679837fe247ba037e65}{mean\+MF}} () const
+\item 
+\mbox{\hyperlink{classudc_1_1_vector}{Vector}} \mbox{\hyperlink{classudc_1_1_m_s_d_aa996c134623e5f28bb2d599088f4cd56}{mean\+MFL}} () const
+\item 
+\mbox{\hyperlink{classudc_1_1_vector}{Vector}} \mbox{\hyperlink{classudc_1_1_m_s_d_ab4b2b0695b3e6143c44b6ab391f9890d}{mean\+MFR}} () const
+\item 
+\mbox{\hyperlink{classudc_1_1_vector}{Vector}} \mbox{\hyperlink{classudc_1_1_m_s_d_a9aac2bad16a926cd6ac24e3c4291325f}{mean\+MFm}} () const
+\item 
+double \mbox{\hyperlink{classudc_1_1_m_s_d_a07edbbd70d154577745c22e5ec7bdee4}{meanU}} () const
+\item 
+double \mbox{\hyperlink{classudc_1_1_m_s_d_aec1081b7cc26892ee7bc9399f1fadbb2}{mean\+UL}} () const
+\item 
+double \mbox{\hyperlink{classudc_1_1_m_s_d_a250a0059dd38873b6efe85a4f5da8668}{mean\+UR}} () const
+\item 
+double \mbox{\hyperlink{classudc_1_1_m_s_d_a922653ef103119a00b0c808c62a7f9d3}{mean\+Um}} () const
+\item 
+double \mbox{\hyperlink{classudc_1_1_m_s_d_a41a86b85c83949242bcc602775ed136d}{mean\+UmL}} () const
+\item 
+double \mbox{\hyperlink{classudc_1_1_m_s_d_ad5c1cd7334fdd3ea7db7964f2e69a536}{mean\+UmR}} () const
+\item 
+double \mbox{\hyperlink{classudc_1_1_m_s_d_a215bb03467cc147f837cd3afe89a793a}{mean\+ULR}} () const
+\item 
+\mbox{\hyperlink{classudc_1_1_m_s_d_1_1_iterator}{Iterator}} \mbox{\hyperlink{classudc_1_1_m_s_d_afb91b037de5315bfde0159ee591267a3}{begin}} () const
+\item 
+\mbox{\hyperlink{classudc_1_1_m_s_d_1_1_iterator}{Iterator}} \mbox{\hyperlink{classudc_1_1_m_s_d_a917317363ac8e2e78840845d6fc49f91}{end}} () const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::vector$<$ \mbox{\hyperlink{structudc_1_1_m_s_d_1_1_results}{Results}} $>$ \mbox{\hyperlink{classudc_1_1_m_s_d_a6a807356604fd24654d015c41974b526}{record}}
+\item 
+\mbox{\hyperlink{classudc_1_1_m_s_d_a3d235795ecc459cc0c2069c3f05d089d}{Flipping\+Algorithm}} \mbox{\hyperlink{classudc_1_1_m_s_d_a2ccd325cf09e82420004de9702894de5}{flipping\+Algorithm}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const \mbox{\hyperlink{classudc_1_1_m_s_d_a3d235795ecc459cc0c2069c3f05d089d}{Flipping\+Algorithm}} \mbox{\hyperlink{classudc_1_1_m_s_d_a7010b43c1e96eca520bcefba7aa36ad3}{UP\+\_\+\+DOWN\+\_\+\+MODEL}}
+\item 
+static const \mbox{\hyperlink{classudc_1_1_m_s_d_a3d235795ecc459cc0c2069c3f05d089d}{Flipping\+Algorithm}} \mbox{\hyperlink{classudc_1_1_m_s_d_a82cedfe873fa654afa32ab3d1b6f3ead}{CONTINUOUS\+\_\+\+SPIN\+\_\+\+MODEL}}
+\item 
+static const \mbox{\hyperlink{classudc_1_1_m_s_d_aa5aef25b88fee8190e1ac32070d06d66}{Mol\+Proto\+Factory}} \mbox{\hyperlink{classudc_1_1_m_s_d_ac578f0076fce752e661058c648d88997}{LINEAR\+\_\+\+MOL}}
+\item 
+static const \mbox{\hyperlink{classudc_1_1_m_s_d_aa5aef25b88fee8190e1ac32070d06d66}{Mol\+Proto\+Factory}} \mbox{\hyperlink{classudc_1_1_m_s_d_a72708188b46e1ddffb7c6e2fec96c587}{CIRCULAR\+\_\+\+MOL}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classudc_1_1_m_s_d_a01c9eff4fc0c233e1aafc04ea6271036}{Mol\+::set\+LocalM}} (unsigned int a, const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&spin, const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&flux)
+\item 
+void \mbox{\hyperlink{classudc_1_1_m_s_d_a4d4a91fd46eec66e753dfa2642c25068}{Mol\+::set\+Spin}} (unsigned int a, const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&spin)
+\item 
+void \mbox{\hyperlink{classudc_1_1_m_s_d_a0bb8c1e9fef1960578abc46446380dbf}{Mol\+::set\+Flux}} (unsigned int a, const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&flux)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+An abstract Molecular Spintronic Device. 
+
+\doxysubsection{Member Typedef Documentation}
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a3d235795ecc459cc0c2069c3f05d089d}\label{classudc_1_1_m_s_d_a3d235795ecc459cc0c2069c3f05d089d}} 
+\index{udc::MSD@{udc::MSD}!FlippingAlgorithm@{FlippingAlgorithm}}
+\index{FlippingAlgorithm@{FlippingAlgorithm}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{FlippingAlgorithm}{FlippingAlgorithm}}
+{\footnotesize\ttfamily typedef function$<$\mbox{\hyperlink{classudc_1_1_vector}{Vector}} (const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&, function$<$double()$>$)$>$ \mbox{\hyperlink{classudc_1_1_m_s_d_a3d235795ecc459cc0c2069c3f05d089d}{udc\+::\+MSD\+::\+Flipping\+Algorithm}}}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_ab3c0b3e8474e18cb213f79d66f221b67}\label{classudc_1_1_m_s_d_ab3c0b3e8474e18cb213f79d66f221b67}} 
+\index{udc::MSD@{udc::MSD}!Mol@{Mol}}
+\index{Mol@{Mol}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{Mol}{Mol}}
+{\footnotesize\ttfamily typedef Molecule\+::\+Instance \mbox{\hyperlink{classudc_1_1_m_s_d_ab3c0b3e8474e18cb213f79d66f221b67}{udc\+::\+MSD\+::\+Mol}}}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a7266f08d021d5a06960b152c95a9213e}\label{classudc_1_1_m_s_d_a7266f08d021d5a06960b152c95a9213e}} 
+\index{udc::MSD@{udc::MSD}!MolProto@{MolProto}}
+\index{MolProto@{MolProto}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{MolProto}{MolProto}}
+{\footnotesize\ttfamily typedef \mbox{\hyperlink{classudc_1_1_molecule}{Molecule}} \mbox{\hyperlink{classudc_1_1_m_s_d_a7266f08d021d5a06960b152c95a9213e}{udc\+::\+MSD\+::\+Mol\+Proto}}}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_aa5aef25b88fee8190e1ac32070d06d66}\label{classudc_1_1_m_s_d_aa5aef25b88fee8190e1ac32070d06d66}} 
+\index{udc::MSD@{udc::MSD}!MolProtoFactory@{MolProtoFactory}}
+\index{MolProtoFactory@{MolProtoFactory}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{MolProtoFactory}{MolProtoFactory}}
+{\footnotesize\ttfamily typedef function$<$\mbox{\hyperlink{classudc_1_1_m_s_d_a7266f08d021d5a06960b152c95a9213e}{Mol\+Proto}} (unsigned int)$>$ \mbox{\hyperlink{classudc_1_1_m_s_d_aa5aef25b88fee8190e1ac32070d06d66}{udc\+::\+MSD\+::\+Mol\+Proto\+Factory}}}
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a8bb6667fb7bc003abe0fc6af8793ed12}\label{classudc_1_1_m_s_d_a8bb6667fb7bc003abe0fc6af8793ed12}} 
+\index{udc::MSD@{udc::MSD}!MSD@{MSD}}
+\index{MSD@{MSD}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{MSD()}{MSD()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily udc\+::\+MSD\+::\+MSD (\begin{DoxyParamCaption}\item[{unsigned int}]{width,  }\item[{unsigned int}]{height,  }\item[{unsigned int}]{depth,  }\item[{const \mbox{\hyperlink{classudc_1_1_m_s_d_a7266f08d021d5a06960b152c95a9213e}{Mol\+Proto}} \&}]{mol\+Proto,  }\item[{unsigned int}]{mol\+PosL,  }\item[{unsigned int}]{topL,  }\item[{unsigned int}]{bottomL,  }\item[{unsigned int}]{frontR,  }\item[{unsigned int}]{backR }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a1d6135b424fccae0e69d8eece84672ea}\label{classudc_1_1_m_s_d_a1d6135b424fccae0e69d8eece84672ea}} 
+\index{udc::MSD@{udc::MSD}!MSD@{MSD}}
+\index{MSD@{MSD}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{MSD()}{MSD()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily udc\+::\+MSD\+::\+MSD (\begin{DoxyParamCaption}\item[{unsigned int}]{width,  }\item[{unsigned int}]{height,  }\item[{unsigned int}]{depth,  }\item[{const \mbox{\hyperlink{classudc_1_1_m_s_d_aa5aef25b88fee8190e1ac32070d06d66}{Mol\+Proto\+Factory}} \&}]{mol\+Type,  }\item[{unsigned int}]{mol\+PosL,  }\item[{unsigned int}]{mol\+PosR,  }\item[{unsigned int}]{topL,  }\item[{unsigned int}]{bottomL,  }\item[{unsigned int}]{frontR,  }\item[{unsigned int}]{backR }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a9f4d8ca0e3bf597898705d6784155f75}\label{classudc_1_1_m_s_d_a9f4d8ca0e3bf597898705d6784155f75}} 
+\index{udc::MSD@{udc::MSD}!MSD@{MSD}}
+\index{MSD@{MSD}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{MSD()}{MSD()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily udc\+::\+MSD\+::\+MSD (\begin{DoxyParamCaption}\item[{unsigned int}]{width,  }\item[{unsigned int}]{height,  }\item[{unsigned int}]{depth,  }\item[{unsigned int}]{mol\+PosL,  }\item[{unsigned int}]{mol\+PosR,  }\item[{unsigned int}]{topL,  }\item[{unsigned int}]{bottomL,  }\item[{unsigned int}]{frontR,  }\item[{unsigned int}]{backR }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a4014b4eaa8dffbd9799aebccf3fdb842}\label{classudc_1_1_m_s_d_a4014b4eaa8dffbd9799aebccf3fdb842}} 
+\index{udc::MSD@{udc::MSD}!MSD@{MSD}}
+\index{MSD@{MSD}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{MSD()}{MSD()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily udc\+::\+MSD\+::\+MSD (\begin{DoxyParamCaption}\item[{unsigned int}]{width,  }\item[{unsigned int}]{height,  }\item[{unsigned int}]{depth,  }\item[{unsigned int}]{heightL,  }\item[{unsigned}]{depthR }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a337868649574cfba54a1d779483a47c8}\label{classudc_1_1_m_s_d_a337868649574cfba54a1d779483a47c8}} 
+\index{udc::MSD@{udc::MSD}!MSD@{MSD}}
+\index{MSD@{MSD}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{MSD()}{MSD()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily udc\+::\+MSD\+::\+MSD (\begin{DoxyParamCaption}\item[{unsigned int}]{width,  }\item[{unsigned int}]{height,  }\item[{unsigned int}]{depth }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classudc_1_1_m_s_d_afb91b037de5315bfde0159ee591267a3}\label{classudc_1_1_m_s_d_afb91b037de5315bfde0159ee591267a3}} 
+\index{udc::MSD@{udc::MSD}!begin@{begin}}
+\index{begin@{begin}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{begin()}{begin()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classudc_1_1_m_s_d_1_1_iterator}{MSD\+::\+Iterator}} udc\+::\+MSD\+::begin (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a917317363ac8e2e78840845d6fc49f91}\label{classudc_1_1_m_s_d_a917317363ac8e2e78840845d6fc49f91}} 
+\index{udc::MSD@{udc::MSD}!end@{end}}
+\index{end@{end}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{end()}{end()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classudc_1_1_m_s_d_1_1_iterator}{MSD\+::\+Iterator}} udc\+::\+MSD\+::end (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a368da5ea0c007b29f0c18a4415b2d1f6}\label{classudc_1_1_m_s_d_a368da5ea0c007b29f0c18a4415b2d1f6}} 
+\index{udc::MSD@{udc::MSD}!getBackR@{getBackR}}
+\index{getBackR@{getBackR}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getBackR()}{getBackR()}}
+{\footnotesize\ttfamily unsigned int udc\+::\+MSD\+::get\+BackR (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a66200786b332ed413fa3e29a7ecedad3}\label{classudc_1_1_m_s_d_a66200786b332ed413fa3e29a7ecedad3}} 
+\index{udc::MSD@{udc::MSD}!getBottomL@{getBottomL}}
+\index{getBottomL@{getBottomL}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getBottomL()}{getBottomL()}}
+{\footnotesize\ttfamily unsigned int udc\+::\+MSD\+::get\+BottomL (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_aefb9f78944562ded126ec46485319557}\label{classudc_1_1_m_s_d_aefb9f78944562ded126ec46485319557}} 
+\index{udc::MSD@{udc::MSD}!getDepth@{getDepth}}
+\index{getDepth@{getDepth}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getDepth()}{getDepth()}}
+{\footnotesize\ttfamily unsigned int udc\+::\+MSD\+::get\+Depth (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a939846baeed48015266b707a703ef15f}\label{classudc_1_1_m_s_d_a939846baeed48015266b707a703ef15f}} 
+\index{udc::MSD@{udc::MSD}!getDimensions@{getDimensions}}
+\index{getDimensions@{getDimensions}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getDimensions()}{getDimensions()}}
+{\footnotesize\ttfamily void udc\+::\+MSD\+::get\+Dimensions (\begin{DoxyParamCaption}\item[{unsigned int \&}]{width,  }\item[{unsigned int \&}]{height,  }\item[{unsigned int \&}]{depth }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a5296876f3e8cc8b963c0daa773f9f3a7}\label{classudc_1_1_m_s_d_a5296876f3e8cc8b963c0daa773f9f3a7}} 
+\index{udc::MSD@{udc::MSD}!getFlux@{getFlux}}
+\index{getFlux@{getFlux}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getFlux()}{getFlux()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classudc_1_1_vector}{Vector}} udc\+::\+MSD\+::get\+Flux (\begin{DoxyParamCaption}\item[{unsigned int}]{a }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a230dd5c4101b1bbb5cf5e2fa533d0a3f}\label{classudc_1_1_m_s_d_a230dd5c4101b1bbb5cf5e2fa533d0a3f}} 
+\index{udc::MSD@{udc::MSD}!getFlux@{getFlux}}
+\index{getFlux@{getFlux}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getFlux()}{getFlux()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classudc_1_1_vector}{Vector}} udc\+::\+MSD\+::get\+Flux (\begin{DoxyParamCaption}\item[{unsigned int}]{x,  }\item[{unsigned int}]{y,  }\item[{unsigned int}]{z }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_af17782522b81ac6827d6874ae6aa5018}\label{classudc_1_1_m_s_d_af17782522b81ac6827d6874ae6aa5018}} 
+\index{udc::MSD@{udc::MSD}!getFM\_L\_exists@{getFM\_L\_exists}}
+\index{getFM\_L\_exists@{getFM\_L\_exists}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getFM\_L\_exists()}{getFM\_L\_exists()}}
+{\footnotesize\ttfamily bool udc\+::\+MSD\+::get\+FM\+\_\+\+L\+\_\+exists (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_ac7b197dca279f02512882dc173a70aaf}\label{classudc_1_1_m_s_d_ac7b197dca279f02512882dc173a70aaf}} 
+\index{udc::MSD@{udc::MSD}!getFM\_R\_exists@{getFM\_R\_exists}}
+\index{getFM\_R\_exists@{getFM\_R\_exists}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getFM\_R\_exists()}{getFM\_R\_exists()}}
+{\footnotesize\ttfamily bool udc\+::\+MSD\+::get\+FM\+\_\+\+R\+\_\+exists (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a7de138059fe647ec24a50d3b98ecdfe8}\label{classudc_1_1_m_s_d_a7de138059fe647ec24a50d3b98ecdfe8}} 
+\index{udc::MSD@{udc::MSD}!getFrontR@{getFrontR}}
+\index{getFrontR@{getFrontR}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getFrontR()}{getFrontR()}}
+{\footnotesize\ttfamily unsigned int udc\+::\+MSD\+::get\+FrontR (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a536ab447508f890fd16272995c6fae8b}\label{classudc_1_1_m_s_d_a536ab447508f890fd16272995c6fae8b}} 
+\index{udc::MSD@{udc::MSD}!getHeight@{getHeight}}
+\index{getHeight@{getHeight}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getHeight()}{getHeight()}}
+{\footnotesize\ttfamily unsigned int udc\+::\+MSD\+::get\+Height (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a54c6db2f1ffe3cb9de31b2e278ae2335}\label{classudc_1_1_m_s_d_a54c6db2f1ffe3cb9de31b2e278ae2335}} 
+\index{udc::MSD@{udc::MSD}!getInnerBounds@{getInnerBounds}}
+\index{getInnerBounds@{getInnerBounds}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getInnerBounds()}{getInnerBounds()}}
+{\footnotesize\ttfamily void udc\+::\+MSD\+::get\+Inner\+Bounds (\begin{DoxyParamCaption}\item[{unsigned int \&}]{topL,  }\item[{unsigned int \&}]{bottomL,  }\item[{unsigned int \&}]{frontR,  }\item[{unsigned int \&}]{backR }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_af0cad12dfc8de11dfbbb600672b94a53}\label{classudc_1_1_m_s_d_af0cad12dfc8de11dfbbb600672b94a53}} 
+\index{udc::MSD@{udc::MSD}!getLocalM@{getLocalM}}
+\index{getLocalM@{getLocalM}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getLocalM()}{getLocalM()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classudc_1_1_vector}{Vector}} udc\+::\+MSD\+::get\+LocalM (\begin{DoxyParamCaption}\item[{unsigned int}]{a }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a45ff1def40c97d90ee19e29ae663efcc}\label{classudc_1_1_m_s_d_a45ff1def40c97d90ee19e29ae663efcc}} 
+\index{udc::MSD@{udc::MSD}!getLocalM@{getLocalM}}
+\index{getLocalM@{getLocalM}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getLocalM()}{getLocalM()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classudc_1_1_vector}{Vector}} udc\+::\+MSD\+::get\+LocalM (\begin{DoxyParamCaption}\item[{unsigned int}]{x,  }\item[{unsigned int}]{y,  }\item[{unsigned int}]{z }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a87c3cff4cf2db6a08fa6d7f184500eea}\label{classudc_1_1_m_s_d_a87c3cff4cf2db6a08fa6d7f184500eea}} 
+\index{udc::MSD@{udc::MSD}!getMol\_exists@{getMol\_exists}}
+\index{getMol\_exists@{getMol\_exists}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getMol\_exists()}{getMol\_exists()}}
+{\footnotesize\ttfamily bool udc\+::\+MSD\+::get\+Mol\+\_\+exists (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a52a344961c0464197bc0936e24ec1107}\label{classudc_1_1_m_s_d_a52a344961c0464197bc0936e24ec1107}} 
+\index{udc::MSD@{udc::MSD}!getMolPos@{getMolPos}}
+\index{getMolPos@{getMolPos}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getMolPos()}{getMolPos()}}
+{\footnotesize\ttfamily void udc\+::\+MSD\+::get\+Mol\+Pos (\begin{DoxyParamCaption}\item[{unsigned int \&}]{mol\+PosL,  }\item[{unsigned int \&}]{mol\+PosR }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a2c5e7ed01ae1e5e5e6157e76748f88ab}\label{classudc_1_1_m_s_d_a2c5e7ed01ae1e5e5e6157e76748f88ab}} 
+\index{udc::MSD@{udc::MSD}!getMolPosL@{getMolPosL}}
+\index{getMolPosL@{getMolPosL}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getMolPosL()}{getMolPosL()}}
+{\footnotesize\ttfamily unsigned int udc\+::\+MSD\+::get\+Mol\+PosL (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a158fcf1df8fc10e66257138df6e4a60e}\label{classudc_1_1_m_s_d_a158fcf1df8fc10e66257138df6e4a60e}} 
+\index{udc::MSD@{udc::MSD}!getMolPosR@{getMolPosR}}
+\index{getMolPosR@{getMolPosR}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getMolPosR()}{getMolPosR()}}
+{\footnotesize\ttfamily unsigned int udc\+::\+MSD\+::get\+Mol\+PosR (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a77dce5d8c1a874c47acfbc69d5a867ab}\label{classudc_1_1_m_s_d_a77dce5d8c1a874c47acfbc69d5a867ab}} 
+\index{udc::MSD@{udc::MSD}!getMolProto@{getMolProto}}
+\index{getMolProto@{getMolProto}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getMolProto()}{getMolProto()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classudc_1_1_m_s_d_a7266f08d021d5a06960b152c95a9213e}{MSD\+::\+Mol\+Proto}} udc\+::\+MSD\+::get\+Mol\+Proto (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a762738c5f2b8e17f526c6138fcf89872}\label{classudc_1_1_m_s_d_a762738c5f2b8e17f526c6138fcf89872}} 
+\index{udc::MSD@{udc::MSD}!getN@{getN}}
+\index{getN@{getN}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getN()}{getN()}}
+{\footnotesize\ttfamily unsigned int udc\+::\+MSD\+::getN (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_adc9f743ee13e82becfe0a2c50ee52ec1}\label{classudc_1_1_m_s_d_adc9f743ee13e82becfe0a2c50ee52ec1}} 
+\index{udc::MSD@{udc::MSD}!getNL@{getNL}}
+\index{getNL@{getNL}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getNL()}{getNL()}}
+{\footnotesize\ttfamily unsigned int udc\+::\+MSD\+::get\+NL (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a7add4bc60686c62e73343afa6092b017}\label{classudc_1_1_m_s_d_a7add4bc60686c62e73343afa6092b017}} 
+\index{udc::MSD@{udc::MSD}!getNLR@{getNLR}}
+\index{getNLR@{getNLR}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getNLR()}{getNLR()}}
+{\footnotesize\ttfamily unsigned int udc\+::\+MSD\+::get\+NLR (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a100e8176f61523c520c546149d9014a6}\label{classudc_1_1_m_s_d_a100e8176f61523c520c546149d9014a6}} 
+\index{udc::MSD@{udc::MSD}!getNm@{getNm}}
+\index{getNm@{getNm}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getNm()}{getNm()}}
+{\footnotesize\ttfamily unsigned int udc\+::\+MSD\+::get\+Nm (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a3a90533d4764c960d421ccf254696133}\label{classudc_1_1_m_s_d_a3a90533d4764c960d421ccf254696133}} 
+\index{udc::MSD@{udc::MSD}!getNmL@{getNmL}}
+\index{getNmL@{getNmL}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getNmL()}{getNmL()}}
+{\footnotesize\ttfamily unsigned int udc\+::\+MSD\+::get\+NmL (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_ad5c8743bd63fd3cdbb0361233e405c0b}\label{classudc_1_1_m_s_d_ad5c8743bd63fd3cdbb0361233e405c0b}} 
+\index{udc::MSD@{udc::MSD}!getNmR@{getNmR}}
+\index{getNmR@{getNmR}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getNmR()}{getNmR()}}
+{\footnotesize\ttfamily unsigned int udc\+::\+MSD\+::get\+NmR (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_ae18b1502712c3ac5314dbb6130c354ed}\label{classudc_1_1_m_s_d_ae18b1502712c3ac5314dbb6130c354ed}} 
+\index{udc::MSD@{udc::MSD}!getNR@{getNR}}
+\index{getNR@{getNR}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getNR()}{getNR()}}
+{\footnotesize\ttfamily unsigned int udc\+::\+MSD\+::get\+NR (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_abfa4f6883d0b4677ab7b70c1adf06066}\label{classudc_1_1_m_s_d_abfa4f6883d0b4677ab7b70c1adf06066}} 
+\index{udc::MSD@{udc::MSD}!getParameters@{getParameters}}
+\index{getParameters@{getParameters}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getParameters()}{getParameters()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structudc_1_1_m_s_d_1_1_parameters}{MSD\+::\+Parameters}} udc\+::\+MSD\+::get\+Parameters (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a61db2cb3389641129ce97c0613917ec5}\label{classudc_1_1_m_s_d_a61db2cb3389641129ce97c0613917ec5}} 
+\index{udc::MSD@{udc::MSD}!getRegions@{getRegions}}
+\index{getRegions@{getRegions}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getRegions()}{getRegions()}}
+{\footnotesize\ttfamily void udc\+::\+MSD\+::get\+Regions (\begin{DoxyParamCaption}\item[{bool \&}]{FM\+\_\+\+L\+\_\+exists,  }\item[{bool \&}]{FM\+\_\+\+R\+\_\+exists,  }\item[{bool \&}]{mol\+\_\+exists }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_ae1bee2a207b40720156243ed19eed671}\label{classudc_1_1_m_s_d_ae1bee2a207b40720156243ed19eed671}} 
+\index{udc::MSD@{udc::MSD}!getResults@{getResults}}
+\index{getResults@{getResults}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getResults()}{getResults()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structudc_1_1_m_s_d_1_1_results}{MSD\+::\+Results}} udc\+::\+MSD\+::get\+Results (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_adedd5f97461ea96c685923b45b49d91b}\label{classudc_1_1_m_s_d_adedd5f97461ea96c685923b45b49d91b}} 
+\index{udc::MSD@{udc::MSD}!getSeed@{getSeed}}
+\index{getSeed@{getSeed}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getSeed()}{getSeed()}}
+{\footnotesize\ttfamily unsigned long udc\+::\+MSD\+::get\+Seed (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a9719db02665a291111d9dd887be6538f}\label{classudc_1_1_m_s_d_a9719db02665a291111d9dd887be6538f}} 
+\index{udc::MSD@{udc::MSD}!getSpin@{getSpin}}
+\index{getSpin@{getSpin}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getSpin()}{getSpin()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classudc_1_1_vector}{Vector}} udc\+::\+MSD\+::get\+Spin (\begin{DoxyParamCaption}\item[{unsigned int}]{a }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_aea1f8af9db8cc945eb35a809e923051d}\label{classudc_1_1_m_s_d_aea1f8af9db8cc945eb35a809e923051d}} 
+\index{udc::MSD@{udc::MSD}!getSpin@{getSpin}}
+\index{getSpin@{getSpin}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getSpin()}{getSpin()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classudc_1_1_vector}{Vector}} udc\+::\+MSD\+::get\+Spin (\begin{DoxyParamCaption}\item[{unsigned int}]{x,  }\item[{unsigned int}]{y,  }\item[{unsigned int}]{z }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a9d5727849f685e6cccb5e5a0a3818cb3}\label{classudc_1_1_m_s_d_a9d5727849f685e6cccb5e5a0a3818cb3}} 
+\index{udc::MSD@{udc::MSD}!getTopL@{getTopL}}
+\index{getTopL@{getTopL}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getTopL()}{getTopL()}}
+{\footnotesize\ttfamily unsigned int udc\+::\+MSD\+::get\+TopL (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a3ece5c5f34abcc06fef11fc96189895d}\label{classudc_1_1_m_s_d_a3ece5c5f34abcc06fef11fc96189895d}} 
+\index{udc::MSD@{udc::MSD}!getWidth@{getWidth}}
+\index{getWidth@{getWidth}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{getWidth()}{getWidth()}}
+{\footnotesize\ttfamily unsigned int udc\+::\+MSD\+::get\+Width (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_ac8f8afe5da02b14af09b1b4861a274e1}\label{classudc_1_1_m_s_d_ac8f8afe5da02b14af09b1b4861a274e1}} 
+\index{udc::MSD@{udc::MSD}!magneticSusceptibility@{magneticSusceptibility}}
+\index{magneticSusceptibility@{magneticSusceptibility}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{magneticSusceptibility()}{magneticSusceptibility()}}
+{\footnotesize\ttfamily double udc\+::\+MSD\+::magnetic\+Susceptibility (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a3a7e3fa4340af6fe33cf2daceb37f656}\label{classudc_1_1_m_s_d_a3a7e3fa4340af6fe33cf2daceb37f656}} 
+\index{udc::MSD@{udc::MSD}!magneticSusceptibility\_L@{magneticSusceptibility\_L}}
+\index{magneticSusceptibility\_L@{magneticSusceptibility\_L}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{magneticSusceptibility\_L()}{magneticSusceptibility\_L()}}
+{\footnotesize\ttfamily double udc\+::\+MSD\+::magnetic\+Susceptibility\+\_\+L (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a215acad84017f65c72a1abcb504b12ea}\label{classudc_1_1_m_s_d_a215acad84017f65c72a1abcb504b12ea}} 
+\index{udc::MSD@{udc::MSD}!magneticSusceptibility\_m@{magneticSusceptibility\_m}}
+\index{magneticSusceptibility\_m@{magneticSusceptibility\_m}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{magneticSusceptibility\_m()}{magneticSusceptibility\_m()}}
+{\footnotesize\ttfamily double udc\+::\+MSD\+::magnetic\+Susceptibility\+\_\+m (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_acb90487ccf1985ac1045c7762fa4f42f}\label{classudc_1_1_m_s_d_acb90487ccf1985ac1045c7762fa4f42f}} 
+\index{udc::MSD@{udc::MSD}!magneticSusceptibility\_R@{magneticSusceptibility\_R}}
+\index{magneticSusceptibility\_R@{magneticSusceptibility\_R}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{magneticSusceptibility\_R()}{magneticSusceptibility\_R()}}
+{\footnotesize\ttfamily double udc\+::\+MSD\+::magnetic\+Susceptibility\+\_\+R (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a4b9e7018e4245eaf23d4e01d0b582cc3}\label{classudc_1_1_m_s_d_a4b9e7018e4245eaf23d4e01d0b582cc3}} 
+\index{udc::MSD@{udc::MSD}!meanM@{meanM}}
+\index{meanM@{meanM}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{meanM()}{meanM()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classudc_1_1_vector}{Vector}} udc\+::\+MSD\+::meanM (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a195fcd710a651679837fe247ba037e65}\label{classudc_1_1_m_s_d_a195fcd710a651679837fe247ba037e65}} 
+\index{udc::MSD@{udc::MSD}!meanMF@{meanMF}}
+\index{meanMF@{meanMF}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{meanMF()}{meanMF()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classudc_1_1_vector}{Vector}} udc\+::\+MSD\+::mean\+MF (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_aa996c134623e5f28bb2d599088f4cd56}\label{classudc_1_1_m_s_d_aa996c134623e5f28bb2d599088f4cd56}} 
+\index{udc::MSD@{udc::MSD}!meanMFL@{meanMFL}}
+\index{meanMFL@{meanMFL}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{meanMFL()}{meanMFL()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classudc_1_1_vector}{Vector}} udc\+::\+MSD\+::mean\+MFL (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a9aac2bad16a926cd6ac24e3c4291325f}\label{classudc_1_1_m_s_d_a9aac2bad16a926cd6ac24e3c4291325f}} 
+\index{udc::MSD@{udc::MSD}!meanMFm@{meanMFm}}
+\index{meanMFm@{meanMFm}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{meanMFm()}{meanMFm()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classudc_1_1_vector}{Vector}} udc\+::\+MSD\+::mean\+MFm (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_ab4b2b0695b3e6143c44b6ab391f9890d}\label{classudc_1_1_m_s_d_ab4b2b0695b3e6143c44b6ab391f9890d}} 
+\index{udc::MSD@{udc::MSD}!meanMFR@{meanMFR}}
+\index{meanMFR@{meanMFR}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{meanMFR()}{meanMFR()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classudc_1_1_vector}{Vector}} udc\+::\+MSD\+::mean\+MFR (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a8fe5c6f539ba5f128d89f6c32e42a81b}\label{classudc_1_1_m_s_d_a8fe5c6f539ba5f128d89f6c32e42a81b}} 
+\index{udc::MSD@{udc::MSD}!meanML@{meanML}}
+\index{meanML@{meanML}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{meanML()}{meanML()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classudc_1_1_vector}{Vector}} udc\+::\+MSD\+::mean\+ML (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a7b1361f8f8a4c2782e16f4885860160d}\label{classudc_1_1_m_s_d_a7b1361f8f8a4c2782e16f4885860160d}} 
+\index{udc::MSD@{udc::MSD}!meanMm@{meanMm}}
+\index{meanMm@{meanMm}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{meanMm()}{meanMm()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classudc_1_1_vector}{Vector}} udc\+::\+MSD\+::mean\+Mm (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a75a2a166c7a100d23729914893024e8b}\label{classudc_1_1_m_s_d_a75a2a166c7a100d23729914893024e8b}} 
+\index{udc::MSD@{udc::MSD}!meanMR@{meanMR}}
+\index{meanMR@{meanMR}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{meanMR()}{meanMR()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classudc_1_1_vector}{Vector}} udc\+::\+MSD\+::mean\+MR (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a4c23d2ce55dbe92303a93b0f04247d6a}\label{classudc_1_1_m_s_d_a4c23d2ce55dbe92303a93b0f04247d6a}} 
+\index{udc::MSD@{udc::MSD}!meanMS@{meanMS}}
+\index{meanMS@{meanMS}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{meanMS()}{meanMS()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classudc_1_1_vector}{Vector}} udc\+::\+MSD\+::mean\+MS (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a6c769149852b83b104041036684cc3b5}\label{classudc_1_1_m_s_d_a6c769149852b83b104041036684cc3b5}} 
+\index{udc::MSD@{udc::MSD}!meanMSL@{meanMSL}}
+\index{meanMSL@{meanMSL}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{meanMSL()}{meanMSL()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classudc_1_1_vector}{Vector}} udc\+::\+MSD\+::mean\+MSL (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a0d9c252051a14d75fbfdab2e3ba0f1e5}\label{classudc_1_1_m_s_d_a0d9c252051a14d75fbfdab2e3ba0f1e5}} 
+\index{udc::MSD@{udc::MSD}!meanMSm@{meanMSm}}
+\index{meanMSm@{meanMSm}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{meanMSm()}{meanMSm()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classudc_1_1_vector}{Vector}} udc\+::\+MSD\+::mean\+MSm (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_af32676ff5839b6a89cae38003cf392a5}\label{classudc_1_1_m_s_d_af32676ff5839b6a89cae38003cf392a5}} 
+\index{udc::MSD@{udc::MSD}!meanMSR@{meanMSR}}
+\index{meanMSR@{meanMSR}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{meanMSR()}{meanMSR()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classudc_1_1_vector}{Vector}} udc\+::\+MSD\+::mean\+MSR (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a07edbbd70d154577745c22e5ec7bdee4}\label{classudc_1_1_m_s_d_a07edbbd70d154577745c22e5ec7bdee4}} 
+\index{udc::MSD@{udc::MSD}!meanU@{meanU}}
+\index{meanU@{meanU}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{meanU()}{meanU()}}
+{\footnotesize\ttfamily double udc\+::\+MSD\+::meanU (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_aec1081b7cc26892ee7bc9399f1fadbb2}\label{classudc_1_1_m_s_d_aec1081b7cc26892ee7bc9399f1fadbb2}} 
+\index{udc::MSD@{udc::MSD}!meanUL@{meanUL}}
+\index{meanUL@{meanUL}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{meanUL()}{meanUL()}}
+{\footnotesize\ttfamily double udc\+::\+MSD\+::mean\+UL (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a215bb03467cc147f837cd3afe89a793a}\label{classudc_1_1_m_s_d_a215bb03467cc147f837cd3afe89a793a}} 
+\index{udc::MSD@{udc::MSD}!meanULR@{meanULR}}
+\index{meanULR@{meanULR}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{meanULR()}{meanULR()}}
+{\footnotesize\ttfamily double udc\+::\+MSD\+::mean\+ULR (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a922653ef103119a00b0c808c62a7f9d3}\label{classudc_1_1_m_s_d_a922653ef103119a00b0c808c62a7f9d3}} 
+\index{udc::MSD@{udc::MSD}!meanUm@{meanUm}}
+\index{meanUm@{meanUm}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{meanUm()}{meanUm()}}
+{\footnotesize\ttfamily double udc\+::\+MSD\+::mean\+Um (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a41a86b85c83949242bcc602775ed136d}\label{classudc_1_1_m_s_d_a41a86b85c83949242bcc602775ed136d}} 
+\index{udc::MSD@{udc::MSD}!meanUmL@{meanUmL}}
+\index{meanUmL@{meanUmL}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{meanUmL()}{meanUmL()}}
+{\footnotesize\ttfamily double udc\+::\+MSD\+::mean\+UmL (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_ad5c1cd7334fdd3ea7db7964f2e69a536}\label{classudc_1_1_m_s_d_ad5c1cd7334fdd3ea7db7964f2e69a536}} 
+\index{udc::MSD@{udc::MSD}!meanUmR@{meanUmR}}
+\index{meanUmR@{meanUmR}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{meanUmR()}{meanUmR()}}
+{\footnotesize\ttfamily double udc\+::\+MSD\+::mean\+UmR (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a250a0059dd38873b6efe85a4f5da8668}\label{classudc_1_1_m_s_d_a250a0059dd38873b6efe85a4f5da8668}} 
+\index{udc::MSD@{udc::MSD}!meanUR@{meanUR}}
+\index{meanUR@{meanUR}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{meanUR()}{meanUR()}}
+{\footnotesize\ttfamily double udc\+::\+MSD\+::mean\+UR (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a3da3a656fdd0a10f6bbc819935c9fa1d}\label{classudc_1_1_m_s_d_a3da3a656fdd0a10f6bbc819935c9fa1d}} 
+\index{udc::MSD@{udc::MSD}!metropolis@{metropolis}}
+\index{metropolis@{metropolis}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{metropolis()}{metropolis()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void udc\+::\+MSD\+::metropolis (\begin{DoxyParamCaption}\item[{unsigned long long}]{N }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_ad9f8ab6d5766749f3f763f2ebb13ce6d}\label{classudc_1_1_m_s_d_ad9f8ab6d5766749f3f763f2ebb13ce6d}} 
+\index{udc::MSD@{udc::MSD}!metropolis@{metropolis}}
+\index{metropolis@{metropolis}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{metropolis()}{metropolis()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void udc\+::\+MSD\+::metropolis (\begin{DoxyParamCaption}\item[{unsigned long long}]{N,  }\item[{unsigned long long}]{freq }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a9b89ead4fcfc2c0ead59dcb33538a334}\label{classudc_1_1_m_s_d_a9b89ead4fcfc2c0ead59dcb33538a334}} 
+\index{udc::MSD@{udc::MSD}!randomize@{randomize}}
+\index{randomize@{randomize}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{randomize()}{randomize()}}
+{\footnotesize\ttfamily void udc\+::\+MSD\+::randomize (\begin{DoxyParamCaption}\item[{bool}]{reseed = {\ttfamily true} }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a82b75829d72149de1992f198ad3c73b6}\label{classudc_1_1_m_s_d_a82b75829d72149de1992f198ad3c73b6}} 
+\index{udc::MSD@{udc::MSD}!reinitialize@{reinitialize}}
+\index{reinitialize@{reinitialize}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{reinitialize()}{reinitialize()}}
+{\footnotesize\ttfamily void udc\+::\+MSD\+::reinitialize (\begin{DoxyParamCaption}\item[{bool}]{reseed = {\ttfamily true} }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a5c1d308f90d10072e5288685ba4d58db}\label{classudc_1_1_m_s_d_a5c1d308f90d10072e5288685ba4d58db}} 
+\index{udc::MSD@{udc::MSD}!set\_kT@{set\_kT}}
+\index{set\_kT@{set\_kT}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{set\_kT()}{set\_kT()}}
+{\footnotesize\ttfamily void udc\+::\+MSD\+::set\+\_\+kT (\begin{DoxyParamCaption}\item[{double}]{kT }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a18aa13537e0deda7d1263c1fd8d8228a}\label{classudc_1_1_m_s_d_a18aa13537e0deda7d1263c1fd8d8228a}} 
+\index{udc::MSD@{udc::MSD}!setB@{setB}}
+\index{setB@{setB}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{setB()}{setB()}}
+{\footnotesize\ttfamily void udc\+::\+MSD\+::setB (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&}]{B }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a7edb86e5541e98220246fc0e44e2ecea}\label{classudc_1_1_m_s_d_a7edb86e5541e98220246fc0e44e2ecea}} 
+\index{udc::MSD@{udc::MSD}!setFlux@{setFlux}}
+\index{setFlux@{setFlux}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{setFlux()}{setFlux()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void \mbox{\hyperlink{classudc_1_1_m_s_d_a0bb8c1e9fef1960578abc46446380dbf}{udc\+::\+MSD\+::set\+Flux}} (\begin{DoxyParamCaption}\item[{unsigned int}]{a,  }\item[{const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&}]{flux }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_ae73524ada6db950bef483d9de3a55dc5}\label{classudc_1_1_m_s_d_ae73524ada6db950bef483d9de3a55dc5}} 
+\index{udc::MSD@{udc::MSD}!setFlux@{setFlux}}
+\index{setFlux@{setFlux}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{setFlux()}{setFlux()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void \mbox{\hyperlink{classudc_1_1_m_s_d_a0bb8c1e9fef1960578abc46446380dbf}{udc\+::\+MSD\+::set\+Flux}} (\begin{DoxyParamCaption}\item[{unsigned int}]{x,  }\item[{unsigned int}]{y,  }\item[{unsigned int}]{z,  }\item[{const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&}]{flux }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a009217401a76ea2f94d5bab24c978e1c}\label{classudc_1_1_m_s_d_a009217401a76ea2f94d5bab24c978e1c}} 
+\index{udc::MSD@{udc::MSD}!setLocalM@{setLocalM}}
+\index{setLocalM@{setLocalM}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{setLocalM()}{setLocalM()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void \mbox{\hyperlink{classudc_1_1_m_s_d_a01c9eff4fc0c233e1aafc04ea6271036}{udc\+::\+MSD\+::set\+LocalM}} (\begin{DoxyParamCaption}\item[{unsigned int}]{a,  }\item[{const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&}]{spin,  }\item[{const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&}]{flux }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a669c3742346be01d961fff30768e09b4}\label{classudc_1_1_m_s_d_a669c3742346be01d961fff30768e09b4}} 
+\index{udc::MSD@{udc::MSD}!setLocalM@{setLocalM}}
+\index{setLocalM@{setLocalM}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{setLocalM()}{setLocalM()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void \mbox{\hyperlink{classudc_1_1_m_s_d_a01c9eff4fc0c233e1aafc04ea6271036}{udc\+::\+MSD\+::set\+LocalM}} (\begin{DoxyParamCaption}\item[{unsigned int}]{x,  }\item[{unsigned int}]{y,  }\item[{unsigned int}]{z,  }\item[{const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&}]{spin,  }\item[{const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&}]{flux }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_aade85204d30f826444572e41f27613aa}\label{classudc_1_1_m_s_d_aade85204d30f826444572e41f27613aa}} 
+\index{udc::MSD@{udc::MSD}!setMolParameters@{setMolParameters}}
+\index{setMolParameters@{setMolParameters}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{setMolParameters()}{setMolParameters()}}
+{\footnotesize\ttfamily void udc\+::\+MSD\+::set\+Mol\+Parameters (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structudc_1_1_molecule_1_1_node_parameters}{Mol\+Proto\+::\+Node\+Parameters}} \&}]{node\+Params,  }\item[{const \mbox{\hyperlink{structudc_1_1_molecule_1_1_edge_parameters}{Mol\+Proto\+::\+Edge\+Parameters}} \&}]{edge\+Params }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_aa8ed0dab0705b810e4d14215b488fb43}\label{classudc_1_1_m_s_d_aa8ed0dab0705b810e4d14215b488fb43}} 
+\index{udc::MSD@{udc::MSD}!setMolProto@{setMolProto}}
+\index{setMolProto@{setMolProto}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{setMolProto()}{setMolProto()}}
+{\footnotesize\ttfamily void udc\+::\+MSD\+::set\+Mol\+Proto (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classudc_1_1_m_s_d_a7266f08d021d5a06960b152c95a9213e}{Mol\+Proto}} \&}]{proto }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_aa1513f639c10ca29773ea287ae104121}\label{classudc_1_1_m_s_d_aa1513f639c10ca29773ea287ae104121}} 
+\index{udc::MSD@{udc::MSD}!setParameters@{setParameters}}
+\index{setParameters@{setParameters}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{setParameters()}{setParameters()}}
+{\footnotesize\ttfamily void udc\+::\+MSD\+::set\+Parameters (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structudc_1_1_m_s_d_1_1_parameters}{Parameters}} \&}]{p }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a3cb49ad4ca11278ed81998a8efd3ce68}\label{classudc_1_1_m_s_d_a3cb49ad4ca11278ed81998a8efd3ce68}} 
+\index{udc::MSD@{udc::MSD}!setSeed@{setSeed}}
+\index{setSeed@{setSeed}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{setSeed()}{setSeed()}}
+{\footnotesize\ttfamily void udc\+::\+MSD\+::set\+Seed (\begin{DoxyParamCaption}\item[{unsigned long}]{seed }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_adfe9f3e16d498e4b9b304a90a1f11498}\label{classudc_1_1_m_s_d_adfe9f3e16d498e4b9b304a90a1f11498}} 
+\index{udc::MSD@{udc::MSD}!setSpin@{setSpin}}
+\index{setSpin@{setSpin}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{setSpin()}{setSpin()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void \mbox{\hyperlink{classudc_1_1_m_s_d_a4d4a91fd46eec66e753dfa2642c25068}{udc\+::\+MSD\+::set\+Spin}} (\begin{DoxyParamCaption}\item[{unsigned int}]{a,  }\item[{const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&}]{spin }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_aef79f4457c2a5a982a3bc346e32d6c34}\label{classudc_1_1_m_s_d_aef79f4457c2a5a982a3bc346e32d6c34}} 
+\index{udc::MSD@{udc::MSD}!setSpin@{setSpin}}
+\index{setSpin@{setSpin}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{setSpin()}{setSpin()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void \mbox{\hyperlink{classudc_1_1_m_s_d_a4d4a91fd46eec66e753dfa2642c25068}{udc\+::\+MSD\+::set\+Spin}} (\begin{DoxyParamCaption}\item[{unsigned int}]{x,  }\item[{unsigned int}]{y,  }\item[{unsigned int}]{z,  }\item[{const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&}]{spin }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_aca1fecf2568de928a441aa031280fc49}\label{classudc_1_1_m_s_d_aca1fecf2568de928a441aa031280fc49}} 
+\index{udc::MSD@{udc::MSD}!specificHeat@{specificHeat}}
+\index{specificHeat@{specificHeat}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{specificHeat()}{specificHeat()}}
+{\footnotesize\ttfamily double udc\+::\+MSD\+::specific\+Heat (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a0b14f09fe74231e5f9981b1571666ce5}\label{classudc_1_1_m_s_d_a0b14f09fe74231e5f9981b1571666ce5}} 
+\index{udc::MSD@{udc::MSD}!specificHeat\_L@{specificHeat\_L}}
+\index{specificHeat\_L@{specificHeat\_L}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{specificHeat\_L()}{specificHeat\_L()}}
+{\footnotesize\ttfamily double udc\+::\+MSD\+::specific\+Heat\+\_\+L (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_ab0205d423d26ab312fe9d612eb6b82e4}\label{classudc_1_1_m_s_d_ab0205d423d26ab312fe9d612eb6b82e4}} 
+\index{udc::MSD@{udc::MSD}!specificHeat\_LR@{specificHeat\_LR}}
+\index{specificHeat\_LR@{specificHeat\_LR}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{specificHeat\_LR()}{specificHeat\_LR()}}
+{\footnotesize\ttfamily double udc\+::\+MSD\+::specific\+Heat\+\_\+\+LR (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_abb96b180a4960bf101178aa01701b3cc}\label{classudc_1_1_m_s_d_abb96b180a4960bf101178aa01701b3cc}} 
+\index{udc::MSD@{udc::MSD}!specificHeat\_m@{specificHeat\_m}}
+\index{specificHeat\_m@{specificHeat\_m}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{specificHeat\_m()}{specificHeat\_m()}}
+{\footnotesize\ttfamily double udc\+::\+MSD\+::specific\+Heat\+\_\+m (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a2d9850c33757ced8ae7c7b4b5de5afb2}\label{classudc_1_1_m_s_d_a2d9850c33757ced8ae7c7b4b5de5afb2}} 
+\index{udc::MSD@{udc::MSD}!specificHeat\_mL@{specificHeat\_mL}}
+\index{specificHeat\_mL@{specificHeat\_mL}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{specificHeat\_mL()}{specificHeat\_mL()}}
+{\footnotesize\ttfamily double udc\+::\+MSD\+::specific\+Heat\+\_\+mL (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a162b9154b562fb1f70e128eb9f0b9c46}\label{classudc_1_1_m_s_d_a162b9154b562fb1f70e128eb9f0b9c46}} 
+\index{udc::MSD@{udc::MSD}!specificHeat\_mR@{specificHeat\_mR}}
+\index{specificHeat\_mR@{specificHeat\_mR}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{specificHeat\_mR()}{specificHeat\_mR()}}
+{\footnotesize\ttfamily double udc\+::\+MSD\+::specific\+Heat\+\_\+mR (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a8c62ebc53fe5f1d620785ad492b27414}\label{classudc_1_1_m_s_d_a8c62ebc53fe5f1d620785ad492b27414}} 
+\index{udc::MSD@{udc::MSD}!specificHeat\_R@{specificHeat\_R}}
+\index{specificHeat\_R@{specificHeat\_R}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{specificHeat\_R()}{specificHeat\_R()}}
+{\footnotesize\ttfamily double udc\+::\+MSD\+::specific\+Heat\+\_\+R (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+
+
+\doxysubsection{Friends And Related Function Documentation}
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a0bb8c1e9fef1960578abc46446380dbf}\label{classudc_1_1_m_s_d_a0bb8c1e9fef1960578abc46446380dbf}} 
+\index{udc::MSD@{udc::MSD}!Mol::setFlux@{Mol::setFlux}}
+\index{Mol::setFlux@{Mol::setFlux}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{Mol::setFlux}{Mol::setFlux}}
+{\footnotesize\ttfamily void Mol\+::set\+Flux (\begin{DoxyParamCaption}\item[{unsigned int}]{a,  }\item[{const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&}]{flux }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a01c9eff4fc0c233e1aafc04ea6271036}\label{classudc_1_1_m_s_d_a01c9eff4fc0c233e1aafc04ea6271036}} 
+\index{udc::MSD@{udc::MSD}!Mol::setLocalM@{Mol::setLocalM}}
+\index{Mol::setLocalM@{Mol::setLocalM}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{Mol::setLocalM}{Mol::setLocalM}}
+{\footnotesize\ttfamily void Mol\+::set\+LocalM (\begin{DoxyParamCaption}\item[{unsigned int}]{a,  }\item[{const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&}]{spin,  }\item[{const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&}]{flux }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a4d4a91fd46eec66e753dfa2642c25068}\label{classudc_1_1_m_s_d_a4d4a91fd46eec66e753dfa2642c25068}} 
+\index{udc::MSD@{udc::MSD}!Mol::setSpin@{Mol::setSpin}}
+\index{Mol::setSpin@{Mol::setSpin}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{Mol::setSpin}{Mol::setSpin}}
+{\footnotesize\ttfamily void Mol\+::set\+Spin (\begin{DoxyParamCaption}\item[{unsigned int}]{a,  }\item[{const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&}]{spin }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a72708188b46e1ddffb7c6e2fec96c587}\label{classudc_1_1_m_s_d_a72708188b46e1ddffb7c6e2fec96c587}} 
+\index{udc::MSD@{udc::MSD}!CIRCULAR\_MOL@{CIRCULAR\_MOL}}
+\index{CIRCULAR\_MOL@{CIRCULAR\_MOL}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{CIRCULAR\_MOL}{CIRCULAR\_MOL}}
+{\footnotesize\ttfamily const \mbox{\hyperlink{classudc_1_1_m_s_d_aa5aef25b88fee8190e1ac32070d06d66}{MSD\+::\+Mol\+Proto\+Factory}} udc\+::\+MSD\+::\+CIRCULAR\+\_\+\+MOL\hspace{0.3cm}{\ttfamily [static]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{= [](\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} \mbox{\hyperlink{_m_s_d-export_8cpp_a16c69478280e0f9d6898c700f3b51574}{nodeCount}}) \{}
+\DoxyCodeLine{    \mbox{\hyperlink{_m_s_d-export_8cpp_aec2cc3918e5933a0bad019dd661cdbef}{MolProto}} mol(\mbox{\hyperlink{_m_s_d-export_8cpp_a16c69478280e0f9d6898c700f3b51574}{nodeCount}});}
+\DoxyCodeLine{    \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} i = 1; i < \mbox{\hyperlink{_m_s_d-export_8cpp_a16c69478280e0f9d6898c700f3b51574}{nodeCount}}; i++)}
+\DoxyCodeLine{        mol.connectNodes(i -\/ 1, i);}
+\DoxyCodeLine{    \textcolor{keywordflow}{if} (\mbox{\hyperlink{_m_s_d-export_8cpp_a16c69478280e0f9d6898c700f3b51574}{nodeCount}} >= 2)}
+\DoxyCodeLine{        mol.connectNodes(\mbox{\hyperlink{_m_s_d-export_8cpp_a16c69478280e0f9d6898c700f3b51574}{nodeCount}} -\/ 1, 0);}
+\DoxyCodeLine{    mol.setLeads(0, \mbox{\hyperlink{_m_s_d-export_8cpp_a16c69478280e0f9d6898c700f3b51574}{nodeCount}} / 2);}
+\DoxyCodeLine{    \textcolor{keywordflow}{return} mol;}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a82cedfe873fa654afa32ab3d1b6f3ead}\label{classudc_1_1_m_s_d_a82cedfe873fa654afa32ab3d1b6f3ead}} 
+\index{udc::MSD@{udc::MSD}!CONTINUOUS\_SPIN\_MODEL@{CONTINUOUS\_SPIN\_MODEL}}
+\index{CONTINUOUS\_SPIN\_MODEL@{CONTINUOUS\_SPIN\_MODEL}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{CONTINUOUS\_SPIN\_MODEL}{CONTINUOUS\_SPIN\_MODEL}}
+{\footnotesize\ttfamily const \mbox{\hyperlink{classudc_1_1_m_s_d_a3d235795ecc459cc0c2069c3f05d089d}{MSD\+::\+Flipping\+Algorithm}} udc\+::\+MSD\+::\+CONTINUOUS\+\_\+\+SPIN\+\_\+\+MODEL\hspace{0.3cm}{\ttfamily [static]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{= [](\textcolor{keyword}{const} Vector \&spin, function<double()> rand) \{}
+\DoxyCodeLine{    \textcolor{keywordflow}{return} \mbox{\hyperlink{classudc_1_1_vector_a89b43ddd10a372d584a03a5583ad5652}{Vector::sphericalForm}}( spin.norm(), 2 * PI * rand(), asin(2 * rand() -\/ 1) );}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a2ccd325cf09e82420004de9702894de5}\label{classudc_1_1_m_s_d_a2ccd325cf09e82420004de9702894de5}} 
+\index{udc::MSD@{udc::MSD}!flippingAlgorithm@{flippingAlgorithm}}
+\index{flippingAlgorithm@{flippingAlgorithm}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{flippingAlgorithm}{flippingAlgorithm}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classudc_1_1_m_s_d_a3d235795ecc459cc0c2069c3f05d089d}{Flipping\+Algorithm}} udc\+::\+MSD\+::flipping\+Algorithm}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_ac578f0076fce752e661058c648d88997}\label{classudc_1_1_m_s_d_ac578f0076fce752e661058c648d88997}} 
+\index{udc::MSD@{udc::MSD}!LINEAR\_MOL@{LINEAR\_MOL}}
+\index{LINEAR\_MOL@{LINEAR\_MOL}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{LINEAR\_MOL}{LINEAR\_MOL}}
+{\footnotesize\ttfamily const \mbox{\hyperlink{classudc_1_1_m_s_d_aa5aef25b88fee8190e1ac32070d06d66}{MSD\+::\+Mol\+Proto\+Factory}} udc\+::\+MSD\+::\+LINEAR\+\_\+\+MOL\hspace{0.3cm}{\ttfamily [static]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{= [](\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} \mbox{\hyperlink{_m_s_d-export_8cpp_a16c69478280e0f9d6898c700f3b51574}{nodeCount}}) \{}
+\DoxyCodeLine{    \mbox{\hyperlink{_m_s_d-export_8cpp_aec2cc3918e5933a0bad019dd661cdbef}{MolProto}} mol(\mbox{\hyperlink{_m_s_d-export_8cpp_a16c69478280e0f9d6898c700f3b51574}{nodeCount}});}
+\DoxyCodeLine{    \textcolor{keywordflow}{for} (\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} i = 1; i < \mbox{\hyperlink{_m_s_d-export_8cpp_a16c69478280e0f9d6898c700f3b51574}{nodeCount}}; i++)}
+\DoxyCodeLine{        mol.connectNodes(i -\/ 1, i);}
+\DoxyCodeLine{    mol.setLeads(0, \mbox{\hyperlink{_m_s_d-export_8cpp_a16c69478280e0f9d6898c700f3b51574}{nodeCount}} -\/ 1);}
+\DoxyCodeLine{    \textcolor{keywordflow}{return} mol;}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a6a807356604fd24654d015c41974b526}\label{classudc_1_1_m_s_d_a6a807356604fd24654d015c41974b526}} 
+\index{udc::MSD@{udc::MSD}!record@{record}}
+\index{record@{record}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{record}{record}}
+{\footnotesize\ttfamily std\+::vector$<$\mbox{\hyperlink{structudc_1_1_m_s_d_1_1_results}{Results}}$>$ udc\+::\+MSD\+::record}
+
+\mbox{\Hypertarget{classudc_1_1_m_s_d_a7010b43c1e96eca520bcefba7aa36ad3}\label{classudc_1_1_m_s_d_a7010b43c1e96eca520bcefba7aa36ad3}} 
+\index{udc::MSD@{udc::MSD}!UP\_DOWN\_MODEL@{UP\_DOWN\_MODEL}}
+\index{UP\_DOWN\_MODEL@{UP\_DOWN\_MODEL}!udc::MSD@{udc::MSD}}
+\doxysubsubsection{\texorpdfstring{UP\_DOWN\_MODEL}{UP\_DOWN\_MODEL}}
+{\footnotesize\ttfamily const \mbox{\hyperlink{classudc_1_1_m_s_d_a3d235795ecc459cc0c2069c3f05d089d}{MSD\+::\+Flipping\+Algorithm}} udc\+::\+MSD\+::\+UP\+\_\+\+DOWN\+\_\+\+MODEL\hspace{0.3cm}{\ttfamily [static]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{= [](\textcolor{keyword}{const} Vector \&spin, function<double()> rand) \{}
+\DoxyCodeLine{    \textcolor{keywordflow}{return} -\/spin;}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/mathh/\+Git\+Hub/\+Molecular-\/\+Spintronics-\/\+Research-\/\+Project/\+MSD Research Project -\/ Latest Development Version/src/\mbox{\hyperlink{_m_s_d_8h}{MSD.\+h}}\end{DoxyCompactItemize}

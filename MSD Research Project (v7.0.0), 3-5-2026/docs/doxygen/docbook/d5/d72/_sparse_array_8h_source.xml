@@ -1,0 +1,105 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__sparse_array_8h_source" xml:lang="en-US">
+<title>SparseArray.h</title>
+<indexterm><primary>C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/src/SparseArray.h</primary></indexterm>
+Go to the documentation of this file.<programlisting linenumbering="unnumbered">1 <emphasis role="preprocessor">#ifndef&#32;UDC_HASHMAP</emphasis>
+2 <emphasis role="preprocessor">#define&#32;UDC_HASHMAP</emphasis>
+3 
+4 <emphasis role="preprocessor">#include&#32;&lt;stdexcept&gt;</emphasis>
+5 
+6 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespaceudc">udc</link>&#32;{
+7 
+8 <emphasis role="keyword">using&#32;</emphasis>std::out_of_range;
+9 
+10 <emphasis role="keyword">template</emphasis>&#32;&lt;<emphasis role="keyword">typename</emphasis>&#32;T&gt;&#32;<emphasis role="keyword">struct&#32;</emphasis><link linkend="_structudc_1_1_sparse_array_value">SparseArrayValue</link>&#32;{
+11 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_structudc_1_1_sparse_array_value_1af9f5e4a41eaf287226a160a0a0ee364c">set</link>;
+12 &#32;&#32;&#32;&#32;T&#32;<link linkend="_structudc_1_1_sparse_array_value_1a8aa0b6b7a654f78737afcf7520f4733f">value</link>;
+13 
+14 &#32;&#32;&#32;&#32;<link linkend="_structudc_1_1_sparse_array_value_1ab1ffe7e06c634e2f52998250131a9713">SparseArrayValue</link>()&#32;:&#32;<link linkend="_structudc_1_1_sparse_array_value_1af9f5e4a41eaf287226a160a0a0ee364c">set</link>(false),&#32;<link linkend="_structudc_1_1_sparse_array_value_1a8aa0b6b7a654f78737afcf7520f4733f">value</link>()&#32;{&#32;<emphasis role="comment">/*&#32;empty&#32;*/</emphasis>&#32;}
+15 
+16 &#32;&#32;&#32;&#32;T&amp;&#32;<link linkend="_structudc_1_1_sparse_array_value_1a1a9f4655ad0c7b13ce4c9a8fa25789bb">create</link>();
+17 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_structudc_1_1_sparse_array_value_1a4da48ea04f68479e9c094535a49e3c95">clear</link>();
+18 };
+19 
+20 <emphasis role="comment">/*</emphasis>
+21 <emphasis role="comment">&#32;*&#32;A&#32;fixed-sized&#32;data&#32;structure,&#32;which&#32;maps&#32;(unsigned&#32;int&#32;-&gt;&#32;value&#32;type,&#32;T).</emphasis>
+22 <emphasis role="comment">&#32;*&#32;Not&#32;all&#32;elements&#32;need&#32;to&#32;contain&#32;values.</emphasis>
+23 <emphasis role="comment">&#32;*&#32;Uses&#32;std::out_of_range&#32;exception.</emphasis>
+24 <emphasis role="comment">&#32;*/</emphasis>
+25 <emphasis role="keyword">template</emphasis>&#32;&lt;<emphasis role="keyword">typename</emphasis>&#32;T&gt;&#32;<emphasis role="keyword">class&#32;</emphasis><link linkend="_classudc_1_1_sparse_array">SparseArray</link>&#32;{
+26 &#32;<emphasis role="keyword">private</emphasis>:
+27 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">unsigned</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;_capacity;
+28 &#32;&#32;&#32;&#32;<link linkend="_structudc_1_1_sparse_array_value">SparseArrayValue&lt;T&gt;</link>&#32;*values;
+29 
+30 &#32;<emphasis role="keyword">public</emphasis>:
+31 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_sparse_array_1a6b2c69b5e882d6041ceef3a37fe15a02">SparseArray</link>()&#32;:&#32;_capacity(0),&#32;values(NULL)&#32;{&#32;<emphasis role="comment">/*&#32;empty&#32;*/</emphasis>&#32;}
+32 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_sparse_array_1a16578c6d4a9e74cac96d74789c5f0a48">SparseArray</link>(<emphasis role="keywordtype">unsigned</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_classudc_1_1_sparse_array_1a9403a23fa88896d44b49e515d68f04f6">capacity</link>)&#32;:&#32;_capacity(<link linkend="_classudc_1_1_sparse_array_1a9403a23fa88896d44b49e515d68f04f6">capacity</link>)&#32;{&#32;values&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_structudc_1_1_sparse_array_value">SparseArrayValue&lt;T&gt;</link>[<link linkend="_classudc_1_1_sparse_array_1a9403a23fa88896d44b49e515d68f04f6">capacity</link>];&#32;}
+33 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_sparse_array_1a50dde7858264e15303f7e90ae8bc240d">~SparseArray</link>()&#32;{&#32;<emphasis role="keyword">delete</emphasis>[]&#32;values;&#32;}
+34 
+35 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_sparse_array_1a23594c1825bf065889a54187a3491071">SparseArray</link>(<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_sparse_array">SparseArray&lt;T&gt;</link>&#32;&amp;);&#32;&#32;<emphasis role="comment">//&#32;do&#32;not&#32;use:&#32;not&#32;implemented!</emphasis>
+36 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_sparse_array">SparseArray&lt;T&gt;</link>&amp;&#32;<link linkend="_classudc_1_1_sparse_array_1a7ca09645d3083b5dc1001fa44b8608f2">operator=</link>(<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_sparse_array">SparseArray&lt;T&gt;</link>&#32;&amp;);&#32;&#32;<emphasis role="comment">//&#32;do&#32;not&#32;use:&#32;not&#32;implemented!</emphasis>
+37 
+38 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">unsigned</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_classudc_1_1_sparse_array_1a9403a23fa88896d44b49e515d68f04f6">capacity</link>()<emphasis role="keyword">&#32;const&#32;</emphasis>{&#32;<emphasis role="keywordflow">return</emphasis>&#32;_capacity;&#32;}
+39 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_classudc_1_1_sparse_array_1afdf642eb989638bb62e21563f83baa1c">resize</link>(<emphasis role="keywordtype">unsigned</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;<link linkend="_classudc_1_1_sparse_array_1a9403a23fa88896d44b49e515d68f04f6">capacity</link>);&#32;&#32;<emphasis role="comment">//&#32;will&#32;clear&#32;the&#32;array</emphasis>
+40 
+41 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;does&#32;NO&#32;bounds&#32;checking</emphasis>
+42 &#32;&#32;&#32;&#32;T&amp;&#32;<link linkend="_classudc_1_1_sparse_array_1a489dd0cd13e71c62645789d320ce1bc6">operator[]</link>(<emphasis role="keywordtype">unsigned</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;index)&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;values[index].<link linkend="_structudc_1_1_sparse_array_value_1a1a9f4655ad0c7b13ce4c9a8fa25789bb">create</link>();&#32;}&#32;&#32;<emphasis role="comment">//&#32;creates&#32;an&#32;element&#32;at&#32;index&#32;if&#32;it&#32;has&#32;not&#32;yet&#32;been&#32;created</emphasis>
+43 &#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;T&amp;&#32;<link linkend="_classudc_1_1_sparse_array_1ac4053a55e9b52246fd78e998631dcd98">operator[]</link>(<emphasis role="keywordtype">unsigned</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;index)<emphasis role="keyword">&#32;const&#32;</emphasis>{&#32;<emphasis role="keywordflow">return</emphasis>&#32;values[index].<link linkend="_structudc_1_1_sparse_array_value_1a8aa0b6b7a654f78737afcf7520f4733f">value</link>;&#32;}&#32;&#32;<emphasis role="comment">//&#32;Undefined&#32;behaviour&#32;if&#32;index&#32;has&#32;not&#32;been&#32;set,&#32;or&#32;if&#32;out&#32;of&#32;bounds.</emphasis>
+44 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_classudc_1_1_sparse_array_1ae18b55e238a3a96a733b3caff3dd9ae8">clear</link>(<emphasis role="keywordtype">unsigned</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;index)&#32;{&#32;values[index].<link linkend="_structudc_1_1_sparse_array_value_1a4da48ea04f68479e9c094535a49e3c95">clear</link>();&#32;}&#32;&#32;<emphasis role="comment">//&#32;has&#32;no&#32;effect&#32;if&#32;the&#32;element&#32;was&#32;not&#32;yet&#32;created</emphasis>
+45 
+46 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;DOES&#32;bounds&#32;checking:</emphasis>
+47 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;throws&#32;an&#32;out_of_range&#32;exception&#32;if&#32;the&#32;given&#32;index&#32;is&#32;out&#32;of&#32;range&#32;or</emphasis>
+48 &#32;&#32;&#32;&#32;<emphasis role="comment">//&#32;if&#32;the&#32;element&#32;has&#32;not&#32;yet&#32;been&#32;created.</emphasis>
+49 &#32;&#32;&#32;&#32;T&amp;&#32;<link linkend="_classudc_1_1_sparse_array_1a9a89430f9cb6b03bfaf249a0ebcbfc8c">at</link>(<emphasis role="keywordtype">unsigned</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;index);
+50 &#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;T&amp;&#32;<link linkend="_classudc_1_1_sparse_array_1ad68e7e0bc27b653427c9091de3e421b9">at</link>(<emphasis role="keywordtype">unsigned</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;index)&#32;<emphasis role="keyword">const</emphasis>;
+51 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_classudc_1_1_sparse_array_1a550a858fba0596aeedf061bc068ae062">clearAt</link>(<emphasis role="keywordtype">unsigned</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;index);
+52 };
+53 
+54 <emphasis role="keyword">template</emphasis>&#32;&lt;<emphasis role="keyword">typename</emphasis>&#32;T&gt;&#32;T&amp;&#32;<link linkend="_structudc_1_1_sparse_array_value_1a1a9f4655ad0c7b13ce4c9a8fa25789bb">SparseArrayValue&lt;T&gt;::create</link>()&#32;{
+55 &#32;&#32;&#32;&#32;set&#32;=&#32;<emphasis role="keyword">true</emphasis>;
+56 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;value;
+57 }
+58 
+59 <emphasis role="keyword">template</emphasis>&#32;&lt;<emphasis role="keyword">typename</emphasis>&#32;T&gt;&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_structudc_1_1_sparse_array_value_1a4da48ea04f68479e9c094535a49e3c95">SparseArrayValue&lt;T&gt;::clear</link>()&#32;{
+60 &#32;&#32;&#32;&#32;set&#32;=&#32;<emphasis role="keyword">false</emphasis>;
+61 &#32;&#32;&#32;&#32;value&#32;=&#32;value();
+62 }
+63 
+64 <emphasis role="keyword">template</emphasis>&#32;&lt;<emphasis role="keyword">typename</emphasis>&#32;T&gt;&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_classudc_1_1_sparse_array_1afdf642eb989638bb62e21563f83baa1c">SparseArray&lt;T&gt;::resize</link>(<emphasis role="keywordtype">unsigned</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;capacity)&#32;{
+65 &#32;&#32;&#32;&#32;<emphasis role="keyword">delete</emphasis>[]&#32;values;
+66 &#32;&#32;&#32;&#32;_capacity&#32;=&#32;capacity;
+67 &#32;&#32;&#32;&#32;values&#32;=&#32;<emphasis role="keyword">new</emphasis>&#32;<link linkend="_structudc_1_1_sparse_array_value">SparseArrayValue&lt;T&gt;</link>[capacity];
+68 }
+69 
+70 <emphasis role="keyword">template</emphasis>&#32;&lt;<emphasis role="keyword">typename</emphasis>&#32;T&gt;&#32;T&amp;&#32;<link linkend="_classudc_1_1_sparse_array_1a9a89430f9cb6b03bfaf249a0ebcbfc8c">SparseArray&lt;T&gt;::at</link>(<emphasis role="keywordtype">unsigned</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;index)&#32;{
+71 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(index&#32;&lt;&#32;0&#32;||&#32;index&#32;&gt;=&#32;capacity())
+72 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;out_of_range(<emphasis role="stringliteral">&quot;SparseArray::at(unsigned&#32;int):&#32;illegal&#32;index&quot;</emphasis>);
+73 &#32;&#32;&#32;&#32;<link linkend="_structudc_1_1_sparse_array_value">SparseArrayValue&lt;T&gt;</link>&#32;&amp;v&#32;=&#32;values[index];
+74 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!v.<link linkend="_structudc_1_1_sparse_array_value_1af9f5e4a41eaf287226a160a0a0ee364c">set</link>)
+75 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;out_of_range(<emphasis role="stringliteral">&quot;SparseArray::at(unsigned&#32;int):&#32;index&#32;not&#32;yet&#32;set&quot;</emphasis>);
+76 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;v.<link linkend="_structudc_1_1_sparse_array_value_1a8aa0b6b7a654f78737afcf7520f4733f">value</link>;
+77 }
+78 
+79 <emphasis role="keyword">template</emphasis>&#32;&lt;<emphasis role="keyword">typename</emphasis>&#32;T&gt;&#32;<emphasis role="keyword">const</emphasis>&#32;T&amp;&#32;<link linkend="_classudc_1_1_sparse_array_1a9a89430f9cb6b03bfaf249a0ebcbfc8c">SparseArray&lt;T&gt;::at</link>(<emphasis role="keywordtype">unsigned</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;index)<emphasis role="keyword">&#32;const&#32;</emphasis>{
+80 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(index&#32;&lt;&#32;0&#32;||&#32;index&#32;&gt;=&#32;capacity())
+81 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;out_of_range(<emphasis role="stringliteral">&quot;SparseArray::at(unsigned&#32;int):&#32;illegal&#32;index&quot;</emphasis>);
+82 &#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<link linkend="_structudc_1_1_sparse_array_value">SparseArrayValue&lt;T&gt;</link>&#32;&amp;v&#32;=&#32;values[index];
+83 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!v.<link linkend="_structudc_1_1_sparse_array_value_1af9f5e4a41eaf287226a160a0a0ee364c">set</link>)
+84 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;out_of_range(<emphasis role="stringliteral">&quot;SparseArray::at(unsigned&#32;int):&#32;index&#32;not&#32;yet&#32;set&quot;</emphasis>);
+85 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;v.<link linkend="_structudc_1_1_sparse_array_value_1a8aa0b6b7a654f78737afcf7520f4733f">value</link>;
+86 }
+87 
+88 <emphasis role="keyword">template</emphasis>&#32;&lt;<emphasis role="keyword">typename</emphasis>&#32;T&gt;&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_classudc_1_1_sparse_array_1a550a858fba0596aeedf061bc068ae062">SparseArray&lt;T&gt;::clearAt</link>(<emphasis role="keywordtype">unsigned</emphasis>&#32;<emphasis role="keywordtype">int</emphasis>&#32;index)&#32;{
+89 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(index&#32;&lt;&#32;0&#32;||&#32;index&#32;&gt;=&#32;capacity())
+90 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;out_of_range(<emphasis role="stringliteral">&quot;SparseArray::at(unsigned&#32;int):&#32;illegal&#32;index&quot;</emphasis>);
+91 &#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<link linkend="_structudc_1_1_sparse_array_value">SparseArrayValue&lt;T&gt;</link>&#32;&amp;v&#32;=&#32;values[index];
+92 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>&#32;(!v.<link linkend="_structudc_1_1_sparse_array_value_1af9f5e4a41eaf287226a160a0a0ee364c">set</link>)
+93 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">throw</emphasis>&#32;out_of_range(<emphasis role="stringliteral">&quot;SparseArray::at(unsigned&#32;int):&#32;index&#32;not&#32;yet&#32;set&quot;</emphasis>);
+94 &#32;&#32;&#32;&#32;v.<link linkend="_structudc_1_1_sparse_array_value_1a4da48ea04f68479e9c094535a49e3c95">clear</link>();
+95 
+96 }
+97 
+98 }&#32;&#32;<emphasis role="comment">//&#32;end&#32;of&#32;namespace&#32;udc</emphasis>
+99 
+100 <emphasis role="preprocessor">#endif</emphasis>
+</programlisting></section>
