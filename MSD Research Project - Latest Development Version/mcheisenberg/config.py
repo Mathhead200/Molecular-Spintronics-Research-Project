@@ -1327,7 +1327,8 @@ class Config:
 								nnid = self.nodeId(neighbor)  # neighbor's node id
 								src2 += f"\t; {edgelbl}: {nid0} -> {nid1}\n"
 								src2 += f"\tvmovapd {sfmj}, ymmword ptr [nodes + ({nindex})*SIZEOF_NODE + OFFSETOF_SPIN]          ; load s_{nnid} (neighbor)\n"
-								src2 += f"\tvaddpd {sfmj}, {sfmj}, ymmword ptr [nodes + ({nindex})*SIZEOF_NODE + OFFSETOF_FLUX]   ; m_{nnid} = s_{nnid} + f_{nnid}\n"
+								if flux_mode:
+									src2 += f"\tvaddpd {sfmj}, {sfmj}, ymmword ptr [nodes + ({nindex})*SIZEOF_NODE + OFFSETOF_FLUX]   ; m_{nnid} = s_{nnid} + f_{nnid}\n"
 								if optimization_remove_scalar:
 									if not out_init:
 										src2 += f"\t_vdotp {resx}, {resy}, {m1i}, {sfmj}, {prmx}  ; optimization (b*=1), ({m1i}, {sfmj}) -> {resx}\n"
@@ -1442,7 +1443,8 @@ class Config:
 									src3 += "; skipping self-loop since cross product is 0\n"
 								else:
 									src3 += f"\tvmovapd {sfmj}, ymmword ptr [nodes + ({nindex})*SIZEOF_NODE + OFFSETOF_SPIN]        ; load s_{nnid} (neighbor)\n"
-									src3 += f"\tvaddpd {sfmj}, {sfmj}, ymmword ptr [nodes + ({nindex})*SIZEOF_NODE + OFFSETOF_FLUX]   ; m_{nnid} = s_{nnid} + f_{nnid}\n"
+									if flux_mode:
+										src3 += f"\tvaddpd {sfmj}, {sfmj}, ymmword ptr [nodes + ({nindex})*SIZEOF_NODE + OFFSETOF_FLUX]   ; m_{nnid} = s_{nnid} + f_{nnid}\n"
 									if not tmp_init:
 										if direction > 0:  # forward edge: node == edge[0]
 											src3 += f"\t_vcrossp {tmpy}, {dsm}, {sfmj}, {smi}, {fm1}\n"  # smi and fm1 are unused durring phase 3
