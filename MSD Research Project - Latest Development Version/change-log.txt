@@ -226,8 +226,8 @@ Second bug fix. In MSD::setParameters()
 	mcheisenberg.config.Config.compile bug fix with b or D trying to load OFFSETOF_FLUX when not in flux_mode.
 
 7.0.2:
-(3-7-2026) implemented ASM randomize in mcheisenberg.config.compile
-	Fixed CSV bug causing misalignmnet in snapshot 
+(3-7-2026) implemented ASM randomize in mcheisenberg.config.compile.
+	Fixed CSV bug causing misalignmnet in snapshot.
 
 ------------------------------------ TODOs ------------------------------------
 [mcheisenberg]
