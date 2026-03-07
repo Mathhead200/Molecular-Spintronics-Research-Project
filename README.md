@@ -11,7 +11,7 @@ Special thanks to my student Robert J. for his recent contributions to the code 
 
 <hr>
 
-Version 7.0.0 is the current & latest version as of 3-5-2026  
+Version 7.0.1 is the current & latest version as of 3-5-2026  
   
 Testing needed:  
 	v6.0.0: The custom molecule features have not yet been fully tested, but preliminary results are promising.  
