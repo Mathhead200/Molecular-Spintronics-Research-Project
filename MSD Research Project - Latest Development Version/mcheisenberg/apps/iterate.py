@@ -2,7 +2,8 @@ import argparse
 import sys
 from datetime import datetime
 from pathlib import Path
-from mcheisenberg.io import IterateParameters
+from mcheisenberg import VisualStudio
+from mcheisenberg.io import IterateParameters, DEFAULT_TOOL
 from mcheisenberg.util import report_datetime
 
 def main(argv=sys.argv):
@@ -13,6 +14,7 @@ def main(argv=sys.argv):
 	parser.add_argument("--out", dest="out_dir", type=str, default="out", help="Output directory for CSV")
 	parser.add_argument("--temp", dest="temp_dir", type=str, default=None, help="Directory for temp files: .asm, .obj, .def, .dll")
 	parser.add_argument("--asm", dest="asm", type=str, nargs="?", default=None, const=True, help="Save .asm file (for debugging)")
+	parser.add_argument("--year", dest="year", type=int, default=None, help="Select edition of Visual Studio")
 	args = parser.parse_args(argv[1:])
 
 	print(f"Reading {args.in_file}", flush=True)
@@ -23,7 +25,8 @@ def main(argv=sys.argv):
 	print("_" * 80)
 	if args.asm is True:
 		args.asm = "iterate.asm" if args.temp_dir is None else str(Path(args.temp_dir) / "iterate.asm")
-	output_filename = p.run(out_dir=args.out_dir, temp_dir=args.temp_dir, asm=args.asm, sim_progress_bar="iterate", out_progress_bar="Writing CSV")
+	tool = DEFAULT_TOOL if args.year is None else VisualStudio(year=args.year)
+	output_filename = p.run(tool=tool, out_dir=args.out_dir, temp_dir=args.temp_dir, asm=args.asm, sim_progress_bar="iterate", out_progress_bar="Writing CSV")
 
 	print(f"({report_datetime()}) Done: {output_filename}")
 

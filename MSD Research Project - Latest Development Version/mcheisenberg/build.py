@@ -12,6 +12,7 @@ class Linker:
 class VisualStudio(Assembler, Linker):
 	def __init__(self, year: int=2022, edition: str="Community", install: str=None, bat: str=None):
 		DEFAULTS = {  # (instal, bat)
+			2026: ("C:\\Program Files\\Microsoft Visual Studio\\18", "VC\\Auxiliary\\Build\\vcvars64.bat"),
 			2022: ("C:\\Program Files\\Microsoft Visual Studio\\2022", "VC\\Auxiliary\\Build\\vcvars64.bat"),
 			2019: ("C:\\Program Files (x86)\\Microsoft Visual Studio\\2019", "VC\\Auxiliary\\Build\\vcvars64.bat"),
 			2017: ("C:\\Program Files (x86)\\Microsoft Visual Studio\\2017", "VC\\Auxiliary\\Build\\vcvars64.bat"),
