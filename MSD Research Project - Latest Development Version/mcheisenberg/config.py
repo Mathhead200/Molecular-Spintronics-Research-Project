@@ -2007,7 +2007,7 @@ class Config:
 		if def_ is None: def_ = reserve_tempfile(".def");  def_temp = True
 		if dll is None:  dll  = reserve_tempfile(".dll");  dll_temp = True
 		
-		# DEBUG
+		# DEBUG: logging
 		print("ASM:", asm)
 		print("OBJ:", obj)
 		print("DEF:", def_)
@@ -2033,7 +2033,8 @@ class Config:
 				else:
 					tool.dlink(obj, "ucrt.lib", "legacy_stdio_definitions.lib", out=dll, entry="DllMain", exports=def_)  # DEBUG
 			except CalledProcessError as ex:
-				raise  # TODO: (stub) Re-raise exception
+				ex.add_note(f"Error running {tool}. Are you sure this version is installed?")
+				raise
 		
 		# clean up temp files
 		if asm_temp:  os.remove(asm)

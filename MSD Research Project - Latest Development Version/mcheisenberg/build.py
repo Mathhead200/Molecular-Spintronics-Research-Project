@@ -19,11 +19,19 @@ class VisualStudio(Assembler, Linker):
 			2015: ("C:\\Program Files (x86)\\Microsoft Visual Studio 14.0", "VC\\vcvarsall.bat x64"),
 			2013: ("C:\\Program Files (x86)\\Microsoft Visual Studio 12.0", "VC\\vcvarsall.bat x64")
 		}
-		if install is None:
-			install, _ = DEFAULTS[year]
-		if bat is None:
-			_, bat = DEFAULTS[year]
+		try:
+			if install is None:
+				install, _ = DEFAULTS[year]
+			if bat is None:
+				_, bat = DEFAULTS[year]
+		except KeyError as ex:
+			ex.add_note(f"Unreconginized version of Visual Studio (e.g. 2022, 2026): {year} ({type(year).__name__})")
+			raise
 		self.setup = f'"{install}\\{edition}\\{bat}"'
+		self.name = f"Visual Studio {year} {edition}"
+	
+	def __str__(self) -> str:
+		return self.name
 
 	def assemble(self, *src, out=None, include=[]):
 		src = ' '.join(quote(s) for s in src)  # e.g. 'file1.asm file2.lib'
