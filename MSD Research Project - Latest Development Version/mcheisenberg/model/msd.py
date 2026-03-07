@@ -77,13 +77,16 @@ def MSD(width: int, height: int, depth: int,
 	# default parameters
 	msd.globalParameters = {
 		"kT": 0.1,
-		"S": 1.0,
-		"J": 1.0
+		"S": 1.0
 	}
+	msd.regionNodeParameters = {}
 	msd.regionEdgeParameters = {
-		("mol", "FMR"): {
-			"J": -1.0
-		}
+		(__FML__, __FML__): { "J": 1.0 },
+		(__FML__, __mol__): { "J": 1.0 },
+		(__mol__, __mol__): { "J": 1.0 },
+		(__mol__, __FMR__): { "J": -1.0 },
+		(__FMR__, __FMR__): { "J": 1.0 }
+		# no default JLR direct coupling
 	}
 
 	msd.nodes = list(msd.nodes)

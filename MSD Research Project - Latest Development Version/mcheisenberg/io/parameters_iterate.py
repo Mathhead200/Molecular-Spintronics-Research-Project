@@ -166,13 +166,13 @@ class IterateParameters:
 		msd.programParameters = { "seed": self.seed }
 
 		# Required parameters:
-		msd.globalParameters = { "kT": self.kT }
-		msd.regionNodeParameters = {
+		msd.globalParameters = { "kT": self.kT }      # override MSD default global parameters
+		msd.regionNodeParameters = {                  # override MSD default region node parameters (default is empty {})
 			__FML__: { "S": self.SL },
 			__FMR__: { "S": self.SR },
 			__mol__: { "S": self.Sm }
 		}
-		msd.regionEdgeParameters = defaultdict(dict)
+		msd.regionEdgeParameters = defaultdict(dict)  # override MSD default edge parameters
 
 		# Optional parameters:
 		if self.B  is not None:
