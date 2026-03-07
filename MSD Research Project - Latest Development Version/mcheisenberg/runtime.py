@@ -187,8 +187,7 @@ class Runtime:
 		"""
 		if len(seed) != 0:
 			self.seed(*seed)
-		raise NotImplementedError("TODO: implement (in ASM?)")
-		# TODO: implement (in ASM?)
+		self.driver.randomize()
 
 	def metropolis(self, iterations: int) -> None:
 		""" Run the metropolis algorithm for the given number of iterations. """

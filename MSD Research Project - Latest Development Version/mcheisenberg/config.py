@@ -1817,6 +1817,140 @@ class Config:
 		src += "seed ENDP\n\n"
 		exports.append(("seed", False))
 
+		# randomize PROC
+		src += "; Randomize the state of all nodes (i.e. kT=\infty)\n"
+		src += "; @param (void)\n"
+		src += "; @return (void)\n"
+		src += "randomize PROC\n"
+		if self.MUTABLE_NODE_COUNT != 0:
+			regi = "rcx"
+			one = "ymm6"
+			lbl_suffix = "RAND"
+			# load PRNG state, and other constants
+			if prng.startswith("xoshiro256"):  # TODO: support other PRNGs
+				src += f"\t; load vectorized PRNG ({prng}) state into YMM12, YMM13, YMM14, YMM15; and load other constants\n"
+				src += "\tvmovdqa ymm12, ymmword ptr [prng_state + (0)*32]\n"
+				src += "\tvmovdqa ymm13, ymmword ptr [prng_state + (1)*32]\n"
+				src += "\tvmovdqa ymm14, ymmword ptr [prng_state + (2)*32]\n"
+				src += "\tvmovdqa ymm15, ymmword ptr [prng_state + (3)*32]\n"
+			src += f"\t_vones {one}  ; [1.0, 1.0, 1.0, 1.0]\n\n"
+			src += f"\tmov {regi}, MUTABLE_NODE_COUNT  ; load mutable nodes array size\n"
+			src += f"\t; assert {regi} > 0\n"
+			src += f"\tLOOP_START_{lbl_suffix}:\n"
+			src += f"\t\tdec {regi}\n\n"
+			# pick uniformally random new state for the node
+			wxys = "ymm1"  # [u_1, v_1, u_2, v_2] -> [x_1, y_1, x_2, y_2] -> s'
+			flux = "ymm2"  # f'
+			zmsk = "ymm3"  # comparision bit-mask -> [z_1, 0, z_2, 0]
+			s = "ymm4"     # [s_1, s_1, s_2, s_2] where s_i = (u_i)^2 + (v_i)^2
+			omega = "ymm5" if "F" in self.allKeys else "ymm1"  # contains the PRNG random float [0, 1.0) incase it goes unused
+			padl = " " * (len(regi) + 1 + 6 - len(lbl_suffix))
+			MARSAGLIA_START_2 = f"MARSAGLIA_START_2_{lbl_suffix}"
+			MARSAGLIA_START_1 = f"MARSAGLIA_START_1_{lbl_suffix}"
+			MARSAGLIA_END = f"MARSAGLIA_END_{lbl_suffix}"
+			MARSAGLIA_END_LO = f"MARSAGLIA_END_LO_{lbl_suffix}" if "F" in self.allKeys else MARSAGLIA_END  # end with "leftover" omegas
+			F = ["G", "F"][int(batch4)]
+			S = ["T", "S"][int(batch4)]
+			F1 = f"{F}{2*num+1}"
+			F2 = f"{F}{2*num+2}"
+			S1 = f"{S}{2*num+1}"
+			S2 = f"{S}{2*num+2}"
+			src += f"\t\t; pick uniformally random new state for node [{regi}] (Marsaglia's method)\n"
+			if "F" in self.allKeys:
+				src += f"\t\t{MARSAGLIA_START_2}:             {pad}{padl}; 2 vectors, f' -> {flux}, s' -> {wxys}\n"
+				src += f"\t\t\t_gen_ws {wxys}, {wxys}, {s}, {one}, ymm10\n"
+				src += f"\t\t\tvcmppd {zmsk}, {s}, {one}, 11h          ; {s} < {one}\n"
+				src += f"\t\t\tvmovmskpd rax, {zmsk}                   ; rax = 0...bbaa where a = (s_1 < 1.0) and b = (s_2 < 1.0)\n"
+				src += f"\t\t\t{F1}:\ttest rax, 0100b                   ; test bit (b)\n"
+				src += f"\t\t\t\tjz {F2}                             ; !b -> s_2 >= 1.0\n"
+				src += f"\t\t\t\t_calc_xyz {wxys}, {zmsk}, {s}, {one}\n"
+				src += f"\t\t\t\tvperm2f128 {flux}, {wxys}, {zmsk}, 31h  ; [x_2, y_2, z_2, 0] = f'\n"
+				src += "\t\t\t\ttest rax, 0001b                   ; test bit (a)\n"
+				src += f"\t\t\t\tjz {MARSAGLIA_START_1}   {pad}{padl}; !a -> s_1 >= 1.0\n"
+				src += f"\t\t\t\tvperm2f128 {wxys}, {wxys}, {zmsk}, 20h  ; [x_1, y_1, z_1, 0] = s'\n"
+				src += f"\t\t\t\tjmp {MARSAGLIA_END}\n"
+				src += f"\t\t\t{F2}:\ttest rax, 0001b                   ; test bit (a)\n"
+				src += f"\t\t\t\tjz {MARSAGLIA_START_2}   {pad}{padl}; !a -> s_1 >= 1.0\n"
+				src += f"\t\t\t\t_calc_xyz {wxys}, {zmsk}, {s}, {one}\n"
+				src += f"\t\t\t\tvperm2f128 {flux}, {wxys}, {zmsk}, 20h  ; [x_1, y_1, z_1, 0] -> f'\n"
+				src += f"\t\t\t\t; jmp {MARSAGLIA_START_1}\n"
+			# either no flux. or already haveflux. only need s'
+			src += f"\t\t{MARSAGLIA_START_1}:             {pad}{padl}; only 1 vector, s' -> {wxys}\n"
+			src += f"\t\t\t_gen_ws {omega}, {wxys}, {s}, {one}, ymm10\n"
+			src += f"\t\t\tvcmppd {zmsk}, {s}, {one}, 11h          ; {s} < {one}\n"
+			src += f"\t\t\tvmovmskpd rax, {zmsk}                   ; rax = 0...bbaa where a = (s_1 < 1.0) and b = (s_2 < 1.0)\n"
+			src += f"\t\t\t{S1}:\ttest rax, 0100b                   ; test bit (b)\n"
+			src += f"\t\t\t\tjz {S2}                             ; !b -> s_2 >= 1.0\n"
+			src += f"\t\t\t\t_calc_xyz {wxys}, {zmsk}, {s}, {one}\n"
+			src += f"\t\t\t\tvperm2f128 {wxys}, {wxys}, {zmsk}, 31h  ; [x_2, y_2, z_2, 0] = s'\n"
+			src += f"\t\t\t\tjmp {MARSAGLIA_END_LO}\n"
+			src += f"\t\t\t{S2}:\ttest rax, 0001b                   ; test bit (a)\n"
+			src += f"\t\t\t\tjz {MARSAGLIA_START_1}   {pad}{padl}; !a -> s_1 >= 1.0\n"
+			src += f"\t\t\t\t_calc_xyz {wxys}, {zmsk}, {s}, ymm6\n"
+			src += f"\t\t\t\tvperm2f128 {wxys}, {wxys}, {zmsk}, 20h  ; [x_1, y_1, z_1, 0] = s'\n"
+			src += f"\t\t{MARSAGLIA_END}:\n"
+			# scale by S and F
+			spin = wxys
+			flux = flux
+			coef = "ymm3"   # scalar S or F broadcast, e.g. [S, S, S, S]
+			msk = "xmm3"    # Note: vgather mask used before coef. overlap okay
+			addr = "xmm4"   # Addresses [&S, &F] IMPORTANT: Can *not* not overlap with dest `sf` nor mask `msk`. Will cause runtime #UD fault!
+			omegaY = omega  # pseudo random ω for randomizing 0 <= |f'| < F
+			omegaX = omega.replace("y", "x")
+			one = one       # "ymm6"
+			sf = "xmm6"     # scalars [S, F] packed; OVERLAPS with {one}
+			# TODO: (optimization) skip for S=1.0 and/or F=1.0 (Note: S, F >= 0)
+			if "F" in self.allKeys:
+				src += "\t\t; generate \\omega coef. for randomizing |f'| = \\omega * F\n"
+				src += f"\t\t_gen_omega {omega}, {one}, ymm10\n"
+				src += f"\t\t{MARSAGLIA_END_LO}:  ; use \"leftover\" \\omega in {omega}\n"
+				src += f"\t\t; scale s' ({spin}) and f' ({flux})\n"
+				src += f"\t\tlea rax, SFref\n"
+				src += f"\t\tmov rsi, {regi}                           {pad}; calculate array offset\n"
+				src += f"\t\tshl rsi, 4                             ; mul 16\n"
+				src += f"\t\tvmovapd {addr}, xmmword ptr [rax + rsi]  ; pointers (double*[]) to [S, F]\n"
+				src += f"\t\txor rax, rax                           ; 0 base for absolute vgather\n"
+				src += f"\t\tvpcmpeqq {msk}, {msk}, {msk}              ; load mask (all 1's)\n"
+				src += f"\t\tvgatherqpd {sf}, [rax + {addr}], {msk}\n"
+				src += f"\t\tvbroadcastsd {coef}, {sf}                ; {coef} = [S, S, S, S]\n"
+				src += f"\t\tvmulpd {spin}, {spin}, {coef}                ; scale {spin} by S\n"
+				src += f"\t\t_vpermj {sf}, {sf}                     ; [F, S]\n"
+				src += f"\t\tvbroadcastsd {coef}, {sf}                ; {coef} = [F, F, F, F]\n"
+				src += f"\t\tvmulpd {flux}, {flux}, {coef}                ; scale {flux} by F\n"
+				src += f"\t\tvbroadcastsd {coef}, {omegaX}                 ; {coef} = [\\omega[0], \\omega[0], \\omega[0], \\omega[0]]\n"
+				src += f"\t\tvmulpd {flux}, {flux}, {coef}                ; scale {flux} by \\omega\n"
+			else:
+				src += f"\t\t; scale s' ({spin})\n"
+				src += f"\t\tlea rax, Sref\n"
+				src += f"\t\tmov rax, qword ptr [rax + {regi}*8]    {pad}; pointer (double*) to S\n"
+				src += f"\t\tvbroadcastsd {coef}, qword ptr [rax]  ; [S, S, S, S]\n"
+				src += f"\t\tvmulpd {spin}, {spin}, {coef}  ; scale {spin} by S\n"
+			src += "\n"
+			# change the node's state
+			temp = "rdx"
+			src += "\t\tlea rax, nodes\n"
+			src += f"\t\tmov {temp}, {regi}\n"
+			if is_pow2(self.SIZEOF_NODE):
+				src += f"\t\tshl {temp}, {self.SIZEOF_NODE.bit_length() - 1}  ; mul SIZEOF_NODE ({self.SIZEOF_NODE})\n"
+			else:
+				src += f"\t\timul {temp}, SIZEOF_NODE\n"
+			src += f"\t\tvmovapd [rax + {temp} + OFFSETOF_SPIN], {spin}  {pad}; update s' -> spin\n"
+			if "F" in self.allKeys:
+				src += f"\t\tvmovapd [rax + {temp} + OFFSETOF_FLUX], {flux}  {pad}; update f' -> flux\n"
+			# loop end
+			src += f"\t\ttest {regi}, {regi}\n"
+			src += f"\t\tjnz LOOP_START_{lbl_suffix}\n"
+			src += f"\tLOOP_END_{lbl_suffix}:\n\n"
+			# save PRNG state
+			src += "\t; save PRNG state\n"
+			src += "\tvmovdqa ymmword ptr [prng_state + (0)*32], ymm12\n"
+			src += "\tvmovdqa ymmword ptr [prng_state + (1)*32], ymm13\n"
+			src += "\tvmovdqa ymmword ptr [prng_state + (2)*32], ymm14\n"
+			src += "\tvmovdqa ymmword ptr [prng_state + (3)*32], ymm15\n\n"
+		src += "\tret\n"
+		src += "randomize ENDP\n\n"
+		exports.append(("randomize", False))
+
 		# DLL main (for (un)initialization) -- bypass CRT
 		src += "; Windows DLL main (for (un)initialization)\n"
 		src += "; @param (rcx) hinstDLL\n"

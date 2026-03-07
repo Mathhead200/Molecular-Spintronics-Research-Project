@@ -18,6 +18,9 @@ class Driver:
 		self.dll.seed.argtypes = ()
 		self.dll.seed.restype = None
 
+		self.dll.randomize.argtypes = ()
+		self.dll.randomize.restype = None
+
 		n = (config.SIZEOF_NODE // 8) * config.NODE_COUNT
 		if n > 0:
 			self.nodes = (c_double * n).in_dll(self.dll, "nodes")
@@ -81,6 +84,9 @@ class Driver:
 	
 	def seed(self) -> None:
 		self.dll.seed()
+	
+	def randomize(self) -> None:
+		self.dll.randomize()
 
 	def free(self):
 		_handle = self.dll._handle

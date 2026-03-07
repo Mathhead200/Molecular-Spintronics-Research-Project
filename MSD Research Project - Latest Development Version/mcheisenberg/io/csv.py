@@ -117,9 +117,8 @@ def csv(sim: Simulation, out: str=None, dir: Path|str=".", prefix: str=None, par
 			try:
 				n = next(node_iter)
 				if isinstance(n, Sequence):
-					count = 0
-					for count, coord in enumerate(n):  line += f'{coord},'
-					line += ',' * (n_index_len - count)
+					for coord in n:  line += f'{coord},'
+					line += ',' * (n_index_len - len(n))
 				else:
 					line += f'{n},'
 					line += ',' * (n_index_len - 1)

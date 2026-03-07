@@ -1,5 +1,5 @@
-# Initial state.
-randomize = False
+# Initial state. (Defaults to True)
+randomize = True
 
 # Seed for pseudo-random number generator. (One or more numbers. Omit for unique seeds.)
 # seed = unique
