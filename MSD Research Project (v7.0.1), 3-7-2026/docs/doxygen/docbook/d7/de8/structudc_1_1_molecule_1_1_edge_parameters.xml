@@ -1,0 +1,78 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_structudc_1_1_molecule_1_1_edge_parameters" xml:lang="en-US">
+<title>udc::Molecule::EdgeParameters Struct Reference</title>
+<indexterm><primary>udc::Molecule::EdgeParameters</primary></indexterm>
+<para>
+
+<para>Information about an edge between two Nodes. </para>
+ 
+</para>
+<para>
+<computeroutput>#include &lt;MSD.h&gt;</computeroutput>
+</para>
+<simplesect>
+    <title>Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para><link linkend="_structudc_1_1_molecule_1_1_edge_parameters_1afdea45614d2c2dafb5aedc4cecface74">EdgeParameters</link> ()</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Public Attributes    </title>
+        <itemizedlist>
+            <listitem><para>double <link linkend="_structudc_1_1_molecule_1_1_edge_parameters_1a888be7fafaea5cedfc9f59ce6291a5c8">Jm</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_molecule_1_1_edge_parameters_1afe9b27d63588d6f6066137961556274b">Je1m</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_molecule_1_1_edge_parameters_1a8e66fedceee8f6cbd949e2e39f68cb38">Jeem</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_molecule_1_1_edge_parameters_1ae10a09e2ff621f6427be2bb5a69ba595">bm</link></para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_structudc_1_1_molecule_1_1_edge_parameters_1a7c1edcd9071395e3e894f12c03a2a8b2">Dm</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Detailed Description</title>
+
+<para>Information about an edge between two Nodes. </para>
+</section>
+<section>
+<title>Constructor &amp; Destructor Documentation</title>
+<anchor xml:id="_structudc_1_1_molecule_1_1_edge_parameters_1afdea45614d2c2dafb5aedc4cecface74"/><section>
+    <title>EdgeParameters()</title>
+<indexterm><primary>EdgeParameters</primary><secondary>udc::Molecule::EdgeParameters</secondary></indexterm>
+<indexterm><primary>udc::Molecule::EdgeParameters</primary><secondary>EdgeParameters</secondary></indexterm>
+<para><computeroutput>udc::Molecule::EdgeParameters::EdgeParameters ( )</computeroutput></para></section>
+</section>
+<section>
+<title>Member Data Documentation</title>
+<anchor xml:id="_structudc_1_1_molecule_1_1_edge_parameters_1ae10a09e2ff621f6427be2bb5a69ba595"/><section>
+    <title>bm</title>
+<indexterm><primary>bm</primary><secondary>udc::Molecule::EdgeParameters</secondary></indexterm>
+<indexterm><primary>udc::Molecule::EdgeParameters</primary><secondary>bm</secondary></indexterm>
+<para><computeroutput>double udc::Molecule::EdgeParameters::bm</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_molecule_1_1_edge_parameters_1a7c1edcd9071395e3e894f12c03a2a8b2"/><section>
+    <title>Dm</title>
+<indexterm><primary>Dm</primary><secondary>udc::Molecule::EdgeParameters</secondary></indexterm>
+<indexterm><primary>udc::Molecule::EdgeParameters</primary><secondary>Dm</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::Molecule::EdgeParameters::Dm</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_molecule_1_1_edge_parameters_1afe9b27d63588d6f6066137961556274b"/><section>
+    <title>Je1m</title>
+<indexterm><primary>Je1m</primary><secondary>udc::Molecule::EdgeParameters</secondary></indexterm>
+<indexterm><primary>udc::Molecule::EdgeParameters</primary><secondary>Je1m</secondary></indexterm>
+<para><computeroutput>double udc::Molecule::EdgeParameters::Je1m</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_molecule_1_1_edge_parameters_1a8e66fedceee8f6cbd949e2e39f68cb38"/><section>
+    <title>Jeem</title>
+<indexterm><primary>Jeem</primary><secondary>udc::Molecule::EdgeParameters</secondary></indexterm>
+<indexterm><primary>udc::Molecule::EdgeParameters</primary><secondary>Jeem</secondary></indexterm>
+<para><computeroutput>double udc::Molecule::EdgeParameters::Jeem</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_molecule_1_1_edge_parameters_1a888be7fafaea5cedfc9f59ce6291a5c8"/><section>
+    <title>Jm</title>
+<indexterm><primary>Jm</primary><secondary>udc::Molecule::EdgeParameters</secondary></indexterm>
+<indexterm><primary>udc::Molecule::EdgeParameters</primary><secondary>Jm</secondary></indexterm>
+<para><computeroutput>double udc::Molecule::EdgeParameters::Jm</computeroutput></para></section>
+<para>
+The documentation for this struct was generated from the following file:</para>
+C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/src/<link linkend="__m_s_d_8h">MSD.h</link></section>
+</section>

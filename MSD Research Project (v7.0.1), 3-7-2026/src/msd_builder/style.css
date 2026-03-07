@@ -1,0 +1,666 @@
+/* @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Sometype+Mono:ital,wght@0,400..700;1,400..700&display=swap'); */
+@import url("fonts.css");
+
+:root {
+	--header-height: 3.4em;
+	--timeline-height: 8rem;
+	--params-form-width: 683px;
+	--brand-color: white;
+	--global-input-width: 24%;
+}
+
+/* ---- General Styles ----------------------------------------------------- */
+body {
+	max-width: 100vw;
+	max-height: 100vh;
+	overflow: hidden;
+	margin: 0;
+	
+	font-family: "Sometype Mono", monospace;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	margin: 0;
+	font-weight: bold;
+	font-family: "Open Sans", sans-serif;
+}
+
+select, input, button {
+	font: inherit;
+}
+
+.sideways {
+	writing-mode: vertical-lr;
+	transform: rotate(180deg);
+}
+
+.hide {
+	display: none;
+}
+
+
+/* ---- Header ------------------------------------------------------------- */
+body > header {
+	--header-padding: 0.6rem;
+
+	display: flex;
+	justify-content: space-between;
+	box-sizing: border-box;
+	height: var(--header-height);
+	padding: var(--header-padding);
+
+	background-color: black;
+	color: white;
+}
+
+body > header h1 {
+	font-size: 1.1rem;
+	margin: calc(0.9rem - var(--header-padding));
+	color: var(--brand-color);
+}
+
+body > header svg {
+	--logo-dim: calc(var(--header-height) - 2 * var(--header-padding));
+
+	width: var(--logo-dim);
+	height: var(--logo-dim);
+	object-fit: contain;
+	cursor: pointer;
+
+	transition: transform 1s;
+	transform: rotate(0deg);
+}
+
+body.show-settings > header svg {
+	transform: rotate(360deg);
+}
+
+body > header svg > * {
+	fill: var(--brand-color);
+	stroke: var(--brand-color);
+}
+
+/* ---- Canvas (Three.js) -------------------------------------------------- */
+#msd-3d {
+	width: 100%;
+	height: calc(100vh - var(--header-height));
+	background-color: #1c1a1a;
+}
+
+#msd-3d canvas {
+	width: inherit;
+	height: inherit;
+	object-fit: contain;
+	object-position: center;
+	transition: object-position 1s;
+}
+
+body.show-params-form #msd-3d canvas {
+	object-position: right;
+}
+
+body.show-timeline #msd-3d canvas {
+	object-position: top;
+}
+
+body.show-params-form.show-timeline #msd-3d canvas {
+	object-position: right top;
+}
+
+
+/* ---- Parameters Form ---------------------------------------------------- */
+#msd-params-form {
+	position: absolute;
+	z-index: 2;
+	top: var(--header-height);
+	bottom: 0;
+	left: 0;
+	width: var(--params-form-width);
+	resize: horizontal;
+	overflow: hidden;
+	min-width: 10rem;  /* TODO: change to fit content */
+	max-width: 100vw;
+	/* TODO: add snap to default? */
+	
+	display: flex;
+	flex-direction: column;
+
+	background-color: white;
+
+	transition: transform 1s, bottom 1s;
+	transform: translateX(-100%);
+}
+
+body.show-params-form #msd-params-form {
+	transform: translateX(0);
+}
+
+body.show-timeline #msd-params-form {
+	bottom: var(--timeline-height);
+}
+
+#msd-params-form nav {
+	border-bottom: 1px solid rgb(178, 178, 178);
+}
+
+#msd-params-form nav > * {
+	display: flex;
+	justify-content: center;
+	margin: 1em;
+	gap: 1em;
+}
+
+#msd-params-form nav input[type=button],
+#msd-params-form nav input[type=reset],
+#msd-params-form nav input[type=submit],
+#msd-params-form nav select {
+	background-color: #f7f7f7;
+	border: 0px hidden transparent;
+	outline: 2px solid #e6e6e6;
+	cursor: pointer;
+}
+
+#msd-params-form nav input[type=button]:hover,
+#msd-params-form nav input[type=reset]:hover,
+#msd-params-form nav input[type=submit]:hover,
+#msd-params-form nav select:hover,
+#msd-params-form nav input[type=button]:focus,
+#msd-params-form nav input[type=reset]:focus,
+#msd-params-form nav input[type=submit]:focus,
+#msd-params-form nav select:focus {
+	background-color: #e6e6e6;
+}
+
+#workspaces {
+	width: 100%;
+	padding: 0.25em 0.5em;
+	font-weight: bold;
+}
+
+#msd-params-form h2 {
+	font-size: inherit;
+	padding-block-end: 0.15em;  /* lines up baseline since we are using a different font face */
+}
+
+
+/* ---- Parameters Table --------------------------------------------------- */
+#msd-params-table {
+	position: relative;  /* Used for JS posistion offset calculation. [See: scrollTo() in form.js] */
+	flex-grow: 1;
+	overflow: auto;
+
+	padding-bottom: 2.95rem;  /* extra blank row at bottom */
+}
+
+#msd-params-table header {
+	position: sticky;
+	background-color: white;
+	z-index: 1;
+	text-align: center;
+	font-size: 0.9em;
+}
+
+#msd-params-table > *  {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+	min-width: 40rem;
+	/* margin: 1em 0em; */
+	/* gap: 1px; */
+}
+
+#msd-params-table > .global > :not(:first-child) {
+	grid-column: 2 / -1;
+}
+
+#msd-params-table > * > * {
+	outline: 1px solid #e6e6e6;
+}
+
+#msd-params-table > header > *,
+#msd-params-table > * > header {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+#msd-params-table > header {
+	top: 0;
+	z-index: 2; /* On top of vertical row headers which have z-index: 1 */
+	box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.27);
+	background-color: white;
+}
+
+#msd-params-table > header > :first-child {
+	position: sticky;
+	left: 0;
+	z-index: 3; /* On top of both vertical row headers (z-index: 1) AND horizontal column headers (z-index: 2) */
+	background-color: white;
+}
+
+#msd-params-table > header > * {
+	padding-block: 0.5em;
+}
+
+#msd-params-table section > :first-child {
+	left: 0;
+}
+
+#msd-params-table > * > :first-child {
+	width: 7.5em;
+	padding-inline: 1.5rem;
+}
+
+#msd-params-table input,
+#msd-params-table button,
+#msd-params-table select {
+	border: 2px solid;
+	border-radius: 0.5em;
+	box-sizing: border-box;
+	padding: 0.25em;
+}
+
+#msd-params-table input,
+#msd-params-table select {
+	display: block;
+	width: 80%;
+	margin: 0.5em;
+	text-align: right;
+	border-color: black;
+}
+
+#msd-params-table input:focus,
+#msd-params-table input.focus,  /* synced (faux) focus */
+#msd-params-table select:focus {
+	outline: none;
+	background-color: rgba(0, 0, 0, 0.0875);
+}
+
+#msd-params-table section:not(.vector) input:not(.set):not(.focus),
+#msd-params-table section.vector > div:not(:first-child):not(.set),
+#msd-params-table section.vector > div:not(:first-child).set input:not(.set) {
+	opacity: 0.375;  /* TODO: the "faded out" black is too stong */
+}
+
+#msd-params-table .global input,
+#msd-params-table .global select {
+	width: var(--global-input-width);
+}
+
+#msd-params-table > section:not(.global) > div:nth-child(2) input,
+#msd-params-table > section:not(.global) > div:nth-child(2) select {
+	border-color: lightskyblue;
+}
+
+#msd-params-table > section:not(.global) > div:nth-child(2) input:focus,
+#msd-params-table > section:not(.global) > div:nth-child(2) input.focus,  /* synced (faux) focus */
+#msd-params-table > section:not(.global) > div:nth-child(2) select:focus {
+	background-color: rgba(135, 206, 250, 0.25);
+}
+
+#msd-params-table > section:not(.global) > div:nth-child(3) input,
+#msd-params-table > section:not(.global) > div:nth-child(3) select {
+	border-color: forestgreen;
+}
+
+#msd-params-table > section:not(.global) > div:nth-child(3) input:focus,
+#msd-params-table > section:not(.global) > div:nth-child(3) input.focus,  /* synced (faux) focus */
+#msd-params-table > section:not(.global) > div:nth-child(3) select:focus {
+	background-color: rgba(34, 139, 34, 0.125);
+}
+
+#msd-params-table > section:not(.global) > div:nth-child(4) input,
+#msd-params-table > section:not(.global) > div:nth-child(4) select {
+	border-color: crimson;
+}
+
+#msd-params-table > section:not(.global) > div:nth-child(4) input:focus,
+#msd-params-table > section:not(.global) > div:nth-child(4) input.focus,  /* synced (faux) focus */
+#msd-params-table > section:not(.global) > div:nth-child(4) select:focus {
+	background-color: rgba(220, 20, 60, 0.125);
+}
+
+.vector > * {
+	line-height: 1em;
+}
+
+.vector > :first-child {
+	position: relative;
+}
+
+.vector .coordinate-labels {
+	position: absolute;
+	right: 0.5em;
+	top: 0;
+	bottom: 0;
+
+	/* align labels with number fields */
+	display: flex;
+	flex-direction: column;
+	justify-content: space-evenly;
+	margin-block: -0.5em;
+	overflow-y: hidden;
+
+	color: #bbbbbb;
+	font-size: 0.75rem;
+	font-weight: bold;
+}
+
+.vector > :not(:first-child):not(:empty) {
+	/* Column vector brackets as SVG background image. */
+	background-image:
+		url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewbox='0 0 50 300' width='50' height='300' preserveAspectRatio='none'><path fill='transparent' stroke='black' stroke-width='4' d='M39,11 Q11,11,11,39 V261 Q11,289,39,289' /></svg>"),
+		url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewbox='0 0 50 300' width='50' height='300' preserveAspectRatio='none'><path fill='transparent' stroke='black' stroke-width='4' d='M11,11 Q39,11,39,39 V261 Q39,289,11,289' /></svg>");
+	background-size: contain, contain;
+	background-position: left, right;
+	background-repeat: no-repeat;
+	/* Scaling of SVG backgrounds: https://developer.mozilla.org/en-US/docs/Web/CSS/Scaling_of_SVG_backgrounds */
+	/* preserveAspectRatio: https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/preserveAspectRatio */
+	/* (SVG) Paths: https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths */
+}
+
+.vector:not(.global) > :nth-child(2):not(:empty) {
+	background-image:
+		url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewbox='0 0 50 300' width='50' height='300' preserveAspectRatio='none'><path fill='transparent' stroke='lightskyblue' stroke-width='4' d='M39,11 Q11,11,11,39 V261 Q11,289,39,289' /></svg>"),
+		url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewbox='0 0 50 300' width='50' height='300' preserveAspectRatio='none'><path fill='transparent' stroke='lightskyblue' stroke-width='4' d='M11,11 Q39,11,39,39 V261 Q39,289,11,289' /></svg>");
+}
+
+.vector:not(.global) > :nth-child(3):not(:empty) {
+	background-image:
+		url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewbox='0 0 50 300' width='50' height='300' preserveAspectRatio='none'><path fill='transparent' stroke='forestgreen' stroke-width='4' d='M39,11 Q11,11,11,39 V261 Q11,289,39,289' /></svg>"),
+		url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewbox='0 0 50 300' width='50' height='300' preserveAspectRatio='none'><path fill='transparent' stroke='forestgreen' stroke-width='4' d='M11,11 Q39,11,39,39 V261 Q39,289,11,289' /></svg>");
+}
+
+.vector:not(.global) > :nth-child(4):not(:empty) {
+	background-image:
+		url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewbox='0 0 50 300' width='50' height='300' preserveAspectRatio='none'><path fill='transparent' stroke='crimson' stroke-width='4' d='M39,11 Q11,11,11,39 V261 Q11,289,39,289' /></svg>"),
+		url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewbox='0 0 50 300' width='50' height='300' preserveAspectRatio='none'><path fill='transparent' stroke='crimson' stroke-width='4' d='M11,11 Q39,11,39,39 V261 Q39,289,11,289' /></svg>");
+}
+
+.vector.global > :not(:first-child):not(:empty) {
+	background-position: left, var(--global-input-width) center;
+}
+
+#toggle-params-menu {
+	cursor: pointer;
+}
+
+#toggle-params-menu:hover,
+#toggle-params-menu:focus {
+	text-decoration: underline;
+}
+
+#toggle-params-menu:focus h2 {
+	background-color: rgba(0, 0, 0, 0.0875);
+}
+
+#toggle-params-menu h2::after {
+	content: "(+)";
+}
+
+body.show-params-menu #toggle-params-menu h2::after {
+	content: "(-)";
+}
+
+#msd-params-table .hide {
+	display: none;
+}
+
+
+/* ---- Show Params Menu --------------------------------------------------- */
+#params-menu {
+	--params-menu-header-width: 3em;
+
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	z-index: 4; /* On top of everything */
+	width: calc(0.475 * var(--params-form-width));
+	height: calc(0.573 * var(--params-form-width));  /* TODO: should align with 3rd "hr" under "depth" */
+	box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.4);
+	background-color: ghostwhite;
+	box-sizing: border-box;
+
+	font-size: 0.9rem;
+
+	transition: transform 1s;
+	transform: translateY(calc(100% - 2.25rem));
+}
+
+body.show-params-menu #params-menu {
+	transform: translateY(0);
+}
+
+#params-menu > * {
+	position: absolute;
+	top: 0rem;
+	bottom: 0.8rem;
+	left: 0;
+	right: 0;
+	overflow-y: auto;
+	box-sizing: border-box;
+	margin-bottom: -0.8rem;
+}
+
+#params-menu > * > header {
+	position: sticky;
+	top: 0;
+	z-index: 5;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	box-sizing: border-box;
+	height: 2.25rem;
+	background-color: black;
+	color: white;
+	text-align: center;
+	margin-bottom: 0.8rem;
+	padding-block: 0.4rem;
+	cursor: pointer;
+}
+
+#params-menu > * > header svg {
+	position: absolute;
+	right: 1rem;
+	height: 2.25rem;
+	fill: white;
+	transform: scaleY(-1);
+}
+
+#params-menu > * > header:hover,
+#params-menu > * > header:focus {
+	text-decoration: underline;
+}
+
+#params-menu > * > header:hover svg,
+#params-menu > * > header:focus svg {
+	/* TODO */
+}
+
+body.show-params-menu #params-menu > * > header svg {
+	transform: scaleY(1);
+}
+
+#params-menu section {
+	--params-menu-section-border-width: 2px;
+	display: flex;
+	justify-content: flex-start;
+	margin: 0em 0.8rem 0.8rem 0.8rem;
+	cursor: pointer;
+	box-sizing: border-box;
+	border: var(--params-menu-section-border-width) solid #dddde6;
+	transition: border-color 0.2s;
+}
+
+#params-menu section:hover,
+#params-menu section:focus {
+	border: var(--params-menu-section-border-width) solid rgb(210, 210, 218);
+}
+
+#params-menu section > * {
+	padding: 0.5em 1em;
+}
+
+#params-menu section header {
+	width: var(--params-menu-header-width);
+	background-color: rgb(240, 240, 247);
+	text-align: center;
+	font-weight: bold;
+	transition: background-color 0.2s, padding-right 0.2s;
+}
+
+#params-menu section:hover header,
+#params-menu section:focus header {
+	background-color: rgb(210, 210, 218);
+	/* padding-right: 2rem; */  /* Find a way to fix .description "smushing" */
+}
+
+#params-menu section .description {
+	display: flex;
+	justify-content: space-between;
+	width: calc(100% - var(--params-menu-header-width));
+	background-color: white;
+	font: 0.8rem "Open Sans", sans-serif;
+	transition: background-color 0.2s;
+}
+
+#params-menu section:hover .description,
+#params-menu section:focus .description {
+	background-color: rgb(240, 240, 247);
+}
+
+#params-menu .add {
+	margin-left: 1em;
+	font-weight: bold;
+	transition: transform 0.2s;
+}
+
+#params-menu section:hover .add,
+#params-menu section:focus .add {
+	transform: scale(1.5);
+}
+
+#params-menu section header,
+#params-menu section .description > * {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+#params-menu .hide {
+	display: none;
+}
+
+
+
+/* ---- Lens --------------------------------------------------------------- */
+#lens {
+	position: absolute;
+	z-index: 1;
+	top: calc(var(--header-height) + 1rem);
+	right: 1rem;
+
+	box-sizing: border-box;
+	padding: 0.5em 1em;
+	border: 0px hidden;
+	text-align: center;
+}
+
+
+/* ---- Timeline ----------------------------------------------------------- */
+#timeline {
+	--scrollbar-width: 20px;  /* chrome */ 
+	--timeline-nav-height: 2rem;
+	--results-height: calc(var(--timeline-height) - var(--timeline-nav-height) - var(--scrollbar-width));
+
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: var(--timeline-height);
+
+	box-sizing: border-box;
+	background-color: white;
+	border-top: 2px solid black;
+	white-space: nowrap;
+	font-size: 10pt;
+
+	transition: transform 1s;
+	transform: translateY(100%);
+	overflow-x: hidden;
+}
+
+body.show-timeline #timeline {
+	transform: translateY(0);
+	overflow-x: auto;
+}
+
+#results {
+	height: var(--results-height);
+}
+
+#results > * {
+	display: inline-block;
+	box-sizing: border-box;
+	min-width: 2.5vw;  /* TODO */
+	height: var(--results-height);
+	border-right: 1px solid #f4f4f4;
+	text-align: center;  /* TODO */
+	background-color: white;
+	cursor: pointer;
+	padding: 0.5em;
+	transition: min-width 0.2s;
+}
+
+#results > :first-child {
+	border-left: 1px solid #e6e6e6;
+}
+
+#results > :hover {
+	/* filter: brightness(0.7); */
+	background-color: #f7f7f7;
+}
+
+#results > .active {
+	min-width: 10em;
+	border-color: #2b2b2b;  /* TODO */
+	background-color: #2b2b2b;
+	color: white;
+}
+
+#timeline nav {
+	position: sticky;
+	top: 0;
+	left: 0;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	height: var(--timeline-nav-height);
+	width: 100%;
+}
+
+#timeline form {
+	display: flex;
+	justify-content: center;
+	text-align: center;
+}
+
+#timeline form > * {
+	margin-inline: 0.5em;
+}
+
+#timeline form input[type=text],
+#timeline form input[type=number] {
+	text-align: right;
+}
+
+#timeline form input[type=button] {
+	background-color: #f7f7f7;
+	border: 0px hidden transparent;
+	outline: 2px solid #e6e6e6;
+	cursor: pointer;
+}
+
+#timeline form input[type=button]:hover,
+#timeline form input[type=button]:focus {
+	background-color: #e6e6e6;
+}

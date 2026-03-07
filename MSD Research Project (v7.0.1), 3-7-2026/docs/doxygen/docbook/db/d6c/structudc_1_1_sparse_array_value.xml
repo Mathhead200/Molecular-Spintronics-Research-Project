@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_structudc_1_1_sparse_array_value" xml:lang="en-US">
+<title>udc::SparseArrayValue&lt; T &gt; Struct Template Reference</title>
+<indexterm><primary>udc::SparseArrayValue&lt; T &gt;</primary></indexterm>
+<para>
+<computeroutput>#include &lt;SparseArray.h&gt;</computeroutput>
+</para>
+<simplesect>
+    <title>Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para><link linkend="_structudc_1_1_sparse_array_value_1ab1ffe7e06c634e2f52998250131a9713">SparseArrayValue</link> ()</para>
+</listitem>
+            <listitem><para>T &amp; <link linkend="_structudc_1_1_sparse_array_value_1a1a9f4655ad0c7b13ce4c9a8fa25789bb">create</link> ()</para>
+</listitem>
+            <listitem><para>void <link linkend="_structudc_1_1_sparse_array_value_1a4da48ea04f68479e9c094535a49e3c95">clear</link> ()</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Public Attributes    </title>
+        <itemizedlist>
+            <listitem><para>bool <link linkend="_structudc_1_1_sparse_array_value_1af9f5e4a41eaf287226a160a0a0ee364c">set</link></para>
+</listitem>
+            <listitem><para>T <link linkend="_structudc_1_1_sparse_array_value_1a8aa0b6b7a654f78737afcf7520f4733f">value</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Constructor &amp; Destructor Documentation</title>
+<anchor xml:id="_structudc_1_1_sparse_array_value_1ab1ffe7e06c634e2f52998250131a9713"/><section>
+    <title>SparseArrayValue()</title>
+<indexterm><primary>SparseArrayValue</primary><secondary>udc::SparseArrayValue&lt; T &gt;</secondary></indexterm>
+<indexterm><primary>udc::SparseArrayValue&lt; T &gt;</primary><secondary>SparseArrayValue</secondary></indexterm>
+<computeroutput>template&lt;typename T &gt; </computeroutput><para><computeroutput><link linkend="_structudc_1_1_sparse_array_value">udc::SparseArrayValue</link>&lt; T &gt;::SparseArrayValue ( )<computeroutput>[inline]</computeroutput></computeroutput></para></section>
+</section>
+<section>
+<title>Member Function Documentation</title>
+<anchor xml:id="_structudc_1_1_sparse_array_value_1a4da48ea04f68479e9c094535a49e3c95"/><section>
+    <title>clear()</title>
+<indexterm><primary>clear</primary><secondary>udc::SparseArrayValue&lt; T &gt;</secondary></indexterm>
+<indexterm><primary>udc::SparseArrayValue&lt; T &gt;</primary><secondary>clear</secondary></indexterm>
+<computeroutput>template&lt;typename T &gt; </computeroutput><para><computeroutput>void <link linkend="_structudc_1_1_sparse_array_value">udc::SparseArrayValue</link>&lt; T &gt;::clear</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_sparse_array_value_1a1a9f4655ad0c7b13ce4c9a8fa25789bb"/><section>
+    <title>create()</title>
+<indexterm><primary>create</primary><secondary>udc::SparseArrayValue&lt; T &gt;</secondary></indexterm>
+<indexterm><primary>udc::SparseArrayValue&lt; T &gt;</primary><secondary>create</secondary></indexterm>
+<computeroutput>template&lt;typename T &gt; </computeroutput><para><computeroutput>T &amp; <link linkend="_structudc_1_1_sparse_array_value">udc::SparseArrayValue</link>&lt; T &gt;::create</computeroutput></para></section>
+</section>
+<section>
+<title>Member Data Documentation</title>
+<anchor xml:id="_structudc_1_1_sparse_array_value_1af9f5e4a41eaf287226a160a0a0ee364c"/><section>
+    <title>set</title>
+<indexterm><primary>set</primary><secondary>udc::SparseArrayValue&lt; T &gt;</secondary></indexterm>
+<indexterm><primary>udc::SparseArrayValue&lt; T &gt;</primary><secondary>set</secondary></indexterm>
+<computeroutput>template&lt;typename T &gt; </computeroutput><para><computeroutput>bool <link linkend="_structudc_1_1_sparse_array_value">udc::SparseArrayValue</link>&lt; T &gt;::set</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_sparse_array_value_1a8aa0b6b7a654f78737afcf7520f4733f"/><section>
+    <title>value</title>
+<indexterm><primary>value</primary><secondary>udc::SparseArrayValue&lt; T &gt;</secondary></indexterm>
+<indexterm><primary>udc::SparseArrayValue&lt; T &gt;</primary><secondary>value</secondary></indexterm>
+<computeroutput>template&lt;typename T &gt; </computeroutput><para><computeroutput>T <link linkend="_structudc_1_1_sparse_array_value">udc::SparseArrayValue</link>&lt; T &gt;::value</computeroutput></para></section>
+<para>
+The documentation for this struct was generated from the following file:</para>
+C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/src/<link linkend="__sparse_array_8h">SparseArray.h</link></section>
+</section>

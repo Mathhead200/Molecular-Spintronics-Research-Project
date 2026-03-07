@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__vector_8h_source" xml:lang="en-US">
+<title>Vector.h</title>
+<indexterm><primary>C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/src/Vector.h</primary></indexterm>
+Go to the documentation of this file.<programlisting linenumbering="unnumbered">1 <emphasis role="comment">/*</emphasis>
+2 <emphasis role="comment">&#32;*&#32;Vector.h</emphasis>
+3 <emphasis role="comment">&#32;*</emphasis>
+4 <emphasis role="comment">&#32;*&#32;&#32;Last&#32;Edited:&#32;May&#32;27,&#32;2021</emphasis>
+5 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;Author:&#32;Christopher&#32;D&apos;Angelo</emphasis>
+6 <emphasis role="comment">&#32;*/</emphasis>
+7 
+8 <emphasis role="preprocessor">#ifndef&#32;UDC_VECTOR</emphasis>
+9 <emphasis role="preprocessor">#define&#32;UDC_VECTOR</emphasis>
+10 
+11 <emphasis role="preprocessor">#include&#32;&lt;cmath&gt;</emphasis>
+12 <emphasis role="preprocessor">#include&#32;&lt;iostream&gt;</emphasis>
+13 <emphasis role="preprocessor">#include&#32;&quot;<link linkend="_udc_8h">udc.h</link>&quot;</emphasis>
+14 
+15 
+16 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespaceudc">udc</link>&#32;{
+17 
+18 <emphasis role="keyword">using&#32;</emphasis>std::ostream;
+19 
+20 <emphasis role="keyword">using&#32;</emphasis><link linkend="_namespaceudc_1a1757f9fc50446243658974977dd95e7c">udc::PI</link>;
+21 
+22 
+23 <emphasis role="keyword">class&#32;</emphasis><link linkend="_classudc_1_1_vector">Vector</link>&#32;{
+24 &#32;<emphasis role="keyword">private</emphasis>:
+25 &#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keywordtype">double</emphasis>&#32;turn(<emphasis role="keywordtype">double</emphasis>&#32;angle);&#32;<emphasis role="comment">//&#32;Rotate&#32;the&#32;angle&#32;PI&#32;radians;&#32;stays&#32;in&#32;[PI,&#32;-PI).</emphasis>
+26 
+27 &#32;<emphasis role="keyword">public</emphasis>:
+28 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>;
+29 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>;
+30 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>;
+31 
+32 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_vector_1a8c4d5f7db83f0cef1c07b4b42f78e0e3">Vector</link>(<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>,&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>,&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>);
+33 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_vector_1a8c4d5f7db83f0cef1c07b4b42f78e0e3">Vector</link>(<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>,&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>);
+34 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_vector_1a8c4d5f7db83f0cef1c07b4b42f78e0e3">Vector</link>();
+35 
+36 &#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;<link linkend="_classudc_1_1_vector_1a9e75b0360efe22b62f12b7988cac26b8">ZERO</link>;
+37 &#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;<link linkend="_classudc_1_1_vector_1a6d438b86c88ac12f037a45d4af1953a8">I</link>;
+38 &#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;<link linkend="_classudc_1_1_vector_1a969618e05cff7f052ae3e9fcf7b49104">J</link>;
+39 &#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;<link linkend="_classudc_1_1_vector_1ac57b86ef94fc93ce70a804f7130b7fba">K</link>;
+40 
+41 &#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;<link linkend="_classudc_1_1_vector_1a8d2d80545ccc58ea8a5fa8fca5f51a91">cylindricalForm</link>(<emphasis role="keywordtype">double</emphasis>&#32;r,&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1aa8f4197da79290967d284765240a2551">theta</link>,&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>);
+42 &#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;<link linkend="_classudc_1_1_vector_1ab7647edf7b8e9b71ebee3df8362c5e52">polarForm</link>(<emphasis role="keywordtype">double</emphasis>&#32;r,&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1aa8f4197da79290967d284765240a2551">theta</link>);
+43 &#32;&#32;&#32;&#32;<emphasis role="keyword">static</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;<link linkend="_classudc_1_1_vector_1a89b43ddd10a372d584a03a5583ad5652">sphericalForm</link>(<emphasis role="keywordtype">double</emphasis>&#32;rho,&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1aa8f4197da79290967d284765240a2551">theta</link>,&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1ad5b5e60153daf6afab0122028700ae2f">phi</link>);
+44 
+45 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1a5c3eb6000799a6fc4756f029b9b67e98">normSq</link>()&#32;<emphasis role="keyword">const</emphasis>;
+46 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1ad0a32e923bceab96a3a1eb36b9cc5e3a">norm</link>()&#32;<emphasis role="keyword">const</emphasis>;
+47 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1aa8f4197da79290967d284765240a2551">theta</link>()&#32;<emphasis role="keyword">const</emphasis>;
+48 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1ad5b5e60153daf6afab0122028700ae2f">phi</link>()&#32;<emphasis role="keyword">const</emphasis>;
+49 
+50 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_classudc_1_1_vector_1afadaf3cac73f92d1dc3a549a468a23f2">operator ==</link>(<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;&amp;)&#32;<emphasis role="keyword">const</emphasis>;
+51 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_classudc_1_1_vector_1aebb8fa9252c42fc1fe5a232f3bda3957">operator !=</link>(<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;&amp;)&#32;<emphasis role="keyword">const</emphasis>;
+52 
+53 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;<link linkend="_classudc_1_1_vector_1a798f07e0b0e18f6a3171f6f4939ac065">operator +</link>(<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;&amp;)&#32;<emphasis role="keyword">const</emphasis>;
+54 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;<link linkend="_classudc_1_1_vector_1a7447d65cc9637c6638fc2455b0b4aaeb">operator -</link>()&#32;<emphasis role="keyword">const</emphasis>;
+55 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;<link linkend="_classudc_1_1_vector_1a7447d65cc9637c6638fc2455b0b4aaeb">operator -</link>(<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;&amp;)&#32;<emphasis role="keyword">const</emphasis>;
+56 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;<link linkend="_classudc_1_1_vector_1a3158bde8e319b0e79a36b2ad7c775846">operator *</link>(<emphasis role="keywordtype">double</emphasis>)&#32;<emphasis role="keyword">const</emphasis>;
+57 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1a3158bde8e319b0e79a36b2ad7c775846">operator *</link>(<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;&amp;)&#32;<emphasis role="keyword">const</emphasis>;&#32;<emphasis role="comment">//dot&#32;product</emphasis>
+58 
+59 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1a159fb5e0fc16d4acbe6fb1a62cdd401c">distanceSq</link>(<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;&amp;)&#32;<emphasis role="keyword">const</emphasis>;
+60 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1a881c949c7af45c78a3ef96169fa288de">distance</link>(<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;&amp;)&#32;<emphasis role="keyword">const</emphasis>;
+61 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1a9e68392b62678f54eb7ad7a21091dab7">dotProduct</link>(<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;&amp;)&#32;<emphasis role="keyword">const</emphasis>;
+62 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1a201525a4474e786eada5fe7243225230">angleBetween</link>(<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;&amp;)&#32;<emphasis role="keyword">const</emphasis>;
+63 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;<link linkend="_classudc_1_1_vector_1a5e5018a08cc0c3988f7a47243943e530">crossProduct</link>(<link linkend="_classudc_1_1_vector">Vector</link>&#32;v)&#32;<emphasis role="keyword">const</emphasis>;
+64 
+65 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_vector">Vector</link>&amp;&#32;<link linkend="_classudc_1_1_vector_1a3dfb48ed1a5d372c126d770c4a99ba12">operator +=</link>(<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;&amp;);
+66 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_vector">Vector</link>&amp;&#32;<link linkend="_classudc_1_1_vector_1a8f044be5579888dc19c2754f3d436064">operator -=</link>(<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;&amp;);
+67 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_vector">Vector</link>&amp;&#32;<link linkend="_classudc_1_1_vector_1a35e41ab5ba8f980219e09eb8b164cb65">operator *=</link>(<emphasis role="keywordtype">double</emphasis>);
+68 
+69 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_vector">Vector</link>&amp;&#32;<link linkend="_classudc_1_1_vector_1a470e0981589813bdb73d63fcdee26d30">negate</link>();
+70 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_vector">Vector</link>&amp;&#32;<link linkend="_classudc_1_1_vector_1a1d615c52f81858b3d65fea669c2630d7">rotate</link>(<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1aa8f4197da79290967d284765240a2551">theta</link>,&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1ad5b5e60153daf6afab0122028700ae2f">phi</link>);
+71 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_vector">Vector</link>&amp;&#32;<link linkend="_classudc_1_1_vector_1a1d615c52f81858b3d65fea669c2630d7">rotate</link>(<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1aa8f4197da79290967d284765240a2551">theta</link>);
+72 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_vector">Vector</link>&amp;&#32;<link linkend="_classudc_1_1_vector_1ac385aa5781a8b72847e6b28dcaa5e917">normalize</link>();
+73 };
+74 
+75 <link linkend="_classudc_1_1_vector">Vector</link>&#32;<link linkend="_namespaceudc_1a6105effafda7b50687a43e471e65aa14">operator *</link>(<emphasis role="keywordtype">double</emphasis>&#32;k,&#32;<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;&amp;v);
+76 ostream&amp;&#32;<link linkend="_namespaceudc_1a6b685c21976ba81485ee5434b8a7ca41">operator &lt;&lt;</link>(ostream&#32;&amp;out,&#32;<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;&amp;v);
+77 
+78 
+79 <emphasis role="comment">//--------------------------------------------------------------------------------</emphasis>
+80 <emphasis role="keywordtype">double</emphasis>&#32;Vector::turn(<emphasis role="keywordtype">double</emphasis>&#32;angle)&#32;{
+81 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;angle&#32;+&#32;(angle&#32;&lt;=&#32;0&#32;?&#32;<link linkend="_namespaceudc_1a1757f9fc50446243658974977dd95e7c">PI</link>&#32;:&#32;-<link linkend="_namespaceudc_1a1757f9fc50446243658974977dd95e7c">PI</link>);
+82 }
+83 
+84 
+85 <emphasis role="comment">//--------------------------------------------------------------------------------</emphasis>
+86 <emphasis role="keyword">const</emphasis>&#32;Vector&#32;<link linkend="_classudc_1_1_vector_1a9e75b0360efe22b62f12b7988cac26b8">Vector::ZERO</link>(0,&#32;0,&#32;0);
+87 <emphasis role="keyword">const</emphasis>&#32;Vector&#32;<link linkend="_classudc_1_1_vector_1a6d438b86c88ac12f037a45d4af1953a8">Vector::I</link>(1,&#32;0,&#32;0);
+88 <emphasis role="keyword">const</emphasis>&#32;Vector&#32;<link linkend="_classudc_1_1_vector_1a969618e05cff7f052ae3e9fcf7b49104">Vector::J</link>(0,&#32;1,&#32;0);
+89 <emphasis role="keyword">const</emphasis>&#32;Vector&#32;<link linkend="_classudc_1_1_vector_1ac57b86ef94fc93ce70a804f7130b7fba">Vector::K</link>(0,&#32;0,&#32;1);
+90 
+91 
+92 <emphasis role="comment">//--------------------------------------------------------------------------------</emphasis>
+93 <link linkend="_classudc_1_1_vector_1a8c4d5f7db83f0cef1c07b4b42f78e0e3">Vector::Vector</link>(<emphasis role="keywordtype">double</emphasis>&#32;x,&#32;<emphasis role="keywordtype">double</emphasis>&#32;y,&#32;<emphasis role="keywordtype">double</emphasis>&#32;z)&#32;:&#32;x(x),&#32;y(y),&#32;z(z)&#32;{
+94 }
+95 
+96 <link linkend="_classudc_1_1_vector_1a8c4d5f7db83f0cef1c07b4b42f78e0e3">Vector::Vector</link>(<emphasis role="keywordtype">double</emphasis>&#32;x,&#32;<emphasis role="keywordtype">double</emphasis>&#32;y)&#32;:&#32;x(x),&#32;y(y),&#32;z(0)&#32;{
+97 }
+98 
+99 <link linkend="_classudc_1_1_vector_1a8c4d5f7db83f0cef1c07b4b42f78e0e3">Vector::Vector</link>()&#32;:&#32;x(0),&#32;y(0),&#32;z(0)&#32;{
+100 }
+101 
+102 
+103 <emphasis role="comment">//-------------------------------------------------------------------------------</emphasis>
+104 <link linkend="_classudc_1_1_vector">Vector</link>&#32;<link linkend="_classudc_1_1_vector_1a8d2d80545ccc58ea8a5fa8fca5f51a91">Vector::cylindricalForm</link>(<emphasis role="keywordtype">double</emphasis>&#32;r,&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="__m_s_d-export_8cpp_1ae5e5b13dcd20e93e2ea1fb4e0da9fb0e">theta</link>,&#32;<emphasis role="keywordtype">double</emphasis>&#32;z)&#32;{
+105 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_classudc_1_1_vector_1a8c4d5f7db83f0cef1c07b4b42f78e0e3">Vector</link>(&#32;r&#32;*&#32;cos(<link linkend="_classudc_1_1_vector_1aa8f4197da79290967d284765240a2551">theta</link>),&#32;&#32;r&#32;*&#32;sin(<link linkend="_classudc_1_1_vector_1aa8f4197da79290967d284765240a2551">theta</link>),&#32;<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>&#32;);
+106 }
+107 
+108 <link linkend="_classudc_1_1_vector">Vector</link>&#32;<link linkend="_classudc_1_1_vector_1ab7647edf7b8e9b71ebee3df8362c5e52">Vector::polarForm</link>(<emphasis role="keywordtype">double</emphasis>&#32;r,&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="__m_s_d-export_8cpp_1ae5e5b13dcd20e93e2ea1fb4e0da9fb0e">theta</link>)&#32;{
+109 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_classudc_1_1_vector_1a8d2d80545ccc58ea8a5fa8fca5f51a91">cylindricalForm</link>(r,&#32;<link linkend="_classudc_1_1_vector_1aa8f4197da79290967d284765240a2551">theta</link>,&#32;0);
+110 }
+111 
+112 <link linkend="_classudc_1_1_vector">Vector</link>&#32;<link linkend="_classudc_1_1_vector_1a89b43ddd10a372d584a03a5583ad5652">Vector::sphericalForm</link>(<emphasis role="keywordtype">double</emphasis>&#32;rho,&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="__m_s_d-export_8cpp_1ae5e5b13dcd20e93e2ea1fb4e0da9fb0e">theta</link>,&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="__m_s_d-export_8cpp_1ac62de771439b59f446700050115488f4">phi</link>)&#32;{
+113 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_classudc_1_1_vector_1a8d2d80545ccc58ea8a5fa8fca5f51a91">cylindricalForm</link>(&#32;rho&#32;*&#32;cos(<link linkend="_classudc_1_1_vector_1ad5b5e60153daf6afab0122028700ae2f">phi</link>),&#32;<link linkend="_classudc_1_1_vector_1aa8f4197da79290967d284765240a2551">theta</link>,&#32;rho&#32;*&#32;sin(<link linkend="_classudc_1_1_vector_1ad5b5e60153daf6afab0122028700ae2f">phi</link>)&#32;);
+114 }
+115 
+116 
+117 <emphasis role="comment">//-------------------------------------------------------------------------------</emphasis>
+118 <emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1a5c3eb6000799a6fc4756f029b9b67e98">Vector::normSq</link>()<emphasis role="keyword">&#32;const&#32;</emphasis>{
+119 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>&#32;*&#32;<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>&#32;+&#32;<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>&#32;*&#32;<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>&#32;+&#32;<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>&#32;*&#32;<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>;
+120 }
+121 
+122 <emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1ad0a32e923bceab96a3a1eb36b9cc5e3a">Vector::norm</link>()<emphasis role="keyword">&#32;const&#32;</emphasis>{
+123 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;sqrt(&#32;<link linkend="_classudc_1_1_vector_1a5c3eb6000799a6fc4756f029b9b67e98">normSq</link>()&#32;);
+124 }
+125 
+126 <emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1aa8f4197da79290967d284765240a2551">Vector::theta</link>()<emphasis role="keyword">&#32;const&#32;</emphasis>{
+127 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;atan2(<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>,&#32;<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>);
+128 }
+129 
+130 <emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1ad5b5e60153daf6afab0122028700ae2f">Vector::phi</link>()<emphasis role="keyword">&#32;const&#32;</emphasis>{
+131 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">double</emphasis>&#32;r&#32;=&#32;sqrt(&#32;<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>&#32;*&#32;<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>&#32;+&#32;<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>&#32;*&#32;<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>&#32;);
+132 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>(&#32;r&#32;==&#32;0&#32;)&#32;{
+133 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">if</emphasis>(&#32;<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>&#32;&gt;&#32;0&#32;)
+134 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_namespaceudc_1a1757f9fc50446243658974977dd95e7c">PI</link>&#32;/&#32;2;
+135 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>&#32;<emphasis role="keywordflow">if</emphasis>(&#32;<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>&#32;&lt;&#32;0&#32;)
+136 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;-<link linkend="_namespaceudc_1a1757f9fc50446243658974977dd95e7c">PI</link>&#32;/&#32;2;
+137 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">else</emphasis>
+138 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;0;
+139 &#32;&#32;&#32;&#32;}&#32;<emphasis role="keywordflow">else</emphasis>
+140 &#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;atan(&#32;<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>&#32;/&#32;r&#32;);
+141 }
+142 
+143 
+144 <emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_classudc_1_1_vector_1afadaf3cac73f92d1dc3a549a468a23f2">Vector::operator ==</link>(<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;&amp;v)<emphasis role="keyword">&#32;const&#32;</emphasis>{
+145 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>&#32;==&#32;v.<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>&#32;&amp;&amp;&#32;<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>&#32;==&#32;v.<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>&#32;&amp;&amp;&#32;<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>&#32;==&#32;v.<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>;
+146 }
+147 
+148 <emphasis role="keywordtype">bool</emphasis>&#32;<link linkend="_classudc_1_1_vector_1aebb8fa9252c42fc1fe5a232f3bda3957">Vector::operator !=</link>(<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;&amp;v)<emphasis role="keyword">&#32;const&#32;</emphasis>{
+149 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>&#32;!=&#32;v.<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>&#32;||&#32;<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>&#32;!=&#32;v.<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>&#32;||&#32;<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>&#32;!=&#32;v.<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>;
+150 }
+151 
+152 
+153 <link linkend="_classudc_1_1_vector">Vector</link>&#32;<link linkend="_classudc_1_1_vector_1a798f07e0b0e18f6a3171f6f4939ac065">Vector::operator +</link>(<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;&amp;v)<emphasis role="keyword">&#32;const&#32;</emphasis>{
+154 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_classudc_1_1_vector_1a8c4d5f7db83f0cef1c07b4b42f78e0e3">Vector</link>(<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>&#32;+&#32;v.<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>,&#32;<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>&#32;+&#32;v.<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>,&#32;<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>&#32;+&#32;v.<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>);
+155 }
+156 
+157 <link linkend="_classudc_1_1_vector">Vector</link>&#32;<link linkend="_classudc_1_1_vector_1a7447d65cc9637c6638fc2455b0b4aaeb">Vector::operator -</link>()<emphasis role="keyword">&#32;const&#32;</emphasis>{
+158 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_classudc_1_1_vector_1a8c4d5f7db83f0cef1c07b4b42f78e0e3">Vector</link>(-<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>,&#32;-<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>,&#32;-<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>);
+159 }
+160 
+161 <link linkend="_classudc_1_1_vector">Vector</link>&#32;<link linkend="_classudc_1_1_vector_1a7447d65cc9637c6638fc2455b0b4aaeb">Vector::operator -</link>(<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;&amp;v)<emphasis role="keyword">&#32;const&#32;</emphasis>{
+162 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_classudc_1_1_vector_1a8c4d5f7db83f0cef1c07b4b42f78e0e3">Vector</link>(<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>&#32;-&#32;v.<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>,&#32;<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>&#32;-&#32;v.<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>,&#32;<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>&#32;-&#32;v.<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>);
+163 }
+164 
+165 <link linkend="_classudc_1_1_vector">Vector</link>&#32;<link linkend="_classudc_1_1_vector_1a3158bde8e319b0e79a36b2ad7c775846">Vector::operator *</link>(<emphasis role="keywordtype">double</emphasis>&#32;k)<emphasis role="keyword">&#32;const&#32;</emphasis>{
+166 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_classudc_1_1_vector_1a8c4d5f7db83f0cef1c07b4b42f78e0e3">Vector</link>(k&#32;*&#32;<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>,&#32;k&#32;*&#32;<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>,&#32;k&#32;*&#32;<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>);
+167 }
+168 
+169 <emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1a3158bde8e319b0e79a36b2ad7c775846">Vector::operator *</link>(<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;&amp;v)<emphasis role="keyword">&#32;const&#32;</emphasis>{
+170 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_classudc_1_1_vector_1a9e68392b62678f54eb7ad7a21091dab7">dotProduct</link>(v);
+171 }
+172 
+173 
+174 <emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1a159fb5e0fc16d4acbe6fb1a62cdd401c">Vector::distanceSq</link>(<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;&amp;v)<emphasis role="keyword">&#32;const&#32;</emphasis>{
+175 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">double</emphasis>&#32;dx&#32;=&#32;v.<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>&#32;-&#32;<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>,&#32;dy&#32;=&#32;v.<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>&#32;-&#32;<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>,&#32;dz&#32;=&#32;v.<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>&#32;-&#32;<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>;
+176 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;dx&#32;*&#32;dx&#32;+&#32;dy&#32;*&#32;dy&#32;+&#32;dz&#32;*&#32;dz;
+177 }
+178 
+179 <emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1a881c949c7af45c78a3ef96169fa288de">Vector::distance</link>(<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;&amp;v)<emphasis role="keyword">&#32;const&#32;</emphasis>{
+180 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;sqrt(&#32;<link linkend="_classudc_1_1_vector_1a159fb5e0fc16d4acbe6fb1a62cdd401c">distanceSq</link>(v)&#32;);
+181 }
+182 
+183 <emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1a9e68392b62678f54eb7ad7a21091dab7">Vector::dotProduct</link>(<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;&amp;v)<emphasis role="keyword">&#32;const&#32;</emphasis>{
+184 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>&#32;*&#32;v.<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>&#32;+&#32;<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>&#32;*&#32;v.<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>&#32;+&#32;<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>&#32;*&#32;v.<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>;
+185 }
+186 
+187 <emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_classudc_1_1_vector_1a201525a4474e786eada5fe7243225230">Vector::angleBetween</link>(<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;&amp;v)<emphasis role="keyword">&#32;const&#32;</emphasis>{
+188 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;acos(&#32;<link linkend="_classudc_1_1_vector_1a9e68392b62678f54eb7ad7a21091dab7">dotProduct</link>(v)&#32;/&#32;(<link linkend="_classudc_1_1_vector_1ad0a32e923bceab96a3a1eb36b9cc5e3a">norm</link>()&#32;*&#32;v.<link linkend="_classudc_1_1_vector_1ad0a32e923bceab96a3a1eb36b9cc5e3a">norm</link>())&#32;);
+189 }
+190 
+191 <link linkend="_classudc_1_1_vector">Vector</link>&#32;<link linkend="_classudc_1_1_vector_1a5e5018a08cc0c3988f7a47243943e530">Vector::crossProduct</link>(<link linkend="_classudc_1_1_vector">Vector</link>&#32;v)<emphasis role="keyword">&#32;const&#32;</emphasis>{
+192 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_classudc_1_1_vector_1a8c4d5f7db83f0cef1c07b4b42f78e0e3">Vector</link>(&#32;<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>&#32;*&#32;v.<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>&#32;-&#32;<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>&#32;*&#32;v.<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>,&#32;<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>&#32;*&#32;v.<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>&#32;-&#32;<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>&#32;*&#32;v.<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>,&#32;<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>&#32;*&#32;v.<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>&#32;-&#32;<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>&#32;*&#32;v.<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>&#32;);
+193 }
+194 
+195 
+196 <link linkend="_classudc_1_1_vector">Vector</link>&amp;&#32;<link linkend="_classudc_1_1_vector_1a3dfb48ed1a5d372c126d770c4a99ba12">Vector::operator +=</link>(<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;&amp;v)&#32;{
+197 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>&#32;+=&#32;v.<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>;
+198 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>&#32;+=&#32;v.<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>;
+199 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>&#32;+=&#32;v.<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>;
+200 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;*<emphasis role="keyword">this</emphasis>;
+201 }
+202 
+203 <link linkend="_classudc_1_1_vector">Vector</link>&amp;&#32;<link linkend="_classudc_1_1_vector_1a8f044be5579888dc19c2754f3d436064">Vector::operator -=</link>(<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;&amp;v)&#32;{
+204 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>&#32;-=&#32;v.<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>;
+205 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>&#32;-=&#32;v.<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>;
+206 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>&#32;-=&#32;v.<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>;
+207 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;*<emphasis role="keyword">this</emphasis>;
+208 }
+209 
+210 <link linkend="_classudc_1_1_vector">Vector</link>&amp;&#32;<link linkend="_classudc_1_1_vector_1a35e41ab5ba8f980219e09eb8b164cb65">Vector::operator *=</link>(<emphasis role="keywordtype">double</emphasis>&#32;k)&#32;{
+211 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>&#32;*=&#32;k;
+212 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>&#32;*=&#32;k;
+213 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>&#32;*=&#32;k;
+214 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;*<emphasis role="keyword">this</emphasis>;
+215 }
+216 
+217 
+218 <link linkend="_classudc_1_1_vector">Vector</link>&amp;&#32;<link linkend="_classudc_1_1_vector_1a470e0981589813bdb73d63fcdee26d30">Vector::negate</link>()&#32;{
+219 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>&#32;=&#32;-<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>;
+220 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>&#32;=&#32;-<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>;
+221 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>&#32;=&#32;-<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>;
+222 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;*<emphasis role="keyword">this</emphasis>;
+223 }
+224 
+225 <link linkend="_classudc_1_1_vector">Vector</link>&amp;&#32;<link linkend="_classudc_1_1_vector_1a1d615c52f81858b3d65fea669c2630d7">Vector::rotate</link>(<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="__m_s_d-export_8cpp_1ae5e5b13dcd20e93e2ea1fb4e0da9fb0e">theta</link>,&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="__m_s_d-export_8cpp_1ac62de771439b59f446700050115488f4">phi</link>)&#32;{
+226 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;*<emphasis role="keyword">this</emphasis>&#32;=&#32;<link linkend="_classudc_1_1_vector_1a89b43ddd10a372d584a03a5583ad5652">sphericalForm</link>(&#32;<link linkend="_classudc_1_1_vector_1ad0a32e923bceab96a3a1eb36b9cc5e3a">norm</link>(),&#32;this-&gt;<link linkend="_classudc_1_1_vector_1aa8f4197da79290967d284765240a2551">theta</link>()&#32;+&#32;theta,&#32;this-&gt;<link linkend="_classudc_1_1_vector_1ad5b5e60153daf6afab0122028700ae2f">phi</link>()&#32;+&#32;phi&#32;);
+227 }
+228 
+229 <link linkend="_classudc_1_1_vector">Vector</link>&amp;&#32;<link linkend="_classudc_1_1_vector_1a1d615c52f81858b3d65fea669c2630d7">Vector::rotate</link>(<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="__m_s_d-export_8cpp_1ae5e5b13dcd20e93e2ea1fb4e0da9fb0e">theta</link>)&#32;{
+230 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;<link linkend="_classudc_1_1_vector_1a1d615c52f81858b3d65fea669c2630d7">rotate</link>(<link linkend="_classudc_1_1_vector_1aa8f4197da79290967d284765240a2551">theta</link>,&#32;0);
+231 }
+232 
+233 <link linkend="_classudc_1_1_vector">Vector</link>&amp;&#32;<link linkend="_classudc_1_1_vector_1ac385aa5781a8b72847e6b28dcaa5e917">Vector::normalize</link>()&#32;{
+234 &#32;&#32;&#32;&#32;<emphasis role="keywordtype">double</emphasis>&#32;k&#32;=&#32;1.0&#32;/&#32;<link linkend="_classudc_1_1_vector_1ad0a32e923bceab96a3a1eb36b9cc5e3a">norm</link>();
+235 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>&#32;*=&#32;k;
+236 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>&#32;*=&#32;k;
+237 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>&#32;*=&#32;k;
+238 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;*<emphasis role="keyword">this</emphasis>;
+239 }
+240 
+241 
+242 <emphasis role="comment">//--------------------------------------------------------------------------------</emphasis>
+243 <link linkend="_classudc_1_1_vector">Vector</link>&#32;<link linkend="_namespaceudc_1a6105effafda7b50687a43e471e65aa14">operator *</link>(<emphasis role="keywordtype">double</emphasis>&#32;k,&#32;<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;&amp;v)&#32;{
+244 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;v&#32;*&#32;k;
+245 }
+246 
+247 ostream&amp;&#32;<link linkend="_namespaceudc_1a6b685c21976ba81485ee5434b8a7ca41">operator &lt;&lt;</link>(ostream&#32;&amp;out,&#32;<emphasis role="keyword">const</emphasis>&#32;<link linkend="_classudc_1_1_vector">Vector</link>&#32;&amp;v)&#32;{
+248 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;out&#32;&lt;&lt;&#32;<emphasis role="charliteral">&apos;&lt;&apos;</emphasis>&#32;&lt;&lt;&#32;v.<link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>&#32;&lt;&lt;&#32;<emphasis role="stringliteral">&quot;,&#32;&quot;</emphasis>&#32;&lt;&lt;&#32;v.<link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>&#32;&lt;&lt;&#32;<emphasis role="stringliteral">&quot;,&#32;&quot;</emphasis>&#32;&lt;&lt;&#32;v.<link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>&#32;&lt;&lt;&#32;<emphasis role="charliteral">&apos;&gt;&apos;</emphasis>;
+249 }
+250 
+251 
+252 }&#32;<emphasis role="comment">//end&#32;of&#32;namespace</emphasis>
+253 
+254 <emphasis role="preprocessor">#endif</emphasis>
+</programlisting></section>
