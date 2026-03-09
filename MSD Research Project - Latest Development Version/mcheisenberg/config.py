@@ -802,8 +802,8 @@ class Config:
 			src += f"OFFSETOF_REGION_D   EQU 32*({offset32})\n";  offset32 += 1
 		self.SIZEOF_EDGE_REGION = 32 * offset32
 		src += f"SIZEOF_EDGE_REGION  EQU 32*({offset32})\n"
-		self.EGDE_REGION_COUNT = len(self.regionCombos)
-		src += f"EDGE_REGION_COUNT EQU {len(self.regionCombos)}\n\n"
+		self.EDGE_REGION_COUNT = len(_ for combo in self.regionCombos if combo in self.regionEdgeParameters)
+		src += f"EDGE_REGION_COUNT EQU {self.EDGE_REGION_COUNT}\n\n"
 		# define memeory for edge_regions
 		src += "EDGE_REGIONS SEGMENT ALIGN(32)\n"
 		for r0, r1 in self.regionCombos:
