@@ -1,0 +1,86 @@
+randomize = False
+
+simCount = 200000000
+freq = 50000
+
+# dimensions of bounding box. WIDTH IS TO BE CHANGED
+width  = 15
+height = 50
+depth  = 50
+
+# boundaries which define the exact dimensions of FM_L, FM_R, and mol. WE CHANGE HERE MOLPOSR
+molPosL = 5  
+molPosR = 9
+topL    = 23
+bottomL = 26
+frontR  = 23
+backR   = 26
+
+#High voltage/spin on 1 face
+
+
+# Tempurature
+kT = 0.1
+
+# External Magnetic Field
+# B = 0 0 0
+
+# Magnetude of spin vectors
+SL = 1
+SR = 1
+Sm = 1
+
+# Maximum Magnetude of spin fluctuation ("flux") vectors. No need in it probably
+# FL = 0
+# FR = 0
+# Fm = 0
+
+# Heisenberg exchange coupling between two neighboring spins/ JL and JR are FM, Jm - molecule, can be played. JmL and JmR too
+JL = 1  
+JR = 1  
+Jm = 0.2
+JmL = 0.75
+JmR = -0.75
+JLR = 0
+
+# exchange coupling between a spin and its local flux
+# Je0L = 0
+# Je0R = 0
+# Je0m = 0
+
+# exchange coupling between a spin and its neighboring flux (and vice versa)
+# Je1L = 0
+# Je1R = 0
+# Je1m = 0
+# Je1mL = 0
+# Je1mR = 0
+# Je1LR = 0
+
+# exchange coupling between two neighboring fluxes
+# JeeL = 0
+# JeeR = 0
+# Jeem = 0
+# JeemL = 0
+# JeemR = 0
+# JeeLR = 0
+
+# Anisotropy constant(s), as vectors. AR
+AL = 0 0.75 0
+# AR = 0 0 0
+Am = 0 0.75 0
+
+# Biquadratic coupling. No clue
+# bL = 0
+# bR = 0
+# bm = 0
+# bmL = 0
+# bmR = 0
+# bLR = 0
+
+# Dzyaloshinskii-Moriya (i.e. Skyrmion) interaction, as vectors. maybe we should use 
+# DL = 0 0 0
+DR = 0 0.75 0
+# Dm = 0 0 0
+# DmL = 0 0 0
+# DmR = 0 0 0
+# DLR = 0 0 0

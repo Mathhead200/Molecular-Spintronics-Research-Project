@@ -7,7 +7,8 @@ Center for Nanotechnology Research and Education (CNRE) at
 the University of the District of Columbia (UDC)
 https://www.udc.edu/seas/centers/cnre/  
   
-Special thanks to my student Robert J. for his recent contributions to the code base.  
+Special thanks to my student Robert J. for his contributions to the GUI code base,
+and Vladimir Vinarskiy for bug testing.  
 
 <hr>
 

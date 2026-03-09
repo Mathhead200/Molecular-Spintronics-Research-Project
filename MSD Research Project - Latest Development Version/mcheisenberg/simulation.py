@@ -11,7 +11,7 @@ import numpy as np
 if TYPE_CHECKING:
 	from .simulation_util import *
 	from collections.abc import Sequence
-
+from pympler.asizeof import asizeof  # DEBUG
 
 # The full state of the Simulation at some simulation time, t.
 class Snapshot:
@@ -35,7 +35,7 @@ class Snapshot:
 		self.S   = dict(zip(nodes, sim.S.values(list_n)))   # don't need to save NDArray, not used in u calc. & don't need copy since is 1D and iter -> scalars
 		self.F   = dict(zip(nodes, sim.F.values(list_n)))   # don't need to save NDArray, not used in u calc. & don't need copy since is 1D and iter -> scalars
 		self.kT  = dict(zip(nodes, sim.kT.values(list_n)))  # don't need to save NDArray, not used in u calc. & don't need copy since is 1D and iter -> scalars
-		self.Je0 = dict(zip(nodes, sim.Je0.values(Je0)))  # don't need copy since is 1D and iter -> scalars
+		self.Je0 = dict(zip(nodes, sim.Je0.values(Je0)))    # don't need copy since is 1D and iter -> scalars
 
 		edges = sim.edges
 		D   = sim.D.values(None)  # must make copy to avoid shallow copying rows
@@ -128,7 +128,7 @@ class Simulation:
 			if p in Simulation.NODE_PARAMETERS:
 				parameters[p] = ReadOnlyOrderedSet(ordered_set(node for node in config.nodes if config.hasNodeParameter(node, p)))
 			else:
-				assert p in EDGE_PARAMETERS
+				assert p in Simulation.EDGE_PARAMETERS
 				parameters[p] = ReadOnlyOrderedSet(ordered_set(edge for edge in config.edges if config.hasEdgeParameter(edge, p)))
 		self._parameters = ReadOnlyDict(parameters)
 		
@@ -215,6 +215,8 @@ class Simulation:
 	def record(self) -> Snapshot:
 		sample = Snapshot(self)
 		self.history[sample.t] = sample
+		print(f"asizeof Snapshot(t={sample.t}): {asizeof(sample)}")  # DEBUG
+		print(f"asizeof Simulation: {asizeof(self)}")  # DEBUG
 		return sample
 
 	def clear_history(self) -> None:

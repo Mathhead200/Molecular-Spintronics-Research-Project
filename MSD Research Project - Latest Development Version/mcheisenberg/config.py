@@ -1818,7 +1818,7 @@ class Config:
 		exports.append(("seed", False))
 
 		# randomize PROC
-		src += "; Randomize the state of all nodes (i.e. kT=\infty)\n"
+		src += "; Randomize the state of all nodes (i.e. kT=\\infty)\n"
 		src += "; @param (void)\n"
 		src += "; @return (void)\n"
 		src += "randomize PROC\n"
