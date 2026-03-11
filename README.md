@@ -8,7 +8,7 @@ the University of the District of Columbia (UDC)
 https://www.udc.edu/seas/centers/cnre/  
   
 Special thanks to my student Robert J. for his contributions to the GUI code base,
-and Vladimir Vinarskiy for bug testing.  
+and Vladimir Vinarskiy for bug testing mcheisenberg (v7).  
 
 <hr>
 

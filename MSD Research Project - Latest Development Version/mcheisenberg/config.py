@@ -1951,6 +1951,58 @@ class Config:
 		src += "randomize ENDP\n\n"
 		exports.append(("randomize", False))
 
+		# record PROC
+		self.SIZEOF_RECORD = 0
+		src += "; Allocate memory and store mutable state. e.g., nodes, edges, parameters, etc.\n"
+		src += "; @param (rcx) void*: allocated memory large enough to store the mutable state.\n"
+		src += ";\tstruct record {\n"
+		if self.MUTABLE_NODE_COUNT != 0 and self.SIZEOF_NODE != 0:
+			src += f";\t\tstruct node *nodes[MUTABLE_NODE_COUNT];           // {self.MUTABLE_NODE_COUNT} * {self.SIZEOF_NODE}\n"
+			self.SIZEOF_RECORD += self.MUTABLE_NODE_COUNT * self.SIZEOF_NODE
+		if self.REGION_COUNT != 0 and self.SIZEOF_REGION != 0:
+			src += f";\t\tstruct region *regions[REGION_COUNT];             // {self.REGION_COUNT} * {self.SIZEOF_REGION}\n"
+			self.SIZEOF_RECORD += self.REGION_COUNT * self.SIZEOF_REGION
+		g = []
+		if "B" in self.globalKeys:
+			g.append("B[4]")
+			self.SIZEOF_RECORD += 32
+		if "A" in self.globalKeys:
+			g.append("A[4]")
+			self.SIZEOF_RECORD += 32
+		if any(p in self.globalKeys for p in ["S", "F", "kT", "Je0"]):
+			g.append("S, F, kT, Je0")
+			self.SIZEOF_RECORD += 32
+		g_join = ", ".join(g)
+		pad = " " * 42 - len(g_join)
+		src += f";\t\tdouble {g_join}; {pad}// {32 * len(g)}\n"
+		if self.EDGE_COUNT != 0 and self.SIZEOF_EDGE != 0:
+			src += f";\t\tstruct edge *edges[EDGE_COUNT];                   // {self.EDGE_COUNT} * {self.SIZEOF_EDGE}\n"
+			self.SIZEOF_RECORD += self.EDGE_COUNT * self.SIZEOF_EDGE
+		if self.EDGE_REGION_COUNT != 0 and self.SIZEOF_EDGE_REGION != 0:
+			src += f";\t\tstruct edge_region *eregions[EDGE_REGION_COUNT];  // {self.EDGE_REGION_COUNT} * {self.SIZEOF_EDGE_REGION}\n"
+			self.SIZEOF_RECORD += self.EDGE_REGION_COUNT * self.SIZEOF_EDGE_REGION
+		g = []
+		if any(p in self.globalKeys for p in ["J", "Je1", "Jee", "b"]):
+			g.append("J, Je1, Jee, b")
+			self.SIZEOF_RECORD += 32
+		if "D" in self.globalKeys:
+			g.append("D[4]")
+			self.SIZEOF_RECORD += 32
+		g_join = ", ".join(g)
+		pad = 42 - len(g_join)
+		src += f";\t\tdouble {g_join};  {pad}// {32 * len(g)}\n"
+		src += ";\t}\n"
+		src += "; @return (void)\n"
+		src += "record PROC\n"
+		src += "\t; TODO: store nodes\n"  # TODO: stub
+		src += "\t; TODO: store regions\n"  # TODO: stub
+		src += "\t; TODO: store node globals\n"  # TODO: stub
+		src += "\t; TODO: store edges\n"  # TODO: stub
+		src += "\t; TODO: store edges regions\n"  # TODO: stub
+		src += "\t; TODO: store edge globals\n"  # TODO: stub
+		src += "\tret\n"
+		src += "record ENDP\n\n"
+
 		# DLL main (for (un)initialization) -- bypass CRT
 		src += "; Windows DLL main (for (un)initialization)\n"
 		src += "; @param (rcx) hinstDLL\n"
@@ -1994,7 +2046,7 @@ class Config:
 
 		src += "END"  # absolute end of ASM file
 
-
+		# ---------------------------------------------------------------------
 		def reserve_tempfile(suffix):
 			""" Create an empty temp file for later use. """
 			fd, path = mkstemp(suffix=suffix, dir=dir)
@@ -2031,7 +2083,7 @@ class Config:
 				if len(self.debug) == 0:
 					tool.dlink(obj, out=dll, entry="DllMain", exports=def_)
 				else:
-					tool.dlink(obj, "ucrt.lib", "legacy_stdio_definitions.lib", out=dll, entry="DllMain", exports=def_)  # DEBUG
+					tool.dlink(obj, "ucrt.lib", "legacy_stdio_definitions.lib", out=dll, exports=def_)  # DEBUG
 			except CalledProcessError as ex:
 				ex.add_note(f"Error running {tool}. Are you sure this version is installed?")
 				raise

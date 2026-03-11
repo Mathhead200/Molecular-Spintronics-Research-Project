@@ -230,8 +230,10 @@ Second bug fix. In MSD::setParameters()
 	Fixed CSV bug causing misalignmnet in snapshot.
 	Added VS 2026 support, and iterate flag for selecting the year (i.e. VS version, e.g. 2022, 2026) and edition (e.g. Community).
 
+
 ------------------------------------ TODOs ------------------------------------
 [mcheisenberg]
+TODO: Vlad found architecture problem on (3-9-2026) where Python uses ~9x memory overhead for storing snapshots. Refactor!
 TODO: heat and magnetize2
 TODO: Ploting (matplotlib) tools
 
