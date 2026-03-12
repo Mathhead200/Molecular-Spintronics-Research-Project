@@ -1,11 +1,11 @@
 from __future__ import annotations
-from .util import Numeric, ReadOnlyDict
+from ..util import Numeric, ReadOnlyDict
 from collections.abc import Mapping
 from numpy.typing import NDArray
 from typing import Annotated, Any, TYPE_CHECKING, override
 import numpy as np
 if TYPE_CHECKING:
-	from .config import vec
+	from ..config import vec
 	from .simulation_proxies import Proxy
 
 type numpy_vec = Annotated[NDArray[np.float64], (3,)]

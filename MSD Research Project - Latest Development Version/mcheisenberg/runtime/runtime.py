@@ -1,13 +1,16 @@
 from __future__ import annotations
-from .driver import Driver
-from .prng import SplitMix64
-from .runtime_proxies import *
-from .util import ReadOnlyList, div8
+from ..driver import Driver, GlobalNode, GlobalEdge
+from ..prng import SplitMix64
+from ..util import ReadOnlyList, div8
+from .runtime_proxies import * 
+from .runtime_buffers import MutableStateBuffer
+from .libc import libc
+from ctypes import sizeof
 import os
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
 	from collections.abc import Sequence, Mapping
-	from .config import Config, vec
+	from ..config import Config, vec
 
 # Handles communication to and from the DLL, as well as the liftime of the DLL file.
 class Runtime:
@@ -70,6 +73,15 @@ class Runtime:
 			setattr(self, f"_{param}_proxy", VectorParameterProxy(self, param))  # e.g. self._B_proxy
 		for param in ["S", "F", "kT", "Je0", "J", "Je1", "Jee", "b"]:
 			setattr(self, f"_{param}_proxy", ScalarParameterProxy(self, param))  # e.g. self._J_proxy
+		
+		self._mutable_state_buffer_size = \
+			config.SIZEOF_NODE * config.MUTABLE_NODE_COUNT + \
+			config.SIZEOF_REGION * config.REGION_COUNT + \
+			sizeof(GlobalNode(config)) + \
+			config.SIZEOF_EDGE * config.EDGE_COUNT + \
+			config.SIZEOF_EDGE_REGION * config.EDGE_REGION_COUNT + \
+			sizeof(GlobalEdge(config))
+			# TODO: add extra fields to config for SIZEOF_GLOBAL_NODE/EDGE ?
 
 	def _fromNodes(self, index: int, offset: int) -> float:
 		return self.driver.nodes[index * self._node_len + offset]
@@ -151,7 +163,7 @@ class Runtime:
 		return prng_state
 
 	def shutdown(self):
-		self.driver.free()
+		self.driver.unload()
 		if self._delete:
 			os.remove(self.dll)
 
@@ -192,6 +204,19 @@ class Runtime:
 	def metropolis(self, iterations: int) -> None:
 		""" Run the metropolis algorithm for the given number of iterations. """
 		self.driver.metropolis(iterations)
+	
+	def allocate_buffer(self) -> MutableStateBuffer:
+		"""
+		Allocates a buffer large enough to store the full mutable state of the model.
+		Returns a low-level reference to the buffer and the size of the buffer (in bytes).
+		"""
+		size = self._mutable_state_buffer_size
+		ptr = libc.malloc(size)
+		return MutableStateBuffer(self, ptr, size)
+	
+	def record(self, buffer: MutableStateBuffer) -> None:
+		""" Copies the current mutable state in the given buffer """
+		self.driver.mutable_state(buffer.ptr)
 
 	@property
 	def prng_state(self) -> list[list[int]]:

@@ -1,17 +1,14 @@
 from __future__ import annotations
-from .constants import EDGE_PARAMETERS, NODE_PARAMETERS, PARAMETERS
-from .runtime import Runtime
 from .simulation_proxies import *
-from .simulation_util import VEC_J, VEC_ZERO, simscal, simvec
-from .util import *
+from .simulation_util import VEC_J, VEC_ZERO
+from ..runtime import Runtime
+from ..util import *
 from itertools import chain
 from typing import TYPE_CHECKING
 from tqdm import tqdm
 import numpy as np
 if TYPE_CHECKING:
 	from .simulation_util import *
-	from collections.abc import Sequence
-from pympler.asizeof import asizeof  # DEBUG
 
 # The full state of the Simulation at some simulation time, t.
 class Snapshot:
@@ -215,8 +212,6 @@ class Simulation:
 	def record(self) -> Snapshot:
 		sample = Snapshot(self)
 		self.history[sample.t] = sample
-		print(f"asizeof Snapshot(t={sample.t}): {asizeof(sample)}")  # DEBUG
-		print(f"asizeof Simulation: {asizeof(self)}")  # DEBUG
 		return sample
 
 	def clear_history(self) -> None:

@@ -1,5 +1,5 @@
 import subprocess
-from .util import quote
+from ..util import quote
 
 class Assembler:
 	def assemble(*src, out=None, include=[]) -> list[str]:

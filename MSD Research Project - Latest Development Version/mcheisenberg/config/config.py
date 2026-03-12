@@ -1,9 +1,7 @@
 from __future__ import annotations
-from .asm_reserved_keywords import MASM_RESERVED_KEYWORDS
-from .build import VisualStudio
-from .constants import EDGE_PARAMETERS, NODE_PARAMETERS
-from .runtime import Runtime
-from .util import StrJoiner, floats, is_pow2
+from ..util import StrJoiner, floats, is_pow2, MASM_RESERVED_KEYWORDS, EDGE_PARAMETERS, NODE_PARAMETERS
+from ..build import VisualStudio
+from ..runtime import Runtime
 from collections import defaultdict
 from copy import deepcopy
 from datetime import datetime
@@ -681,6 +679,10 @@ class Config:
 		src += f"REGION_COUNT  EQU {len(self.regionNodeParameters.keys())}\n\n"
 		# define memeory for regions
 		src += "REGIONS SEGMENT ALIGN(32)  ; AVX-256 (i.e. 32-byte) alignment\n"
+		if self.REGION_COUNT != 0:
+			src += "  regions LABEL qword\n"
+		else:
+			src += "; regions  ; (0 bytes) none defined\n"
 		for region in self.regions:
 			rid = self.regionId(region)
 			if region not in self.regionNodeParameters:
@@ -707,6 +709,10 @@ class Config:
 		
 		# global parameters (node only):
 		src += "GLOBAL_NODE SEGMENT ALIGN(32)\n"
+		if any(p in self.globalKeys for p in ["B", "A", "S", "F", "kT", "Je0"]):
+			src += "global_node LABEL qword\n"
+		else:
+			src += "; global_node  ; (0 bytes) none defined"
 		params = self.globalParameters
 		if "B" in self.globalKeys:
 			Bx, By, Bz = floats(params["B"])  # unpack generator
@@ -802,10 +808,14 @@ class Config:
 			src += f"OFFSETOF_REGION_D   EQU 32*({offset32})\n";  offset32 += 1
 		self.SIZEOF_EDGE_REGION = 32 * offset32
 		src += f"SIZEOF_EDGE_REGION  EQU 32*({offset32})\n"
-		self.EDGE_REGION_COUNT = len(_ for combo in self.regionCombos if combo in self.regionEdgeParameters)
+		self.EDGE_REGION_COUNT = sum(1 for combo in self.regionCombos if combo in self.regionEdgeParameters)
 		src += f"EDGE_REGION_COUNT EQU {self.EDGE_REGION_COUNT}\n\n"
 		# define memeory for edge_regions
 		src += "EDGE_REGIONS SEGMENT ALIGN(32)\n"
+		if self.EDGE_REGION_COUNT != 0:
+			src += "  edge_regions LABEL qword\n"
+		else:
+			src += "; edge_regions  ; (0 bytes) none defined\n"
 		for r0, r1 in self.regionCombos:
 			rid = f"{self.regionId(r0)}_{self.regionId(r1)}"
 			if (r0, r1) not in self.regionEdgeParameters:
@@ -829,6 +839,10 @@ class Config:
 
 		# global parameters (edge only):
 		src += "GLOBAL_EDGE SEGMENT ALIGN(32)\n"
+		if any(p in self.globalKeys for p in ["J", "Je1", "Jee", "b", "D"]):
+			src += "global_edge LABEL qword\n"
+		else:
+			src += "; global_edge  ; (0 bytes) none defined\n"
 		params = self.globalParameters
 		if any(p in self.globalKeys for p in ["J", "Je1", "Jee", "b"]):
 			J   = float(params.get("J",   0.0))
@@ -1951,11 +1965,11 @@ class Config:
 		src += "randomize ENDP\n\n"
 		exports.append(("randomize", False))
 
-		# record PROC
+		# mutable_state PROC
 		self.SIZEOF_RECORD = 0
 		src += "; Allocate memory and store mutable state. e.g., nodes, edges, parameters, etc.\n"
 		src += "; @param (rcx) void*: allocated memory large enough to store the mutable state.\n"
-		src += ";\tstruct record {\n"
+		src += ";\tstruct mutable_state {\n"
 		if self.MUTABLE_NODE_COUNT != 0 and self.SIZEOF_NODE != 0:
 			src += f";\t\tstruct node *nodes[MUTABLE_NODE_COUNT];           // {self.MUTABLE_NODE_COUNT} * {self.SIZEOF_NODE}\n"
 			self.SIZEOF_RECORD += self.MUTABLE_NODE_COUNT * self.SIZEOF_NODE
@@ -1972,9 +1986,10 @@ class Config:
 		if any(p in self.globalKeys for p in ["S", "F", "kT", "Je0"]):
 			g.append("S, F, kT, Je0")
 			self.SIZEOF_RECORD += 32
-		g_join = ", ".join(g)
-		pad = " " * 42 - len(g_join)
-		src += f";\t\tdouble {g_join}; {pad}// {32 * len(g)}\n"
+		if len(g) != 0:
+			g_join = ", ".join(g)
+			pad = " " * (41 - len(g_join))
+			src += f";\t\tdouble {g_join}; {pad}// {32 * len(g)}\n"
 		if self.EDGE_COUNT != 0 and self.SIZEOF_EDGE != 0:
 			src += f";\t\tstruct edge *edges[EDGE_COUNT];                   // {self.EDGE_COUNT} * {self.SIZEOF_EDGE}\n"
 			self.SIZEOF_RECORD += self.EDGE_COUNT * self.SIZEOF_EDGE
@@ -1988,20 +2003,70 @@ class Config:
 		if "D" in self.globalKeys:
 			g.append("D[4]")
 			self.SIZEOF_RECORD += 32
-		g_join = ", ".join(g)
-		pad = 42 - len(g_join)
-		src += f";\t\tdouble {g_join};  {pad}// {32 * len(g)}\n"
+		if len(g) != 0:
+			g_join = ", ".join(g)
+			pad = " " * (41 - len(g_join))
+			src += f";\t\tdouble {g_join};  {pad}// {32 * len(g)}\n"
 		src += ";\t}\n"
 		src += "; @return (void)\n"
-		src += "record PROC\n"
-		src += "\t; TODO: store nodes\n"  # TODO: stub
-		src += "\t; TODO: store regions\n"  # TODO: stub
-		src += "\t; TODO: store node globals\n"  # TODO: stub
-		src += "\t; TODO: store edges\n"  # TODO: stub
-		src += "\t; TODO: store edges regions\n"  # TODO: stub
-		src += "\t; TODO: store edge globals\n"  # TODO: stub
+		src += "mutable_state PROC\n"
+		src += "\tmov r11, rdi  ; backup non-volitile reg.\n"
+		src += "\tmov r10, rsi  ; backup non-volitile reg.\n\n"
+		src += "\tmov rdi, rcx  ; destination buffer\n\n"
+		# store nodes
+		src += "\t; store nodes\n"
+		src += "\tmov rsi, OFFSET nodes  ; source\n"
+		src += "\tmov rcx, (SIZEOF_NODE / 8) * MUTABLE_NODE_COUNT  ; number of quadwords (i.e. doubles)\n"
+		src += "\trep movsq\n\n"
+		# store regions
+		if self.REGION_COUNT != 0:
+			src += "\t; store regions\n"
+			src += "\tmov rsi, OFFSET regions  ; source\n"
+			src += "\tmov rcx, (SIZEOF_REGION / 8) * REGION_COUNT  ; ; number of quadwords (i.e. doubles)\n"
+			src += "\trep movsq\n\n"
+		else:
+			src += "\t; skip regions\n\n"
+		# store global_nodes
+		g = []
+		if "B" in self.globalKeys:  g.append("B")
+		if "A" in self.globalKeys:  g.append("A")
+		if any(p in self.globalKeys for p in ["S", "F", "kT", "Je0"]):  g.append("S, F, kT, Je0")
+		if len(g) != 0:
+			src += "\tmov rsi, OFFSET global_node  ; source\n"
+			src += f"\tmov rcx, 4*({len(g)})  ; {', '.join(g)}\n"
+			src += "\trep movsq\n\n"
+		else:
+			src += "\t; skip global_node\n\n"
+		# store edges
+		if self.EDGE_COUNT != 0 and self.SIZEOF_EDGE != 0:
+			src += "\t; store edges\n"
+			src += "\tmov rsi, OFFSET edges  ; source\n"
+			src += "\tmov rcx, (SIZEOF_EDGE / 8) * EDGE_COUNT  ; number of quqdwords (i.e. doubles)\n"
+			src += "\trep movsq\n\n"
+		else:
+			src += "\t; skip edges\n\n"
+		# store edge_regions
+		if self.EDGE_REGION_COUNT != 0:
+			src += "\tmov rsi, OFFSET edge_regions  ; source\n"
+			src += "\tmov rcx, (SIZEOF_EDGE_REGION / 8) * EDGE_REGION_COUNT  ; number of quqdwords (i.e. doubles)\n"
+			src += "\trep movsq\n\n"
+		else:
+			src += "\t; skip edge_regions\n\n"
+		# store global_edge
+		g = []
+		if any(p in self.globalKeys for p in ["J", "Je1", "Jee", "b"]):  g.append("J, Je1, Jee, b")
+		if "D" in self.globalKeys:  g.append("D")
+		if len(g) != 0:
+			src += "\tmov rsi, OFFSET global_edge  ; source\n"
+			src += f"\tmov rcx, 4*({len(g)})  ; {', '.join(g)}\n"
+			src += "\trep movsq\n\n"
+		else:
+			src += "\t; skip global_edge\n\n"
+		src += "\tmov rsi, r10  ; restore\n"
+		src += "\tmov rdi, r11  ; restore\n"
 		src += "\tret\n"
-		src += "record ENDP\n\n"
+		src += "mutable_state ENDP\n\n"
+		exports.append(("mutable_state", False))
 
 		# DLL main (for (un)initialization) -- bypass CRT
 		src += "; Windows DLL main (for (un)initialization)\n"

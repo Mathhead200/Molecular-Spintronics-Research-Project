@@ -1,6 +1,7 @@
 from __future__ import annotations
 from datetime import date, datetime
 from typing import TYPE_CHECKING
+from .numeric import IInt
 if TYPE_CHECKING:
 	from collections.abc import Iterable
 
@@ -16,11 +17,26 @@ class StrJoiner:
 	def __str__(self):
 		return "".join(self.pieces)
 
+class Incrementer(IInt):
+	value: int = 0
+	
+	def __init__(self, start=0, step=1):
+		self.value = start
+		self.step = step
+	
+	def __call__(self) -> int:
+		self.value += self.step
+		return self.value
+
 
 def quote(s: str) -> str:
 	if len(s) >= 2 and s[0] == '"' and s[-1] == '"':
 		return s  # already quoted
 	return f'"{s}"'
+
+def count(g: Iterable):
+	""" Count the items in a generator or other Iterable. """
+	return sum(1 for _ in g)
 
 
 def floats(values: Iterable) -> tuple[float]:

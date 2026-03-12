@@ -1,8 +1,8 @@
 from __future__ import annotations
-from .util import AbstractReadableDict, ReadOnlyDict
+from ..util import AbstractReadableDict, ReadOnlyDict
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-	from .config import vec
+	from ..config import vec
 	from .runtime import Runtime
 
 # Provides properties (i.e. getters and setters) for local node state and parameters.

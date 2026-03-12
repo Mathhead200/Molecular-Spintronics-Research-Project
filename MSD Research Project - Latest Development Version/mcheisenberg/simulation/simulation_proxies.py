@@ -1,17 +1,16 @@
 from __future__ import annotations
-from .constants import __EDGES__, __NODES__
 from .simulation_util import *
 from .simulation_util import _cov_list, _var_list
-from .util import *
+from ..util import NODES_, EDGES_, ReadOnlyList, ReadOnlyCollection, OrderedSet, ordered_set, IInt
 from collections.abc import KeysView
 from copy import copy
 from itertools import chain
 from typing import Any, override, TYPE_CHECKING
 import numpy as np
 if TYPE_CHECKING:
-	from .config import vec
 	from .simulation import Simulation, Snapshot
 	from .simulation_util import *
+	from ..config import vec
 	from collections.abc import Callable, Collection, Iterable, Iterator, Sequence
 
 type vec = tuple[float, float, float]  # TODO: refactor type system. This is redefiniton from config.py
@@ -115,8 +114,8 @@ def _edge_filter(sim: Simulation, param: str, key: Edge|ERegion) -> Collection[E
 
 # Allow parameter (and literal) keys, but only stores Node|Edge keys as elements
 def _ntype_filter(sim: Simulation, param: str, key: Node|Edge|Region|ERegion|Parameter|Literal) -> Collection[Node|Edge]:
-	if key == __NODES__:       return sim.nodes  # interpreted as the set of all nodes
-	if key == __EDGES__:       return sim.edges  # interpreted as the set of all edges
+	if key == NODES_:       return sim.nodes  # interpreted as the set of all nodes
+	if key == EDGES_:       return sim.edges  # interpreted as the set of all edges
 	if key in sim.nodes:       return [key]      # interpreted as a (local) node
 	if key in sim.edges:       return [key]      # interpreted as a (local) edge
 	if key in sim.regions:     return sim.regions[key]     # interpreted as a (node) region
@@ -126,8 +125,8 @@ def _ntype_filter(sim: Simulation, param: str, key: Node|Edge|Region|ERegion|Par
 
 # Allows parameter (and literal) keys, and stores Node|Edge|Parameter keys are elements
 def _utype_filter(sim: Simulation, param: str, key: Node|Edge|Region|ERegion|Parameter|Literal) -> Iterable[Node|Edge|Parameter]:
-	if key == __NODES__:       return chain(sim.nodes, sim.parameters)
-	if key == __EDGES__:       return chain(sim.edges, sim.parameters)
+	if key == NODES_:       return chain(sim.nodes, sim.parameters)
+	if key == EDGES_:       return chain(sim.edges, sim.parameters)
 	if key in sim.nodes:       return chain([key], sim.parameters)
 	if key in sim.edges:       return chain([key], sim.parameters)
 	if key in sim.regions:     return chain(sim.regions[key], sim.parameters)
