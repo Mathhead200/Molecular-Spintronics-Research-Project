@@ -1,11 +1,16 @@
 from __future__ import annotations
-from .structs import Node, Edge, Region, EdgeRegion
+from .structs import Node, Edge, Region, EdgeRegion, c_double_3
 from ctypes import WinDLL, c_int64, c_double, c_void_p, wintypes
 import ctypes
 import gc
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
 	from ..config import Config
+
+def property_wrap(c_mem):
+	def fget(self):  return c_mem.value
+	def fset(self, value):  c_mem.value = value
+	return property(fget, fset)
 
 # Thin wrapper for DLL
 class Driver:
@@ -57,11 +62,11 @@ class Driver:
 					self._symbols.append(rid)
 		
 		if "B" in config.globalKeys:
-			self.B = (c_double * 4).in_dll(self.dll, "B")
+			self.B = c_double_3.in_dll(self.dll, "B")
 			self._symbols.append("B")
 
 		if "A" in config.globalKeys:
-			self.A = (c_double * 4).in_dll(self.dll, "A")
+			self.A = c_double_3.in_dll(self.dll, "A")
 			self._symbols.append("A")
 
 		if any(p in config.globalKeys for p in ["S", "F", "kT", "Je0"]):
@@ -79,7 +84,7 @@ class Driver:
 			self._symbols.extend(["J", "Je1", "Jee", "b"])
 
 		if "D" in config.globalKeys:
-			self.D = (c_double * 4).in_dll(self.dll, "D")
+			self.D = c_double_3.in_dll(self.dll, "D")
 			self._symbols.append("D")
 
 		# TODO: _ref parallel arrays?

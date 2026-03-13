@@ -1,12 +1,11 @@
 from __future__ import annotations
-from ctypes import cast, sizeof
-from . import Node, Region, GlobalNode, Edge, EdgeRegion, GlobalEdge
+from ..driver import libc, Node, Region, GlobalNode, Edge, EdgeRegion, GlobalEdge
 from ..util import NODE_PARAMETERS, EDGE_PARAMETERS
-from .libc import libc
+from ctypes import cast, sizeof
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-	from ctypes import c_void_p, Array, Structure
 	from ..config import Config
+	from ctypes import c_void_p, Array, Structure
 
 class Buffer:
 	def __init__(self, ptr: c_void_p, capacity: int):
@@ -19,6 +18,7 @@ class Buffer:
 	def __len__(self) -> int:
 		return self.size
 
+# Same iterface as Driver: i.e., symbols for each DLL global (e.g. nodes, edges, {rid}, {erid}, and {global_key})
 class MutableStateBuffer(Buffer):
 	def __init__(self, config: Config, ptr: c_void_p, capacity: int):
 		super().__init__(ptr, capacity)
@@ -49,30 +49,19 @@ class MutableStateBuffer(Buffer):
 		if self.size > capacity:
 			raise ValueError(f"Buffer wasn't big enough: capacity={capacity} size={self.size}")
 
+		id = config.regionId  # function
 		for idx, r in enumerate(r for t in config.regions if r in config.regionNodeParameters):
-			rid = config.regionId(r)
-			rstruct = self._regions[idx]
-			setattr(self, rid, property(
-				fget=lambda self, _r=rstruct: _r
-			))
+			rid = id(r)
+			setattr(self, rid, self._regions[idx])
 		for idx, (r0, r1) in enumerate(e for e in config.regionCombos if e in config.regionEdgeParameters):
-			erid = f"{config.regionId(r0)}_{config.regionId(r1)}"
-			erstruct = self._eregions[idx]
-			setattr(self, erid, property(
-				fget=lambda self, _r=erstruct: _r
-			))
+			erid = f"{id(r0)}_{id(r1)}"
+			setattr(self, erid, self._eregions[idx])
 		for p in config.globalKeys:
 			if p in NODE_PARAMETERS:
-				setattr(self, p, property(
-					fget=lambda self,        _p=p: getattr(self._global_node, p),
-					fset=lambda self, value, _p=p: setattr(self._global_node, p, value)
-				))
+				setattr(self, p, self._global_node.p)
 			else:
 				assert p in EDGE_PARAMETERS  # DEBUG
-				setattr(self, p, property(
-					fget=lambda self,        _p=p: getattr(self._global_edge, p),
-					fset=lambda self, value, _p=p: setattr(self._global_edge, p, value)
-				))
+				setattr(self, p, self._global_edge.p)
 
 	@property
 	def nodes(self) -> Array[Structure]:
