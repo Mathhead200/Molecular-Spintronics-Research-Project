@@ -52,4 +52,5 @@ class LibcDriver:
 		if not kernel32.FreeLibrary(_handle_libc):
 			err = ctypes.get_last_error()
 			raise OSError(f"FreeLibrary failed: {err}")
-	
+
+libc = LibcDriver()

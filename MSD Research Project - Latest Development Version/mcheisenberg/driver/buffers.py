@@ -1,13 +1,12 @@
 from __future__ import annotations
 from ctypes import cast, sizeof
-from ..driver import Node, Region, GlobalNode, Edge, EdgeRegion, GlobalEdge
+from . import Node, Region, GlobalNode, Edge, EdgeRegion, GlobalEdge
 from ..util import NODE_PARAMETERS, EDGE_PARAMETERS
 from .libc import libc
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-	from ctypes import c_void_p
-	from collections.abc import Sequence, Mapping
-	from .runtime import Runtime
+	from ctypes import c_void_p, Array, Structure
+	from ..config import Config
 
 class Buffer:
 	def __init__(self, ptr: c_void_p, capacity: int):
@@ -21,11 +20,10 @@ class Buffer:
 		return self.size
 
 class MutableStateBuffer(Buffer):
-	def __init__(self, rt: Runtime, ptr: c_void_p, capacity: int):
+	def __init__(self, config: Config, ptr: c_void_p, capacity: int):
 		super().__init__(ptr, capacity)
 		
 		# build scheme from config
-		config = rt.config
 		struct_node        = Node(config)
 		struct_region      = Region(config)
 		struct_global_node = GlobalNode(config)
@@ -51,38 +49,51 @@ class MutableStateBuffer(Buffer):
 		if self.size > capacity:
 			raise ValueError(f"Buffer wasn't big enough: capacity={capacity} size={self.size}")
 
-		# dict: (E)Region -> struct alias
-		self._region_map  = { r: self._regions[i]  for i, r in enumerate(rt.regions)  }
-		self._eregion_map = { e: self._eregions[i] for i, e in enumerate(rt.eregions) }
-		self._globals = rt.config.globalKeys
+		for idx, r in enumerate(r for t in config.regions if r in config.regionNodeParameters):
+			rid = config.regionId(r)
+			rstruct = self._regions[idx]
+			setattr(self, rid, property(
+				fget=lambda self, _r=rstruct: _r
+			))
+		for idx, (r0, r1) in enumerate(e for e in config.regionCombos if e in config.regionEdgeParameters):
+			erid = f"{config.regionId(r0)}_{config.regionId(r1)}"
+			erstruct = self._eregions[idx]
+			setattr(self, erid, property(
+				fget=lambda self, _r=erstruct: _r
+			))
+		for p in config.globalKeys:
+			if p in NODE_PARAMETERS:
+				setattr(self, p, property(
+					fget=lambda self,        _p=p: getattr(self._global_node, p),
+					fset=lambda self, value, _p=p: setattr(self._global_node, p, value)
+				))
+			else:
+				assert p in EDGE_PARAMETERS  # DEBUG
+				setattr(self, p, property(
+					fget=lambda self,        _p=p: getattr(self._global_edge, p),
+					fset=lambda self, value, _p=p: setattr(self._global_edge, p, value)
+				))
 
 	@property
-	def nodes(self) -> Sequence:
+	def nodes(self) -> Array[Structure]:
 		return self._nodes
 	
 	@property
-	def regions(self) -> Mapping:
+	def regions(self) -> Array[Structure]:
 		return self._region_map
 	
 	@property
-	def edges(self) -> Sequence:
+	def global_node(self) -> Structure:
+		return self._global_node
+
+	@property
+	def edges(self) -> Array[Structure]:
 		return self._edges
 	
 	@property
-	def eregions(self) -> Mapping:
+	def eregions(self) -> Array[Structure]:
 		return self._eregion_map
-
+	
 	@property
-	def globals(self) -> dict:
-		return { p: getattr(self, p) for p in self._globals }
-
-for p in NODE_PARAMETERS:
-	setattr(MutableStateBuffer, p, property(
-		fget=lambda self,        _p=p: getattr(self._global_node, p),
-		fset=lambda self, value, _p=p: setattr(self._global_node, p, value)
-	))
-for p in EDGE_PARAMETERS:
-	setattr(MutableStateBuffer, p, property(
-		fget=lambda self,        _p=p: getattr(self._global_edge, p),
-		fset=lambda self, value, _p=p: setattr(self._global_edge, p, value)
-	))
+	def global_edge(self) -> Structure:
+		return self._global_edge

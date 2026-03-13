@@ -1,62 +1,15 @@
 from __future__ import annotations
+from ..runtime import Runtime
+from ..util import NODE_PARAMETERS, EDGE_PARAMETERS, PARAMETERS, ordered_set, ReadOnlyOrderedSet, ReadOnlyDict
 from .simulation_proxies import *
 from .simulation_util import VEC_J, VEC_ZERO
-from ..runtime import Runtime
-from ..util import *
+from .snapshot import Snapshot
 from itertools import chain
 from typing import TYPE_CHECKING
 from tqdm import tqdm
 import numpy as np
 if TYPE_CHECKING:
-	from .simulation_util import *
-
-# The full state of the Simulation at some simulation time, t.
-class Snapshot:
-	SAVES = [ *NODE_PARAMETERS, *EDGE_PARAMETERS, "s", "f", "m" ]  # "u"
-
-	def __init__(self, sim: Simulation):
-		mat_n, mat_n2, list_n = sim._buf_mat_node, sim._buf_mat_node2, sim._buf_list_node
-		mat_e, list_e = sim._buf_mat_edge, sim._buf_list_edge
-		s_i, s_j = sim._buf_s_i, sim._buf_s_j
-		f_i, f_j = sim._buf_f_i, sim._buf_f_j
-		m_i, m_j = sim._buf_m_i, sim._buf_m_j
-		Je0, J, Je1, Jee, b = sim._buf_Je0, sim._buf_J, sim._buf_Je1, sim._buf_Jee, sim._buf_b
-		
-		self.t = sim.t
-
-		nodes = sim.nodes
-		B = sim.B.values(None)  # must make copy to avoid shallow copying rows
-		A = sim.A.values(None)  # must make copy to avoid shallow copying rows
-		self.B   = dict(zip(nodes, B))
-		self.A   = dict(zip(nodes, A))
-		self.S   = dict(zip(nodes, sim.S.values(list_n)))   # don't need to save NDArray, not used in u calc. & don't need copy since is 1D and iter -> scalars
-		self.F   = dict(zip(nodes, sim.F.values(list_n)))   # don't need to save NDArray, not used in u calc. & don't need copy since is 1D and iter -> scalars
-		self.kT  = dict(zip(nodes, sim.kT.values(list_n)))  # don't need to save NDArray, not used in u calc. & don't need copy since is 1D and iter -> scalars
-		self.Je0 = dict(zip(nodes, sim.Je0.values(Je0)))    # don't need copy since is 1D and iter -> scalars
-
-		edges = sim.edges
-		D   = sim.D.values(None)  # must make copy to avoid shallow copying rows
-		self.J   = dict(zip(edges, sim.J.values(J)))      # don't need copy since is 1D and iter -> scalars
-		self.Je1 = dict(zip(edges, sim.Je1.values(Je1)))  # don't need copy since is 1D and iter -> scalars
-		self.Jee = dict(zip(edges, sim.Jee.values(Jee)))  # don't need copy since is 1D and iter -> scalars
-		self.b   = dict(zip(edges, sim.b.values(b)))      # don't need copy since is 1D and iter -> scalars
-		self.D   = dict(zip(edges, D))
-		
-		s = sim.s.values(None)  # must make copy to avoid shallow copying rows
-		f = sim.f.values(None)  # must make copy to avoid shallow copying rows
-		self.s = dict(zip(nodes, s))
-		self.f = dict(zip(nodes, f))
-		
-		# compute magnetizations in paralell with numpy
-		m = sim.m.values(out=None, s=s, f=f, buf_mat=mat_n)  # must make copy to avoid shallow copying rows
-		self.m = dict(zip(nodes, m))
-
-		# compute energies in paralell with numpy
-		u = sim.u.values(out=None,
-			buf_mat_node=mat_n, buf_mat_node2=mat_n2, buf_list_node=list_n, buf_mat_edge=mat_e, buf_list_edge=list_e,
-			buf_s_i=s_i, buf_s_j=s_j, buf_f_i=f_i, buf_f_j=f_j, buf_m_i=m_i, buf_m_j=m_j,
-			s=s, f=f, m=m, B=B, A=A, Je0=Je0, J=J, Je1=Je1, Jee=Jee, b=b, D=D)  # copy m again since it may be clobbered by anisotropy calc.
-		self.u = dict(zip(chain(nodes, edges), u))
+	from ..util import ReadOnlyDict
 
 # Runtime wrapper which converts everything to numpy float arrays and adds
 #	simulation logic like recording snapshots, aggregates (e.g. m, U, n, etc.), etc.

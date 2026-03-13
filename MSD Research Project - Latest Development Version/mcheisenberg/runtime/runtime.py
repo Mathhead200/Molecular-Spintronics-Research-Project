@@ -2,9 +2,8 @@ from __future__ import annotations
 from ..driver import Driver, GlobalNode, GlobalEdge
 from ..prng import SplitMix64
 from ..util import ReadOnlyList, div8
-from .runtime_proxies import * 
-from .runtime_buffers import MutableStateBuffer
-from .libc import libc
+from .runtime_proxies import *
+from ..driver import libc, MutableStateBuffer
 from ctypes import sizeof
 import os
 from typing import TYPE_CHECKING

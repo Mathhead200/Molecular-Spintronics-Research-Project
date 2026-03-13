@@ -1,6 +1,7 @@
 from __future__ import annotations
+from .structs import Node, Edge, Region, EdgeRegion
+from ctypes import WinDLL, c_int64, c_double, c_void_p, wintypes
 import ctypes
-from ctypes import CDLL, WinDLL, c_int64, c_double, c_void_p, wintypes
 import gc
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -29,30 +30,30 @@ class Driver:
 		self.dll.mutable_state.restype = None
 		self._procs.append("mutable_state")
 
-		n = (config.SIZEOF_NODE // 8) * config.NODE_COUNT
-		if n > 0:
-			self.nodes = (c_double * n).in_dll(self.dll, "nodes")
+		struct_node = Node(config)
+		if config.SIZEOF_NODE > 0 and config.NODE_COUNT > 0:
+			self.nodes = (struct_node * config.NODE_COUNT).in_dll(self.dll, "nodes")  # Note: all nodes, not just MUTABLE_NODES
 			self._symbols.append("nodes")
 		
-		n = (config.SIZEOF_EDGE // 8) * config.EDGE_COUNT
-		if n > 0:
-			self.edges = (c_double * n).in_dll(self.dll, "edges")
+		struct_edge = Edge(config)
+		if config.SIZEOF_EDGE > 0 and config.EDGE_COUNT > 0:
+			self.edges = (struct_edge * config.EDGE_COUNT).in_dll(self.dll, "edges")
 			self._symbols.append("edges")
 		
+		struct_region = Region(config)
 		if config.SIZEOF_REGION != 0:
 			for r in config.regions:
 				if r in config.regionNodeParameters:
 					rid = config.regionId(r)
-					n = config.SIZEOF_REGION // 8
-					setattr(self, rid, (c_double * n).in_dll(self.dll, rid))
+					setattr(self, rid, (struct_region).in_dll(self.dll, rid))
 					self._symbols.append(rid)
 
+		struct_edge_region = EdgeRegion(config)
 		if config.SIZEOF_EDGE_REGION:
 			for r0, r1 in config.regionCombos:
 				if (r0, r1) in config.regionEdgeParameters:
 					rid = f"{config.regionId(r0)}_{config.regionId(r1)}"
-					n = config.SIZEOF_EDGE_REGION // 8
-					setattr(self, rid, (c_double * n).in_dll(self.dll, rid))
+					setattr(self, rid, (struct_edge_region).in_dll(self.dll, rid))
 					self._symbols.append(rid)
 		
 		if "B" in config.globalKeys:
