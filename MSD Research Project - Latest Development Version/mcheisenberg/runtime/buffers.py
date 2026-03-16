@@ -69,7 +69,7 @@ class MutableStateBuffer(Buffer):
 	
 	@property
 	def regions(self) -> Array[Structure]:
-		return self._region_map
+		return self._regions
 	
 	@property
 	def global_node(self) -> Structure:
@@ -80,8 +80,8 @@ class MutableStateBuffer(Buffer):
 		return self._edges
 	
 	@property
-	def eregions(self) -> Array[Structure]:
-		return self._eregion_map
+	def edge_regions(self) -> Array[Structure]:
+		return self._eregions
 	
 	@property
 	def global_edge(self) -> Structure:

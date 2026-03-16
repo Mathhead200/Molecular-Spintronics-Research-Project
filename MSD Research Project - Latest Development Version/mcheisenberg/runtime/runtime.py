@@ -1,8 +1,8 @@
 from __future__ import annotations
 from ..driver import Driver, GlobalNode, GlobalEdge, libc
 from ..prng import SplitMix64
-from ..util import ReadOnlyList
-from .data import Data
+from ..util import ReadOnlyList, ReadOnlyCollection
+from .data_view import DataView
 from .buffers import MutableStateBuffer
 from ctypes import sizeof
 import os
@@ -10,11 +10,11 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
 	from ..config import Config, vec
 	from ..driver import Driver
-	from collections.abc import Sequence
+	from collections.abc import Sequence, Collection
 
 
 # Handles communication to and from the DLL, as well as the liftime of the DLL file.
-class Runtime(Data[Driver]):
+class Runtime(DataView[Driver]):
 	VEC_ZERO = (0.0, 0.0, 0.0)  # TODO: different type for runtime data
 	VEC_I    = (1.0, 0.0, 0.0)
 	VEC_J    = (0.0, 1.0, 0.0)
@@ -26,11 +26,6 @@ class Runtime(Data[Driver]):
 
 		self.dll: str = dll
 		self._delete: bool = delete  # delete on exit?
-
-		self._nodes_view    = ReadOnlyList(config.nodes)
-		self._edges_view    = ReadOnlyList(config.edges)
-		self._regions_view  = ReadOnlyList([ *config.regions ])
-		self._eregions_view = ReadOnlyList(config.regionCombos)
 		
 		self._mutable_state_buffer_size = \
 			config.SIZEOF_NODE * config.MUTABLE_NODE_COUNT + \
@@ -139,18 +134,21 @@ class Runtime(Data[Driver]):
 		""" Run the metropolis algorithm for the given number of iterations. """
 		self.driver.metropolis(iterations)
 	
-	def allocate_buffer(self) -> Data[MutableStateBuffer]:
+	def allocate_buffer(self) -> MutableStateBuffer:
 		"""
 		Allocates a buffer large enough to store the full mutable state of the model.
-		Returns a low-level reference to the buffer and the size of the buffer (in bytes).
+		Caller responsibility: Buffer must be manually freed! (see: Buffer.free())
 		"""
 		size = self._mutable_state_buffer_size
 		ptr = libc.malloc(size)
-		return Data[MutableStateBuffer](MutableStateBuffer(self, ptr, size))
+		return MutableStateBuffer(self, ptr, size)
 	
-	def record(self, buffer: Data[MutableStateBuffer]) -> None:
-		""" Copies the current mutable state in the given buffer """
-		self.driver.mutable_state(buffer.source.ptr)
+	def record(self, buffer: MutableStateBuffer) -> DataView[MutableStateBuffer]:
+		"""
+		Copies the current mutable state into the given buffer, and
+		returns a DataView object which gives access to the data consistant with the Runtime interface.
+		"""
+		return DataView[MutableStateBuffer](self, self.driver.mutable_state(buffer.source.ptr))
 
 	@property
 	def prng_state(self) -> list[list[int]]:
@@ -162,22 +160,6 @@ class Runtime(Data[Driver]):
 		assert self.config.programParameters["prng"].startswith("xoshiro256")
 		self._validateXoshiro256State(prng_state)
 		self._setXoshiro256State(prng_state)
-
-	@property
-	def nodes(self) -> Sequence:
-		return self._nodes_view
-	
-	@property
-	def edges(self) -> Sequence:
-		return self._edges_view
-
-	@property
-	def regions(self) -> Sequence:
-		return self._regions_view
-	
-	@property
-	def eregions(self) -> Sequence:
-		return self._eregions_view
 
 	@property
 	def globals(self) -> dict:

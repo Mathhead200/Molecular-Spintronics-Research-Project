@@ -81,8 +81,14 @@ class Config:
 	ALLOWED_EDGE_PARAMETERS = set(EDGE_PARAMETERS)
 	ALLOWED_PRGM_PARAMETERS = { "prng", "seed" }
 	RESERVED_IDS = {
+		# segments
 		"NODES", "EDGES", "REGIONS", "EDGE_REGIONS", "GLOBAL_NODE", "GLOBAL_EDGE",
-		"kTref", "Sref", "Fref", "SFref", "prng_state", "metropolis", "seed"
+		# ASM identifiers
+		*NODE_PARAMETERS, *EDGE_PARAMETERS,             # globals
+		"nodes", "regions", "edges", "edge_regions",    # arrays
+		"kTref", "Sref", "Fref", "SFref", "prng_state",
+		# procedures
+		"metropolis", "seed", "randomize", "mutable_state"
 	}
 
 	@staticmethod
@@ -439,6 +445,10 @@ class Config:
 		if len(_unrecognized_debug_options) != 0:
 			raise ValueError(f"Urecognized debug options: {_unrecognized_debug_options}")
 
+		# CHECK: at least one node
+		if len(self.nodes) == 0:
+			raise ValueError("Must define at least one node.")
+
 		# CHECK: No duplicate nodes or edges (TODO: allow duplicate edges?)
 		if len(set(self.nodes)) != len(self.nodes):
 			raise ValueError("Duplicate nodes.")
@@ -681,6 +691,7 @@ class Config:
 		src += "REGIONS SEGMENT ALIGN(32)  ; AVX-256 (i.e. 32-byte) alignment\n"
 		if self.REGION_COUNT != 0:
 			src += "  regions LABEL qword\n"
+			exports.append(("regions", True))
 		else:
 			src += "; regions  ; (0 bytes) none defined\n"
 		for region in self.regions:
@@ -711,6 +722,7 @@ class Config:
 		src += "GLOBAL_NODE SEGMENT ALIGN(32)\n"
 		if any(p in self.globalKeys for p in ["B", "A", "S", "F", "kT", "Je0"]):
 			src += "global_node LABEL qword\n"
+			exports.append(("global_node", True))
 		else:
 			src += "; global_node  ; (0 bytes) none defined"
 		params = self.globalParameters
@@ -814,6 +826,7 @@ class Config:
 		src += "EDGE_REGIONS SEGMENT ALIGN(32)\n"
 		if self.EDGE_REGION_COUNT != 0:
 			src += "  edge_regions LABEL qword\n"
+			exports.append(("edge_regions", True))
 		else:
 			src += "; edge_regions  ; (0 bytes) none defined\n"
 		for r0, r1 in self.regionCombos:
@@ -841,6 +854,7 @@ class Config:
 		src += "GLOBAL_EDGE SEGMENT ALIGN(32)\n"
 		if any(p in self.globalKeys for p in ["J", "Je1", "Jee", "b", "D"]):
 			src += "global_edge LABEL qword\n"
+			exports.append(("global_edge", True))
 		else:
 			src += "; global_edge  ; (0 bytes) none defined\n"
 		params = self.globalParameters

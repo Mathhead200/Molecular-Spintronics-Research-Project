@@ -1,5 +1,5 @@
 from __future__ import annotations
-from .structs import Node, Edge, Region, EdgeRegion, c_double_3
+from .structs import Node, Edge, Region, EdgeRegion, GlobalNode, GlobalEdge, c_double_3
 from ctypes import WinDLL, c_int64, c_double, c_void_p, wintypes
 import ctypes
 import gc
@@ -45,21 +45,35 @@ class Driver:
 			self.edges = (struct_edge * config.EDGE_COUNT).in_dll(self.dll, "edges")
 			self._symbols.append("edges")
 		
-		struct_region = Region(config)
 		if config.SIZEOF_REGION != 0:
+			struct_region = Region(config)
+			self.regions = (struct_region * config.REGION_COUNT).in_dll(self.dll, "regions")
+			self._symbols.append("regions")
 			for r in config.regions:
 				if r in config.regionNodeParameters:
 					rid = config.regionId(r)
 					setattr(self, rid, (struct_region).in_dll(self.dll, rid))
 					self._symbols.append(rid)
 
-		struct_edge_region = EdgeRegion(config)
 		if config.SIZEOF_EDGE_REGION:
+			struct_edge_region = EdgeRegion(config)
+			self.edge_regions = (struct_edge_region * config.EDGE_REGION_COUNT).in_dll(self.dll, "edge_regions")
+			self._symbols.append("edge_regions")
 			for r0, r1 in config.regionCombos:
 				if (r0, r1) in config.regionEdgeParameters:
 					rid = f"{config.regionId(r0)}_{config.regionId(r1)}"
 					setattr(self, rid, (struct_edge_region).in_dll(self.dll, rid))
 					self._symbols.append(rid)
+		
+		if any(p in config.globalKeys for p in ["B", "A", "S", "F", "kT", "Je0"]):
+			struct_global_node = GlobalNode(config)
+			self.global_node = struct_global_node.in_dll(self.dll, "global_node")
+			self._symbols.append("global_node")
+
+		if any(p in config.globalKeys for p in ["J", "Je1", "Jee", "b", "D"]):
+			struct_global_edge = GlobalEdge(config)
+			self.global_edge = struct_global_edge.in_dll(self.dll, "global_edge")
+			self._symbols.append("global_edge")
 		
 		if "B" in config.globalKeys:
 			self.B = c_double_3.in_dll(self.dll, "B")

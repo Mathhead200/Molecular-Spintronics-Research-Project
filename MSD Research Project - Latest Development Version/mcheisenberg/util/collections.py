@@ -22,13 +22,11 @@ class ReadOnlyCollection(Collection):
 	def __repr__(self):  return repr(self._obj)
 	def __str__(self):   return str(self._obj)
 
-
 # Wrapper allowing read-only access to underlying list/Sequence
 class ReadOnlyList[T](ReadOnlyCollection[T]):
 	def __init__(self, lst: Sequence):  super().__init__(lst)
 	
 	def __getitem__(self, i):   return self._obj[i]
-
 
 # Parent to be extended/derived from
 class AbstractReadableDict[K, V](Mapping[K, V]):

@@ -1,9 +1,10 @@
 from __future__ import annotations
 from ..util import AbstractReadableDict, ReadOnlyDict
+from collections.abc import Mapping
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-	from .data import Data
-	from collections.abc import Sequence, Mapping
+	from .data_view import DataView
+	from collections.abc import Sequence
 	from ctypes import Array, c_double
 	from typing import Annotated
 
@@ -21,7 +22,7 @@ class NodeProxy:
 	__slots__ = [ "spin", "flux", "B", "A", "S", "F", "kT", "Je0",
 	              "_runtime", "_node", "_index" ]
 
-	def __init__(self, data: Data, node):
+	def __init__(self, data: DataView, node):
 		self._data = data
 		self._node = node
 	
@@ -124,7 +125,7 @@ class EdgeProxy:
 	__slots__ = [ "J", "Je1", "Jee", "b", "D",
 	              "_runtime", "_edge", "_index" ]
 
-	def __init__(self, data: Data, edge):
+	def __init__(self, data: DataView, edge):
 		self._data = data
 		self._edge = edge
 	
@@ -196,7 +197,7 @@ class RegionProxy:
 	__slots__ = [ "B", "A", "S", "F", "kT", "Je0",
 	              "_runtime", "_region", "_rid" ]
 
-	def __init__(self, data: Data, region):
+	def __init__(self, data: DataView, region):
 		self._data = data
 		self._region = region
 	
@@ -258,7 +259,7 @@ class ERegionProxy:
 	__slots__ = [ "J", "Je1", "Jee", "b", "D",
 	              "_runtime", "_eregion", "_erid" ]
 
-	def __init__(self, data: Data, eregion: tuple):
+	def __init__(self, data: DataView, eregion: tuple):
 		self._data = data
 		self._eregion = eregion
 	
@@ -326,9 +327,9 @@ for param in ["D"]:
 class GlobalsProxy:
 	__slots__ = [ "B", "A", "S", "F", "kT", "Je0",
 	              "J", "Je1", "Jee", "b", "D",
-	              "_runtime" ]
+	              "_data" ]
 
-	def __init__(self, data: Data):
+	def __init__(self, data: DataView):
 		self._data = data
 	
 	def _getScalar(self, param: str) -> scal_out:
@@ -363,9 +364,12 @@ for param in ["S", "F", "kT", "Je0", "J", "Je1", "Jee", "b"]:
 	))
 
 class NodeListProxy(Mapping):
-	def __init__(self, data: Data):
+	def __init__(self, data: DataView):
 		self._data = data
-	
+
+	def __iter__(self):  return iter(self._data._nodes_view)
+	def __len__(self):   return len(self._data._nodes_view)
+
 	def __getitem__(self, node) -> NodeProxy:
 		data = self._data
 		if node not in data.config.nodes:
@@ -373,8 +377,11 @@ class NodeListProxy(Mapping):
 		return NodeProxy(data, node)
 
 class EdgeListProxy(Mapping):
-	def __init__(self, data: Data):
+	def __init__(self, data: DataView):
 		self._data = data
+	
+	def __iter__(self):  return iter(self._data._edges_view)
+	def __len__(self):   return len(self._data._edges_view)
 	
 	def __getitem__(self, edge: tuple) -> EdgeProxy:
 		data = self._data
@@ -386,8 +393,11 @@ class EdgeListProxy(Mapping):
 		return self[(node0, node1)]
 
 class RegionListProxy(Mapping):
-	def __init__(self, data: Data):
+	def __init__(self, data: DataView):
 		self._data = data
+	
+	def __iter__(self):  return iter(self._data._regions_view)
+	def __len__(self):   return len(self._data._regions_view)
 	
 	def __getitem__(self, region) -> RegionProxy:
 		data = self._data
@@ -396,8 +406,11 @@ class RegionListProxy(Mapping):
 		return RegionProxy(data, region)
 
 class ERegionListProxy(ReadOnlyDict):
-	def __init__(self, data: Data):
+	def __init__(self, data: DataView):
 		self._data = data
+	
+	def __iter__(self):  return iter(self._data._eregions_view)
+	def __len__(self):   return len(self._data._eregions_view)
 	
 	def __getitem__(self, eregion: tuple) -> ERegionProxy:
 		data = self._data
@@ -409,7 +422,7 @@ class ERegionListProxy(ReadOnlyDict):
 		return self[(region0, region1)]
 
 class StateListProxy(AbstractReadableDict):
-	def __init__(self, data: Data, state: str):
+	def __init__(self, data: DataView, state: str):
 		self._proxy_list = data.node
 		self._state = state  # e.g. "spin", or "flux"
 
@@ -434,7 +447,7 @@ class StateListProxy(AbstractReadableDict):
 # Acts like the global parameter when used as a value, but allows the lookup
 #	for local/region parameters via __getitem__/__setitem__.
 class ParameterProxy:
-	def __init__(self, data: Data, param: str):
+	def __init__(self, data: DataView, param: str):
 		self._data = data
 		self._param = param
 	
