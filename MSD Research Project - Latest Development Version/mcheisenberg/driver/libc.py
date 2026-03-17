@@ -10,31 +10,35 @@ class LibcDriver:
 		self._libc_procs = []
 		
 		self.libc.malloc.argtypes = [c_size_t]
-		self.libc.malloc.restype = c_void_p
+		self.libc.malloc.restype = c_void_p  # will actual return int (python is stupid)
 		self._libc_procs.append("malloc")
 
 		self.libc.calloc.argtypes = [c_size_t, c_size_t]
-		self.libc.calloc.restype = c_void_p
+		self.libc.calloc.restype = c_void_p  # will actual return int (python is stupid)
 		self._libc_procs.append("calloc")
 
 		self.libc.realloc.argtypes = [c_void_p, c_size_t]
-		self.libc.realloc.restype = c_void_p
+		self.libc.realloc.restype = c_void_p  # will actual return int (python is stupid)
 		self._libc_procs.append("realloc")
 
 		self.libc.free.argtypes = [c_void_p]
 		self.libc.free.restype = None
 		self._libc_procs.append("free")
 	
-	def malloc(self, size: c_size_t) -> c_void_p:
+	def malloc(self, size: c_size_t) -> int:
+		# returns pointer as python int
 		return self.libc.malloc(size)
 	
-	def calloc(self, num_of_ele: c_size_t, ele_size: c_size_t) -> c_void_p:
+	def calloc(self, num_of_ele: c_size_t, ele_size: c_size_t) -> int:
+		# returns pointer as python int
 		return self.libc.calloc(num_of_ele, ele_size)
 	
-	def realloc(self, ptr: c_void_p, new_size: c_size_t) -> c_void_p:
+	def realloc(self, ptr: int|c_void_p, new_size: c_size_t) -> int:
+		# takes and returns pointer as python int
 		return self.libc.realloc(ptr, new_size)
 	
-	def free(self, ptr: c_void_p) -> None:
+	def free(self, ptr: int|c_void_p) -> None:
+		# takes pointer as python int
 		self.libc.free(ptr)
 	
 	def unload(self) -> None:

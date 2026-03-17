@@ -141,14 +141,15 @@ class Runtime(DataView[Driver]):
 		"""
 		size = self._mutable_state_buffer_size
 		ptr = libc.malloc(size)
-		return MutableStateBuffer(self, ptr, size)
+		return MutableStateBuffer(self.config, ptr, size)
 	
 	def record(self, buffer: MutableStateBuffer) -> DataView[MutableStateBuffer]:
 		"""
 		Copies the current mutable state into the given buffer, and
 		returns a DataView object which gives access to the data consistant with the Runtime interface.
 		"""
-		return DataView[MutableStateBuffer](self, self.driver.mutable_state(buffer.source.ptr))
+		self.driver.mutable_state(buffer.ptr)
+		return DataView[MutableStateBuffer](self.config, buffer)
 
 	@property
 	def prng_state(self) -> list[list[int]]:

@@ -6,11 +6,8 @@ import gc
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
 	from ..config import Config
+	from ctypes import Array, Structure
 
-def property_wrap(c_mem):
-	def fget(self):  return c_mem.value
-	def fset(self, value):  c_mem.value = value
-	return property(fget, fset)
 
 # Thin wrapper for DLL
 class Driver:
@@ -37,17 +34,17 @@ class Driver:
 
 		struct_node = Node(config)
 		if config.SIZEOF_NODE > 0 and config.NODE_COUNT > 0:
-			self.nodes = (struct_node * config.NODE_COUNT).in_dll(self.dll, "nodes")  # Note: all nodes, not just MUTABLE_NODES
+			self.nodes: Array[Structure] = (struct_node * config.NODE_COUNT).in_dll(self.dll, "nodes")  # Note: all nodes, not just MUTABLE_NODES
 			self._symbols.append("nodes")
 		
 		struct_edge = Edge(config)
 		if config.SIZEOF_EDGE > 0 and config.EDGE_COUNT > 0:
-			self.edges = (struct_edge * config.EDGE_COUNT).in_dll(self.dll, "edges")
+			self.edges: Array[Structure] = (struct_edge * config.EDGE_COUNT).in_dll(self.dll, "edges")
 			self._symbols.append("edges")
 		
 		if config.SIZEOF_REGION != 0:
 			struct_region = Region(config)
-			self.regions = (struct_region * config.REGION_COUNT).in_dll(self.dll, "regions")
+			self.regions: Array[Structure] = (struct_region * config.REGION_COUNT).in_dll(self.dll, "regions")
 			self._symbols.append("regions")
 			for r in config.regions:
 				if r in config.regionNodeParameters:
@@ -57,7 +54,7 @@ class Driver:
 
 		if config.SIZEOF_EDGE_REGION:
 			struct_edge_region = EdgeRegion(config)
-			self.edge_regions = (struct_edge_region * config.EDGE_REGION_COUNT).in_dll(self.dll, "edge_regions")
+			self.edge_regions: Array[Structure] = (struct_edge_region * config.EDGE_REGION_COUNT).in_dll(self.dll, "edge_regions")
 			self._symbols.append("edge_regions")
 			for r0, r1 in config.regionCombos:
 				if (r0, r1) in config.regionEdgeParameters:
@@ -67,12 +64,12 @@ class Driver:
 		
 		if any(p in config.globalKeys for p in ["B", "A", "S", "F", "kT", "Je0"]):
 			struct_global_node = GlobalNode(config)
-			self.global_node = struct_global_node.in_dll(self.dll, "global_node")
+			self.global_node: Structure = struct_global_node.in_dll(self.dll, "global_node")
 			self._symbols.append("global_node")
 
 		if any(p in config.globalKeys for p in ["J", "Je1", "Jee", "b", "D"]):
 			struct_global_edge = GlobalEdge(config)
-			self.global_edge = struct_global_edge.in_dll(self.dll, "global_edge")
+			self.global_edge: Structure = struct_global_edge.in_dll(self.dll, "global_edge")
 			self._symbols.append("global_edge")
 		
 		if "B" in config.globalKeys:
@@ -116,7 +113,8 @@ class Driver:
 	def randomize(self) -> None:
 		self.dll.randomize()
 	
-	def mutable_state(self, buffer: c_void_p) -> None:
+	def mutable_state(self, buffer: int|c_void_p) -> None:
+		# c_void_p passed as int (b.c. cpython is stupid.)
 		self.dll.mutable_state(buffer)
 
 	def unload(self):

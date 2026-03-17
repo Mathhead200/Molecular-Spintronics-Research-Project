@@ -1,5 +1,5 @@
 from __future__ import annotations
-from ..util import AbstractReadableDict, ReadOnlyDict
+from ..util import AbstractReadableDict, ReadOnlyDict, Numeric
 from collections.abc import Mapping
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -496,10 +496,10 @@ class ParameterProxy:
 	def __repr__(self) -> str: return repr(self.value)
 
 # Acts like a float
-class ScalarParameterProxy(ParameterProxy):
-	def __float__(self) -> float:  return self.value
+class ScalarParameterProxy(ParameterProxy, Numeric):
+	def __float__(self) -> float:  return self.value.value  # second .value converts (via copy) c_double -> float
 
 # Acts like a tuple
-class VectorParameterProxy(ParameterProxy):
+class VectorParameterProxy(ParameterProxy, Numeric):
 	def __iter__(self) -> vec_out:  return self.value
 	def __len__(self) -> int:  return len(self.value)

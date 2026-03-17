@@ -5,10 +5,10 @@ from ctypes import cast, sizeof
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
 	from ..config import Config
-	from ctypes import c_void_p, Array, Structure
+	from ctypes import Array, Structure
 
 class Buffer:
-	def __init__(self, ptr: c_void_p, capacity: int):
+	def __init__(self, ptr: int, capacity: int):
 		self.ptr = ptr
 		self.capacity = capacity
 	
@@ -20,7 +20,7 @@ class Buffer:
 
 # Same iterface as Driver: i.e., symbols for each DLL global (e.g. nodes, edges, {rid}, {erid}, and {global_key})
 class MutableStateBuffer(Buffer):
-	def __init__(self, config: Config, ptr: c_void_p, capacity: int):
+	def __init__(self, config: Config, ptr: int, capacity: int):
 		super().__init__(ptr, capacity)
 		
 		# build scheme from config
@@ -31,21 +31,21 @@ class MutableStateBuffer(Buffer):
 		struct_edge_region = EdgeRegion(config)
 		struct_global_edge = GlobalEdge(config)
 
-		addr = ptr.value  # (int) address
-		self._nodes = cast(c_void_p(addr), struct_node * config.MUTABLE_NODE_COUNT)
+		addr = ptr  # (int) address
+		self._nodes: Array[Structure] = (struct_node * config.MUTABLE_NODE_COUNT).from_address(addr)
 		addr += sizeof(self._nodes)
-		self._regions = cast(c_void_p(addr), struct_region * config.REGION_COUNT)
+		self._regions: Array[Structure] = (struct_region * config.REGION_COUNT).from_address(addr)
 		addr += sizeof(self._regions)
-		self._global_node = cast(c_void_p(addr), struct_global_node)
+		self._global_node: Structure = struct_global_node.from_address(addr)
 		addr += sizeof(self._global_node)
-		self._edges = cast(c_void_p(addr), struct_edge * config.EDGE_COUNT)
+		self._edges: Array[Structure] = (struct_edge * config.EDGE_COUNT).from_address(addr)
 		addr += sizeof(self._edges)
-		self._eregions = cast(c_void_p(addr), struct_edge_region * config.EDGE_REGION_COUNT)
+		self._edge_regions: Array[Structure] = (struct_edge_region * config.EDGE_REGION_COUNT).from_address(addr)
 		addr += sizeof(self._edge_regions)
-		self._global_edge = cast(c_void_p(addr), struct_global_edge)
+		self._global_edge: Structure = struct_global_edge.from_address(addr)
 		addr += sizeof(self._global_edge)
 
-		self.size = addr - ptr.value
+		self.size = addr - ptr
 		if self.size > capacity:
 			raise ValueError(f"Buffer wasn't big enough: capacity={capacity} size={self.size}")
 
@@ -58,10 +58,14 @@ class MutableStateBuffer(Buffer):
 			setattr(self, erid, self._eregions[idx])
 		for p in config.globalKeys:
 			if p in NODE_PARAMETERS:
-				setattr(self, p, self._global_node.p)
+				g: Structure = self._global_node
+				if hasattr(g, p):
+					setattr(self, p, getattr(g, p))
 			else:
 				assert p in EDGE_PARAMETERS  # DEBUG
-				setattr(self, p, self._global_edge.p)
+				g: Structure = self._global_edge
+				if hasattr(g, p):
+					setattr(self, p, getattr(g, p))
 
 	@property
 	def nodes(self) -> Array[Structure]:
@@ -81,7 +85,7 @@ class MutableStateBuffer(Buffer):
 	
 	@property
 	def edge_regions(self) -> Array[Structure]:
-		return self._eregions
+		return self._edge_regions
 	
 	@property
 	def global_edge(self) -> Structure:
