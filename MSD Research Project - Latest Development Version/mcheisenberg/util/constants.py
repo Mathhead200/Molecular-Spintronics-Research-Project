@@ -15,4 +15,6 @@ EDGES_ = "__EDGES__"  # enum
 
 NODE_PARAMETERS = [S_, F_, kT_, B_, A_, Je0_]
 EDGE_PARAMETERS = [J_, Je1_, Jee_,  b_, D_]
+SCALAR_PARAMETERS = [S_, F_, kT_, Je0_, J_, Je1_, Jee_, b_]
+VECTOR_PARAMETERS = [B_, A_, D_]
 PARAMETERS = [S_, F_, kT_, J_, Je0_, Je1_, Jee_, B_, A_, b_, D_]

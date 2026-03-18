@@ -1,11 +1,16 @@
 from __future__ import annotations
-from ..driver import libc, Node, Region, GlobalNode, Edge, EdgeRegion, GlobalEdge
-from ..util import NODE_PARAMETERS, EDGE_PARAMETERS
-from ctypes import cast, sizeof
+from ..driver import libc, Node, Region, GlobalNode, Edge, EdgeRegion, GlobalEdge, c_double_3
+from ..util import NODE_PARAMETERS, EDGE_PARAMETERS, SCALAR_PARAMETERS, VECTOR_PARAMETERS
+from ctypes import sizeof, c_double
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
 	from ..config import Config
 	from ctypes import Array, Structure
+
+NODE_PARAMETER_SET = set(NODE_PARAMETERS)
+EDGE_PARAMETER_SET = set(EDGE_PARAMETERS)
+SCALAR_PARAMETER_SET = set(SCALAR_PARAMETERS)
+VECTOR_PARAMETER_SET = set(VECTOR_PARAMETERS)
 
 class Buffer:
 	def __init__(self, ptr: int, capacity: int):
@@ -55,17 +60,24 @@ class MutableStateBuffer(Buffer):
 			setattr(self, rid, self._regions[idx])
 		for idx, (r0, r1) in enumerate(e for e in config.regionCombos if e in config.regionEdgeParameters):
 			erid = f"{id(r0)}_{id(r1)}"
-			setattr(self, erid, self._eregions[idx])
+			setattr(self, erid, self._edge_regions[idx])
+		print("globalKeys:", config.globalKeys)  # DEBUG
 		for p in config.globalKeys:
-			if p in NODE_PARAMETERS:
-				g: Structure = self._global_node
-				if hasattr(g, p):
-					setattr(self, p, getattr(g, p))
+			if p in NODE_PARAMETER_SET:
+				if p in VECTOR_PARAMETER_SET:
+					c_type = c_double_3
+				else:
+					assert p in SCALAR_PARAMETER_SET  # DEBUG
+					c_type = c_double
+				setattr(self, p, c_type.from_buffer(self._global_node, getattr(struct_global_node, p).offset))
 			else:
-				assert p in EDGE_PARAMETERS  # DEBUG
-				g: Structure = self._global_edge
-				if hasattr(g, p):
-					setattr(self, p, getattr(g, p))
+				assert p in EDGE_PARAMETER_SET  # DEBUG
+				if p in VECTOR_PARAMETER_SET:
+					c_type = c_double_3
+				else:
+					assert p in SCALAR_PARAMETER_SET  # DEBUG
+					c_type = c_double
+				setattr(self, p, c_type.from_buffer(self._global_edge, getattr(struct_global_edge, p).offset))
 
 	@property
 	def nodes(self) -> Array[Structure]:

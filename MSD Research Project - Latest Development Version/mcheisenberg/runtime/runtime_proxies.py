@@ -503,3 +503,5 @@ class ScalarParameterProxy(ParameterProxy, Numeric):
 class VectorParameterProxy(ParameterProxy, Numeric):
 	def __iter__(self) -> vec_out:  return self.value
 	def __len__(self) -> int:  return len(self.value)
+	def __getitem__(self, i: int) -> float:  return self.value[i]
+	def __setitem__(self, i: int, value: float):  self.value[i] = value

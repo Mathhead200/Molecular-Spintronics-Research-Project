@@ -3,4 +3,5 @@ from .numeric import Numeric, IInt
 from .collections import OrderedSet, ordered_set, AbstractReadableDict, ReadOnlyCollection, ReadOnlyDict, ReadOnlyList, ReadOnlyOrderedSet
 from .typing import TypeCheckedAny, TypeCheckedIterable, TypeCheckedCollection, TypeCheckedSequence, TypeCheckedSet, TypeCheckedSet, TypeCheckedTuple
 from .asm_reserved_keywords import MASM_RESERVED_KEYWORDS
-from .constants import A_, B_, b_, D_, EDGES_, F_, J_, Je0_, Je1_, Jee_, kT_, NODES_, S_, EDGE_PARAMETERS, NODE_PARAMETERS, PARAMETERS
+from .constants import A_, B_, b_, D_, F_, J_, Je0_, Je1_, Jee_, kT_, S_, NODES_, EDGES_, \
+	EDGE_PARAMETERS, NODE_PARAMETERS, SCALAR_PARAMETERS, VECTOR_PARAMETERS, PARAMETERS
