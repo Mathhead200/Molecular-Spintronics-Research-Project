@@ -1,11 +1,13 @@
 from __future__ import annotations
 from ..util import Numeric, ReadOnlyDict
+from ..driver import c_double_3
 from collections.abc import Mapping
+from ctypes import POINTER, c_double
 from numpy.typing import NDArray
 from typing import Annotated, Any, TYPE_CHECKING, override
 import numpy as np
 if TYPE_CHECKING:
-	from ..config import vec
+	from ..runtime import vec_in, vec_out, scal_in, scal_out
 	from .simulation_proxies import Proxy
 
 type numpy_vec = Annotated[NDArray[np.float64], (3,)]
@@ -21,38 +23,36 @@ type Parameter = str
 type Literal = str  # == type(__NODES__)|type(__EDGES__), both defined in .constants
 
 
-VEC_ZERO = np.zeros(3, dtype=float)
-VEC_I = np.array([1.0, 0.0, 0.0])
-VEC_J = np.array([0.0, 1.0, 0.0])
-VEC_K = np.array([0.0, 0.0, 1.0])
+VEC_ZERO = np.zeros(3, dtype=float);  VEC_ZERO.flags.writeable = False
+VEC_I = np.array([1.0, 0.0, 0.0]);    VEC_I.flags.writeable = False
+VEC_J = np.array([0.0, 1.0, 0.0]);    VEC_J.flags.writeable = False
+VEC_K = np.array([0.0, 0.0, 1.0]);    VEC_K.flags.writeable = False
 
 
-def simvec(v: vec|numpy_vec|None, out: NDArray=None) -> numpy_vec:
-	""" Convert a Runtime tuple vec to a Simulation numpy ndarray. """
-	if v is None:
-		v = VEC_ZERO
-	if out is None:
-		return np.asarray(v, dtype=float)
-	out[0:len(v)] = v
-	return out
+def simvec(v: vec_out|None, out: NDArray=None) -> numpy_vec:
+	""" Convert a Runtime vec to a Simulation numpy ndarray. """
+	if v is None:  res = VEC_ZERO
+	else:          res = np.ctypeslib.as_array(v)
 
-def rtvec(v: vec|numpy_vec|None) -> vec:
-	""" Converts a Simulation numpy ndarray to a Runtime tuple vec. """
-	return tuple(simvec(v).astype(float).tolist())
+	if out is not None:
+		out[0:len(v)] = res
+	return res
 
-def simscal(x: float|None, out: NDArray=None) -> float:
+def rtvec(v: numpy_vec|None) -> vec_in:
+	""" Converts a Simulation numpy ndarray to a Runtime vec. """
+	return v  # should acts enough like a c_double_3 for use with runtime interface
+
+def simscal(x: scal_out|None, out: NDArray=None) -> float:
 	""" Convert a Runtime float|None to a Simulation float. """
-	if x is None:
-		x = 0.0
-	if out is None:
-		return x
-	out[0] = x
-	return out
+	if x is None:  res = 0.0
+	else:          res = x.value
 
-def rtscal(x: float|None) -> float:
+	if out is not None:
+		out[0] = res
+	return res
+
+def rtscal(x: float) -> scal_in:
 	""" Convert a Simulation float to a Runtime float. """
-	if x is None:
-		return 0.0
 	return x
 
 

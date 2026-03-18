@@ -9,6 +9,7 @@ from importlib import resources
 from math import ceil, log2
 from subprocess import CalledProcessError
 from tempfile import mkstemp
+from tqdm import tqdm
 from typing import Generic, Optional, TypeVar, TypedDict, TYPE_CHECKING
 import os
 if TYPE_CHECKING:
@@ -417,7 +418,7 @@ class Config:
 			return v
 		return self.globalParameters.get(k, None)
 	
-	def compile(self, tool=VisualStudio(), asm: str=None, def_: str=None, obj: str=None, dll: str=None, dir: str=None, copy_config: bool=True) -> Runtime:
+	def compile(self, tool=VisualStudio(), asm: str=None, def_: str=None, obj: str=None, dll: str=None, dir: str=None, copy_config: bool=True, progress_bars: bool=False) -> Runtime:
 		# Check for and fix missing required attributes;
 		if "nodes"                not in self.__dict__:  self.nodes = []
 		if "mutableNodes"         not in self.__dict__:  self.mutableNodes = self.nodes
@@ -445,21 +446,36 @@ class Config:
 		if len(_unrecognized_debug_options) != 0:
 			raise ValueError(f"Urecognized debug options: {_unrecognized_debug_options}")
 
+		tqdm_check = tqdm(
+			total= 3 + len(self.nodes) + len(self.regions) + len(self.edges) + len(self.localNodeParameters) + \
+				len(self.localEdgeParameters) + len(self.regionNodeParameters) + len(self.regionEdgeParameters) + \
+				len(self.globalParameters) + len(self.programParameters) + 1 + len(seed) if seed is not None else 0 + \
+				1 + len(self.localNodeParameters) + len(self.localEdgeParameters) + len(self.regionNodeParameters) + \
+				len(self.regionEdgeParameters),
+			desc="[Compiling] Validating config"
+		) if progress_bars else None
+		def tqdm_check_update(n=1):
+			if tqdm_check is not None:  tqdm_check.update(n)
 		# CHECK: at least one node
 		if len(self.nodes) == 0:
 			raise ValueError("Must define at least one node.")
+		tqdm_check_update()
 
 		# CHECK: No duplicate nodes or edges (TODO: allow duplicate edges?)
 		if len(set(self.nodes)) != len(self.nodes):
 			raise ValueError("Duplicate nodes.")
+		tqdm_check_update()
 		if len(set(self.edges)) != len(self.edges):
 			raise ValueError("Duplicate edges.")
+		tqdm_check_update()
 
 		# CHECK: Make sure all node and region names are valid identifiers for ASM output
 		for id in self.nodes:
 			Config.validate_id(id, err_prefix="Node")
+			tqdm_check_update()
 		for id in self.regions:
 			Config.validate_id(id, err_prefix="Region")
+			tqdm_check_update()
 
 		# CHECK: Do all nodes referenced in self.edges actually exist in self.nodes?
 		for edge in self.edges:
@@ -470,6 +486,7 @@ class Config:
 			for node in edge:
 				if node not in self.nodes:
 					raise KeyError(f"All nodes referenced in model.edges must exist in model.nodes: Couldn't find node {node} referenced in edge {edge}")
+			tqdm_check_update()
 
 		# CHECK: Are all parameters (i.e. dict keys) supported by the program and
 		# 	in the correct dicts (i.e. edge parameter in node dict)?
@@ -482,6 +499,7 @@ class Config:
 						raise KeyError(f'{k} is a program parameter and unsupported in localNodeParameters[{n}]["{k}"]. Fix: config.programParameters[{n}, {n}]["{k}"] = {v}')
 					else:
 						raise KeyError(f'{k} is an unrecognized parameter and unsupported in localNodeParameters[{n}]["{k}"]. Typo? (Allowable node parameters: {Config.ALLOWED_NODE_PARAMETERS})')
+			tqdm_check_update()
 		for e, p in self.localEdgeParameters.items():
 			n0, n1 = e
 			for k, v in p.items():
@@ -492,6 +510,7 @@ class Config:
 						raise KeyError(f'{k} is a program parameter and unsupported in localEdeParameters[{n0}, {n1}]["{k}"]. Fix: config.programParameters["{k}"] = {v}')
 					else:
 						raise KeyError(f'{k} is an unrecognized parameter and unsupported in localEdgeParameters["{k}"]. Typo? (Allowable edge parameters: {Config.ALLOWED_EDGE_PARAMETERS})')
+			tqdm_check_update()
 		for r, p in self.regionNodeParameters.items():
 			for k, v in p.items():
 				if k not in Config.ALLOWED_NODE_PARAMETERS:
@@ -501,6 +520,7 @@ class Config:
 						raise KeyError(f'{k} is a program parameter and unsupported in regionNodeParameters[{r}]["{k}"]. Fix: config.programParameters[{r}]["{k}"] = {v}')
 					else:
 						raise KeyError(f'{k} is an unrecognized parameter and unsupported in regionNodeParameters[{r}]["{k}"]. Typo? (Allowable node parameters: {Config.ALLOWED_NODE_PARAMETERS})')
+			tqdm_check_update()
 		for r, p in self.regionEdgeParameters.items():
 			for k, v in p.items():
 				if k not in Config.ALLOWED_EDGE_PARAMETERS:
@@ -510,12 +530,14 @@ class Config:
 						raise KeyError(f'{k} is a program parameter and unsupported in regionEdgeParameters[{r}]["{k}"]. Fix: config.programParameters[{r}]["{k}"] = {v}')
 					else:
 						raise KeyError(f'{k} is an unrecognized parameter and unsupported in regionNodeParameters[{r}]["{k}"]. Typo? (Allowable edge parameters: {Config.ALLOWED_EDGE_PARAMETERS})')
+			tqdm_check_update()
 		for k, v in self.globalParameters.items():
 			if k not in Config.ALLOWED_NODE_PARAMETERS | Config.ALLOWED_EDGE_PARAMETERS:
 				if k in Config.ALLOWED_PRGM_PARAMETERS:
 					raise KeyError(f'{k} is a program parameter and unsupported in globalParameters["{k}"]. Fix: config.prograParameters["{k}"] = {v}')
 				else:
 					raise KeyError(f'{k} is an unrecognized parameter and unsupported in globalParameters["{k}"]. Typo? (Allowable node/edge parameters: {Config.ALLOWED_NODE_PARAMETERS | Config.ALLOWED_EDGE_PARAMETERS})')
+			tqdm_check_update()
 		for k, v in self.programParameters.items():
 			if k not in Config.ALLOWED_PRGM_PARAMETERS:
 				if k in Config.ALLOWED_NODE_PARAMETERS:
@@ -524,14 +546,17 @@ class Config:
 					raise KeyError(f'{k} is an edge parameter and unsupported in programParameters["{k}"]. Fix: config.globalParameters["{k}"] = {v}')
 				else:
 					raise KeyError(f'{k} is an unrecognized parameter and unsupported in programParameters["{k}"]. Typo? (Allowable program parameters: {Config.ALLOWED_PRGM_PARAMETERS})')
+			tqdm_check_update()
 		
 		# CHECK: Is PRNG algorithm supported?
 		if prng not in ["xoshiro256**", "xoshiro256++", "xoshiro256+"]:
 			raise ValueError(f"Unsupported psuedo-random number generator algorithm: {prng}. Suggested algorithm model.programParameters[\"prng\"] = \"xoshiro256**\"")
+		tqdm_check_update()
 		if seed is not None:
 			for s in seed:
 				if s < 0 or s >= 2**64:
 					raise ValueError(f"Seed value {s} is out-of-range [0, 2**64)")
+				tqdm_check_update()
 
 		# other (dependant) variables
 		self.localNodeKeys = Config.innerKeys(self.localNodeParameters)    # set[str]
@@ -545,11 +570,13 @@ class Config:
 		self.regionCombos = self.calcAllRegionCombos()  # list[tuple[Region|None, Region|None]]
 		self.nodeIndex = {}  # dict[Node, int]
 		self.edgeIndex = {}  # dict[Edge, int]
+		tqdm_check_update()
 
 		# CHECK: Do all keys in localNodeParameters reference nodes in self.nodes?
 		for node in self.localNodeParameters:
 			if node not in self.nodes:
 				raise KeyError(f"dict key {node} in localNodeParameters is not a defined node in config.nodes")
+			tqdm_check_update()
 
 		# CHECK: Do all keys in localEdgeParameters reference edges in self.edgs?
 		for edge in self.localEdgeParameters:
@@ -559,11 +586,13 @@ class Config:
 				raise KeyError(f"dict key {edge} in localEdgeParameter must reference exactly 2 nodes: len={len(edge)}")
 			if edge not in self.edges:
 				raise KeyError(f"dict key {edge} in localEdgeParameters is not a defined edge in config.edges")
+			tqdm_check_update()
 
 		# CHECK: Do all keys in regionNodeParameters reference regions in self.regions?
 		for region in self.regionNodeParameters:
 			if region not in self.regions:
 				raise KeyError(f"dit key {region} in regionNodeParameters is not a defined region in config.regions")
+			tqdm_check_update()
 
 		# CHECK: Do all edge-regions reference regions that actually exists in self.regions?
 		for combo in self.regionEdgeParameters.keys():
@@ -573,6 +602,14 @@ class Config:
 				raise KeyError(f"dict key {combo} in regionEdgeParameters must reference exactly 2 regions (or None): len={len(combo)}")
 			if combo not in self.regionCombos:
 				raise KeyError(f"dict key {combo} in regionEdgeParameters is not referencing a defined edge-region. Defined edge-regions are: {self.regionCombos}")
+			tqdm_check_update()
+		
+		if tqdm_check is not None:  tqdm_check.close()
+
+		def tqdm_(iterable, desc):
+			if progress_bars:
+				return tqdm(iterable, desc=desc)
+			return iterable
 
 		exports = []  # [(symbol: str, data: bool), ...]
 
@@ -633,7 +670,7 @@ class Config:
 		# define memeory for nodes
 		src += "NODES SEGMENT ALIGN(32)  ; AVX-256 (i.e. 32-byte) alignment\n"
 		src += "nodes\t"
-		for i, node in enumerate([*self.mutableNodes, *self.immutableNodes]):
+		for i, node in tqdm_(enumerate([*self.mutableNodes, *self.immutableNodes]), "[Compiling] Writing ASM .data nodes"):
 			self.nodeIndex[node] = i  # store map: node -> array index
 			if i != 0:  src += "\t\t"  # ASM formating: first struct must be on same line as symbol (i.e. "nodes")
 			params = self.localNodeParameters.get(node, {})  # dict
@@ -694,7 +731,7 @@ class Config:
 			exports.append(("regions", True))
 		else:
 			src += "; regions  ; (0 bytes) none defined\n"
-		for region in self.regions:
+		for region in tqdm_(self.regions, "[Compiling] Writing ASM .data regions"):
 			rid = self.regionId(region)
 			if region not in self.regionNodeParameters:
 				src += f"; {rid}\n"
@@ -778,7 +815,7 @@ class Config:
 			src += "; edges  ; (0 bytes) array of empty edge structs\n"
 		else:
 			src += "edges\t"
-			for i, edge in enumerate(self.edges):
+			for i, edge in tqdm_(enumerate(self.edges), "[Compiling] Writing ASM .data edges"):
 				self.edgeIndex[edge] = i
 				if i != 0:  src += "\t\t"  # ASM formating: first struct must be on same line as symbol (i.e. "edges")
 				src += "dq "
@@ -829,7 +866,7 @@ class Config:
 			exports.append(("edge_regions", True))
 		else:
 			src += "; edge_regions  ; (0 bytes) none defined\n"
-		for r0, r1 in self.regionCombos:
+		for r0, r1 in tqdm_(self.regionCombos, "[Compiling] Writing ASM .data edge_regions"):
 			rid = f"{self.regionId(r0)}_{self.regionId(r1)}"
 			if (r0, r1) not in self.regionEdgeParameters:
 				src += f"; {rid}\n"
@@ -889,7 +926,7 @@ class Config:
 			if len(self.mutableNodes) == 0:
 				src += "; 0 byte array. no mutable nodes.\n"
 			first_line = True
-			for node in self.mutableNodes:
+			for node in tqdm_(self.mutableNodes, f"[Compiling] Writing ASM .data {name}"):
 				idx = self.nodeIndex[node]
 				for k, v in zip(ks, vs):
 					if first_line:
@@ -924,7 +961,7 @@ class Config:
 		src += "deltaU\t"
 		if len(self.mutableNodes) == 0:
 			src += "; 0 byte empty array. no multable nodes.\n"
-		for i, node in enumerate(self.mutableNodes):
+		for i, node in tqdm_(enumerate(self.mutableNodes), "[Compiling] Writing ASM .data deltaU (ptr)"):
 			if i != 0:  # loop index, not node index.
 				src += "\t\t"  # ASM formating: first struct must be on same line as symbol (i.e. "dU")
 			src += f"dq deltaU_{self.nodeId(node)}  ; nodes[{self.nodeIndex[node]}]\n"
@@ -982,7 +1019,7 @@ class Config:
 		if len(self.mutableNodes) == 0:
 			src += "; deltaU_{nodeId} PROCs missing. No mutable nodes!\n\n"
 		else:
-			for node in self.mutableNodes:
+			for node in tqdm_(self.mutableNodes, "[Compiling] Writing ASM .code deltaU (PROC)"):
 				nid = self.nodeId(node)
 				proc_id = f"deltaU_{nid}"
 				index = self.nodeIndex[node]
@@ -1538,6 +1575,10 @@ class Config:
 				src += f"{proc_id} ENDP\n\n"
 				exports.append((proc_id, False))
 		
+		tqdm_proc = tqdm(total=5, desc="[Compiling] Writing ASM .code (other PROC)") if progress_bars else None
+		def tqdm_proc_update(n=1):
+			if progress_bars:  tqdm_proc.update(n)
+
 		# metropolis PROC
 		src += "; Helpers for calculating random unit vectors (Marsaglia's method)\n"
 		src += "_gen_omega MACRO o, one, temp\n"
@@ -1816,6 +1857,7 @@ class Config:
 		src += "\tret\n"
 		src += "metropolis ENDP\n\n"
 		exports.append(("metropolis", False))
+		tqdm_proc_update()
 
 		# seed PROC
 		src += "; Seeds (or reseeds) the PRNG using rdseed if availbe, otherwise rdtscp."
@@ -1844,6 +1886,7 @@ class Config:
 		src += "\tret\n"
 		src += "seed ENDP\n\n"
 		exports.append(("seed", False))
+		tqdm_proc_update()
 
 		# randomize PROC
 		src += "; Randomize the state of all nodes (i.e. kT=\\infty)\n"
@@ -1978,6 +2021,7 @@ class Config:
 		src += "\tret\n"
 		src += "randomize ENDP\n\n"
 		exports.append(("randomize", False))
+		tqdm_proc_update()
 
 		# mutable_state PROC
 		self.SIZEOF_RECORD = 0
@@ -2081,6 +2125,7 @@ class Config:
 		src += "\tret\n"
 		src += "mutable_state ENDP\n\n"
 		exports.append(("mutable_state", False))
+		tqdm_proc_update()
 
 		# DLL main (for (un)initialization) -- bypass CRT
 		src += "; Windows DLL main (for (un)initialization)\n"
@@ -2118,9 +2163,10 @@ class Config:
 		src += "\tmov rax, 1  ; return true\n"
 		src += "\tret\n"
 		src += "DllMain ENDP\n\n"
+		tqdm_proc_update()
 
 		# ---------------------------------------------------------------------
-		for symbol, _ in exports:
+		for symbol, _ in tqdm_(exports, "[Compiling] Writing ASM PUBLIC (exports)"):
 			src += f"PUBLIC {symbol}\n"
 
 		src += "END"  # absolute end of ASM file

@@ -1,21 +1,21 @@
 from __future__ import annotations
-from .simulation_util import *
-from .simulation_util import _cov_list, _var_list
+from ..runtime import scal_in, scal_out, vec_in, vec_out
 from ..util import NODES_, EDGES_, ReadOnlyList, ReadOnlyCollection, OrderedSet, ordered_set, IInt
+from .simulation_util import NumericArrangeable, Vector, Scalar, simvec, simscal, rtvec, rtscal, dot, _cov_list, _var_list, \
+	Node, Edge, Region, ERegion, Parameter, Literal, numpy_vec, numpy_mat, numpy_list, numpy_sq
 from collections.abc import KeysView
 from copy import copy
 from itertools import chain
-from typing import Any, override, TYPE_CHECKING
+from typing import override, TYPE_CHECKING
 import numpy as np
 if TYPE_CHECKING:
 	from .simulation import Simulation, Snapshot
-	from .simulation_util import *
-	from ..config import vec
+	from .data_view_wraper import DataViewWrapper
 	from collections.abc import Callable, Collection, Iterable, Iterator, Sequence
+	from typing import Any, Annotated
+	from numpy.typing import NDArray
 
-type vec = tuple[float, float, float]  # TODO: refactor type system. This is redefiniton from config.py
-
-type Filter = Callable[[Simulation, str, Any], Iterable]  # (Proxy.simulation, Proxy.name, key) -> candidate_elements
+type Filter = Callable[[DataViewWrapper, str, Any], Iterable]  # (Proxy._data, Proxy.name, key) -> candidate_elements
 
 class ProxyKeysView(KeysView):
 	def __repr__(self) -> str:
@@ -45,8 +45,8 @@ class _Proxy_get[E, K, V]:
 		return self._obj[elements]  # treat as singular element as redirect to core self._obj.__getitem__ behaviour
 
 class Proxy[E, K, V]:
-	def __init__(self, simulation: Simulation, sim_name: str, elements: Collection[E], filter: Filter, subscripts: list=[]):
-		self._sim: Simulation = simulation
+	def __init__(self, data: DataViewWrapper, sim_name: str, elements: Collection[E], filter: Filter, subscripts: list=[]):
+		self._data: DataViewWrapper = data
 		self._name = sim_name
 		self._elements: Collection[E] = elements
 		self._filter = filter
@@ -59,7 +59,7 @@ class Proxy[E, K, V]:
 
 	def __getitem__(self, key: K) -> Proxy[E, K, V]:
 		proxy = copy(self)
-		candidate_elements = self._filter(self._sim, self._name, key)
+		candidate_elements = self._filter(self._data, self._name, key)
 		proxy._elements = { x: None for x in candidate_elements if x in self._elements }  # (ordered set) itersection of candidate_elements and self._elements
 		if len(proxy._elements) == 0:
 			raise ValueError(f"{key} is valid by itself, but disjoint with previous subscripts: {self._subscripts}")
@@ -102,36 +102,36 @@ class NumericProxy[E, K, V](Proxy[E, K, V], NumericArrangeable):
 	def __setitem__(self, key: K, value: V) -> None:
 		self[key].value = value
 
-def _node_filter(sim: Simulation, param: str, key: Node|Region) -> Collection[Node]:
-	if key in sim.nodes:    return [key]             # key is interpreted a (local) node
-	if key in sim.regions:  return sim.regions[key]  # key is interpreted as a (node) region
+def _node_filter(data: DataViewWrapper, param: str, key: Node|Region) -> Collection[Node]:
+	if key in data.nodes:    return [key]              # key is interpreted a (local) node
+	if key in data.regions:  return data.regions[key]  # key is interpreted as a (node) region
 	raise KeyError(f"Subscript [{key}] is undefined for parameter {param}: not a node nor region in Config")
 
-def _edge_filter(sim: Simulation, param: str, key: Edge|ERegion) -> Collection[Edge]:
-	if key in sim.edges:     return [key]              # key is interpreted as a (local) edge
-	if key in sim.eregions:  return sim.eregions[key]  # key is interpreted as an edge-region
+def _edge_filter(data: DataViewWrapper, param: str, key: Edge|ERegion) -> Collection[Edge]:
+	if key in data.edges:     return [key]               # key is interpreted as a (local) edge
+	if key in data.eregions:  return data.eregions[key]  # key is interpreted as an edge-region
 	raise KeyError(f"Subscript [{key}] is undefined for parameter {param}: not an edge nor edge-region in Config")
 
 # Allow parameter (and literal) keys, but only stores Node|Edge keys as elements
-def _ntype_filter(sim: Simulation, param: str, key: Node|Edge|Region|ERegion|Parameter|Literal) -> Collection[Node|Edge]:
-	if key == NODES_:       return sim.nodes  # interpreted as the set of all nodes
-	if key == EDGES_:       return sim.edges  # interpreted as the set of all edges
-	if key in sim.nodes:       return [key]      # interpreted as a (local) node
-	if key in sim.edges:       return [key]      # interpreted as a (local) edge
-	if key in sim.regions:     return sim.regions[key]     # interpreted as a (node) region
-	if key in sim.eregions:    return sim.eregions[key]    # interpreted as an edge-region
-	if key in sim.parameters:  return sim.parameters[key]  # interpreted as a (node or edge) parameter
+def _ntype_filter(data: DataViewWrapper, param: str, key: Node|Edge|Region|ERegion|Parameter|Literal) -> Collection[Node|Edge]:
+	if key == NODES_:       return data.nodes  # interpreted as the set of all nodes
+	if key == EDGES_:       return data.edges  # interpreted as the set of all edges
+	if key in data.nodes:       return [key]      # interpreted as a (local) node
+	if key in data.edges:       return [key]      # interpreted as a (local) edge
+	if key in data.regions:     return data.regions[key]     # interpreted as a (node) region
+	if key in data.eregions:    return data.eregions[key]    # interpreted as an edge-region
+	if key in data.parameters:  return data.parameters[key]  # interpreted as a (node or edge) parameter
 	raise KeyError(f"For parameter {param}, undefined subscript: [{key}]")
 
 # Allows parameter (and literal) keys, and stores Node|Edge|Parameter keys are elements
-def _utype_filter(sim: Simulation, param: str, key: Node|Edge|Region|ERegion|Parameter|Literal) -> Iterable[Node|Edge|Parameter]:
-	if key == NODES_:       return chain(sim.nodes, sim.parameters)
-	if key == EDGES_:       return chain(sim.edges, sim.parameters)
-	if key in sim.nodes:       return chain([key], sim.parameters)
-	if key in sim.edges:       return chain([key], sim.parameters)
-	if key in sim.regions:     return chain(sim.regions[key], sim.parameters)
-	if key in sim.eregions:    return chain(sim.eregions[key], sim.parameters)
-	if key in sim.parameters:  return chain(sim.nodes, sim.edges, [key])
+def _utype_filter(data: DataViewWrapper, param: str, key: Node|Edge|Region|ERegion|Parameter|Literal) -> Iterable[Node|Edge|Parameter]:
+	if key == NODES_:       return chain(data.nodes, data.parameters)
+	if key == EDGES_:       return chain(data.edges, data.parameters)
+	if key in data.nodes:       return chain([key], data.parameters)
+	if key in data.edges:       return chain([key], data.parameters)
+	if key in data.regions:     return chain(data.regions[key], data.parameters)
+	if key in data.eregions:    return chain(data.eregions[key], data.parameters)
+	if key in data.parameters:  return chain(data.nodes, data.edges, [key])
 	raise KeyError(f"For parameter {param}, Unrecognized subscript: [{key}]")
 
 def _history_filter(sim: Simulation, param: str, key: int|slice|tuple) -> Iterable[int]:
@@ -142,8 +142,12 @@ def _history_filter(sim: Simulation, param: str, key: int|slice|tuple) -> Iterab
 
 
 class HistoryProxy[H](NumericProxy[int, int|slice|tuple, H]):
-	def __init__(self, simulation: Simulation, sim_name: str, evaluate: Callable[[Snapshot], H]):
-		super().__init__(simulation, sim_name, elements=ordered_set(simulation.history), filter=_history_filter)
+	_data: Simulation
+
+	def __init__(self, data: DataViewWrapper, sim_name: str, evaluate: Callable[[Snapshot], H]):
+		if not isinstance(data, Simulation):
+			raise ValueError(f"History only exists for Simulations: {type(data)}")
+		super().__init__(data, sim_name, elements=ordered_set(data.history), filter=_history_filter)
 		self._evaluate = evaluate
 	
 	@override
@@ -152,7 +156,7 @@ class HistoryProxy[H](NumericProxy[int, int|slice|tuple, H]):
 		if len(self._elements) != 1:
 			raise ValueError(f"History can not be evaluated unless fully specified: len(indices)={len(self._elements)}")
 		t = next(iter(self._elements))  # self._elements may not be any Collection type (e.g. ordered_set)
-		return self._evaluate(self._sim.history[t])
+		return self._evaluate(self._data.history[t])
 
 class Historical[H]:
 	@property
@@ -166,18 +170,18 @@ class HistoricalNumericProxy[E, K, V](NumericProxy[E, K, V], Historical[V]):  pa
 #	"states", e.g. n, s, f, m, u. Instead they access location specific
 #	information, e.g. J["FML"] would get the J value used in region "FML", and
 #	not the sum of J values used across the region.
-class ParameterProxy[E: Node|Edge, K: Node|Edge|Region|ERegion, V: numpy_vec|float, R: vec|float](HistoricalNumericProxy[E, K, V]):
+class ParameterProxy[E: Node|Edge, K: Node|Edge|Region|ERegion, V: numpy_vec|float, R_in: vec_in|scal_in, R_out: vec_out|scal_out](HistoricalNumericProxy[E, K, V]):
 	def __init__(self,
-		simulation: Simulation,
+		data: DataViewWrapper,
 		param: str,
 		elements: Collection[E],
 		filter: Filter,
-		to_sim: Callable[[R], V],      # for getting simulation value from runtime
-		to_rt: Callable[[V], R],       # for updating runtime value from simualtion
+		to_sim: Callable[[R_out], V],     # for getting simulation value from runtime
+		to_rt: Callable[[V], R_in],       # for updating runtime value from simualtion
 		shape: Callable[[int], tuple]  # for values shape (given len(_elements))
 	):
-		super().__init__(simulation, param, elements, filter)
-		self._runtime_proxy = getattr(simulation.rt, param)  # Returned proxy should be const. Get once and store.
+		super().__init__(data, param, elements, filter)
+		self._runtime_proxy = getattr(data.view, param)  # Returned proxy should be const(-esk). Get once and store.
 		self._to_sim = to_sim
 		self._to_rt = to_rt
 		self._shape = shape
@@ -190,14 +194,14 @@ class ParameterProxy[E: Node|Edge, K: Node|Edge|Region|ERegion, V: numpy_vec|flo
 	@property
 	def value(self) -> V:
 		if len(self._subscripts) == 0:
-			value = self._runtime_proxy.value  # global parameter
+			value: R_out = self._runtime_proxy.value  # global parameter
 		else:
-			value = self._runtime_proxy[self._key]
+			value: R_out = self._runtime_proxy[self._key]
 		return self._to_sim(value)
 
 	@value.setter
 	def value(self, value: V) -> None:
-		value = self._to_rt(value)
+		value: R_in = self._to_rt(value)
 		if len(self._subscripts) == 0:
 			self._runtime_proxy.value = value  # global parameter
 		else:
@@ -210,7 +214,7 @@ class ParameterProxy[E: Node|Edge, K: Node|Edge|Region|ERegion, V: numpy_vec|flo
 			out = np.empty(self._shape(len(keys)), dtype=float)
 		_mat = out.ndim > 1  # bool. e.g. parameter D would be shape=(3, M), _mat=True; J would be (M,), False; and B would be (3, N), True
 		for idx, key in enumerate(keys):
-			self._to_sim(self._runtime_proxy[key], out=out[idx] if _mat else out[idx:idx+1])
+			self._to_sim(self._runtime_proxy[key], out=(out[idx] if _mat else out[idx:idx+1]))
 		return out
 	
 	def _get_consistant_value(self, snapshot: Snapshot) -> V:
@@ -222,26 +226,26 @@ class ParameterProxy[E: Node|Edge, K: Node|Edge|Region|ERegion, V: numpy_vec|flo
 			elif result != value:  # for global or region selections, make sure all values are equal
 				raise KeyError(f"Parameter {self._name} is not consistant across selection from subscript [{self._subscripts}]")
 		return result
-
+	
 	@override
 	@property
 	def history(self) -> HistoryProxy[V]:
-		return HistoryProxy(self._sim, self._name, lambda snapshot: self._get_consistant_value(snapshot))
+		return HistoryProxy(self._data, self._name, lambda snapshot: self._get_consistant_value(snapshot))
 
 
-class VectorNodeParameterProxy(ParameterProxy[Node, Node|Region, numpy_vec, vec], Vector):
+class VectorNodeParameterProxy(ParameterProxy[Node, Node|Region, numpy_vec, vec_in, vec_out], Vector):
 	def __init__(self, sim: Simulation, param: str):
 		super().__init__(sim, param, elements=sim.nodes, filter=_node_filter, to_sim=simvec, to_rt=rtvec, shape=lambda n: (n, 3))
 
-class ScalarNodeParameterProxy(ParameterProxy[Node, Node|Region, float, float], Scalar):
+class ScalarNodeParameterProxy(ParameterProxy[Node, Node|Region, float, scal_in, scal_out], Scalar):
 	def __init__(self, sim: Simulation, param: str):
 		super().__init__(sim, param, elements=sim.nodes, filter=_node_filter, to_sim=simscal, to_rt=rtscal, shape=lambda n: (n,))
 
-class VectorEdgeParameterProxy(ParameterProxy[Edge, Edge|ERegion, numpy_vec, vec], Vector):
+class VectorEdgeParameterProxy(ParameterProxy[Edge, Edge|ERegion, numpy_vec, vec_in, vec_out], Vector):
 	def __init__(self, sim: Simulation, param: str):
 		super().__init__(sim, param, elements=sim.edges, filter=_edge_filter, to_sim=simvec, to_rt=rtvec, shape=lambda n: (n, 3))
 
-class ScalarEdgeParameterProxy(ParameterProxy[Edge, Edge|ERegion, float, float], Scalar):
+class ScalarEdgeParameterProxy(ParameterProxy[Edge, Edge|ERegion, float, scal_in, scal_out], Scalar):
 	def __init__(self, sim: Simulation, param: str):
 		super().__init__(sim, param, elements=sim.edges, filter=_edge_filter, to_sim=simscal, to_rt=rtscal, shape=lambda n: (n,))
 
@@ -258,9 +262,9 @@ class SumProxy[E, K, H](HistoricalNumericProxy[E, K, H]):
 
 # For spin and flux
 class StateProxy(SumProxy[Node, Node|Region, numpy_vec], Vector):
-	def __init__(self, sim: Simulation, rt_attr: str, sim_name: str):
-		super().__init__(sim, sim_name, elements=sim.nodes, filter=_node_filter)
-		self._runtime_proxy = getattr(sim.rt, rt_attr)
+	def __init__(self, data: DataViewWrapper, rt_attr: str, sim_name: str):
+		super().__init__(data, sim_name, elements=data.nodes, filter=_node_filter)
+		self._runtime_proxy = getattr(data.view, rt_attr)
 	
 	@override
 	@property
@@ -272,7 +276,7 @@ class StateProxy(SumProxy[Node, Node|Region, numpy_vec], Vector):
 			return simvec(self._runtime_proxy[node])
 	
 	@value.setter
-	def value(self, value: numpy_vec|vec) -> None:
+	def value(self, value: numpy_vec) -> None:
 		if len(self._elements) != 1:
 			raise ValueError(f"Can't directly assign to {self._name} for a non-local selection. (Subscript(s): {self._subscripts}.) Instead, select nodes individually and set them one at a time.")
 		node = [*self._elements][0]
@@ -288,8 +292,8 @@ class StateProxy(SumProxy[Node, Node|Region, numpy_vec], Vector):
 		return out
 
 class MProxy(SumProxy[Node, Node|Region, numpy_vec], Vector):
-	def __init__(self, sim: Simulation, sim_name: str="m"):
-		super().__init__(sim, sim_name, elements=sim.nodes, filter=_node_filter)
+	def __init__(self, data: DataViewWrapper, sim_name: str="m"):
+		super().__init__(data, sim_name, elements=data.nodes, filter=_node_filter)
 
 	@override
 	@property
@@ -297,26 +301,25 @@ class MProxy(SumProxy[Node, Node|Region, numpy_vec], Vector):
 		if len(self._elements) > 1:
 			return np.sum(self.values(), axis=0)  # add all the row (i.e. axis=0) vectors
 		else:
-			runtime = self._sim.rt
+			view = self._data.view
 			node = [*self._elements][0]
-			s = simvec(runtime.spin[node])
-			return np.add(s, simvec(runtime.flux[node]), out=s)
+			return simvec(view.spin[node]) + simvec(view.flux[node])
 	
 	@override
 	def values(self, out: NDArray=None, buf_mat: NDArray=None, s: NDArray=None, f: NDArray=None) -> numpy_mat:
 		nodes = self._elements
 		if out is None:
 			out = np.empty((len(nodes), 3), dtype=float)
-		sim = self._sim
-		if s is None:  s = sim.s.sub(nodes).values(out)
-		if f is None:  f = sim.f.sub(nodes).values(buf_mat)
+		data = self._data
+		if s is None:  s = data.s.sub(nodes).values(out)
+		if f is None:  f = data.f.sub(nodes).values(buf_mat)
 		return np.add(s, f, out=out)
 
 
 # Number of nodes in selection
 class NProxy(HistoricalNumericProxy[Node|Edge, Node|Edge|Region|ERegion, int], IInt):
-	def __init__(self, sim: Simulation, sim_name: str="n"):
-		super().__init__(sim, sim_name, elements=ordered_set(chain(sim.nodes, sim.edges)), filter=_ntype_filter)
+	def __init__(self, data: DataViewWrapper, sim_name: str="n"):
+		super().__init__(data, sim_name, elements=ordered_set(chain(data.nodes, data.edges)), filter=_ntype_filter)
 	
 	@override
 	@property
@@ -337,25 +340,25 @@ class NProxy(HistoricalNumericProxy[Node|Edge, Node|Edge|Region|ERegion, int], I
 	@property
 	def history(self) -> HistoryProxy[int]:
 		# n can't change over time
-		return HistoryProxy(self._sim, self._name, lambda snapshot: self.value)
+		return HistoryProxy(self._data, self._name, lambda snapshot: self.value)
 
 
 class UTypeProxy(NumericProxy[Node|Edge|Parameter, Node|Edge|Region|ERegion|Parameter, float], Scalar):
-	def __init__(self, sim: Simulation, sim_name: str):
-		parameters = sim.parameters - ["S", "F"]  # these parameters don't contribute to energy
-		super().__init__(sim, sim_name, elements=ordered_set(chain(sim.nodes, sim.edges, parameters)), filter=_utype_filter)
+	def __init__(self, data: DataViewWrapper, sim_name: str):
+		parameters = data.parameters - ["S", "F"]  # these parameters don't contribute to energy
+		super().__init__(data, sim_name, elements=ordered_set(chain(data.nodes, data.edges, parameters)), filter=_utype_filter)
 	
 	@property
 	def parameters(self) -> Collection[str]:
-		return self._sim.parameters & self._elements
+		return self._data.parameters & self._elements
 	
 	@property
 	def nodes(self) -> OrderedSet[Node]:
-		return self._elements & self._sim.nodes
+		return self._elements & self._data.nodes
 	
 	@property
 	def edges(self) -> OrderedSet[Edge]:
-		return self._elements & self._sim.edges
+		return self._elements & self._data.edges
 	
 	@override
 	def __iter__(self) -> Iterator[Node|Edge]:
@@ -367,8 +370,8 @@ class UTypeProxy(NumericProxy[Node|Edge|Parameter, Node|Edge|Region|ERegion|Para
 
 # Internal Energy in selection
 class UProxy(UTypeProxy, Historical[float]):
-	def __init__(self, sim: Simulation, sim_name: str="u"):
-		super().__init__(sim, sim_name)
+	def __init__(self, data: DataViewWrapper, sim_name: str="u"):
+		super().__init__(data, sim_name)
 	
 	@override
 	def __iter__(self) -> Iterator[Node|Edge]:
@@ -390,7 +393,7 @@ class UProxy(UTypeProxy, Historical[float]):
 		B: numpy_mat=None, A: numpy_mat=None, Je0: numpy_list=None,  # pre-calculated node parameter
 		J: numpy_list=None, Je1: numpy_list=None, Jee: numpy_list=None, b: numpy_list=None, D: numpy_mat=None  # pre-calculated edge parameters
 	) -> numpy_list:
-		sim = self._sim
+		data = self._data
 		parameters = self.parameters
 		nodes = self.nodes
 		edges = self.edges
@@ -412,19 +415,19 @@ class UProxy(UTypeProxy, Historical[float]):
 			buf_mat2 = m if m is None else np.empty((N, 3), dtype=float) if buf_mat_node2 is None else buf_mat_node2
 
 			if "B" in parameters:
-				if m is None:  m = sim.m.sub(nodes).values(None)  # (new buffer)
-				if B is None:  B = sim.B.sub(nodes).values(buf_mat)
+				if m is None:  m = data.m.sub(nodes).values(None)  # (new buffer)
+				if B is None:  B = data.B.sub(nodes).values(buf_mat)
 				out[0:N] -= dot(B, m, temp=buf_mat)
 			
 			if "A" in parameters:
-				if m is None:  m = sim.m.sub(nodes).values(None)  # (new buffer)
-				if A is None:  A = sim.A.sub(nodes).values(buf_mat)
+				if m is None:  m = data.m.sub(nodes).values(None)  # (new buffer)
+				if A is None:  A = data.A.sub(nodes).values(buf_mat)
 				np.multiply(m, m, out=buf_mat2)  # Hadamard product: [[mx * mx, my * my, mz * mz], ...]
 				out[0:N] -= dot(A, m, temp=buf_mat)
 			
 			if "Je0" in parameters:
-				if s is None:  s = sim.s.sub(nodes).values(buf_mat)   # (!) don't need m anymore
-				if f is None:  f = sim.f.sub(nodes).values(buf_mat2)  # (!) don't need f after this
+				if s is None:  s = data.s.sub(nodes).values(buf_mat)   # (!) don't need m anymore
+				if f is None:  f = data.f.sub(nodes).values(buf_mat2)  # (!) don't need f after this
 				if Je0 is None:  Je0 = sim.Je0.sub(nodes).values(buf_list)
 				out[0:N] -= np.multiply(Je0, dot(s, f, temp=buf_mat), out=buf_list)
 		
@@ -439,37 +442,37 @@ class UProxy(UTypeProxy, Historical[float]):
 			buf_list = np.empty((M,), dtype=float) if buf_list_edge is None else buf_list_edge
 
 			if "J" in parameters:
-				s_i = sim.s.get(i for i, _ in edges).values(buf_s_i)  # new buffer?
-				s_j = sim.s.get(j for _, j in edges).values(buf_s_j)  # new buffer?
-				if J is None:  J = sim.J.sub(edges).values(buf_list)
+				s_i = data.s.get(i for i, _ in edges).values(buf_s_i)  # new buffer?
+				s_j = data.s.get(j for _, j in edges).values(buf_s_j)  # new buffer?
+				if J is None:  J = data.J.sub(edges).values(buf_list)
 				out[N:L] -= np.multiply(J, dot(s_i, s_j, temp=buf_mat), out=buf_list)
 
 			if "Je1" in parameters:
-				if s_i is None:  s_i = sim.s.get(i for i, _ in edges).values(buf_s_i)  # new buffer?
-				if s_j is None:  s_j = sim.s.get(j for _, j in edges).values(buf_s_j)  # new buffer?
-				f_i = sim.f.get(i for i, _ in edges).values(buf_f_i)  # new buffer?
-				f_j = sim.f.get(j for _, j in edges).values(buf_f_j)  # new buffer?
+				if s_i is None:  s_i = data.s.get(i for i, _ in edges).values(buf_s_i)  # new buffer?
+				if s_j is None:  s_j = data.s.get(j for _, j in edges).values(buf_s_j)  # new buffer?
+				f_i = data.f.get(i for i, _ in edges).values(buf_f_i)  # new buffer?
+				f_j = data.f.get(j for _, j in edges).values(buf_f_j)  # new buffer?
 				if Je1 is None:  Je1 = sim.Je1.sub(edges).values(buf_list)
 				dotp1 = dot(s_i, f_j, temp=buf_mat)
 				dotp2 = dot(f_i, s_j, temp=buf_mat)
 				out[N:L] -= np.multiply(Je1, np.add(dotp1, dotp2), out=buf_list)
 
 			if "Jee" in parameters:
-				if f_i is None:  f_i = sim.f.get(i for i, _ in edges).values(buf_f_i)  # new buffer?
-				if f_j is None:  f_j = sim.f.get(j for _, j in edges).values(buf_f_j)  # new buffer?
-				if Jee is None:  Jee = sim.Jee.sub(edges).values(buf_list)
+				if f_i is None:  f_i = data.f.get(i for i, _ in edges).values(buf_f_i)  # new buffer?
+				if f_j is None:  f_j = data.f.get(j for _, j in edges).values(buf_f_j)  # new buffer?
+				if Jee is None:  Jee = data.Jee.sub(edges).values(buf_list)
 				out[N:L] -= np.multiply(Jee, dot(f_i, f_j, temp=buf_mat), out=buf_list)
 
 			if "b" in parameters:
-				m_i = sim.m.get(i for i, _ in edges).values(buf_m_i)  # new buffer?
-				m_j = sim.m.get(j for _, j in edges).values(buf_m_j)  # new buffer?
-				if b is None:  b = sim.b.sub(edges).values(buf_list)
+				m_i = data.m.get(i for i, _ in edges).values(buf_m_i)  # new buffer?
+				m_j = data.m.get(j for _, j in edges).values(buf_m_j)  # new buffer?
+				if b is None:  b = data.b.sub(edges).values(buf_list)
 				out[N:L] -= np.multiply(b, dot(m_i, m_j, temp=buf_mat)**2, out=buf_list)
 
 			if "D" in parameters:
-				if m_i is None:  m_i = sim.m.get(i for i, _ in edges).values(buf_m_i)  # new buffer?
-				if m_j is None:  m_j = sim.m.get(j for _, j in edges).values(buf_m_j)  # new buffer?
-				if D is None:    D = sim.D.sub(edges).values(buf_mat)
+				if m_i is None:  m_i = data.m.get(i for i, _ in edges).values(buf_m_i)  # new buffer?
+				if m_j is None:  m_j = data.m.get(j for _, j in edges).values(buf_m_j)  # new buffer?
+				if D is None:    D = data.D.sub(edges).values(buf_mat)
 				out[N:L] -= dot(D, np.cross(m_i, m_j), temp=buf_mat)
 
 		return out
@@ -477,10 +480,16 @@ class UProxy(UTypeProxy, Historical[float]):
 	@override
 	@property
 	def history(self) -> HistoryProxy[float]:
-		return HistoryProxy(self._sim, self._name, lambda snapshot: float(_sum(self, snapshot)))  # float(...) converts numpy float to python float
+		return HistoryProxy(self._data, self._name, lambda snapshot: float(_sum(self, snapshot)))  # float(...) converts numpy float to python float
 
+# TODO: revisit these! I don't know if they are correct.
 class CProxy(UTypeProxy):
+	""" Specific heat """
+
+	_data: Simulation
+
 	def __init__(self, sim: Simulation, sim_name="c"):
+		assert isinstance(sim, Simulation)
 		super().__init__(sim, sim_name)
 	
 	@override
@@ -490,29 +499,35 @@ class CProxy(UTypeProxy):
 	@override
 	@property
 	def value(self) -> float:
-		sim = self._sim
+		sim = self._data
 		nodes = self.nodes
-		u = sim.u.sub(self._elements).history.array()
+		u = sim.u.sub(self._elements).history.values(None)
 		kT = sim.kT.sub(nodes).value
 		n = len(nodes)
-		return _var_list(u) / (kT * n)
-
+		return _var_list(u, temp=u) / (kT * n)
+	
 	@override
 	@property
 	def values(self) -> numpy_list:
-		sim = self._sim
+		sim = self._data
 		parameters = self.parameters
 		nodes = self.nodes
 		edges = self.edges
 		C = np.empty((len(nodes),), dtype=float)
 		for idx, node in nodes:
-			u = sim.u.sub([node, *parameters]).history.array()
-			u += 0.5 * sim.u.get(chain((e for e in edges if node in e), parameters)).history.array()
+			u = sim.u.sub([node, *parameters]).history.values(None)
+			u += 0.5 * sim.u.get(chain((e for e in edges if node in e), parameters)).history.values()
 			C[idx] = _var_list(u, temp=u)
 		return C
 
-class ChiProxy(NumericProxy[Node, Node|Region, numpy_sq], Array):
+# TODO: revisit these! I don't know if they are correct.
+class ChiProxy(NumericProxy[Node, Node|Region, numpy_sq]):
+	""" Magnetic susceptibility """
+
+	_data: Simulation
+
 	def __init__(self, sim: Simulation, sim_name="x"):
+		assert isinstance(sim, Simulation)
 		super().__init__(sim, sim_name, elements=sim.nodes, filter=_node_filter)
 
 	def _calc(self, m_history: numpy_mat, out: NDArray) -> None:
@@ -523,9 +538,9 @@ class ChiProxy(NumericProxy[Node, Node|Region, numpy_sq], Array):
 	@override
 	@property
 	def value(self) -> numpy_sq:
-		sim = self._sim
+		sim = self._data
 		nodes = self._elements
-		m = sim.m.sub(nodes).history.array()
+		m = sim.m.sub(nodes).history.values(None)
 		kT = sim.kT.sub(nodes).value
 		n = len(nodes)
 		x = np.empty((3, 3), dtype=float)  # tenser (3 by 3 alpha-beta matrix)

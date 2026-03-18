@@ -12,9 +12,12 @@ import numpy as np
 if TYPE_CHECKING:
 	from pathlib import Path
 
-def csv(sim: Simulation, out: str=None, dir: Path|str=".", prefix: str=None, params: Mapping[str, Any]=None, progress_bar: str=None) -> str:
+def csv(sim: Simulation, out: str=None, dir: Path|str=".", prefix: str=None, params: Mapping[str, Any]=None, progress_bar: bool|str=None) -> str:
 	# header: 1 row
-	if progress_bar is not None:  progress_bar = tqdm(total=1 + max(len(sim.nodes), len(sim.history)), desc=progress_bar)
+	if progress_bar is not None and progress_bar is not False:
+		if progress_bar is True:  progress_bar = "Writing CSV"
+		progress_bar = tqdm(total=1 + max(len(sim.nodes), len(sim.history)), desc=progress_bar)
+	
 	if out is None:
 		out = unique_path(dir, prefix, suffix=".csv")
 	file = open(out, "w", encoding="utf-8")

@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
 	from ..config import Config, vec
 	from ..driver import Driver
+	from .runtime_proxies import NodeProxy
 	from collections.abc import Sequence, Collection
 
 
@@ -21,13 +22,14 @@ class Runtime(DataView[Driver]):
 	VEC_K    = (0.0, 0.0, 1.0)
 	
 	def __init__(self, config: Config, dll: str, delete: bool=False):
-		self.driver: Driver = Driver(config, dll)
-		super().__init__(config, self.driver)
-
+		super().__init__(config, source=Driver(config, dll))
+		self.driver: Driver = self.source
 		self.dll: str = dll
 		self._delete: bool = delete  # delete on exit?
+
+		self.buffers: list[MutableStateBuffer] = []  # track allocated buffers so they can be freed on shutdownvvvvvv
 		
-		self._mutable_state_buffer_size = \
+		self._buffer_size: int = \
 			config.SIZEOF_NODE * config.MUTABLE_NODE_COUNT + \
 			config.SIZEOF_REGION * config.REGION_COUNT + \
 			sizeof(GlobalNode(config)) + \
@@ -92,7 +94,13 @@ class Runtime(DataView[Driver]):
 		return prng_state
 
 	def shutdown(self):
+		# free all allocated buffers (if any)
+		for buffer in reversed(self.buffers):
+			buffer.free()
+		self.buffers = []
+		# unload DLL
 		self.driver.unload()
+		# delete .dll file (unless requested otherwise)
 		if self._delete:
 			os.remove(self.dll)
 
@@ -116,6 +124,7 @@ class Runtime(DataView[Driver]):
 			self._setXoshiro256State(Runtime._generateXoshiro256State(seed))
 
 	def reinitialize(self, initSpin: vec=VEC_J, initFlux: vec=VEC_ZERO):
+		node_proxy: NodeProxy
 		for node_proxy in self.node.values():
 			node_proxy.spin = initSpin
 			node_proxy.flux = initFlux
@@ -137,19 +146,26 @@ class Runtime(DataView[Driver]):
 	def allocate_buffer(self) -> MutableStateBuffer:
 		"""
 		Allocates a buffer large enough to store the full mutable state of the model.
-		Caller responsibility: Buffer must be manually freed! (see: Buffer.free())
+		Caller responsibility: Buffer should be manually freed when memory is no longer need (see: Buffer.free())
+		All allocated buffers will be freed when this Runntime is shutdown.
 		"""
-		size = self._mutable_state_buffer_size
+		size = self._buffer_size
 		ptr = libc.malloc(size)
-		return MutableStateBuffer(self.config, ptr, size)
+		buffer = MutableStateBuffer(self.config, ptr, size)
+		self.buffers.append(buffer)
+		return buffer
 	
-	def record(self, buffer: MutableStateBuffer) -> DataView[MutableStateBuffer]:
+	def snapshot(self, buffer: MutableStateBuffer) -> DataView[MutableStateBuffer]:
 		"""
 		Copies the current mutable state into the given buffer, and
 		returns a DataView object which gives access to the data consistant with the Runtime interface.
 		"""
 		self.driver.mutable_state(buffer.ptr)
 		return DataView[MutableStateBuffer](self.config, buffer)
+
+	@property
+	def buffer_size(self) -> int:
+		return self._buffer_size
 
 	@property
 	def prng_state(self) -> list[list[int]]:

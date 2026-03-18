@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
 	from ..runtime import scal_out, vec_out
 
-test_sizes = [0, 1, 2, 3, 10, 100, 1000, 10000]  # TODO: 1000000. Takes too long to compile! Why?
+test_sizes = [0, 1, 2, 3, 10, 100, 1000, 10000, 20000]  # TODO: 1000000. Takes too long to compile! Why?
 
 test_globalParameters = {
 	"No spin-flux": {
@@ -48,7 +48,7 @@ for g_lbl, g in test_globalParameters.items():
 			except:             assert False
 			continue  # skip the rest of the check since compilation is expected to fail in this case
 		print("Compiling...")
-		with config.compile() as rt:
+		with config.compile(progress_bars=True) as rt:
 			print("Testing...")
 			assert config.NODE_COUNT == n
 			assert config.MUTABLE_NODE_COUNT == n
@@ -74,7 +74,7 @@ for g_lbl, g in test_globalParameters.items():
 			rt.randomize()
 			rt.metropolis(simCount)
 			buf = rt.allocate_buffer()
-			data = rt.record(buf)
+			data = rt.snapshot(buf)
 
 		assert len(data.source.nodes) == n
 		assert len(data.source.edges) == n - 1
@@ -83,7 +83,6 @@ for g_lbl, g in test_globalParameters.items():
 		epsilon = 1e-14
 		for p in SCALAR_PARAMETERS:
 			if p not in g:  continue
-			print(data.source.__dict__)  # DEBUG
 			v: scal_out = getattr(data.source, p)
 			assert type(v) is c_double
 			assert abs(v.value - g[p]) < epsilon
@@ -93,7 +92,6 @@ for g_lbl, g in test_globalParameters.items():
 		for p in VECTOR_PARAMETERS:
 			if p not in g:  continue
 			v: vec_out = getattr(data.source, p)
-			print(p, v, type(v))  # DEBUG
 			assert type(v) is c_double_3
 			for i in range(3):
 				assert abs(v[i] - g[p][i]) < epsilon

@@ -13,15 +13,15 @@ SCALAR_PARAMETER_SET = set(SCALAR_PARAMETERS)
 VECTOR_PARAMETER_SET = set(VECTOR_PARAMETERS)
 
 class Buffer:
-	def __init__(self, ptr: int, capacity: int):
+	def __init__(self, ptr: int, capacity: int, live: bool=True):
 		self.ptr = ptr
 		self.capacity = capacity
+		self.live = live
 	
 	def free(self) -> None:
-		libc.free(self.ptr)
-
-	def __len__(self) -> int:
-		return self.size
+		if self.live:
+			libc.free(self.ptr)
+			self.live = False  # avoid duplicate frees on same memory
 
 # Same iterface as Driver: i.e., symbols for each DLL global (e.g. nodes, edges, {rid}, {erid}, and {global_key})
 class MutableStateBuffer(Buffer):
@@ -78,6 +78,9 @@ class MutableStateBuffer(Buffer):
 					assert p in SCALAR_PARAMETER_SET  # DEBUG
 					c_type = c_double
 				setattr(self, p, c_type.from_buffer(self._global_edge, getattr(struct_global_edge, p).offset))
+
+	def __len__(self) -> int:
+		return self.size
 
 	@property
 	def nodes(self) -> Array[Structure]:
