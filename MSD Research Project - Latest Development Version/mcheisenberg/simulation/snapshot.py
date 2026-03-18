@@ -8,9 +8,9 @@ if TYPE_CHECKING:
 
 # The full state of the Simulation at some simulation time, t.
 class Snapshot(DataViewWrapper[MutableStateBuffer]):
-	def __init__(self, data: DataView, t: int):
-		assert isinstance(data.view, MutableStateBuffer)
-		super().__init__(data)
+	def __init__(self, view: DataView, t: int):
+		assert isinstance(view.source, MutableStateBuffer)
+		super().__init__(view)
 		self.t = t
 	
 	def free(self) -> None:

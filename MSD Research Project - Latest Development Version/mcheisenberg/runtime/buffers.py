@@ -55,13 +55,12 @@ class MutableStateBuffer(Buffer):
 			raise ValueError(f"Buffer wasn't big enough: capacity={capacity} size={self.size}")
 
 		id = config.regionId  # function
-		for idx, r in enumerate(r for t in config.regions if r in config.regionNodeParameters):
+		for idx, r in enumerate(r for r in config.regions if r in config.regionNodeParameters):
 			rid = id(r)
 			setattr(self, rid, self._regions[idx])
 		for idx, (r0, r1) in enumerate(e for e in config.regionCombos if e in config.regionEdgeParameters):
 			erid = f"{id(r0)}_{id(r1)}"
 			setattr(self, erid, self._edge_regions[idx])
-		print("globalKeys:", config.globalKeys)  # DEBUG
 		for p in config.globalKeys:
 			if p in NODE_PARAMETER_SET:
 				if p in VECTOR_PARAMETER_SET:

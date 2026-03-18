@@ -20,7 +20,7 @@ type scal_in = float|c_double  # something assignable to a c_double.value
 #	getters will pass through this information, but setters will raise KeyError.
 class NodeProxy:
 	__slots__ = [ "spin", "flux", "B", "A", "S", "F", "kT", "Je0",
-	              "_runtime", "_node", "_index" ]
+	              "_data", "_node", "_index" ]
 
 	def __init__(self, data: DataView, node):
 		self._data = data
@@ -30,13 +30,13 @@ class NodeProxy:
 	def _getScalar(self, param: str) -> scal_out:
 		data = self._data
 		index = data.config.nodeIndex[self._node]
-		return getattr(data.source.nodes[index], param)
+		return getattr(data.source.nodes[index], param, None)
 	
 	# get vector only from NODES; or None.
 	def _getVector(self, param: str) -> vec_out:
 		data = self._data
 		index = data.config.nodeIndex[self._node]
-		return getattr(data.source.nodes[index], param)
+		return getattr(data.source.nodes[index], param, None)
 	
 	# get scalar from either NODES, REGIONS, or GLOBAL_NODE; or None.
 	def _fgetScalar(self, param: str) -> scal_out:
@@ -123,7 +123,7 @@ for param in ["S", "F", "kT", "Je0"]:
 # Similar to NodeProxy, but for edge parameters.
 class EdgeProxy:
 	__slots__ = [ "J", "Je1", "Jee", "b", "D",
-	              "_runtime", "_edge", "_index" ]
+	              "_data", "_edge", "_index" ]
 
 	def __init__(self, data: DataView, edge):
 		self._data = data
@@ -195,7 +195,7 @@ for param in ["D"]:
 # Similar to NodeProxy/EdgeProxy but for region (node) parameters
 class RegionProxy:
 	__slots__ = [ "B", "A", "S", "F", "kT", "Je0",
-	              "_runtime", "_region", "_rid" ]
+	              "_data", "_region", "_rid" ]
 
 	def __init__(self, data: DataView, region):
 		self._data = data
@@ -257,7 +257,7 @@ for param in ["S", "F", "kT", "Je0"]:
 # Similar to RegionProxy but for region edge parameters
 class ERegionProxy:
 	__slots__ = [ "J", "Je1", "Jee", "b", "D",
-	              "_runtime", "_eregion", "_erid" ]
+	              "_data", "_eregion", "_erid" ]
 
 	def __init__(self, data: DataView, eregion: tuple):
 		self._data = data
@@ -503,5 +503,3 @@ class ScalarParameterProxy(ParameterProxy, Numeric):
 class VectorParameterProxy(ParameterProxy, Numeric):
 	def __iter__(self) -> vec_out:  return self.value
 	def __len__(self) -> int:  return len(self.value)
-	def __getitem__(self, i: int) -> float:  return self.value[i]
-	def __setitem__(self, i: int, value: float):  self.value[i] = value

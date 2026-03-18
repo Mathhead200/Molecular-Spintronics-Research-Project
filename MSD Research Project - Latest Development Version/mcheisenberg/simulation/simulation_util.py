@@ -35,7 +35,7 @@ def simvec(v: vec_out|None, out: NDArray=None) -> numpy_vec:
 	else:          res = np.ctypeslib.as_array(v)
 
 	if out is not None:
-		out[0:len(v)] = res
+		out[0:3] = res
 	return res
 
 def rtvec(v: numpy_vec|None) -> vec_in:

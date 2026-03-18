@@ -145,7 +145,7 @@ class HistoryProxy[H](NumericProxy[int, int|slice|tuple, H]):
 	_data: Simulation
 
 	def __init__(self, data: DataViewWrapper, sim_name: str, evaluate: Callable[[Snapshot], H]):
-		if not isinstance(data, Simulation):
+		if not hasattr(data, "history"):  # if not isinstance(data, Simulation):
 			raise ValueError(f"History only exists for Simulations: {type(data)}")
 		super().__init__(data, sim_name, elements=ordered_set(data.history), filter=_history_filter)
 		self._evaluate = evaluate
@@ -252,13 +252,13 @@ class ScalarEdgeParameterProxy(ParameterProxy[Edge, Edge|ERegion, float, scal_in
 
 def _sum(proxy: Proxy, snapshot: Snapshot):
 		# sum of values from dict: _elements (e.g. nodes) -> values
-		return np.sum(np.array([value for key, value in getattr(snapshot, proxy._name).items() if key in proxy]), axis=0)
+		return np.sum(getattr(snapshot, proxy._name).values(None), axis=0)
 
 class SumProxy[E, K, H](HistoricalNumericProxy[E, K, H]):
 	@override
 	@property
 	def history(self) -> HistoryProxy[numpy_vec]:
-		return HistoryProxy(self._sim, self._name, lambda snapshot: _sum(self, snapshot))
+		return HistoryProxy(self._data, self._name, lambda snapshot: _sum(self, snapshot))
 
 # For spin and flux
 class StateProxy(SumProxy[Node, Node|Region, numpy_vec], Vector):
@@ -489,7 +489,7 @@ class CProxy(UTypeProxy):
 	_data: Simulation
 
 	def __init__(self, sim: Simulation, sim_name="c"):
-		assert isinstance(sim, Simulation)
+		assert hasattr(sim, "history")  # assert isinstance(sim, Simulation)
 		super().__init__(sim, sim_name)
 	
 	@override
@@ -527,7 +527,7 @@ class ChiProxy(NumericProxy[Node, Node|Region, numpy_sq]):
 	_data: Simulation
 
 	def __init__(self, sim: Simulation, sim_name="x"):
-		assert isinstance(sim, Simulation)
+		assert hasattr(sim, "history")  # assert isinstance(sim, Simulation)
 		super().__init__(sim, sim_name, elements=sim.nodes, filter=_node_filter)
 
 	def _calc(self, m_history: numpy_mat, out: NDArray) -> None:

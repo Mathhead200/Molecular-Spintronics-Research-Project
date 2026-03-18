@@ -143,16 +143,17 @@ class Runtime(DataView[Driver]):
 		""" Run the metropolis algorithm for the given number of iterations. """
 		self.driver.metropolis(iterations)
 	
-	def allocate_buffer(self) -> MutableStateBuffer:
+	def allocate_buffer(self, attach=True) -> MutableStateBuffer:
 		"""
 		Allocates a buffer large enough to store the full mutable state of the model.
 		Caller responsibility: Buffer should be manually freed when memory is no longer need (see: Buffer.free())
-		All allocated buffers will be freed when this Runntime is shutdown.
+		All attached buffers will be freed when this Runntime is shutdown. To avoid this, set attach=False.
 		"""
 		size = self._buffer_size
 		ptr = libc.malloc(size)
 		buffer = MutableStateBuffer(self.config, ptr, size)
-		self.buffers.append(buffer)
+		if attach:
+			self.buffers.append(buffer)
 		return buffer
 	
 	def snapshot(self, buffer: MutableStateBuffer) -> DataView[MutableStateBuffer]:

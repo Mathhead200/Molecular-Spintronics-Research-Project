@@ -73,7 +73,7 @@ for g_lbl, g in test_globalParameters.items():
 			print(" -- metropolis:", simCount)
 			rt.randomize()
 			rt.metropolis(simCount)
-			buf = rt.allocate_buffer()
+			buf = rt.allocate_buffer(attach=False)  # attach=False allows the runtime to shutdown without losing the data
 			data = rt.snapshot(buf)
 
 		assert len(data.source.nodes) == n

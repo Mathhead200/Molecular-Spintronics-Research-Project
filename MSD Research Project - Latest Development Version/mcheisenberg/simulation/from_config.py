@@ -30,7 +30,7 @@ class ConfigData:
 		}
 		self.eregions = ReadOnlyDict({
 			eregion: ReadOnlyOrderedSet(ordered_set(redges))
-			for eregion, redges in self._eregions.items()
+			for eregion, redges in self.eregions.items()
 			if len(redges) != 0
 		})
 		# set of defined parameters, preserving order defined in Config:
