@@ -1,11 +1,13 @@
-from . import csv
+from __future__ import annotations
+from . import CSV
 from ..build import VisualStudio
 from ..config import Config
 from ..model import MSD, __FML__, __FMR__, __mol__
 from ..runtime import Runtime
-from ..simulation import Simulation
+from ..simulation import Simulation, Snapshot
 from ..util import report_date, TypeCheckedAny as Any, TypeCheckedSequence as Sequence, TypeCheckedTuple as TTuple
 from collections import defaultdict
+from typing import Callable
 
 real = int|float
 vec = TTuple[real, real, real]  # class
@@ -197,21 +199,24 @@ class IterateParameters:
 	def compile(self, tool=DEFAULT_TOOL, asm: str=None, def_: str=None, obj: str=None, dll: str=None, dir: str=None, copy_config: bool=True) -> Runtime:
 		return self.config().compile(tool, asm, def_, obj, dll, dir, copy_config)
 
-	def sim(self, tool=DEFAULT_TOOL, asm: str=None, def_: str=None, obj: str=None, dll: str=None, dir: str=None, copy_config: bool=True, progress_bar: str=None) -> Simulation:
+	def sim(self, tool=DEFAULT_TOOL, asm: str=None, def_: str=None, obj: str=None, dll: str=None, dir: str=None, copy_config: bool=True, callback: Callable[[Snapshot], None]=None, progress_bar: str|bool=None) -> Simulation:
 		rt = self.compile(tool, asm, def_, obj, dll, dir, copy_config)
 		sim = Simulation(rt)
 		if self.randomize:
 			sim.randomize()
-		sim.metropolis(self.simCount, self.freq, progress_bar=progress_bar)
+		sim.metropolis(self.simCount, self.freq, callback=callback, progress_bar=progress_bar)
 		return sim
 
-	def run(self, tool=DEFAULT_TOOL, asm: str=None, def_: str=None, obj: str=None, dll: str=None, temp_dir: str=None, copy_config: bool=True, out: str=None, out_dir: str=None, prefix: str=None, sim_progress_bar: str=None, out_progress_bar: str=None) -> str:
+	def run(self, tool=DEFAULT_TOOL, asm: str=None, def_: str=None, obj: str=None, dll: str=None, temp_dir: str=None, copy_config: bool=True, out: str=None, out_dir: str=None, prefix: str=None, sim_progress_bar: str|bool=None, out_progress_bar: str|bool=None) -> str:
 		if prefix is None:
 			prefix = f"iteration, {report_date()}"
-		sim = None
-		try:
-			sim = self.sim(tool, asm, def_, obj, dll, temp_dir, copy_config, sim_progress_bar)
-			return csv(sim, dir=out_dir, out=out, prefix=prefix, params={ p: getattr(self, p) for p in IterateParameters._fields }, progress_bar=out_progress_bar)
-		finally:
-			if sim is not None:
-				sim.rt.shutdown()
+		with self.compile(tool, asm, def_, obj, dll, temp_dir, copy_config) as rt:
+			sim = Simulation(rt)
+			csv = CSV(sim, data_count=(self.simCount // self.freq) + 1)
+			with csv.open(out, out_dir, prefix, out_progress_bar):
+				csv.write_header(params={ p: getattr(self, p) for p in IterateParameters._fields })
+				if self.randomize:  sim.randomize()
+				def callback(snapshot):  csv.add_data(snapshot)
+				sim.metropolis(self.simCount, self.freq, callback, reuse_buffer=True, progress_bar=sim_progress_bar)
+				csv.write_data()
+				return csv.file.name

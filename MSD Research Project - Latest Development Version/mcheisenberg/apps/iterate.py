@@ -31,7 +31,7 @@ def main(argv=sys.argv):
 	if args.asm is True:
 		args.asm = "iterate.asm" if args.temp_dir is None else str(Path(args.temp_dir) / "iterate.asm")
 	tool = DEFAULT_TOOL if args.year is None else VisualStudio(year=args.year, edition=args.edition)
-	output_filename = p.run(tool=tool, out_dir=args.out_dir, temp_dir=args.temp_dir, asm=args.asm, sim_progress_bar="iterate", out_progress_bar="Writing CSV")
+	output_filename = p.run(tool=tool, out_dir=args.out_dir, temp_dir=args.temp_dir, asm=args.asm, sim_progress_bar="iterate", out_progress_bar=True)
 
 	print(f"({report_datetime()}) Done: {output_filename}")
 

@@ -7,6 +7,7 @@ from .data_view_wraper import DataViewWrapper
 from typing import TYPE_CHECKING
 from tqdm import tqdm
 if TYPE_CHECKING:
+	from ..runtime import MutableStateBuffer
 	from .simulation_util import numpy_vec
 	from typing import Callable
 
@@ -37,7 +38,7 @@ class Simulation(DataViewWrapper):
 		self.rt.randomize(*seed)
 		if clear_history:  self.clear_history()
 
-	def metropolis(self, iterations: int, freq: int=0, callback: Callable[[Snapshot], None]=None, bookend: bool=True, progress_bar: bool|str=None) -> None:
+	def metropolis(self, iterations: int, freq: int=0, callback: Callable[[Snapshot], None]=None, bookend: bool=True, reuse_buffer: MutableStateBuffer|bool=False, progress_bar: bool|str=None) -> None:
 		"""
 		Run the metropolis algorithm on this model for the given number of iterations.
 		May specify a recording/sampling period (freq), i.e. record a snapshot every freq iterations.
@@ -47,6 +48,9 @@ class Simulation(DataViewWrapper):
 				The algorithm will still run for 100 iterations.
 			sim.metropolis(100, freq=11, bookend=True) will generate 11 snapshots at times, t=0, 11, 22, ..., 99, 100.
 		"""
+		if not reuse_buffer:        reuse_buffer = None                       # new buffer each time
+		elif reuse_buffer is True:  reuse_buffer = self.rt.allocate_buffer()  # allocate a single buffer to reuse for each
+
 		if progress_bar is not None and progress_bar is not False:
 			if progress_bar is True:  progress_bar = "Metropolis"
 			progress_bar = tqdm(total=iterations, desc=progress_bar)
@@ -59,11 +63,11 @@ class Simulation(DataViewWrapper):
 		else:
 			if callback is None:  callback = self.record  # default action is to record in Simulation.history
 			
-			callback(self.snapshot())
+			callback(self.snapshot(reuse_buffer))
 			while iterations > freq:
 				self.rt.metropolis(freq)
 				self.t += freq
-				callback(self.snapshot())
+				callback(self.snapshot(reuse_buffer))
 				iterations -= freq
 				if progress_bar is not None:  progress_bar.update(freq)
 			if iterations != 0:
@@ -71,12 +75,13 @@ class Simulation(DataViewWrapper):
 				self.t += iterations
 				if progress_bar is not None:  progress_bar.update(iterations)
 			if bookend:
-				callback(self.snapshot())
+				callback(self.snapshot(reuse_buffer))
 		if progress_bar is not None:  progress_bar.close()
 	
-	def snapshot(self) -> Snapshot:
-		buf = self.rt.allocate_buffer()
-		data = self.rt.snapshot(buf)
+	def snapshot(self, buffer=None) -> Snapshot:
+		if buffer is None:
+			buffer = self.rt.allocate_buffer()
+		data = self.rt.snapshot(buffer)
 		return Snapshot(data, self.t)
 
 	def record(self, snapshot: Snapshot) -> None:
