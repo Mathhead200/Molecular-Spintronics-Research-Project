@@ -229,6 +229,8 @@ Second bug fix. In MSD::setParameters()
 (3-7-2026) implemented ASM randomize in mcheisenberg.config.compile.
 	Fixed CSV bug causing misalignmnet in snapshot.
 	Added VS 2026 support, and iterate flag for selecting the year (i.e. VS version, e.g. 2022, 2026) and edition (e.g. Community).
+
+7.0.3:
 (3-18-2026) Added low-level mutable_state PROC to capture snapshots with low memory overhead.
 (3-20-2026) Fixed memory issue found by Vlad.
 	Added streaming support for more efficiently processing snapshots.
