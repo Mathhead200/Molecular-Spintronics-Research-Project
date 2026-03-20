@@ -2,6 +2,7 @@ from __future__ import annotations
 from ..config import Config
 from ..util import ordered_set, ReadOnlyOrderedSet, ReadOnlyDict, NODE_PARAMETERS, EDGE_PARAMETERS
 from itertools import chain
+import numpy as np
 
 NODE_PARAMETER_SET = set(NODE_PARAMETERS)
 EDGE_PARAMETER_SET = set(EDGE_PARAMETERS)
@@ -48,6 +49,21 @@ class ConfigData:
 				parameters[p] = ReadOnlyOrderedSet(ordered_set(edge for edge in config.edges if config.hasEdgeParameter(edge, p)))
 		self.parameters = ReadOnlyDict(parameters)
 
+		# shared temporary ready buffers
+		n = len(self.nodes)
+		m = len(self.edges)
+		self.buf_mat_node   = np.empty(shape=(n, 3), dtype=float)
+		self.buf_mat_node   = np.empty(shape=(n, 3), dtype=float)
+		self.buf_mat_node2  = np.empty(shape=(n, 3), dtype=float)
+		self.buf_list_node  = np.empty(shape=(n,), dtype=float)
+		self.buf_mat_edge   = np.empty(shape=(m,3), dtype=float)
+		self.buf_list_edge  = np.empty(shape=(m,), dtype=float)
+		self.buf_s_i = np.empty(shape=(m,3), dtype=float)
+		self.buf_s_j = np.empty(shape=(m,3), dtype=float)
+		self.buf_f_i = np.empty(shape=(m,3), dtype=float)
+		self.buf_f_j = np.empty(shape=(m,3), dtype=float)
+		self.buf_m_i = np.empty(shape=(m,3), dtype=float)
+		self.buf_m_j = np.empty(shape=(m,3), dtype=float)
 
 config_data_cache: dict[Config, ConfigData] = {}
 

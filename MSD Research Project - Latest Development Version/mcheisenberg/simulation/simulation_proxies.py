@@ -306,13 +306,13 @@ class MProxy(SumProxy[Node, Node|Region, numpy_vec], Vector):
 			return simvec(view.spin[node]) + simvec(view.flux[node])
 	
 	@override
-	def values(self, out: NDArray=None, buf_mat: NDArray=None, s: NDArray=None, f: NDArray=None) -> numpy_mat:
+	def values(self, out: NDArray=None, s: NDArray=None, f: NDArray=None) -> numpy_mat:
 		nodes = self._elements
 		if out is None:
 			out = np.empty((len(nodes), 3), dtype=float)
 		data = self._data
 		if s is None:  s = data.s.sub(nodes).values(out)
-		if f is None:  f = data.f.sub(nodes).values(buf_mat)
+		if f is None:  f = data.f.sub(nodes).values(data._ready_buffers.mat_node[:len(nodes)])
 		return np.add(s, f, out=out)
 
 
@@ -384,10 +384,6 @@ class UProxy(UTypeProxy, Historical[float]):
 
 	@override
 	def values(self, out: NDArray=None,
-		# volitile (i.e. clobbered!):
-		buf_mat_node: NDArray=None, buf_mat_node2: NDArray=None, buf_list_node: NDArray=None,
-		buf_mat_edge: NDArray=None, buf_list_edge: NDArray=None,
-		buf_s_i: NDArray=None, buf_s_j: NDArray=None, buf_f_i: NDArray=None, buf_f_j: NDArray=None, buf_m_i: NDArray=None, buf_m_j: NDArray=None,
 		# non-volitile:
 		s: numpy_mat=None, f: numpy_mat=None, m: numpy_mat=None,     # pre-calculated s, f, m values
 		B: numpy_mat=None, A: numpy_mat=None, Je0: numpy_list=None,  # pre-calculated node parameter
@@ -400,6 +396,7 @@ class UProxy(UTypeProxy, Historical[float]):
 		N = len(nodes)
 		M = len(edges)
 		L = N+M
+		buf = data._ready_buffers
 
 		# Row vector, u. Each element/column, (scalar) u[key], is the energy for either a node, key=i, or an edges, key=(i,j).
 		# Order: first, u[0:N], all nodes in order of sim.nodes. Then, u[N:N+M], all edges in order of sim.edges.
@@ -410,9 +407,9 @@ class UProxy(UTypeProxy, Historical[float]):
 
 		if N != 0:
 			# m = ...  # is cache (used for calculations: B, A); shape=(N, 3)
-			buf_mat = np.empty((N, 3), dtype=float) if buf_mat_node is None else buf_mat_node
-			buf_list = np.empty((N,), dtype=float) if buf_list_node is None else buf_list_node
-			buf_mat2 = m if m is None else np.empty((N, 3), dtype=float) if buf_mat_node2 is None else buf_mat_node2
+			buf_mat = buf.mat_node[:N]
+			buf_list = buf.list_node[:N]
+			buf_mat2 = buf.mat_node2[:N]
 
 			if "B" in parameters:
 				if m is None:  m = data.m.sub(nodes).values(None)  # (new buffer)
@@ -438,40 +435,40 @@ class UProxy(UTypeProxy, Historical[float]):
 			f_j = None  # cache (used for calculations: Je1, Jee); shape=(M, 3)
 			m_i = None  # cache (used for calculations: b, D); shape=(M, 3)
 			m_j = None  # cache (used for calculations: b, D); shape=(M, 3)
-			buf_mat = np.empty((M, 3), dtype=float) if buf_mat_edge is None else buf_mat_edge
-			buf_list = np.empty((M,), dtype=float) if buf_list_edge is None else buf_list_edge
+			buf_mat = buf.mat_edge[:M]
+			buf_list = buf.list_edge[:M]
 
 			if "J" in parameters:
-				s_i = data.s.get(i for i, _ in edges).values(buf_s_i)  # new buffer?
-				s_j = data.s.get(j for _, j in edges).values(buf_s_j)  # new buffer?
+				s_i = data.s.get(i for i, _ in edges).values(buf.s_i[:M])  # new buffer?
+				s_j = data.s.get(j for _, j in edges).values(buf.s_j[:M])  # new buffer?
 				if J is None:  J = data.J.sub(edges).values(buf_list)
 				out[N:L] -= np.multiply(J, dot(s_i, s_j, temp=buf_mat), out=buf_list)
 
 			if "Je1" in parameters:
-				if s_i is None:  s_i = data.s.get(i for i, _ in edges).values(buf_s_i)  # new buffer?
-				if s_j is None:  s_j = data.s.get(j for _, j in edges).values(buf_s_j)  # new buffer?
-				f_i = data.f.get(i for i, _ in edges).values(buf_f_i)  # new buffer?
-				f_j = data.f.get(j for _, j in edges).values(buf_f_j)  # new buffer?
+				if s_i is None:  s_i = data.s.get(i for i, _ in edges).values(buf.s_i[:M])  # new buffer?
+				if s_j is None:  s_j = data.s.get(j for _, j in edges).values(buf.s_j[:M])  # new buffer?
+				f_i = data.f.get(i for i, _ in edges).values(buf.f_i[:M])  # new buffer?
+				f_j = data.f.get(j for _, j in edges).values(buf.f_j[:M])  # new buffer?
 				if Je1 is None:  Je1 = sim.Je1.sub(edges).values(buf_list)
 				dotp1 = dot(s_i, f_j, temp=buf_mat)
 				dotp2 = dot(f_i, s_j, temp=buf_mat)
 				out[N:L] -= np.multiply(Je1, np.add(dotp1, dotp2), out=buf_list)
 
 			if "Jee" in parameters:
-				if f_i is None:  f_i = data.f.get(i for i, _ in edges).values(buf_f_i)  # new buffer?
-				if f_j is None:  f_j = data.f.get(j for _, j in edges).values(buf_f_j)  # new buffer?
+				if f_i is None:  f_i = data.f.get(i for i, _ in edges).values(buf.f_i[:M])  # new buffer?
+				if f_j is None:  f_j = data.f.get(j for _, j in edges).values(buf.f_j[:M])  # new buffer?
 				if Jee is None:  Jee = data.Jee.sub(edges).values(buf_list)
 				out[N:L] -= np.multiply(Jee, dot(f_i, f_j, temp=buf_mat), out=buf_list)
 
 			if "b" in parameters:
-				m_i = data.m.get(i for i, _ in edges).values(buf_m_i)  # new buffer?
-				m_j = data.m.get(j for _, j in edges).values(buf_m_j)  # new buffer?
+				m_i = data.m.get(i for i, _ in edges).values(buf.m_i[:M])  # new buffer?
+				m_j = data.m.get(j for _, j in edges).values(buf.m_j[:M])  # new buffer?
 				if b is None:  b = data.b.sub(edges).values(buf_list)
 				out[N:L] -= np.multiply(b, dot(m_i, m_j, temp=buf_mat)**2, out=buf_list)
 
 			if "D" in parameters:
-				if m_i is None:  m_i = data.m.get(i for i, _ in edges).values(buf_m_i)  # new buffer?
-				if m_j is None:  m_j = data.m.get(j for _, j in edges).values(buf_m_j)  # new buffer?
+				if m_i is None:  m_i = data.m.get(i for i, _ in edges).values(buf.m_i[:M])  # new buffer?
+				if m_j is None:  m_j = data.m.get(j for _, j in edges).values(buf.m_j[:M])  # new buffer?
 				if D is None:    D = data.D.sub(edges).values(buf_mat)
 				out[N:L] -= dot(D, np.cross(m_i, m_j), temp=buf_mat)
 

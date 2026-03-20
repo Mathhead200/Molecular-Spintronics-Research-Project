@@ -16,6 +16,9 @@ class ReadyBuffers:
 	f   = None
 	B   = None
 	A   = None
+	S   = None
+	F   = None
+	kT  = None
 	Je0 = None
 	J   = None
 	Je1 = None
@@ -23,6 +26,7 @@ class ReadyBuffers:
 	b   = None
 	D   = None
 	m   = None
+	u   = None
 
 	def __init__(self, node_count: int, edge_count: int):
 		self._node_count = node_count
@@ -31,32 +35,17 @@ class ReadyBuffers:
 	def ensure(self, p_set: Collection[str]):
 		n = self._node_count
 		m = self._edge_count
-		if "s"   in p_set and self.s   is None:  self.s   = np.empty(shape=(n, 3), dtype=float)
-		if "f"   in p_set and self.f   is None:  self.f   = np.empty(shape=(n, 3), dtype=float)
-		if "B"   in p_set and self.B   is None:  self.B   = np.empty(shape=(n, 3), dtpye=float)
-		if "A"   in p_set and self.A   is None:  self.A   = np.empty(shape=(n, 3), dtpye=float)
-		if "Je0" in p_set and self.Je0 is None:  self.Je0 = np.empty(shape=(n,),   dtype=float)
-		if "J"   in p_set and self.J   is None:  self.J   = np.empty(shape=(m,),   dtype=float)
-		if "Je1" in p_set and self.Je1 is None:  self.Je1 = np.empty(shape=(m,),   dtype=float)
-		if "Jee" in p_set and self.Jee is None:  self.Jee = np.empty(shape=(m,),   dtype=float)
-		if "b"   in p_set and self.b   is None:  self.b   = np.empty(shape=(m,),   dtype=float)
-		if "D"   in p_set and self.D   is None:  self.D   = np.empty(shape=(m,3),  dtype=float)
-		if "m"   in p_set:
-			if self.m is None:                 self.m        = np.empty(shape=(n, 3), dtype=float)
-			if not hasattr(self, "mat_node"):  self.mat_node = np.empty(shape=(n, 3), dtype=float)
-		if "u"   in p_set:
-			if not hasattr(self, "u"):          self.u = np.empty(shape=(n + m,), dtype=float)
-			if not hasattr(self, "mat_node"):   self.mat_node   = np.empty(shape=(n, 3), dtype=float)
-			if not hasattr(self, "mat_node2"):  self.mat_node2  = np.empty(shape=(n, 3), dtype=float)
-			if not hasattr(self, "list_node"):  self.list_node  = np.empty(shape=(n,), dtype=float)
-			if not hasattr(self, "mat_edge"):   self.mat_edge   = np.empty(shape=(m,3), dtype=float)
-			if not hasattr(self, "list_edge"):  self.list_edge  = np.empty(shape=(m,), dtype=float)
-			if not hasattr(self, "s_i"):  self.s_i = np.empty(shape=(m,3), dtype=float)
-			if not hasattr(self, "s_j"):  self.s_j = np.empty(shape=(m,3), dtype=float)
-			if not hasattr(self, "f_i"):  self.f_i = np.empty(shape=(m,3), dtype=float)
-			if not hasattr(self, "f_j"):  self.f_j = np.empty(shape=(m,3), dtype=float)
-			if not hasattr(self, "m_i"):  self.m_i = np.empty(shape=(m,3), dtype=float)
-			if not hasattr(self, "m_j"):  self.m_j = np.empty(shape=(m,3), dtype=float)
+		for p in ["s", "f", "B", "A", "m"]:
+			# e.g. if "s" in p_set and self.s is None:  self.s = np.empty(shape=(n, 3), dtype=float); etc.
+			if p in p_set and getattr(self, p) is None:  setattr(self, p, np.empty(shape=(n, 3), dtype=float))
+		for p in ["S", "F", "kT", "Je0"]:
+			# e.g. if "S" in p_set and self.S is None:  self.S = np.empty(shape=(n,), dtype=float); etc.
+			if p in p_set and getattr(self, p) is None:  setattr(self, p, np.empty(shape=(n,), dtype=float))
+		for p in ["J", "Je1", "Jee", "b"]:
+			# e.g. if "J" in p_set and self.J is None:  self.J = np.empty(shape=(m,), dtype=float)
+			if p in p_set and getattr(self, p) is None:  setattr(self, p, np.empty(shape=(m,), dtype=float))
+		if "D" in p_set and self.D   is None:  self.D   = np.empty(shape=(m,3),  dtype=float)
+		if "u" in p_set and self.u   is None:  self.u   = np.empty(shape=(n + m,), dtype=float)
 
 class DataViewWrapper[T=Driver|MutableStateBuffer]:
 	A:   VectorNodeParameterProxy
@@ -103,14 +92,37 @@ class DataViewWrapper[T=Driver|MutableStateBuffer]:
 		self._m_proxy = MProxy(self)
 		self._u_proxy = UProxy(self)
 
-		self._ready_buffers = ReadyBuffers(node_count=len(config_data.nodes), edge_count=len(config_data.edges))
+		buf = ReadyBuffers(node_count=len(config_data.nodes), edge_count=len(config_data.edges))
+		for attr in ["mat_node", "mat_node2", "list_node", "mat_edge", "list_edge", "s_", "s_j", "f_i", "f_j", "m_i", "m_j"]:
+			setattr(buf, attr) = getattr(config_data, f"buf_{attr}")  # e.g. buf.mat_node = config_data.buf_mat_node; etc.
+		self._ready_buffers = buf
 		self._ready_cache = {}
 
-	def ready(self, *params: set) -> None:
+	def ready(self, *params: str) -> None:
+		"""
+		Pre-calculates full values for given paramenters. e.g. self.ready("s", "f", "m", "u")
+		Evaluations will be done efficiently and using preallocated-buffers.
+		Caller responsability:
+			If changes are made to the underlying state, these buffers must be
+			invalidated or udated manually, or future calls to Proxies will
+			yeild previously readied values, and not the updated values. Cache
+			can be manually cleared with self.unready(), or calling
+			self.ready() again after changes (with the desired parameters) will
+			update the cache as well.
+		"""
+		self.unready()  # TODO: I think I need to unreadyy the cache to avoid using old values!!?
+		p_set = set(params) if len(params) != 0 else ALL_PROXIES
 		buf = self._ready_buffers
-		buf.ensure(set(params))
+		buf.ensure(p_set)
 		cache = self._ready_cache
-		# TODO: update cache
+		for p in ["s", "f", "B", "A", "S", "F", "kT", "Je0", "J", "Je1", "Jee", "b", "D"]:  # independent proxies
+			if p in p_set:  cache[p] = getattr(self, p).values(getattr(buf, p))  # e.g. if "s" in p_set:  cache["s"] = self.s.values(buf.s); etc.
+		if "m" in p_set:  cache["m"] = self.f.values(buf.m, s=buf.s, f=buf.f)
+		if "u" in p_set:  cache["u"] = self.u.values(buf.u,
+			s=buf.s, f=buf.f, m=buf.m,
+			B=buf.B, A=buf.A, Je0=buf.Je0,
+			J=buf.J, Je1=buf.Je1, Jee=buf.Jee, b=buf.b, D=buf.D)
+		# TODO: use cached values not buf values directly since buffers may be allocated previously but dirty !!
 	
 	def unready(self) -> None:
 		self._ready_cache = {}
