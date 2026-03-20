@@ -121,24 +121,10 @@ class CSV:
 	
 	def add_data(self, ss: Snapshot):
 		sim = self.sim
-		sim.ready("m", "s", "f", "u")
-		s_values = self._s_buf
-		f_values = self._f_buf
-		m_values = self._m_buf
-		u_values = self._u_buf
-		sim.s.values(out=s_values)
-		sim.f.values(out=f_values)
-		sim.m.values(out=m_values, s=s_values, f=f_values)
-		sim.u.values(out=u_values, s=s_values, u=u_values,
-			buf_mat_node=self._buf_mat_node, buf_mat_node2=self._buf_mat_node2, buf_list_node=self._buf_list_node,
-			buf_mat_edge=self._buf_mat_edge, buf_list_edge=self._buf_list_edge,
-			buf_s_i=self._buf_s_i, buf_s_j=self._buf_s_j,
-			buf_f_i=self._buf_f_i, buf_f_j=self._buf_f_j,
-			buf_m_i=self._buf_m_i, buf_m_j=self._buf_m_j)
-
+		ss.ready("m", "s", "f", "u")
 		line = StrJoiner()
 		line += f'{ss.t},,'
-		m = np.sum(m_values, axis=0)
+		m = ss.m.value
 		m_norm  = np.linalg.norm(m)
 		m_theta = np.arccos(m[2]/m_norm) if m_norm != 0 else 0.0  # TODO: double check calculations
 		m_phi   = np.arctan2(m[1], m[0]) if m_norm != 0 else 0.0
@@ -184,7 +170,7 @@ class CSV:
 		sim = self.sim
 		n_index_len = self.n_index_len
 		node_iter = iter(sim.nodes)
-		sim.ready("s", "f", "m")
+		sim.ready("m")
 		for line in self.data:
 			try:
 				n = next(node_iter)
@@ -213,9 +199,8 @@ class CSV:
 				n = next(node_iter)
 				line += "," * (2 + 3 * (7 + 7 * len(sim.regions)) + 3 + len(sim.regions) + len(sim.eregions))  # t + M,S,F + U
 				if isinstance(n, Sequence):
-					count = 0
-					for count, coord in enumerate(n):  line += f'{coord},'
-					line += ',' * (n_index_len - count)
+					for coord in n:  line += f'{coord},'
+					line += ',' * (n_index_len - len(n))
 				else:
 					line += f'{n},'
 					line += ',' * (n_index_len - 1)

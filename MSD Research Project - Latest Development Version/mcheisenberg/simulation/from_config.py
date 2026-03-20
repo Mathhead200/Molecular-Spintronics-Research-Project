@@ -8,7 +8,9 @@ NODE_PARAMETER_SET = set(NODE_PARAMETERS)
 EDGE_PARAMETER_SET = set(EDGE_PARAMETERS)
 
 class ConfigData:
-	__slots__ = ("nodes", "edges", "regions", "eregions", "parameters")
+	__slots__ = ("nodes", "edges", "regions", "eregions", "parameters",
+		"buf_mat_node", "buf_mat_node2", "buf_list_node", "buf_mat_edge", "buf_list_edge",
+		"buf_s_i", "buf_s_j", "buf_f_i", "buf_f_j", "buf_m_i", "buf_m_j")
 
 	def __init__(self, config: Config):
 		# Just need to configure nodes, edges, regions, and eregions once and cache

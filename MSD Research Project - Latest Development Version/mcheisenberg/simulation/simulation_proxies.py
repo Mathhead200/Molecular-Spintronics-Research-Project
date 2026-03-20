@@ -25,9 +25,9 @@ class _Proxy_get[E, K, V]:
 	def __init__(self, proxy: Proxy[E, K, V]):
 		self._obj = proxy
 
-	def __call__(self, elements: Iterable[E]) -> Proxy[E, K, V]:
+	def __call__(self, elements: Iterable[E], key=None, permuted: bool=True) -> Proxy[E, K, V]:
 		""" Wrapper extending functionality to general Iterables, e.g. generators. """
-		return self._obj.sub(list(elements))
+		return self._obj.sub(list(elements), key=(elements if key is None else key), permuted=permuted)
 	
 	def __getitem__(self, elements) -> Proxy[E, K, V]:
 		""" Wrapper extending functionality to slices. """
@@ -38,38 +38,53 @@ class _Proxy_get[E, K, V]:
 			if any(not isinstance(bound, int) for bound in [a, b]):
 				raise ValueError(f"Proxy slice currently only supports int type: get[{type(a).__name__} {a}:{type(b).__name__} {b}]")
 			if elements.step is not None:
-				return self._obj.sub(range(a, b, elements.step))
-			return self._obj.sub(range(a, b))
+				return self._obj.sub(range(a, b, elements.step), key=elements)
+			return self._obj.sub(range(a, b), key=elements)
 		if isinstance(elements, tuple):
 			return self(elements)   # shorthand syntax: proxy.get([1, 2, 3]) becomes proxy.get[1, 2, 3]
 		return self._obj[elements]  # treat as singular element as redirect to core self._obj.__getitem__ behaviour
 
 class Proxy[E, K, V]:
-	def __init__(self, data: DataViewWrapper, sim_name: str, elements: Collection[E], filter: Filter, subscripts: list=[]):
+	def __init__(self, data: DataViewWrapper, sim_name: str, elements: Collection[E], filter: Filter, subscripts: list=[], parent: Proxy=None):
 		self._data: DataViewWrapper = data
 		self._name = sim_name
 		self._elements: Collection[E] = elements
 		self._filter = filter
 		self._subscripts: list = subscripts
 		self._get = _Proxy_get(self)
+		self._parent = parent  # None for root
+		self._root = self  # (const) not modified by subscripting
+		self._permuted: bool = False  # is the relative order of self.elements the same as self.root.elements ?
 	
 	def __len__(self) -> int:             return len(self._elements)
 	def __iter__(self) -> Iterator[E]:    return iter(self._elements)
 	def __contains__(self, key) -> bool:  return key in self._elements
 
-	def __getitem__(self, key: K) -> Proxy[E, K, V]:
-		proxy = copy(self)
-		candidate_elements = self._filter(self._data, self._name, key)
-		proxy._elements = { x: None for x in candidate_elements if x in self._elements }  # (ordered set) itersection of candidate_elements and self._elements
-		if len(proxy._elements) == 0:
-			raise ValueError(f"{key} is valid by itself, but disjoint with previous subscripts: {self._subscripts}")
-		proxy._subscripts = self._subscripts + [key]
-		return proxy
-
-	def sub(self, elements: Collection[E]) -> Proxy[E, K, V]:
+	def sub(self, elements: Collection[E], key=None, permuted: bool=True) -> Proxy[E, K, V]:
 		clone = copy(self)
 		clone._elements = elements
+		clone._subscripts = self._subscripts + [elements if key is None else key]
+		clone._parent = self
+		clone._permuted = permuted
 		return clone
+
+	def __getitem__(self, key: K) -> Proxy[E, K, V]:
+		candidate_elements = self._filter(self._data, self._name, key)
+		elements = { x: None for x in candidate_elements if x in self._elements }  # (ordered set) itersection of candidate_elements and self._elements
+		if len(elements) == 0:
+			raise ValueError(f"{key} is valid by itself, but disjoint with previous subscripts: {self._subscripts}")
+		return self.sub(elements, key=key, permuted=False)
+	
+	def assert_unpermuted(self) -> Proxy:
+		"""
+		Can be used after a call to self.get[], e.g. self.get[1:10:2].assert_unpermuted().values()
+		to turn on Proxy._permuted=False optimizations when using DataViewWrapper.ready().
+		Since unpermuted elements (relative to the root order), can be much more quickly aggrigated.
+		In general, Proxy.sub() Proxy.get(), and Proxy.get[] can not assume an unpermuted element order.
+		Proxy[] can, and does by default.
+		"""
+		self._permuted = False
+		return self
 
 	@ property
 	def get(self) -> _Proxy_get[E, K, V]:
@@ -94,6 +109,14 @@ class Proxy[E, K, V]:
 	@property
 	def subscripts(self) -> Sequence[K]:
 		return ReadOnlyList(self._subscripts)
+	
+	@property
+	def parent(self) -> Proxy:
+		return self._parent
+	
+	@property
+	def root(self) -> Proxy:
+		return self._root
 
 	def keys(self) -> KeysView:
 		return ProxyKeysView(self)
@@ -209,10 +232,15 @@ class ParameterProxy[E: Node|Edge, K: Node|Edge|Region|ERegion, V: numpy_vec|flo
 	
 	@override
 	def values(self, out: NDArray) -> NDArray:
-		keys = self._elements
+		values = self._data._ready_cache.get(self._name, None)
+		if values is not None and self._parent is None:
+			return values  # Note: out is not used/modified in this case
+		# Don't bother using the buffer if we are in a sub-proxy since it's more
+		#	work to build the dict then to just read these values from memory directly.
 		if out is None:
 			out = np.empty(self._shape(len(keys)), dtype=float)
 		_mat = out.ndim > 1  # bool. e.g. parameter D would be shape=(3, M), _mat=True; J would be (M,), False; and B would be (3, N), True
+		keys = self._elements
 		for idx, key in enumerate(keys):
 			self._to_sim(self._runtime_proxy[key], out=(out[idx] if _mat else out[idx:idx+1]))
 		return out
@@ -284,6 +312,11 @@ class StateProxy(SumProxy[Node, Node|Region, numpy_vec], Vector):
 	
 	@override
 	def values(self, out: NDArray=None) -> numpy_mat:
+		values = self._data._ready_cache.get(self._name, None)
+		if values is not None and self._parent is None:
+			return values  # Note: out is not used/modified in this case
+		# Don't bother using the buffer if we are in a sub-proxy since it's more
+		#	work to build the dict then to just read these values from memory directly.
 		nodes = self._elements
 		if out is None:
 			out = np.empty((len(nodes), 3), dtype=float)
@@ -307,14 +340,22 @@ class MProxy(SumProxy[Node, Node|Region, numpy_vec], Vector):
 	
 	@override
 	def values(self, out: NDArray=None, s: NDArray=None, f: NDArray=None) -> numpy_mat:
+		values = self._data._ready_cache.get("m", None)
+		if values is not None and self._parent is None:
+			return values  # Note: out is not used/modified in this case
+		
 		nodes = self._elements
 		if out is None:
 			out = np.empty((len(nodes), 3), dtype=float)
+		if values is not None:
+			index_of_node: dict[Node, int] = self._data.view.config.nodeIndex
+			for idx, n in enumerate(nodes):
+				out[idx] = values[index_of_node[n]]
+
 		data = self._data
 		if s is None:  s = data.s.sub(nodes).values(out)
 		if f is None:  f = data.f.sub(nodes).values(data._ready_buffers.mat_node[:len(nodes)])
 		return np.add(s, f, out=out)
-
 
 # Number of nodes in selection
 class NProxy(HistoricalNumericProxy[Node|Edge, Node|Edge|Region|ERegion, int], IInt):
@@ -330,10 +371,13 @@ class NProxy(HistoricalNumericProxy[Node|Edge, Node|Edge|Region|ERegion, int], I
 	def values(self, out: NDArray=None) -> Annotated[NDArray[np.int64], ("N",)]:
 		keys = self._elements
 		n = len(keys)
+		values = self._data._ready_cache.get("n", None)
+		if values is not None:
+			return values[:n]  # Note: out is not used/modified in this case
 		if out is None:
 			out = np.ones((n,), dtype=int)
 		else:
-			out[0:n].fill(1)
+			out[:n].fill(1)
 		return out
 	
 	@override
@@ -389,14 +433,15 @@ class UProxy(UTypeProxy, Historical[float]):
 		B: numpy_mat=None, A: numpy_mat=None, Je0: numpy_list=None,  # pre-calculated node parameter
 		J: numpy_list=None, Je1: numpy_list=None, Jee: numpy_list=None, b: numpy_list=None, D: numpy_mat=None  # pre-calculated edge parameters
 	) -> numpy_list:
-		data = self._data
-		parameters = self.parameters
+		values = self._data._ready_cache.get("u", None)
+		if values is not None and self._parent is None:
+			return values  # Note: out is not used/modified in this case
+		
 		nodes = self.nodes
 		edges = self.edges
 		N = len(nodes)
 		M = len(edges)
 		L = N+M
-		buf = data._ready_buffers
 
 		# Row vector, u. Each element/column, (scalar) u[key], is the energy for either a node, key=i, or an edges, key=(i,j).
 		# Order: first, u[0:N], all nodes in order of sim.nodes. Then, u[N:N+M], all edges in order of sim.edges.
@@ -404,6 +449,38 @@ class UProxy(UTypeProxy, Historical[float]):
 			out = np.zeros((L,), dtype=float)
 		else:
 			out[0:L] = 0  # clear (zero) slice of output where results will be calculated and stored
+
+		if values is not None:
+			# collect node values
+			index_of_node: dict[Node, int] = self._data.view.config.nodeIndex
+			for idx, n in enumerate(nodes):
+				out[idx] = values[index_of_node[n]]
+			# collect edge values
+			root = self._root
+			zipped_edges: Iterable[tuple[Edge, float]] = zip(root.edges, values[len(root.nodes):])
+			if self._permuted:
+				# un-optimized: build full edge dict
+				value_of_edge: dict[Edge, int] = dict(zipped_edges)
+				for idx, e in enumerate(edges, start=N):
+					out[N + idx] = value_of_edge[e]
+			else:
+				# optimized: O(n)
+				zip_iter = iter(zipped_edges)
+				edge_iter = iter(enumerate(edges, start=N))
+				while True:
+					try:
+						idx, e_target = next(edge_iter)  # edge whos value we need to add, and its index in output array, out
+						e_root, u = next(zip_iter)       # root edge to check against, and its cached energy
+						while e_target[0] != e_root[0] or e_target[1] != e_root[1]:					
+							e_root = next(zip_iter)
+						out[idx] = u
+					except StopIteration:
+						break
+			return out
+
+		data = self._data
+		parameters = self.parameters
+		buf = data._ready_buffers
 
 		if N != 0:
 			# m = ...  # is cache (used for calculations: B, A); shape=(N, 3)
