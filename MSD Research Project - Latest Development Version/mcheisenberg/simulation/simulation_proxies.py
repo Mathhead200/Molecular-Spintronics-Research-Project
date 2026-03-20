@@ -54,7 +54,7 @@ class Proxy[E, K, V]:
 		self._get = _Proxy_get(self)
 		self._parent = parent  # None for root
 		self._root = self  # (const) not modified by subscripting
-		self._permuted: bool = False  # is the relative order of self.elements the same as self.root.elements ?
+		self._permuted: bool = False  # is the relative order of self.elements the same as self.root.elements *and* is it a subset?
 	
 	def __len__(self) -> int:             return len(self._elements)
 	def __iter__(self) -> Iterator[E]:    return iter(self._elements)

@@ -6,4 +6,4 @@ from .simulation_proxies import Filter, Proxy, NumericProxy, HistoryProxy, Histo
 	ParameterProxy, VectorNodeParameterProxy, ScalarNodeParameterProxy, VectorEdgeParameterProxy, ScalarEdgeParameterProxy, \
 	SumProxy, StateProxy, MProxy, NProxy, UTypeProxy, UProxy, CProxy, ChiProxy
 from .data_view_wraper import DataViewWrapper
-from .from_config import ConfigData, from_config, config_data_cache
+from .from_config import ConfigData, GrowableBuffer, from_config, config_data_cache

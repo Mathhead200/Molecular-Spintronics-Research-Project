@@ -1,11 +1,56 @@
 from __future__ import annotations
 from ..config import Config
 from ..util import ordered_set, ReadOnlyOrderedSet, ReadOnlyDict, NODE_PARAMETERS, EDGE_PARAMETERS
+from copy import copy
 from itertools import chain
 import numpy as np
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+	from numpy.typing import NDArray
 
 NODE_PARAMETER_SET = set(NODE_PARAMETERS)
 EDGE_PARAMETER_SET = set(EDGE_PARAMETERS)
+
+class GrowableBuffer:
+	__slots__ = ("arr", "dtype")
+
+	def __init__(self, shape, dtype=float):
+		self.arr = np.empty(shape=shape, dtype=dtype)
+		self.dtype = dtype
+	
+	def ensure(self, required_shape) -> NDArray:
+		""" Ensures the size of the numpy NDArray along axis 0. """
+		arr = self.arr
+		current_shape = arr.shape
+		if len(current_shape) != len(required_shape):
+			raise ValueError("GrowableBuffer can not change number of dimensions")
+		reallocate = False
+		supermum = copy(current_shape)
+		for i in range(len(supermum)):
+			if current_shape[i] < required_shape[i]:
+				supermum[i] = required_shape[i]
+				reallocate = True
+		if reallocate:
+			arr = np.empty(shape=supermum, dtype=self.dtype)
+			self.arr = arr
+		return arr
+
+	def __getitem__(self, key):
+		n = None  # required size
+		if isinstance(key, slice):
+			n = max(n for n in (key.start, key.stop) if n is not None)
+		if isinstance(key, int):
+			n = key
+		
+		# ensure size (along axis 0)
+		if n is not None:
+			current_shape = self.arr.shape
+			if current_shape[0] < n:
+				required_shape = list(current_shape)
+				required_shape[0] = n
+				self.arr = np.empty(shape=required_shape, dtype=self.dtype)
+		
+		return self.arr[key]
 
 class ConfigData:
 	__slots__ = ("nodes", "edges", "regions", "eregions", "parameters",
@@ -54,18 +99,18 @@ class ConfigData:
 		# shared temporary ready buffers
 		n = len(self.nodes)
 		m = len(self.edges)
-		self.buf_mat_node   = np.empty(shape=(n, 3), dtype=float)
-		self.buf_mat_node   = np.empty(shape=(n, 3), dtype=float)
-		self.buf_mat_node2  = np.empty(shape=(n, 3), dtype=float)
-		self.buf_list_node  = np.empty(shape=(n,), dtype=float)
-		self.buf_mat_edge   = np.empty(shape=(m,3), dtype=float)
-		self.buf_list_edge  = np.empty(shape=(m,), dtype=float)
-		self.buf_s_i = np.empty(shape=(m,3), dtype=float)
-		self.buf_s_j = np.empty(shape=(m,3), dtype=float)
-		self.buf_f_i = np.empty(shape=(m,3), dtype=float)
-		self.buf_f_j = np.empty(shape=(m,3), dtype=float)
-		self.buf_m_i = np.empty(shape=(m,3), dtype=float)
-		self.buf_m_j = np.empty(shape=(m,3), dtype=float)
+		self.buf_mat_node   = GrowableBuffer(shape=(n, 3), dtype=float)
+		self.buf_mat_node   = GrowableBuffer(shape=(n, 3), dtype=float)
+		self.buf_mat_node2  = GrowableBuffer(shape=(n, 3), dtype=float)
+		self.buf_list_node  = GrowableBuffer(shape=(n,),   dtype=float)
+		self.buf_mat_edge   = GrowableBuffer(shape=(m,3),  dtype=float)
+		self.buf_list_edge  = GrowableBuffer(shape=(m,),   dtype=float)
+		self.buf_s_i = GrowableBuffer(shape=(m,3), dtype=float)
+		self.buf_s_j = GrowableBuffer(shape=(m,3), dtype=float)
+		self.buf_f_i = GrowableBuffer(shape=(m,3), dtype=float)
+		self.buf_f_j = GrowableBuffer(shape=(m,3), dtype=float)
+		self.buf_m_i = GrowableBuffer(shape=(m,3), dtype=float)
+		self.buf_m_j = GrowableBuffer(shape=(m,3), dtype=float)
 
 config_data_cache: dict[Config, ConfigData] = {}
 

@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
 	from ..driver import Driver
 	from ..runtime import MutableStateBuffer
+	from .from_config import GrowableBuffer
 	from .simulation_util import Parameter
 	from collections.abc import Iterable
 	from numpy.typing import NDArray
@@ -31,6 +32,18 @@ class ReadyBuffers:
 	n:   NDArray = None
 	m:   NDArray = None
 	u:   NDArray = None
+
+	mat_node:  GrowableBuffer
+	mat_node2: GrowableBuffer
+	list_node: GrowableBuffer
+	mat_edge:  GrowableBuffer
+	list_edge: GrowableBuffer
+	s_i: GrowableBuffer
+	s_j: GrowableBuffer
+	f_i: GrowableBuffer
+	f_j: GrowableBuffer
+	m_i: GrowableBuffer
+	m_j: GrowableBuffer
 
 	def __init__(self, node_count: int, edge_count: int):
 		self._node_count = node_count
@@ -77,6 +90,7 @@ class DataViewWrapper[T=Driver|MutableStateBuffer]:
 	f:   StateProxy
 	m:   MProxy
 	u:   UProxy
+
 	nodes:      ReadOnlyOrderedSet[Node]
 	edges:      ReadOnlyOrderedSet[Edge]
 	regions:    ReadOnlyDict[Region, ReadOnlyOrderedSet[Node]]
@@ -123,7 +137,8 @@ class DataViewWrapper[T=Driver|MutableStateBuffer]:
 			self.ready(*p) again after changes (with the desired parameters, *p)
 			will update the cache as well, but only for *p.
 		"""
-		if len(params) == 0:  params = ALL_PROXIES 
+		self.unready(*params)
+		if len(params) == 0:  params = ALL_PROXIES
 		p_set = set(params)  # params, but optimized for membership testing
 		buf = self._ready_buffers
 		buf.flag(params, writeable=True)
@@ -146,7 +161,8 @@ class DataViewWrapper[T=Driver|MutableStateBuffer]:
 		else:
 			cache = self._ready_cache
 			for p in params:
-				del cache[p]
+				if p in cache:
+					del cache[p]
 
 	# @properties added below: Simulation.s, .f, .m, .u, .n, .J, .B, etc.
 

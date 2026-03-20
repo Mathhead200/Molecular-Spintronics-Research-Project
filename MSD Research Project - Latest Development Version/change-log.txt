@@ -230,11 +230,12 @@ Second bug fix. In MSD::setParameters()
 	Fixed CSV bug causing misalignmnet in snapshot.
 	Added VS 2026 support, and iterate flag for selecting the year (i.e. VS version, e.g. 2022, 2026) and edition (e.g. Community).
 (3-18-2026) Added low-level mutable_state PROC to capture snapshots with low memory overhead.
-
+(3-20-2026) Fixed memory issue found by Vlad.
+	Added streaming support for more efficiently processing snapshots.
+	And updated io.csv modual and apps.iterate to leverage these changes.
 
 ------------------------------------ TODOs ------------------------------------
 [mcheisenberg]
-TODO: Removed NDArray buffer optimizations for global energy calculations. Re-add these!
 TODO: Optimize compiling large (e.g. len(nodes)=1_000_000) configurations. Currently taking a **long** time! Why?
 TODO: heat and magnetize2
 TODO: Ploting (matplotlib) tools
