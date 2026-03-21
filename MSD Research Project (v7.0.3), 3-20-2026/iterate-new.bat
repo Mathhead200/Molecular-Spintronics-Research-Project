@@ -1,0 +1,2 @@
+python -m mcheisenberg.apps.iterate --in parameters-iterate.txt --out out --year 2022 --edition Community --asm iterate.asm
+@pause

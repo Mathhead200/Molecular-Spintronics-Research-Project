@@ -12,7 +12,7 @@ and Vladimir Vinarskiy for bug testing mcheisenberg (v7).
 
 <hr>
 
-Version 7.0.2 is the current & latest version as of 3-5-2026  
+Version 7.0.3 is the current & latest version as of 3-20-2026  
   
 Testing needed:  
 	v6.0.0: The custom molecule features have not yet been fully tested, but preliminary results are promising.  

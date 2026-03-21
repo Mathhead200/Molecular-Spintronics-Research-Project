@@ -1,0 +1,36 @@
+\hypertarget{udc_8h}{}\doxysection{C\+:/\+Users/mathh/\+Git\+Hub/\+Molecular-\/\+Spintronics-\/\+Research-\/\+Project/\+MSD Research Project -\/ Latest Development Version/src/udc.h File Reference}
+\label{udc_8h}\index{C:/Users/mathh/GitHub/Molecular-\/Spintronics-\/Research-\/Project/MSD Research Project -\/ Latest Development Version/src/udc.h@{C:/Users/mathh/GitHub/Molecular-\/Spintronics-\/Research-\/Project/MSD Research Project -\/ Latest Development Version/src/udc.h}}
+{\ttfamily \#include $<$cstring$>$}\newline
+{\ttfamily \#include $<$exception$>$}\newline
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classudc_1_1_u_d_c_exception}{udc\+::\+UDCException}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespaceudc}{udc}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+double \mbox{\hyperlink{namespaceudc_aa7cee595bc6a15bdd189f00553c92349}{udc\+::sq}} (double x)
+\begin{DoxyCompactList}\small\item\em square a number fast \end{DoxyCompactList}\item 
+double \mbox{\hyperlink{namespaceudc_a6d899413865bed9b0346dc4a2b6ed4b5}{udc\+::cube}} (double x)
+\begin{DoxyCompactList}\small\item\em cube a number fast \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespaceudc_a51cb94811213523405b27e375b7a1b33}{udc\+::bread}} (void $\ast$destination, size\+\_\+t d\+Size, const unsigned char $\ast$\&buffer)
+\begin{DoxyCompactList}\small\item\em Buffer/\+Binary Read\+: \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename T $>$ }\\void \mbox{\hyperlink{namespaceudc_a6f17d107671fb6c3d5e2044d346e45c5}{udc\+::bread}} (T \&destination, const unsigned char $\ast$\&buffer)
+\begin{DoxyCompactList}\small\item\em Templated version\+: determines the approprate number of bytes by calling \char`\"{}sizeof(\+T)\char`\"{}. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespaceudc_a1e040d8326f2ad3b600f8f66a8de6305}{udc\+::bwrite}} (const void $\ast$source, size\+\_\+t s\+Size, unsigned char $\ast$\&buffer)
+\begin{DoxyCompactList}\small\item\em Buffer/\+Binary Write\+: \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename T $>$ }\\void \mbox{\hyperlink{namespaceudc_a0a7d84b783b302ce21db57fd497817d0}{udc\+::bwrite}} (const T \&source, unsigned char $\ast$\&buffer)
+\begin{DoxyCompactList}\small\item\em Templated version\+: determines the approprate number of bytes by calling \char`\"{}sizeof(\+T)\char`\"{}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const double \mbox{\hyperlink{namespaceudc_aa4b4d55516f1e34de5dc8b228f160597}{udc\+::E}} = 2.\+71828182845904523536
+\begin{DoxyCompactList}\small\item\em Mathematical constant\+: Euler\textquotesingle{}s Number. \end{DoxyCompactList}\item 
+const double \mbox{\hyperlink{namespaceudc_a1757f9fc50446243658974977dd95e7c}{udc\+::\+PI}} = 3.\+14159265358979323846
+\begin{DoxyCompactList}\small\item\em Mathematical constant. \end{DoxyCompactList}\end{DoxyCompactItemize}

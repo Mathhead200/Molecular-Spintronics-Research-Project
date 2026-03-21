@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_udc_8h_source" xml:lang="en-US">
+<title>udc.h</title>
+<indexterm><primary>C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/src/udc.h</primary></indexterm>
+Go to the documentation of this file.<programlisting linenumbering="unnumbered">1 <emphasis role="comment">/*</emphasis>
+2 <emphasis role="comment">&#32;*&#32;udc.h</emphasis>
+3 <emphasis role="comment">&#32;*</emphasis>
+4 <emphasis role="comment">&#32;*&#32;&#32;Last&#32;Edited:&#32;Feb&#32;25,&#32;2014</emphasis>
+5 <emphasis role="comment">&#32;*&#32;&#32;&#32;&#32;&#32;&#32;&#32;Author:&#32;Christopher&#32;D&apos;Angelo</emphasis>
+6 <emphasis role="comment">&#32;*/</emphasis>
+7 
+8 <emphasis role="preprocessor">#ifndef&#32;UDC_H</emphasis>
+9 <emphasis role="preprocessor">#define&#32;UDC_H</emphasis>
+10 
+11 <emphasis role="preprocessor">#include&#32;&lt;cstring&gt;</emphasis>
+12 <emphasis role="preprocessor">#include&#32;&lt;exception&gt;</emphasis>
+13 
+14 <emphasis role="keyword">namespace&#32;</emphasis><link linkend="_namespaceudc">udc</link>&#32;{
+15 
+16 <emphasis role="keyword">using&#32;</emphasis>std::exception;
+17 
+18 
+20 <emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_namespaceudc_1aa4b4d55516f1e34de5dc8b228f160597">E</link>&#32;=&#32;2.71828182845904523536;
+21 
+23 <emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_namespaceudc_1a1757f9fc50446243658974977dd95e7c">PI</link>&#32;=&#32;3.14159265358979323846;
+24 
+25 
+27 <emphasis role="keyword">inline</emphasis>&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_namespaceudc_1aa7cee595bc6a15bdd189f00553c92349">sq</link>(<emphasis role="keywordtype">double</emphasis>&#32;x)&#32;{
+28 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;x&#32;*&#32;x;
+29 }
+30 
+32 <emphasis role="keyword">inline</emphasis>&#32;<emphasis role="keywordtype">double</emphasis>&#32;<link linkend="_namespaceudc_1a6d899413865bed9b0346dc4a2b6ed4b5">cube</link>(<emphasis role="keywordtype">double</emphasis>&#32;x)&#32;{
+33 &#32;&#32;&#32;&#32;<emphasis role="keywordflow">return</emphasis>&#32;x&#32;*&#32;x&#32;*&#32;x;
+34 }
+35 
+42 <emphasis role="keyword">inline</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_namespaceudc_1a51cb94811213523405b27e375b7a1b33">bread</link>(<emphasis role="keywordtype">void</emphasis>&#32;*&#32;destination,&#32;<emphasis role="keywordtype">size_t</emphasis>&#32;dSize,&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">unsigned</emphasis>&#32;<emphasis role="keywordtype">char</emphasis>&#32;*&#32;&amp;buffer)&#32;{
+43 &#32;&#32;&#32;&#32;memcpy(destination,&#32;buffer,&#32;dSize);
+44 &#32;&#32;&#32;&#32;buffer&#32;+=&#32;dSize;
+45 }
+46 
+50 <emphasis role="keyword">template</emphasis>&#32;&lt;<emphasis role="keyword">typename</emphasis>&#32;T&gt;&#32;<emphasis role="keyword">inline</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_namespaceudc_1a51cb94811213523405b27e375b7a1b33">bread</link>(T&#32;&amp;destination,&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">unsigned</emphasis>&#32;<emphasis role="keywordtype">char</emphasis>&#32;*&#32;&amp;buffer)&#32;{
+51 &#32;&#32;&#32;&#32;<link linkend="_namespaceudc_1a51cb94811213523405b27e375b7a1b33">bread</link>(&amp;destination,&#32;<emphasis role="keyword">sizeof</emphasis>(T),&#32;buffer);
+52 }
+53 
+60 <emphasis role="keyword">inline</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_namespaceudc_1a1e040d8326f2ad3b600f8f66a8de6305">bwrite</link>(<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;*&#32;source,&#32;<emphasis role="keywordtype">size_t</emphasis>&#32;sSize,&#32;<emphasis role="keywordtype">unsigned</emphasis>&#32;<emphasis role="keywordtype">char</emphasis>&#32;*&#32;&amp;buffer)&#32;{
+61 &#32;&#32;&#32;&#32;memcpy(buffer,&#32;source,&#32;sSize);
+62 &#32;&#32;&#32;&#32;buffer&#32;+=&#32;sSize;
+63 }
+64 
+68 <emphasis role="keyword">template</emphasis>&#32;&lt;<emphasis role="keyword">typename</emphasis>&#32;T&gt;&#32;<emphasis role="keyword">inline</emphasis>&#32;<emphasis role="keywordtype">void</emphasis>&#32;<link linkend="_namespaceudc_1a1e040d8326f2ad3b600f8f66a8de6305">bwrite</link>(<emphasis role="keyword">const</emphasis>&#32;T&#32;&amp;source,&#32;<emphasis role="keywordtype">unsigned</emphasis>&#32;<emphasis role="keywordtype">char</emphasis>&#32;*&#32;&amp;buffer)&#32;{
+69 &#32;&#32;&#32;&#32;<link linkend="_namespaceudc_1a1e040d8326f2ad3b600f8f66a8de6305">bwrite</link>(&amp;source,&#32;<emphasis role="keyword">sizeof</emphasis>(T),&#32;buffer);
+70 }
+71 
+72 
+73 <emphasis role="keyword">class&#32;</emphasis><link linkend="_classudc_1_1_u_d_c_exception">UDCException</link>&#32;:&#32;<emphasis role="keyword">public</emphasis>&#32;exception&#32;{
+74 &#32;<emphasis role="keyword">private</emphasis>:
+75 &#32;&#32;&#32;&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">char</emphasis>&#32;*message;
+76 
+77 &#32;<emphasis role="keyword">public</emphasis>:
+78 &#32;&#32;&#32;&#32;<link linkend="_classudc_1_1_u_d_c_exception_1a60f9a75be4d8880a5521dc50d4df05f7">UDCException</link>(<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">char</emphasis>&#32;*message)&#32;:&#32;message(message)&#32;{}
+79 &#32;&#32;&#32;&#32;
+80 &#32;&#32;&#32;&#32;<emphasis role="keyword">virtual</emphasis>&#32;<emphasis role="keyword">const</emphasis>&#32;<emphasis role="keywordtype">char</emphasis>&#32;*&#32;<link linkend="_classudc_1_1_u_d_c_exception_1aed918c48351c4bf4673f438235cd3026">what</link>()&#32;const&#32;noexcept&#32;{&#32;<emphasis role="keywordflow">return</emphasis>&#32;message;&#32;}
+81 };
+82 
+83 
+84 }&#32;<emphasis role="comment">//end&#32;of&#32;namespace</emphasis>
+85 
+86 <emphasis role="preprocessor">#endif</emphasis>
+</programlisting></section>
