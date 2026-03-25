@@ -1,6 +1,8 @@
-from ..config import Config
+from .. import Config, VisualStudio
 from ..simulation import Simulation, Snapshot
 import numpy as np
+
+TOOL = VisualStudio(year=2022)
 
 test_sizes = [1, 2, 3, 10, 100, 1000, 10000, 20000]  # TODO: 1000000. Takes too long to compile! Why?
 LEFT = "LEFT"
@@ -31,7 +33,7 @@ for n in test_sizes:
 		n - 1: { "kT": 100.0 }
 	}
 
-	with config.compile(progress_bars=True) as rt:
+	with config.compile(tool=TOOL, progress_bars=True) as rt:
 		sim = Simulation(rt)
 		assert len(sim.nodes) == n
 		assert len(sim.edges) == n - 1

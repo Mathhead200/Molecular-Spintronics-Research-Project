@@ -1,11 +1,13 @@
 from __future__ import annotations
-from .. import Config
+from .. import Config, VisualStudio
 from ..util import S_, F_, kT_, B_, A_, J_, Je0_, Je1_, Jee_, b_, D_, SCALAR_PARAMETERS, VECTOR_PARAMETERS
 from ..driver import c_double_3
 from ctypes import c_double
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
 	from ..runtime import scal_out, vec_out
+
+TOOL = VisualStudio(year=2022)
 
 test_sizes = [0, 1, 2, 3, 10, 100, 1000, 10000, 20000]  # TODO: 1000000. Takes too long to compile! Why?
 
@@ -48,7 +50,7 @@ for g_lbl, g in test_globalParameters.items():
 			except:             assert False
 			continue  # skip the rest of the check since compilation is expected to fail in this case
 		print("Compiling...")
-		with config.compile(progress_bars=True) as rt:
+		with config.compile(tool=TOOL, progress_bars=True) as rt:
 			print("Testing...")
 			assert config.NODE_COUNT == n
 			assert config.MUTABLE_NODE_COUNT == n

@@ -1577,7 +1577,7 @@ class Config:
 		
 		tqdm_proc = tqdm(total=5, desc="[Compiling] Writing ASM .code (other PROC)") if progress_bars else None
 		def tqdm_proc_update(n=1):
-			if progress_bars:  tqdm_proc.update(n)
+			if tqdm_proc is not None:  tqdm_proc.update(n)
 
 		# metropolis PROC
 		src += "; Helpers for calculating random unit vectors (Marsaglia's method)\n"
@@ -2164,6 +2164,7 @@ class Config:
 		src += "\tret\n"
 		src += "DllMain ENDP\n\n"
 		tqdm_proc_update()
+		if tqdm_proc is not None:  tqdm_proc.close()
 
 		# ---------------------------------------------------------------------
 		for symbol, _ in tqdm_(exports, "[Compiling] Writing ASM PUBLIC (exports)"):

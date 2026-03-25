@@ -2,9 +2,9 @@ from ..config import Config
 from ..util import clamp
 
 # region names
-__FML__ = "L"
-__FMR__ = "R"
-__mol__ = "m"
+FML_ = "L"
+FMR_ = "R"
+mol_ = "m"
 
 def MSD(width: int, height: int, depth: int,
 		molPosL: int=None, molPosR: int=None,
@@ -24,7 +24,7 @@ def MSD(width: int, height: int, depth: int,
 	msd = Config()
 	msd.nodes = {}  # ordered set (as dict)
 	msd.edges = []
-	msd.regions = { __FML__: [], __FMR__: [], __mol__: [] }
+	msd.regions = { FML_: [], FMR_: [], mol_: [] }
 
 	# TODO: build nodes chucks to optimize for L1 cache
 	# add all nodes
@@ -33,7 +33,7 @@ def MSD(width: int, height: int, depth: int,
 			for x in range(0, molPosL):
 				i = (x, y, z)
 				msd.nodes[i] = None  # add to ordered set
-				msd.regions[__FML__].append(i)
+				msd.regions[FML_].append(i)
 	
 	for z in range(frontR, backR + 1):
 		for y in range(topL, bottomL + 1):
@@ -41,14 +41,14 @@ def MSD(width: int, height: int, depth: int,
 				for x in range(molPosL, molPosR + 1):
 					i = (x, y, z)
 					msd.nodes[i] = None
-					msd.regions[__mol__].append(i)
+					msd.regions[mol_].append(i)
 	
 	for z in range(frontR, backR + 1):
 		for y in range(0, height):
 			for x in range(molPosR + 1, width):
 				i = (x, y, z)
 				msd.nodes[i] = None
-				msd.regions[__FMR__].append(i)
+				msd.regions[FMR_].append(i)
 	
 	# connect nodes
 	for i in msd.nodes:
@@ -81,11 +81,11 @@ def MSD(width: int, height: int, depth: int,
 	}
 	msd.regionNodeParameters = {}
 	msd.regionEdgeParameters = {
-		(__FML__, __FML__): { "J": 1.0 },
-		(__FML__, __mol__): { "J": 1.0 },
-		(__mol__, __mol__): { "J": 1.0 },
-		(__mol__, __FMR__): { "J": -1.0 },
-		(__FMR__, __FMR__): { "J": 1.0 }
+		(FML_, FML_): { "J": 1.0 },
+		(FML_, mol_): { "J": 1.0 },
+		(mol_, mol_): { "J": 1.0 },
+		(mol_, FMR_): { "J": -1.0 },
+		(FMR_, FMR_): { "J": 1.0 }
 		# no default JLR direct coupling
 	}
 

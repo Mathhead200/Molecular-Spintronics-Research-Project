@@ -71,8 +71,8 @@ class Proxy[E, K, V]:
 	def __getitem__(self, key: K) -> Proxy[E, K, V]:
 		candidate_elements = self._filter(self._data, self._name, key)
 		elements = { x: None for x in candidate_elements if x in self._elements }  # (ordered set) itersection of candidate_elements and self._elements
-		if len(elements) == 0:
-			raise ValueError(f"{key} is valid by itself, but disjoint with previous subscripts: {self._subscripts}")
+		# if len(elements) == 0:
+		# 	raise ValueError(f"{key} is valid by itself, but disjoint with previous subscripts: {self._subscripts}")
 		return self.sub(elements, key=key, permuted=False)
 	
 	def assert_unpermuted(self) -> Proxy:

@@ -1,1 +1,1 @@
-from .msd import MSD, __FML__, __FMR__, __mol__
+from .msd import MSD, FML_, FMR_, mol_
