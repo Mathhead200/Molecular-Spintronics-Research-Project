@@ -127,4 +127,6 @@ def example_3d():
 
 if __name__ == "__main__":
 	msd = example_3d()
-	msd.compile(asm="example_3d.asm", dir=".")  # arguments optional
+	with msd.compile(asm="example_3d.asm", dir=".") as rt:  # arguments optional
+		pass
+	

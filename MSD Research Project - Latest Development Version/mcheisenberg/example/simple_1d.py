@@ -16,4 +16,5 @@ def simple_1d():
 
 if __name__ == "__main__":
 	msd = simple_1d()
-	msd.compile(asm="simple_1d.asm", dir=".")  # arguments optional
+	with msd.compile(asm="simple_1d.asm", dir=".") as rt:  # arguments optional
+		pass

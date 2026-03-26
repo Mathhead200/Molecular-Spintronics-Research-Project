@@ -45,4 +45,5 @@ def example_1d():
 
 if __name__ == "__main__":
 	msd = example_1d()
-	msd.compile(asm="example_1d.asm", dir=".")  # arguments optional
+	with msd.compile(asm="example_1d.asm", dir=".") as rt:  # arguments optional
+		pass
