@@ -12,6 +12,7 @@ from tempfile import mkstemp
 from tqdm import tqdm
 from typing import Generic, Optional, TypeVar, TypedDict, TYPE_CHECKING
 import os
+import re
 if TYPE_CHECKING:
 	from collections.abc import Callable, Collection, Iterable
 
@@ -109,6 +110,8 @@ class Config:
 			raise ValueError(f"{err_prefix} {id} reserved")
 		if id.upper() in MASM_RESERVED_KEYWORDS:  # case insensitive
 			raise ValueError(f"{err_prefix} {id} reserved: MASM keyword (directive, instruction, etc.)")
+		if not re.fullmatch(r"[A-Za-z_]\w*"):
+			raise ValueError(f"{err_prefix} {id} invalid identifier. (e.g. Must not include spaces or start with a digit.)")
 
 	def __init__(self, **kw):
 		self.__dict__ = _Config(*kw)
@@ -428,10 +431,9 @@ class Config:
 		if "localEdgeParameters"  not in self.__dict__:  self.localEdgeParameters = {}
 		if "regionNodeParameters" not in self.__dict__:  self.regionNodeParameters = {}
 		if "regionEdgeParameters" not in self.__dict__:  self.regionEdgeParameters = {}
-		if "globalParameters"     not in self.__dict__:  self.globalParameters = {}
+		if "globalParameters"     not in self.__dict__:  self.globalParameters = { "S": 1.0 }
 		if "variableParameters"   not in self.__dict__:  self.variableParameters = set()
 		if "programParameters"    not in self.__dict__:  self.programParameters = {}
-		if "constParameters"      not in self.__dict__:  self.constParameters = set()
 		if "debug"                not in self.__dict__:  self.debug = set()
 
 		if "prng" not in self.programParameters:
@@ -451,7 +453,7 @@ class Config:
 				len(self.localEdgeParameters) + len(self.regionNodeParameters) + len(self.regionEdgeParameters) + \
 				len(self.globalParameters) + len(self.programParameters) + 1 + len(seed) if seed is not None else 0 + \
 				1 + len(self.localNodeParameters) + len(self.localEdgeParameters) + len(self.regionNodeParameters) + \
-				len(self.regionEdgeParameters),
+				len(self.regionEdgeParameters) + 2*(len(self.mutableNodes) + len(self.regions) + 1),
 			desc="[Compiling] Validating config"
 		) if progress_bars else None
 		def tqdm_check_update(n=1):
@@ -604,6 +606,24 @@ class Config:
 				raise KeyError(f"dict key {combo} in regionEdgeParameters is not referencing a defined edge-region. Defined edge-regions are: {self.regionCombos}")
 			tqdm_check_update()
 		
+		# CHECK: dkT, dB, etc. parameters depend on kT, B, etc.
+		def param_depends_on(p, *dependancies):
+			for node in self.mutableNodes:
+				params = self.localNodeParameters(node, {})
+				if p in params and any(d not in params for d in dependancies):
+					raise ValueError(f"{p} defined for node {node}. {dependancies} must then also be defined for this (mutable) node.")
+				tqdm_check_update()
+			for region in self.regions:
+				params = self.regionNodeParameters(region, {})
+				if p in params and any(d not in params for d in dependancies):
+					raise ValueError(f"{p} defined for region {region}. {dependancies} must then also be defined for this region.")
+				tqdm_check_update()
+			if p in self.globalParameters and any(d not in self.globalParameters for d in dependancies):
+				raise ValueError(f"{p} was defined globally. {dependancies} must then also be defined globally.")
+			tqdm_check_update()
+		param_depends_on("dB", "B")
+		param_depends_on("dkT", "kT")
+
 		if tqdm_check is not None:  tqdm_check.close()
 
 		def tqdm_(iterable, desc):
@@ -635,10 +655,14 @@ class Config:
 			src += ";\tdouble flux[4];  // 32 bytes. last element is ignored.\n"
 		if "B" in self.localNodeKeys:
 			src += ";\tdouble B[4];     // 32 bytes. last element is ignored.\n"
+		if "dB" in self.localNodeKeys:
+			src += ";\tdouble dB[4];    // 32 bytes. last element is ignored.\n"
 		if "A" in self.localNodeKeys:
 			src += ";\tdouble A[4];     // 32 bytes. last element is ignored.\n"
 		if any(p in self.localNodeKeys for p in {"S", "F", "kT", "Je0"}):
 			src += ";\tdouble S, F, kT, Je0;  // 32 bytes. unused parameters are ignored.\n"
+		if "dkT" in self.localNodeKeys:
+			src += ";\tdouble _, _, dkT, _;   // 32 bytes. unused parameters are ignored.\n"
 		src += "; }\n"
 		# symbolic constants related to nodes' memory structure
 		offset32 = 0  # tracks current position as we iterate through struct in 32-byte chunks
@@ -650,6 +674,9 @@ class Config:
 		if "B" in self.localNodeKeys:
 			self.OFFSETOF_B = 32 * offset32
 			src += f"OFFSETOF_B    EQU 32*({offset32})\n";  offset32 += 1
+		if "dB" in self.localNodeKeys:
+			self.OFFSETOF_dB = 32 * offset32
+			src += f"OFFSETOF_dB   EQU 32*({offset32})\n";  offset32 += 1
 		if "A" in self.localNodeKeys:
 			self.OFFSETOF_A = 32 * offset32
 			src += f"OFFSETOF_A    EQU 32*({offset32})\n";  offset32 += 1
@@ -658,6 +685,9 @@ class Config:
 			if "F" in self.localNodeKeys:    src += f"OFFSETOF_F    EQU 32*({offset32}) + 8*(1)\n";  self.OFFSETOF_F   = 32 * offset32 + 8*1
 			if "kT" in self.localNodeKeys:   src += f"OFFSETOF_kT   EQU 32*({offset32}) + 8*(2)\n";  self.OFFSETOF_kT  = 32 * offset32 + 8*2
 			if "Je0" in self.localNodeKeys:  src += f"OFFSETOF_Je0  EQU 32*({offset32}) + 8*(3)\n";  self.OFFSETOF_Je0 = 32 * offset32 + 8*3
+			offset32 += 1
+		if "dkT" in self.localNodeKeys:
+			if True:                         src += f"OFFSETOF_dkT  EQU 32*({offset32}) + 8*(2)\n";  self.OFFSETOF_dkT = 32 * offset32 + 8*2
 			offset32 += 1
 		self.SIZEOF_NODE = 32 * offset32
 		src += f"SIZEOF_NODE   EQU 32*({offset32})\n"
@@ -680,6 +710,9 @@ class Config:
 			if "B" in self.localNodeKeys:
 				Bx, By, Bz = floats(params.get("B", (0.0, 0.0, 0.0)))  # unpack generator
 				src += f", \t{Bx}, {By}, {Bz}, 0.0"
+			if "dB" in self.localNodeKeys:
+				dBx, dBy, dBz = floats(params.get("dB", (0.0, 0.0, 0.0)))  # unpack generator
+				src += f", \t{dBx}, {dBy}, {dBz}, 0.0"
 			if "A" in self.localNodeKeys:
 				Ax, Ay, Az = floats(params.get("A", (0.0, 0.0, 0.0)))  # unpack generator
 				src += f", \t{Ax}, {Ay}, {Az}, 0.0"
@@ -689,6 +722,9 @@ class Config:
 				kT = float(params.get("kT", 0.0))
 				Je0 = float(params.get("Je0", 0.0))
 				src += f", \t{S}, {F}, {kT}, {Je0}"
+			if "dkT" in self.localNodeKeys:
+				dkT = float(params.get("kT", 0.0))
+				src += f", \t0.0, 0.0, {dkT}, 0.0"
 			const = "const " if i >= len(self.mutableNodes) else ""
 			regions = self.getRegions(node)
 			regions = f" in {regions}" if len(regions) != 0 else ""
@@ -701,16 +737,23 @@ class Config:
 		src += "; struct region {\n"
 		if "B" in self.regionNodeKeys:
 			src += ";\tdouble B[4];     // 32 bytes. last element is ignored.\n"
+		if "dB" in self.regionNodeKeys:
+			src += ";\tdouble dB[4];    // 32 bytes. last element is ignored.\n"
 		if "A" in self.regionNodeKeys:
 			src += ";\tdouble A[4];     // 32 bytes. last element is ignored.\n"
 		if any(p in self.regionNodeKeys for p in {"S", "F", "kT", "Je0"}):
 			src += ";\tdouble S, F, kT, Je0;  // 32 bytes. unused parameters are ignored.\n"
+		if "dkT" in self.regionNodeKeys:
+			src += ";\tdouble _, _, dkT, _;   // 32 bytes. unsued parameters are ignored.\n"
 		src += "; }\n"
 		# symbolic constants related to regions' memory structure
 		offset32 = 0  # tracks current position as we iterate through struct in 32-byte chunks
 		if "B" in self.regionNodeKeys:
 			self.OFFSETOF_REGION_B = 32 * offset32
 			src += f"OFFSETOF_REGION_B   EQU 32*({offset32})\n";  offset32 += 1
+		if "dB" in self.regionNodeKeys:
+			self.OFFSETOF_REGION_dB = 32 * offset32
+			src += f"OFFSETOF_REGION_dB  EQU 32*({offset32})\n";  offset32 += 1
 		if "A" in self.regionNodeKeys:
 			self.OFFSETOF_REGION_A = 32 * offset32
 			src += f"OFFSETOF_REGION_A   EQU 32*({offset32})\n";  offset32 += 1
@@ -719,6 +762,9 @@ class Config:
 			if "F"   in self.regionNodeKeys:  src += f"OFFSETOF_REGION_F   EQU 32*({offset32}) + 8*(1)\n";  self.OFFSETOF_REGION_F   = 32 * offset32 + 8*1
 			if "kT"  in self.regionNodeKeys:  src += f"OFFSETOF_REGION_kT  EQU 32*({offset32}) + 8*(2)\n";  self.OFFSETOF_REGION_kT  = 32 * offset32 + 8*2
 			if "Je0" in self.regionNodeKeys:  src += f"OFFSETOF_REGION_Je0 EQU 32*({offset32}) + 8*(3)\n";  self.OFFSETOF_REGION_Je0 = 32 * offset32 + 8*3
+			offset32 += 1
+		if "dkT" in self.regionNodeKeys:
+			if True:                          src += f"OFFSETOF_REGION_dkT EQU 32*({offset32}) + 8*(2)\n";  self.OFFSETOF_REGION_dkT = 32 * offset32 + 8*2
 			offset32 += 1
 		self.SIZEOF_REGION = 32 * offset32
 		src += f"SIZEOF_REGION EQU 32*({offset32})\n"
@@ -741,6 +787,9 @@ class Config:
 			if "B" in self.regionNodeKeys:
 				Bx, By, Bz = floats(params.get("B", (0.0, 0.0, 0.0)))  # unpack generator
 				src += f"{Bx}, {By}, {Bz}, 0.0,\t"
+			if "dB" in self.regionNodeKeys:
+				dBx, dBy, dBz = floats(params.get("dB", (0.0, 0.0, 0.0)))  # unpack generator
+				src += f"{dBx}, {dBy}, {dBz}, 0.0,\t"
 			if "A" in self.regionNodeKeys:
 				Ax, Ay, Az = floats(params.get("A", (0.0, 0.0, 0.0)))  # unpack generator
 				src += f"{Ax}, {Ay}, {Az}, 0.0,\t"
@@ -750,6 +799,9 @@ class Config:
 				kT  = float(params.get("kT",  0.0))
 				Je0 = float(params.get("Je0", 0.0))
 				src += f"{S}, {F}, {kT}, {Je0},\t"
+			if "dkT" in self.regionNodeKeys:
+				dkT = float(params.get("dkT", 0.0))
+				src += f"0.0, 0.0, {dkT}, 0.0,\t"
 			src.pieces[-1] = src.pieces[-1][0:-2]  # remove last 2-char ",\t" delimeter
 			src += "\n"
 			exports.append((rid, True))
@@ -757,7 +809,7 @@ class Config:
 		
 		# global parameters (node only):
 		src += "GLOBAL_NODE SEGMENT ALIGN(32)\n"
-		if any(p in self.globalKeys for p in ["B", "A", "S", "F", "kT", "Je0"]):
+		if any(p in self.globalKeys for p in ["B", "dB", "A", "S", "F", "kT", "Je0", "dkT"]):
 			src += "global_node LABEL qword\n"
 			exports.append(("global_node", True))
 		else:
@@ -767,6 +819,10 @@ class Config:
 			Bx, By, Bz = floats(params["B"])  # unpack generator
 			src += f"B   dq {Bx}, {By}, {Bz}, 0.0\n"
 			exports.append(("B", True))
+		if "dB" in self.globalKeys:
+			dBx, dBy, dBz = floats(params["dB"])  # unpack generator
+			src += f"dB  dq {dBx}, {dBy}, {dBz}, 0.0\n"
+			exports.append(("dB", True))
 		if "A" in self.globalKeys:
 			Ax, Ay, Az = floats(params["A"])  # unpack generator
 			src += f"A   dq {Ax}, {Ay}, {Az}, 0.0\n"
@@ -784,6 +840,13 @@ class Config:
 			exports.append(("F", True))
 			exports.append(("kT", True))
 			exports.append(("Je0", True))
+		if "dkT" in self.globalKeys:
+			dkT = float(params.get("dkT", 0.0))
+			src +=  "    dq 0.0\n"
+			src +=  "    dq 0.0\n"
+			src += f"dkT dq {dkT}\n"
+			src +=  "    dq 0.0\n"
+			exports.append(("dkT", True))
 		src += "GLOBAL_NODE ENDS\n\n"
 
 		# edges:
@@ -1715,9 +1778,9 @@ class Config:
 				S2 = f"{S}{2*num+2}"
 				src += f"\t\t; pick uniformally random new state for node [{regi}] (Marsaglia's method)\n"
 				if regis.index(regi) == 0:
-					src += "\t\t                                          ; assert ymm6 == [1.0, 1.0, 1.0, 1.0]\n"
+					src += f"\t\t                                          ; assert {one} == [1.0, 1.0, 1.0, 1.0]\n"
 				else:
-					src += "\t\t_vones ymm6                               ; [1.0, 1.0, 1.0, 1.0]\n"
+					src += f"\t\t_vones {one}                               ; [1.0, 1.0, 1.0, 1.0]\n"
 				if "F" in self.allKeys:
 					src += f"\t\t{MARSAGLIA_START_2}:             {pad}{padl}; 2 vectors, f' -> {flux}, s' -> {wxys}\n"
 					src += f"\t\t\t_gen_ws {wxys}, {wxys}, {s}, {one}, ymm10\n"
@@ -1829,8 +1892,54 @@ class Config:
 				if "F" in self.allKeys:
 					src += f"\t\tvmovapd [rax + {regi} + OFFSETOF_FLUX], {flux}  {pad}; update f' -> flux\n"
 				src += f"\t\t{SKIP}:\n\n"
-				# TODO?: parameter modification(s); e.g. global.B -= dB
-				# ...
+				# parameter modification(s); e.g. global.B -= dB
+				if not "dkT" in self.allKeys:
+					src += "\t\t; (skip) update kT (linearly)\n\n"
+				else:
+					kT = "xmm10"
+					src += "\t\t; update kT (linearly)\n"
+					for node in self.mutableNodes:
+						params = self.localNodeParameters.get(node, {})
+						if "dkT" in params:
+							idx = self.nodeIndex[node]
+							src += f"\t\tvmovsd {kT}, [nodes + SIZEOF_NODE*({idx}) + OFFSETOF_kT]  ; node[{idx}], id={self.nodeId(node)}\n"
+							src += f"\t\tvaddsd {kT}, {kT}, [nodes + SIZEOF_NODE*({idx}) + OFFSETOF_dkT]\n"
+							src += f"\t\tvmovsd [nodes + SIZEOF_NODE*({idx}) + OFFSETOF_kT], {kT}\n"
+					for region in self.regions:
+						params = self.regionNodeParameters.get(region, {})
+						if "dkT" in params:
+							rid = self.regionId(region)
+							src += f"\t\tvmovsd {kT}, [{rid} + OFFSETOF_REGION_kT]  ; region, {rid}\n"
+							src += f"\t\tvaddsd {kT}, {kT}, [{rid} + OFFSETOF_REGION_dkT]\n"
+							src += f"\t\tvmovsd [{rid} + OFFSETOF_REGION_kT], {kT}\n"
+					if "dkT" in self.globalParameters:
+						src += f"\t\tvmovsd {kT}, kT;  global\n"
+						src += f"\t\tvaddsd {kT}, {kT}, dkT\n"
+						src += f"\t\tvmovsd kT, {kT}\n"
+					src += "\n"
+				if not "dB" in self.allKeys:
+					src += "\t\t; (skip) update B (linearly)\n\n"
+				else:
+					B = "ymm10"
+					src += "\t\t; update B (linearly)\n"
+					for node in self.mutableNodes:
+						params = self.localNodeParameters.get(node, {})
+						if "dB" in params:
+							idx = self.nodeIndex[node]
+							src += f"\t\tvmovapd {B}, ymmword ptr [nodes + SIZEOF_NODE*({idx}) + OFFSETOF_B];  node[{idx}], id={self.nodeId(node)}\n"
+							src += f"\t\tvaddpd {B}, {B}, ymmword ptr [nodes + SIZEOF_NODE*({idx}) + OFFSETOF_dB]\n"
+							src += f"\t\tvmovapd ymmword ptr [nodes + SIZEOF_NODE*({idx}) + OFFSETOF_B], {B}\n"
+					for region in self.regions:
+						params = self.regionNodeParameters.get(region, {})
+						if "dB" in params:
+							rid = self.regionId(region)
+							src += f"\t\tvmovapd {B}, ymmword ptr [{rid} + OFFSETOF_REGION_B];  region, {rid}\n"
+							src += f"\t\tvaddpd {B}, {B}, ymmword prt [{rid} + OFFSETOF_REGION_dB]\n"
+							src += f"\t\tvmovapd ymmword ptr [{rid} + OFFSETOF_REGION_B], {B}\n"
+					if "dB" in self.globalParameters:
+						src += f"\t\tvmovapd {B}, ymmword ptr B;  global\n"
+						src += f"\t\tvaddpd {B}, {B}, ymmword ptr dB\n"
+						src += f"\t\tvmovapd ymmword ptr B, {B}\n"
 				if not batch4 and regi != "rdx":
 					src += "\t\t; done?\n"
 					src += "\t\tdec rcx\n"
@@ -2038,11 +2147,17 @@ class Config:
 		if "B" in self.globalKeys:
 			g.append("B[4]")
 			self.SIZEOF_RECORD += 32
+		if "dB" in self.globalKeys:
+			g.append("dB[4]")
+			self.SIZEOF_RECORD += 32
 		if "A" in self.globalKeys:
 			g.append("A[4]")
 			self.SIZEOF_RECORD += 32
 		if any(p in self.globalKeys for p in ["S", "F", "kT", "Je0"]):
 			g.append("S, F, kT, Je0")
+			self.SIZEOF_RECORD += 32
+		if "dKT" in self.globalKeys:
+			g.append("_, _, dkT, _")
 			self.SIZEOF_RECORD += 32
 		if len(g) != 0:
 			g_join = ", ".join(g)
@@ -2086,9 +2201,11 @@ class Config:
 			src += "\t; skip regions\n\n"
 		# store global_nodes
 		g = []
-		if "B" in self.globalKeys:  g.append("B")
-		if "A" in self.globalKeys:  g.append("A")
+		if "B"  in self.globalKeys:  g.append("B")
+		if "dB" in self.globalKeys:  g.append("dB")
+		if "A"  in self.globalKeys:  g.append("A")
 		if any(p in self.globalKeys for p in ["S", "F", "kT", "Je0"]):  g.append("S, F, kT, Je0")
+		if "dkT" in self.globalKeys: g.append("_, _, dkT, _")
 		if len(g) != 0:
 			src += "\tmov rsi, OFFSET global_node  ; source\n"
 			src += f"\tmov rcx, 4*({len(g)})  ; {', '.join(g)}\n"

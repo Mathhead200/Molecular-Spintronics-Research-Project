@@ -10,11 +10,14 @@ A_   = "A"    # Anisotropy
 b_   = "b"    # Biquadratic coupling
 D_   = "D"    # Dzyaloshinskii–Moriya interaction (DMI), i.e. magnetic skyrmions
 
+dkT_ = "dkT"  # linear change in temperature
+dB_  = "dB"   # linear change in external (applied) magnetic field
+
 NODES_ = "__NODES__"  # enum
 EDGES_ = "__EDGES__"  # enum
 
-NODE_PARAMETERS = [S_, F_, kT_, B_, A_, Je0_]
+NODE_PARAMETERS = [S_, F_, kT_, B_, A_, Je0_, dkT_, dB_]
 EDGE_PARAMETERS = [J_, Je1_, Jee_,  b_, D_]
-SCALAR_PARAMETERS = [S_, F_, kT_, Je0_, J_, Je1_, Jee_, b_]
-VECTOR_PARAMETERS = [B_, A_, D_]
-PARAMETERS = [S_, F_, kT_, J_, Je0_, Je1_, Jee_, B_, A_, b_, D_]
+SCALAR_PARAMETERS = [S_, F_, kT_, Je0_, J_, Je1_, Jee_, b_, dkT_]
+VECTOR_PARAMETERS = [B_, A_, D_, dB_]
+PARAMETERS = [S_, F_, kT_, J_, Je0_, Je1_, Jee_, B_, A_, b_, D_, dkT_, dB_]
