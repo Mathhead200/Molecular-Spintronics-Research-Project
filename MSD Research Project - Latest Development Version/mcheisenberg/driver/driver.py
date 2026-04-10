@@ -75,6 +75,10 @@ class Driver:
 		if "B" in config.globalKeys:
 			self.B = c_double_3.in_dll(self.dll, "B")
 			self._symbols.append("B")
+		
+		if "dB" in config.globalKeys:
+			self.dB = c_double_3.in_dll(self.dll, "dB")
+			self._symbols.append("dB")
 
 		if "A" in config.globalKeys:
 			self.A = c_double_3.in_dll(self.dll, "A")
@@ -86,6 +90,10 @@ class Driver:
 			self.kT = c_double.in_dll(self.dll, "kT")
 			self.Je0 = c_double.in_dll(self.dll, "Je0")
 			self._symbols.extend(["S", "F", "kT", "Je0"])
+		
+		if "dkT" in config.globalKeys:
+			self.dkT = c_double.in_dll(self.dll, "dkT")
+			self._symbols.append("dkT")
 
 		if any(p in config.globalKeys for p in ["J", "Je1", "Jee", "b"]):
 			self.J = c_double.in_dll(self.dll, "J")

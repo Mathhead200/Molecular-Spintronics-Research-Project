@@ -22,9 +22,9 @@ class DataView[T=Driver|MutableStateBuffer]:  # TODO: rename?
 		self._eregion_list_proxy = ERegionListProxy(self)
 		self._spin_list_proxy    = StateListProxy(self, "spin")
 		self._flux_list_proxy    = StateListProxy(self, "flux")
-		for param in ["A", "B", "D"]:
+		for param in ["A", "B", "dB", "D"]:
 			setattr(self, f"_{param}_proxy", VectorParameterProxy(self, param))  # e.g. self._B_proxy
-		for param in ["S", "F", "kT", "Je0", "J", "Je1", "Jee", "b"]:
+		for param in ["S", "F", "kT", "Je0", "dkT", "J", "Je1", "Jee", "b"]:
 			setattr(self, f"_{param}_proxy", ScalarParameterProxy(self, param))  # e.g. self._J_proxy
 		
 		# Not all of these nodes are defined explicitly in the data (i.e. buffer or DLL), but

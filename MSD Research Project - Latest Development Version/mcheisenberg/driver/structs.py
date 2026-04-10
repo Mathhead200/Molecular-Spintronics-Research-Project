@@ -18,14 +18,20 @@ def Node(config: Config) -> Structure:
 	pad = Incrementer()
 	if config.OFFSETOF_SPIN is not None:  fields.extend([ ("spin", c_double_3), _1(pad) ])
 	if config.OFFSETOF_FLUX is not None:  fields.extend([ ("flux", c_double_3), _1(pad) ])
-	if config.OFFSETOF_B is not None:     fields.extend([ ("B",    c_double_3), _1(pad) ])
-	if config.OFFSETOF_A is not None:     fields.extend([ ("A",    c_double_3), _1(pad) ])
+	if config.OFFSETOF_B    is not None:  fields.extend([ ("B",    c_double_3), _1(pad) ])
+	if config.OFFSETOF_dB   is not None:  fields.extend([ ("dB",   c_double_3), _1(pad) ])
+	if config.OFFSETOF_A    is not None:  fields.extend([ ("A",    c_double_3), _1(pad) ])
 	block32 = [config.OFFSETOF_S, config.OFFSETOF_F, config.OFFSETOF_kT, config.OFFSETOF_Je0]
 	if any(p is not None for p in block32):
 		fields.append(("S"   if config.OFFSETOF_S   is not None else _f(pad), c_double))
 		fields.append(("F"   if config.OFFSETOF_F   is not None else _f(pad), c_double))
 		fields.append(("kT"  if config.OFFSETOF_kT  is not None else _f(pad), c_double))
 		fields.append(("Je0" if config.OFFSETOF_Je0 is not None else _f(pad), c_double))
+	if config.OFFSETOF_dkT is not None:
+		fields.append(_1(pad))
+		fields.append(_1(pad))
+		fields.append(("dkT", c_double))
+		fields.append(_1(pad))
 
 	class _Node(Structure):
 		_fields_ = fields
@@ -36,14 +42,20 @@ def Node(config: Config) -> Structure:
 def Region(config: Config) -> Structure:
 	fields = []
 	pad = Incrementer()
-	if config.OFFSETOF_REGION_B is not None:  fields.extend([ ("B", c_double_3), _1(pad) ])
-	if config.OFFSETOF_REGION_A is not None:  fields.extend([ ("A", c_double_3), _1(pad) ])
+	if config.OFFSETOF_REGION_B  is not None:  fields.extend([ ("B",  c_double_3), _1(pad) ])
+	if config.OFFSETOF_REGION_dB is not None:  fields.extend([ ("dB", c_double_3), _1(pad) ])
+	if config.OFFSETOF_REGION_A  is not None:  fields.extend([ ("A",  c_double_3), _1(pad) ])
 	block32 = [config.OFFSETOF_REGION_S, config.OFFSETOF_REGION_F, config.OFFSETOF_REGION_kT, config.OFFSETOF_REGION_Je0]
 	if any(p is not None for p in block32):
 		fields.append(("S"   if config.OFFSETOF_REGION_S   is not None else _f(pad), c_double))
 		fields.append(("F"   if config.OFFSETOF_REGION_F   is not None else _f(pad), c_double))
 		fields.append(("kT"  if config.OFFSETOF_REGION_kT  is not None else _f(pad), c_double))
 		fields.append(("Je0" if config.OFFSETOF_REGION_Je0 is not None else _f(pad), c_double))
+	if config.OFFSETOF_REGION_dkT is not None:
+		fields.append(_1(pad))
+		fields.append(_1(pad))
+		fields.append(("dkT", c_double))
+		fields.append(_1(pad))
 	
 	class _Region(Structure):
 		_fields_ = fields
@@ -54,13 +66,19 @@ def Region(config: Config) -> Structure:
 def GlobalNode(config: Config) -> Structure:
 	fields = []
 	pad = Incrementer()
-	if "B" in config.globalKeys:  fields.extend([ ("B", c_double_3), _1(pad) ])
-	if "A" in config.globalKeys:  fields.extend([ ("A", c_double_3), _1(pad) ])
+	if "B"   in config.globalKeys:  fields.extend([ ("B",  c_double_3), _1(pad) ])
+	if "dkT" in config.globalKeys:  fields.extend([ ("dB", c_double_3), _1(pad) ])
+	if "A"   in config.globalKeys:  fields.extend([ ("A",  c_double_3), _1(pad) ])
 	if any(p in config.globalKeys for p in ["S", "F", "kT", "Je0"]):
 		fields.append(("S"   if "S"   in config.globalKeys else _f(pad), c_double))
 		fields.append(("F"   if "F"   in config.globalKeys else _f(pad), c_double))
 		fields.append(("kT"  if "kT"  in config.globalKeys else _f(pad), c_double))
 		fields.append(("Je0" if "Je0" in config.globalKeys else _f(pad), c_double))
+	if "dkT" in config.globalKeys:
+		fields.append(_1(pad))
+		fields.append(_1(pad))
+		fields.append(("dkT", c_double))
+		fields.append(_1(pad))
 	
 	class _GlobalNode(Structure):
 		_fields_ = fields

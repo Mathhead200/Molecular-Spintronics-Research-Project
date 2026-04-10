@@ -76,10 +76,12 @@ class ReadyBuffers:
 class DataViewWrapper[T=Driver|MutableStateBuffer]:
 	A:   VectorNodeParameterProxy
 	B:   VectorNodeParameterProxy
+	dB:  VectorNodeParameterProxy
 	S:   ScalarNodeParameterProxy
 	F:   ScalarNodeParameterProxy
 	kT:  ScalarNodeParameterProxy
 	Je0: ScalarNodeParameterProxy
+	dkT: ScalarNodeParameterProxy
 	J:   ScalarEdgeParameterProxy
 	Je1: ScalarEdgeParameterProxy
 	Jee: ScalarEdgeParameterProxy
@@ -105,9 +107,9 @@ class DataViewWrapper[T=Driver|MutableStateBuffer]:
 			setattr(self, attr, getattr(config_data, attr))  # e.g. self._nodes = config_data.nodes; etc.
 
 		# proxies
-		for param in ["A", "B"]:
+		for param in ["A", "B", "dB"]:
 			setattr(self, f"_{param}_proxy", VectorNodeParameterProxy(self, param))
-		for param in ["S", "F", "kT", "Je0"]:
+		for param in ["S", "F", "kT", "Je0", "dkT"]:
 			setattr(self, f"_{param}_proxy", ScalarNodeParameterProxy(self, param))
 		for param in ["J", "Je1", "Jee", "b"]:
 			setattr(self, f"_{param}_proxy", ScalarEdgeParameterProxy(self, param))
