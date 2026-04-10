@@ -66,9 +66,9 @@ def Region(config: Config) -> Structure:
 def GlobalNode(config: Config) -> Structure:
 	fields = []
 	pad = Incrementer()
-	if "B"   in config.globalKeys:  fields.extend([ ("B",  c_double_3), _1(pad) ])
-	if "dkT" in config.globalKeys:  fields.extend([ ("dB", c_double_3), _1(pad) ])
-	if "A"   in config.globalKeys:  fields.extend([ ("A",  c_double_3), _1(pad) ])
+	if "B"  in config.globalKeys:  fields.extend([ ("B",  c_double_3), _1(pad) ])
+	if "dB" in config.globalKeys:  fields.extend([ ("dB", c_double_3), _1(pad) ])
+	if "A"  in config.globalKeys:  fields.extend([ ("A",  c_double_3), _1(pad) ])
 	if any(p in config.globalKeys for p in ["S", "F", "kT", "Je0"]):
 		fields.append(("S"   if "S"   in config.globalKeys else _f(pad), c_double))
 		fields.append(("F"   if "F"   in config.globalKeys else _f(pad), c_double))

@@ -77,7 +77,7 @@ class Driver:
 			self._symbols.append("B")
 		
 		if "dB" in config.globalKeys:
-			self.dB = c_double_3.in_dll(self.dll, "dB")
+			self.dB = c_double_3.in_dll(self.dll, "dB_")  # NOTE: dB is ASM directive (define byte)
 			self._symbols.append("dB")
 
 		if "A" in config.globalKeys:

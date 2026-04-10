@@ -236,6 +236,10 @@ Second bug fix. In MSD::setParameters()
 	Added streaming support for more efficiently processing snapshots.
 	And updated io.csv modual and apps.iterate to leverage these changes.
 
+7.1.0:
+(4-10-2026) Added dB and dkT parameters
+	Fixed bug/crash in setting global vector parameters (runtime_proxies)
+
 ------------------------------------ TODOs ------------------------------------
 [mcheisenberg]
 TODO: Optimize compiling large (e.g. len(nodes)=1_000_000) configurations. Currently taking a **long** time! Why?

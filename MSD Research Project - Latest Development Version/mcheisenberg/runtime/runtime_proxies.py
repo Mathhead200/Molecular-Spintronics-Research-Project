@@ -325,7 +325,7 @@ for param in ["D"]:
 	))
 
 class GlobalsProxy:
-	__slots__ = [ "B", "A", "S", "F", "kT", "Je0",
+	__slots__ = [ "B", "dB", "A", "S", "F", "kT", "Je0", "dkT",
 	              "J", "Je1", "Jee", "b", "D",
 	              "_data" ]
 
@@ -344,20 +344,22 @@ class GlobalsProxy:
 		try:
 			getattr(self._data.source, param).value = value
 		except AttributeError as ex:
-			raise AttributeError(f"Global parameter {param} is undefined in Config") from ex
+			ex.add_note(f"Global parameter {param} is undefined in Config")
+			raise
 
 	def _setVector(self, param: str, value: vec_in) -> None:
 		try:
-			getattr(self._runtime.driver, param)[:3] = value
+			getattr(self._data.source, param)[:3] = value
 		except AttributeError as ex:
-			raise AttributeError(f"Global parameter {param} is undefined in Config") from ex
+			ex.add_note(f"Global parameter {param} is undefined in Config")
+			raise
 
-for param in ["A", "B", "D"]:
+for param in ["A", "B", "dB", "D"]:
 	setattr(GlobalsProxy, param, property(
 		fget=lambda self,        _p=param: self._getVector(_p),
 		fset=lambda self, value, _p=param: self._setVector(_p, value)
 	))
-for param in ["S", "F", "kT", "Je0", "J", "Je1", "Jee", "b"]:
+for param in ["S", "F", "kT", "Je0", "dkT", "J", "Je1", "Jee", "b"]:
 	setattr(GlobalsProxy, param, property(
 		fget=lambda self,        _p=param: self._getScalar(_p),
 		fset=lambda self, value, _p=param: self._setScalar(_p, value)

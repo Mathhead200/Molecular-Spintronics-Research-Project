@@ -1,5 +1,5 @@
 from __future__ import annotations
-from ..util import StrJoiner, floats, is_pow2, MASM_RESERVED_KEYWORDS, EDGE_PARAMETERS, NODE_PARAMETERS
+from ..util import StrJoiner, is_pow2, MASM_RESERVED_KEYWORDS, EDGE_PARAMETERS, NODE_PARAMETERS
 from ..build import VisualStudio
 from ..runtime import Runtime
 from collections import defaultdict
@@ -110,8 +110,30 @@ class Config:
 			raise ValueError(f"{err_prefix} {id} reserved")
 		if id.upper() in MASM_RESERVED_KEYWORDS:  # case insensitive
 			raise ValueError(f"{err_prefix} {id} reserved: MASM keyword (directive, instruction, etc.)")
-		if not re.fullmatch(r"[A-Za-z_]\w*"):
-			raise ValueError(f"{err_prefix} {id} invalid identifier. (e.g. Must not include spaces or start with a digit.)")
+	
+	@staticmethod
+	def validate_nid(nid):
+		err_prefix = "Node"
+		Config.validate_id(nid, err_prefix)
+		if not re.fullmatch(r"\w+", nid):
+			raise ValueError(f"{err_prefix} {nid} invalid identifier. (e.g. Must not include spaces.)")
+
+	@staticmethod
+	def validate_rid(rid):
+		err_prefix = "Region"
+		Config.validate_id(rid, err_prefix)
+		if not re.fullmatch(r"[A-Za-z_]\w*", rid):
+			raise ValueError(f"{err_prefix} {rid} invalid identifier. (e.g. Must not include spaces or start with a digit.)")
+
+	@staticmethod
+	def asm_float(value: float) -> str:
+		num = f"{value:.17f}".rstrip("0")
+		if num.endswith("."):  num += "0"
+		return num
+
+	@staticmethod
+	def asm_floats(values: Iterable) -> tuple[str]:
+		return (Config.asm_float(val) for val in values)
 
 	def __init__(self, **kw):
 		self.__dict__ = _Config(*kw)
@@ -446,6 +468,8 @@ class Config:
 		# aliases
 		prng = self.programParameters["prng"]
 		seed = self.programParameters.get("seed", None)
+		asm_float  = Config.asm_float   # function
+		asm_floats = Config.asm_floats  # function
 
 		DEBUG_OPTIONS = { "deltaU_ret_dump" }
 		_unrecognized_debug_options = self.debug - DEBUG_OPTIONS
@@ -476,11 +500,13 @@ class Config:
 		tqdm_check_update()
 
 		# CHECK: Make sure all node and region names are valid identifiers for ASM output
-		for id in self.nodes:
-			Config.validate_id(id, err_prefix="Node")
+		for n in self.nodes:
+			nid = self.nodeId(n)
+			Config.validate_nid(nid)
 			tqdm_check_update()
-		for id in self.regions:
-			Config.validate_id(id, err_prefix="Region")
+		for r in self.regions:
+			rid = self.regionId(r)
+			Config.validate_rid(rid)
 			tqdm_check_update()
 
 		# CHECK: Do all nodes referenced in self.edges actually exist in self.nodes?
@@ -613,12 +639,12 @@ class Config:
 		# CHECK: dkT, dB, etc. parameters depend on kT, B, etc.
 		def param_depends_on(p, *dependancies):
 			for node in self.mutableNodes:
-				params = self.localNodeParameters(node, {})
+				params = self.localNodeParameters.get(node, {})
 				if p in params and any(d not in params for d in dependancies):
 					raise ValueError(f"{p} defined for node {node}. {dependancies} must then also be defined for this (mutable) node.")
 				tqdm_check_update()
 			for region in self.regions:
-				params = self.regionNodeParameters(region, {})
+				params = self.regionNodeParameters.get(region, {})
 				if p in params and any(d not in params for d in dependancies):
 					raise ValueError(f"{p} defined for region {region}. {dependancies} must then also be defined for this region.")
 				tqdm_check_update()
@@ -712,22 +738,22 @@ class Config:
 			if "F" in self.allKeys:
 				src += ", \t0.0, 0.0, 0.0, 0.0"  # init flux <0, 0, 0>
 			if "B" in self.localNodeKeys:
-				Bx, By, Bz = floats(params.get("B", (0.0, 0.0, 0.0)))  # unpack generator
+				Bx, By, Bz = asm_floats(params.get("B", (0.0, 0.0, 0.0)))  # unpack generator
 				src += f", \t{Bx}, {By}, {Bz}, 0.0"
 			if "dB" in self.localNodeKeys:
-				dBx, dBy, dBz = floats(params.get("dB", (0.0, 0.0, 0.0)))  # unpack generator
+				dBx, dBy, dBz = asm_floats(params.get("dB", (0.0, 0.0, 0.0)))  # unpack generator
 				src += f", \t{dBx}, {dBy}, {dBz}, 0.0"
 			if "A" in self.localNodeKeys:
-				Ax, Ay, Az = floats(params.get("A", (0.0, 0.0, 0.0)))  # unpack generator
+				Ax, Ay, Az = asm_floats(params.get("A", (0.0, 0.0, 0.0)))  # unpack generator
 				src += f", \t{Ax}, {Ay}, {Az}, 0.0"
 			if any(p in self.localNodeKeys for p in {"S", "F", "kT", "Je0"}):
-				S = float(params.get("S", 0.0))
-				F = float(params.get("F", 0.0))
-				kT = float(params.get("kT", 0.0))
-				Je0 = float(params.get("Je0", 0.0))
+				S = asm_float(params.get("S", 0.0))
+				F = asm_float(params.get("F", 0.0))
+				kT = asm_float(params.get("kT", 0.0))
+				Je0 = asm_float(params.get("Je0", 0.0))
 				src += f", \t{S}, {F}, {kT}, {Je0}"
 			if "dkT" in self.localNodeKeys:
-				dkT = float(params.get("kT", 0.0))
+				dkT = asm_float(params.get("kT", 0.0))
 				src += f", \t0.0, 0.0, {dkT}, 0.0"
 			const = "const " if i >= len(self.mutableNodes) else ""
 			regions = self.getRegions(node)
@@ -789,22 +815,22 @@ class Config:
 			params = self.regionNodeParameters[region]  # dict
 			src += f"  {rid}\tdq "
 			if "B" in self.regionNodeKeys:
-				Bx, By, Bz = floats(params.get("B", (0.0, 0.0, 0.0)))  # unpack generator
+				Bx, By, Bz = asm_floats(params.get("B", (0.0, 0.0, 0.0)))  # unpack generator
 				src += f"{Bx}, {By}, {Bz}, 0.0,\t"
 			if "dB" in self.regionNodeKeys:
-				dBx, dBy, dBz = floats(params.get("dB", (0.0, 0.0, 0.0)))  # unpack generator
+				dBx, dBy, dBz = asm_floats(params.get("dB", (0.0, 0.0, 0.0)))  # unpack generator
 				src += f"{dBx}, {dBy}, {dBz}, 0.0,\t"
 			if "A" in self.regionNodeKeys:
-				Ax, Ay, Az = floats(params.get("A", (0.0, 0.0, 0.0)))  # unpack generator
+				Ax, Ay, Az = asm_floats(params.get("A", (0.0, 0.0, 0.0)))  # unpack generator
 				src += f"{Ax}, {Ay}, {Az}, 0.0,\t"
 			if any(p in self.regionNodeKeys for p in {"S", "F", "kT", "Je0"}):
-				S   = float(params.get("S",   0.0))
-				F   = float(params.get("F",   0.0))
-				kT  = float(params.get("kT",  0.0))
-				Je0 = float(params.get("Je0", 0.0))
+				S   = asm_float(params.get("S",   0.0))
+				F   = asm_float(params.get("F",   0.0))
+				kT  = asm_float(params.get("kT",  0.0))
+				Je0 = asm_float(params.get("Je0", 0.0))
 				src += f"{S}, {F}, {kT}, {Je0},\t"
 			if "dkT" in self.regionNodeKeys:
-				dkT = float(params.get("dkT", 0.0))
+				dkT = asm_float(params.get("dkT", 0.0))
 				src += f"0.0, 0.0, {dkT}, 0.0,\t"
 			src.pieces[-1] = src.pieces[-1][0:-2]  # remove last 2-char ",\t" delimeter
 			src += "\n"
@@ -820,22 +846,22 @@ class Config:
 			src += "; global_node  ; (0 bytes) none defined"
 		params = self.globalParameters
 		if "B" in self.globalKeys:
-			Bx, By, Bz = floats(params["B"])  # unpack generator
+			Bx, By, Bz = asm_floats(params["B"])  # unpack generator
 			src += f"B   dq {Bx}, {By}, {Bz}, 0.0\n"
 			exports.append(("B", True))
 		if "dB" in self.globalKeys:
-			dBx, dBy, dBz = floats(params["dB"])  # unpack generator
-			src += f"dB  dq {dBx}, {dBy}, {dBz}, 0.0\n"
-			exports.append(("dB", True))
+			dBx, dBy, dBz = asm_floats(params["dB"])  # unpack generator
+			src += f"dB_ dq {dBx}, {dBy}, {dBz}, 0.0\n"  # NOTE: dB is ASM directive (define byte)
+			exports.append(("dB_", True))
 		if "A" in self.globalKeys:
-			Ax, Ay, Az = floats(params["A"])  # unpack generator
+			Ax, Ay, Az = asm_floats(params["A"])  # unpack generator
 			src += f"A   dq {Ax}, {Ay}, {Az}, 0.0\n"
 			exports.append(("A", True))
 		if any(p in self.globalKeys for p in ["S", "F", "kT", "Je0"]):
-			S   = float(params.get("S",   0.0))
-			F   = float(params.get("F",   0.0))
-			kT  = float(params.get("kT",  0.0))
-			Je0 = float(params.get("Je0", 0.0))
+			S   = asm_float(params.get("S",   0.0))
+			F   = asm_float(params.get("F",   0.0))
+			kT  = asm_float(params.get("kT",  0.0))
+			Je0 = asm_float(params.get("Je0", 0.0))
 			src += f"S   dq {S}\n"
 			src += f"F   dq {F}\n"
 			src += f"kT  dq {kT}\n"
@@ -845,7 +871,7 @@ class Config:
 			exports.append(("kT", True))
 			exports.append(("Je0", True))
 		if "dkT" in self.globalKeys:
-			dkT = float(params.get("dkT", 0.0))
+			dkT = asm_float(params.get("dkT", 0.0))
 			src +=  "    dq 0.0\n"
 			src +=  "    dq 0.0\n"
 			src += f"dkT dq {dkT}\n"
@@ -888,13 +914,13 @@ class Config:
 				src += "dq "
 				params = self.localEdgeParameters.get(edge, {})
 				if any(p in self.localEdgeKeys for p in ["J", "Je1", "Jee", "b"]):
-					J   = float(params.get("J",   0.0))
-					Je1 = float(params.get("Je1", 0.0))
-					Jee = float(params.get("Jee", 0.0))
-					b   = float(params.get("b",   0.0))
+					J   = asm_float(params.get("J",   0.0))
+					Je1 = asm_float(params.get("Je1", 0.0))
+					Jee = asm_float(params.get("Jee", 0.0))
+					b   = asm_float(params.get("b",   0.0))
 					src += f"{J}, {Je1}, {Jee}, {b},\t"
 				if "D" in self.localEdgeKeys:
-					Dx, Dy, Dz = floats(params.get("D", (0.0, 0.0, 0.0)))
+					Dx, Dy, Dz = asm_floats(params.get("D", (0.0, 0.0, 0.0)))
 					src += f"{Dx}, {Dy}, {Dz}, 0.0,\t"
 				src.pieces[-1] = src.pieces[-1][0:-2]  # remove last 2-char ",\t" delimeter
 				regions = self.getRegionCombos(edge)
@@ -941,13 +967,13 @@ class Config:
 			params = self.regionEdgeParameters[(r0, r1)]
 			src += f"  {rid}\tdq "
 			if any(p in self.regionEdgeKeys for p in ["J", "Je1", "Jee", "b"]):
-				J   = float(params.get("J",   0.0))
-				Je1 = float(params.get("Je1", 0.0))
-				Jee = float(params.get("Jee", 0.0))
-				b   = float(params.get("b",   0.0))
+				J   = asm_float(params.get("J",   0.0))
+				Je1 = asm_float(params.get("Je1", 0.0))
+				Jee = asm_float(params.get("Jee", 0.0))
+				b   = asm_float(params.get("b",   0.0))
 				src += f"{J}, {Je1}, {Jee}, {b},\t"
 			if "D" in self.regionEdgeKeys:
-				Dx, Dy, Dz = floats(params.get("D", (0.0, 0.0, 0.0)))
+				Dx, Dy, Dz = asm_floats(params.get("D", (0.0, 0.0, 0.0)))
 				src += f"{Dx}, {Dy}, {Dz}, 0.0,\t"
 			src.pieces[-1] = src.pieces[-1][0:-2]  # remove last 2-char ",\t" delimeter
 			src += "\n"
@@ -963,10 +989,10 @@ class Config:
 			src += "; global_edge  ; (0 bytes) none defined\n"
 		params = self.globalParameters
 		if any(p in self.globalKeys for p in ["J", "Je1", "Jee", "b"]):
-			J   = float(params.get("J",   0.0))
-			Je1 = float(params.get("Je1", 0.0))
-			Jee = float(params.get("Jee", 0.0))
-			b   = float(params.get("b",   0.0))
+			J   = asm_float(params.get("J",   0.0))
+			Je1 = asm_float(params.get("Je1", 0.0))
+			Jee = asm_float(params.get("Jee", 0.0))
+			b   = asm_float(params.get("b",   0.0))
 			src += f"J   dq {J}\n"
 			src += f"Je1 dq {Je1}\n"
 			src += f"Jee dq {Jee}\n"
@@ -976,7 +1002,7 @@ class Config:
 			exports.append(("Jee", True))
 			exports.append(("b", True))
 		if "D" in self.globalKeys:
-			Dx, Dy, Dz = floats(params["D"])
+			Dx, Dy, Dz = asm_floats(params["D"])
 			src += f"D   dq {Dx}, {Dy}, {Dz}, 0.0\n"
 			exports.append(("D", True))
 		src += "GLOBAL_EDGE ENDS\n\n"
@@ -1942,7 +1968,7 @@ class Config:
 							src += f"\t\tvmovapd ymmword ptr [{rid} + OFFSETOF_REGION_B], {B}\n"
 					if "dB" in self.globalParameters:
 						src += f"\t\tvmovapd {B}, ymmword ptr B;  global\n"
-						src += f"\t\tvaddpd {B}, {B}, ymmword ptr dB\n"
+						src += f"\t\tvaddpd {B}, {B}, ymmword ptr dB_\n"
 						src += f"\t\tvmovapd ymmword ptr B, {B}\n"
 				if not batch4 and regi != "rdx":
 					src += "\t\t; done?\n"
