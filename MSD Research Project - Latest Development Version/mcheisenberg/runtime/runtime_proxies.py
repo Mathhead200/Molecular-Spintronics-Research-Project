@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 type vec_out = Annotated[Array[c_double], 3]
 type vec_in = Annotated[Sequence[float], 3]
-type scal_out = c_double
+type scal_out = float|c_double
 type scal_in = float|c_double  # something assignable to a c_double.value
 
 # Provides properties (i.e. getters and setters) for local node state and parameters.
@@ -19,8 +19,8 @@ type scal_in = float|c_double  # something assignable to a c_double.value
 # If node parameters are defined at a higher level (e.g. region, or global),
 #	getters will pass through this information, but setters will raise KeyError.
 class NodeProxy:
-	__slots__ = [ "spin", "flux", "B", "A", "S", "F", "kT", "Je0",
-	              "_data", "_node", "_index" ]
+	__slots__ = [ "spin", "flux", "B", "A", "S", "F", "kT", "Je0", "dkT", "dB",
+	              "_data", "_node" ]
 
 	def __init__(self, data: DataView, node):
 		self._data = data
@@ -109,12 +109,12 @@ for attr in ["spin", "flux"]:
 		fget=lambda self,        _a=attr: self._getVector(_a),
 		fset=lambda self, value, _a=attr: self._setVector(_a, value)
 	))
-for param in ["B", "A"]:
+for param in ["B", "A", "dB"]:
 	setattr(NodeProxy, param, property(
 		fget=lambda self,        _p=param: self._fgetVector(_p),
 		fset=lambda self, value, _p=param: self._fsetVector(_p, value)
 	))
-for param in ["S", "F", "kT", "Je0"]:
+for param in ["S", "F", "kT", "Je0", "dkT"]:
 	setattr(NodeProxy, param, property(
 		fget=lambda self,        _p=param: self._fgetScalar(_p),
 		fset=lambda self, value, _p=param: self._fsetScalar(_p, value)
@@ -123,7 +123,7 @@ for param in ["S", "F", "kT", "Je0"]:
 # Similar to NodeProxy, but for edge parameters.
 class EdgeProxy:
 	__slots__ = [ "J", "Je1", "Jee", "b", "D",
-	              "_data", "_edge", "_index" ]
+	              "_data", "_edge" ]
 
 	def __init__(self, data: DataView, edge):
 		self._data = data
@@ -473,10 +473,14 @@ class ParameterProxy:
 			return getattr(data.node[key], param)
 		if param in config.localEdgeParameters.get(key, {}):
 			return getattr(data.edge[key], param)
-		if param in config.regionNodeParameters.get(key, {}):
-			return getattr(data.region[key], param)
-		if param in config.regionEdgeParameters.get(key, {}):
-			return getattr(data.eregion[key], param)
+		# TODO: config.getUnambiguous... only checks for compile-time (static) consistancy.
+		#	Have we also enforced runtime consistancy anywhere?
+		_, region = config.getUnambiguousRegionNodeParameter(key, param)  # we don't need value, only region
+		if region is not None:
+			return getattr(data.region[region], param)
+		_, eregion = config.getUnambiguousRegionEdgeParameter(key, param)  # we don't need value, only edge-region
+		if eregion is not None:
+			return getattr(data.eregion[eregion], param)
 		return self.value  # global parameter
 
 	def __setitem__(self, key, value) -> None:
@@ -505,3 +509,6 @@ class ScalarParameterProxy(ParameterProxy, Numeric):
 class VectorParameterProxy(ParameterProxy, Numeric):
 	def __iter__(self) -> vec_out:  return self.value
 	def __len__(self) -> int:  return len(self.value)
+
+# TODO: should we overwrite __getitem__ for Node and Edge Parameters in specialized subclasses
+#	so that we can return errors when the wrong key type is given instead of returning the global value?

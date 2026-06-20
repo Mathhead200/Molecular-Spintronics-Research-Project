@@ -44,8 +44,9 @@ def rtvec(v: numpy_vec|None) -> vec_in:
 
 def simscal(x: scal_out|None, out: NDArray=None) -> float:
 	""" Convert a Runtime float|None to a Simulation float. """
-	if x is None:  res = 0.0
-	else:          res = x.value
+	if x is None:            res = 0.0
+	if type(x) is c_double:  res = x.value
+	else:                    res = x
 
 	if out is not None:
 		out[0] = res

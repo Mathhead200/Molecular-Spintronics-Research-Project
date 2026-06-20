@@ -2,7 +2,7 @@ from __future__ import annotations
 from . import CSV
 from ..build import VisualStudio
 from ..config import Config
-from ..model import MSD, __FML__, __FMR__, __mol__
+from ..model import MSD, FML_, FMR_, mol_
 from ..runtime import Runtime
 from ..simulation import Simulation, Snapshot
 from ..util import report_date, TypeCheckedAny as Any, TypeCheckedSequence as Sequence, TypeCheckedTuple as TTuple
@@ -170,9 +170,9 @@ class IterateParameters:
 		# Required parameters:
 		msd.globalParameters = { "kT": self.kT }      # override MSD default global parameters
 		msd.regionNodeParameters = {                  # override MSD default region node parameters (default is empty {})
-			__FML__: { "S": self.SL },
-			__FMR__: { "S": self.SR },
-			__mol__: { "S": self.Sm }
+			FML_: { "S": self.SL },
+			FMR_: { "S": self.SR },
+			mol_: { "S": self.Sm }
 		}
 		msd.regionEdgeParameters = defaultdict(dict)  # override MSD default edge parameters
 
@@ -180,14 +180,14 @@ class IterateParameters:
 		if self.B  is not None:
 			msd.globalParameters["B"] = self.B
 
-		for region_suffix, region in [("L", __FML__), ("R", __FMR__), ("m", __mol__)]:
+		for region_suffix, region in [("L", FML_), ("R", FMR_), ("m", mol_)]:
 			for param_prefix in ["F", "A", "Je0"]:
 				# e.g. if self.AL is not None:  msd.regionNodeParameters["FML"]["A"] = self.AL
 				value = getattr(self, f"{param_prefix}{region_suffix}")
 				if value is not None:
 					msd.regionNodeParameters[region][param_prefix] = value
 		
-		for region_suffix, region0, region1 in [("L", __FML__, __FML__), ("R", __FMR__, __FMR__), ("m", __mol__, __mol__), ("mL", __FML__, __mol__, ), ("mR", __mol__, __FMR__), ("LR", __FML__, __FMR__)]:
+		for region_suffix, region0, region1 in [("L", FML_, FML_), ("R", FMR_, FMR_), ("m", mol_, mol_), ("mL", FML_, mol_, ), ("mR", mol_, FMR_), ("LR", FML_, FMR_)]:
 			for param_prefix in ["J", "Je1", "Jee", "b", "D"]:
 				# e.g. if self.JmL is not None:  msd.regionEdgeParameters["FML", "mol"]["J"] = self.JmL
 				value = getattr(self, f"{param_prefix}{region_suffix}")

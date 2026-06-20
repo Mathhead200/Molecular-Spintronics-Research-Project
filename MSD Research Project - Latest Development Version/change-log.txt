@@ -239,6 +239,9 @@ Second bug fix. In MSD::setParameters()
 7.1.0:
 (4-10-2026) Added dB and dkT parameters
 	Fixed bug/crash in setting global vector parameters (runtime_proxies)
+(6-18-2026) Fixed seed parsing issue in app/iterate.py being caused by Config.compile.
+	Now Config.compile can handle a single seed (int) and not just an explicit sequence (e.g. list).
+TODO: fix 0 energy (u) bug!
 
 ------------------------------------ TODOs ------------------------------------
 [mcheisenberg]

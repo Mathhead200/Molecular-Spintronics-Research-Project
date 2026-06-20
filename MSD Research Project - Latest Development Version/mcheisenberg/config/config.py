@@ -3,6 +3,7 @@ from ..util import StrJoiner, is_pow2, MASM_RESERVED_KEYWORDS, EDGE_PARAMETERS, 
 from ..build import VisualStudio
 from ..runtime import Runtime
 from collections import defaultdict
+from collections.abc import Sequence
 from copy import deepcopy
 from datetime import datetime
 from importlib import resources
@@ -468,6 +469,8 @@ class Config:
 		# aliases
 		prng = self.programParameters["prng"]
 		seed = self.programParameters.get("seed", None)
+		if seed is not None and seed is not isinstance(seed, Sequence):
+			seed = [seed]  # one element list
 		asm_float  = Config.asm_float   # function
 		asm_floats = Config.asm_floats  # function
 
@@ -586,6 +589,8 @@ class Config:
 		tqdm_check_update()
 		if seed is not None:
 			for s in seed:
+				if not isinstance(s, int):
+					raise ValueError(f"Seed(s) must be type int: {s}, type={type(s)}")
 				if s < 0 or s >= 2**64:
 					raise ValueError(f"Seed value {s} is out-of-range [0, 2**64)")
 				tqdm_check_update()

@@ -2,7 +2,7 @@
 randomize = True
 
 # Seed for pseudo-random number generator. (One or more numbers. Omit for unique seeds.)
-# seed = unique
+seed = 200
 
 simCount = 1000000000
 freq = 1000000

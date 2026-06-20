@@ -170,7 +170,7 @@ class CSV:
 		sim = self.sim
 		n_index_len = self.n_index_len
 		node_iter = iter(sim.nodes)
-		sim.ready("m")
+		sim.ready("m", "s", "f")
 		for line in self.data:
 			try:
 				n = next(node_iter)

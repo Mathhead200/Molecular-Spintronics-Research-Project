@@ -232,15 +232,16 @@ class ParameterProxy[E: Node|Edge, K: Node|Edge|Region|ERegion, V: numpy_vec|flo
 	
 	@override
 	def values(self, out: NDArray) -> NDArray:
-		values = self._data._ready_cache.get(self._name, None)
-		if values is not None and self._parent is None:
-			return values  # Note: out is not used/modified in this case
+		if self._parent is None:
+			values = self._data._ready_cache.get(self._name, None)
+			if values is not None:
+				return values  # Note: out is not used/modified in this case
+		keys = self._elements
 		# Don't bother using the buffer if we are in a sub-proxy since it's more
 		#	work to build the dict then to just read these values from memory directly.
 		if out is None:
 			out = np.empty(self._shape(len(keys)), dtype=float)
 		_mat = out.ndim > 1  # bool. e.g. parameter D would be shape=(3, M), _mat=True; J would be (M,), False; and B would be (3, N), True
-		keys = self._elements
 		for idx, key in enumerate(keys):
 			self._to_sim(self._runtime_proxy[key], out=(out[idx] if _mat else out[idx:idx+1]))
 		return out
@@ -312,9 +313,10 @@ class StateProxy(SumProxy[Node, Node|Region, numpy_vec], Vector):
 	
 	@override
 	def values(self, out: NDArray=None) -> numpy_mat:
-		values = self._data._ready_cache.get(self._name, None)
-		if values is not None and self._parent is None:
-			return values  # Note: out is not used/modified in this case
+		if self._parent is None:
+			values = self._data._ready_cache.get(self._name, None)
+			if values is not None:
+				return values  # Note: out is not used/modified in this case
 		# Don't bother using the buffer if we are in a sub-proxy since it's more
 		#	work to build the dict then to just read these values from memory directly.
 		nodes = self._elements
@@ -437,6 +439,9 @@ class UProxy(UTypeProxy, Historical[float]):
 		if values is not None and self._parent is None:
 			return values  # Note: out is not used/modified in this case
 		
+		# TODO: OPTIMIZATION:
+		# 	If self._parent is False, we should still use cache if it exists for this subset (e.g. region)
+		
 		nodes = self.nodes
 		edges = self.edges
 		N = len(nodes)
@@ -462,7 +467,7 @@ class UProxy(UTypeProxy, Historical[float]):
 				# un-optimized: build full edge dict
 				value_of_edge: dict[Edge, int] = dict(zipped_edges)
 				for idx, e in enumerate(edges, start=N):
-					out[N + idx] = value_of_edge[e]
+					out[idx] = value_of_edge[e]
 			else:
 				# optimized: O(n)
 				zip_iter = iter(zipped_edges)
