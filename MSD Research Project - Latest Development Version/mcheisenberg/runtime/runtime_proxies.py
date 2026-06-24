@@ -1,10 +1,9 @@
 from __future__ import annotations
 from ..util import AbstractReadableDict, ReadOnlyDict, Numeric
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
 	from .data_view import DataView
-	from collections.abc import Sequence
 	from ctypes import Array, c_double
 	from typing import Annotated
 
@@ -478,9 +477,10 @@ class ParameterProxy:
 		_, region = config.getUnambiguousRegionNodeParameter(key, param)  # we don't need value, only region
 		if region is not None:
 			return getattr(data.region[region], param)
-		_, eregion = config.getUnambiguousRegionEdgeParameter(key, param)  # we don't need value, only edge-region
-		if eregion is not None:
-			return getattr(data.eregion[eregion], param)
+		if isinstance(key, Sequence) and len(key) == 2:
+			_, eregion = config.getUnambiguousRegionEdgeParameter(key, param)  # we don't need value, only edge-region
+			if eregion is not None:
+				return getattr(data.eregion[eregion], param)
 		return self.value  # global parameter
 
 	def __setitem__(self, key, value) -> None:
@@ -488,15 +488,17 @@ class ParameterProxy:
 		data = self._data
 		config = data.config
 		if param in config.localNodeParameters.get(key, {}):
-			setattr(data.node[key], param, value)
-		elif param in config.localEdgeParameters.get(key, {}):
-			setattr(data.edge[key], param, value)
-		elif param in config.regionNodeParameters.get(key, {}):
-			setattr(data.region[key], param, value)
-		elif param in config.regionEdgeParameters.get(key, {}):
-			setattr(data.eregion[key], param, value)
-		else:
-			raise KeyError(f"Parameter {param} is not defined for (node, edge, region, or edge-region) {key}")
+			return setattr(data.node[key], param, value)
+		if param in config.localEdgeParameters.get(key, {}):
+			return setattr(data.edge[key], param, value)
+		_, region = config.getUnambiguousRegionNodeParameter(key, param)  # we don't need value, only region
+		if region is not None:
+			return setattr(data.region[key], param, value)
+		if isinstance(key, Sequence) and len(key) == 2:
+			_, eregion = config.getUnambiguousRegionEdgeParameter(key, param)  # we don't need value, only edge-region
+			if eregion is not None:
+				return setattr(data.eregion[key], param, value)
+		raise KeyError(f"Parameter {param} is not defined for (node, edge, region, or edge-region) {key}")
 	
 	def __str__(self) -> str:  return str(self.value)
 	def __repr__(self) -> str: return repr(self.value)

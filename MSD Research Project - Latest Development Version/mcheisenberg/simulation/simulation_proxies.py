@@ -475,10 +475,13 @@ class UProxy(UTypeProxy, Historical[float]):
 				while True:
 					try:
 						idx, e_target = next(edge_iter)  # edge whos value we need to add, and its index in output array, out
-						e_root, u = next(zip_iter)       # root edge to check against, and its cached energy
-						while e_target[0] != e_root[0] or e_target[1] != e_root[1]:					
-							e_root = next(zip_iter)
-						out[idx] = u
+						try:
+							e_root, u = next(zip_iter)       # root edge to check against, and its cached energy
+							while e_target != e_root:
+								e_root, u = next(zip_iter)
+							out[idx] = u
+						except StopIteration:
+							assert False  # root.edges should contain all edges and never be exhausted before (sub-)edges
 					except StopIteration:
 						break
 			return out

@@ -9,7 +9,7 @@ height = 50
 depth  = 50
 
 # boundaries which define the exact dimensions of FM_L, FM_R, and mol. WE CHANGE HERE MOLPOSR
-molPosL = 5  
+molPosL = 5
 molPosR = 6
 topL    = 23
 bottomL = 26
@@ -36,8 +36,8 @@ Sm = 1
 # Fm = 0
 
 # Heisenberg exchange coupling between two neighboring spins/ JL and JR are FM, Jm - molecule, can be played. JmL and JmR too
-JL = 1  
-JR = 1  
+JL = 1
+JR = 1
 Jm = 1
 JmL = 0.5
 JmR = -0.5
