@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_namespace_m_s_d" xml:lang="en-US">
+<title>MSD Namespace Reference</title>
+<indexterm><primary>MSD</primary></indexterm>
+<simplesect>
+    <title>Classes    </title>
+        <itemizedlist>
+            <listitem><para>class <link linkend="_class_m_s_d_1_1___m_m_t_struct">_MMTStruct</link></para>
+
+<para>Adds the MSD-Molecule-Text, <link linkend="_class_m_s_d_1_1___m_m_t_struct_1a3f795dd08944c744bf10060d8e7a74a3">mmt()</link> method for subclasses. </para>
+</listitem>
+            <listitem><para>class <link linkend="_class_m_s_d_1_1___struct_with_dict">_StructWithDict</link></para>
+
+<para>Version of ctypes.Structure that defines <emphasis role="bold">dict</emphasis> and overrides <emphasis role="bold">repr</emphasis> </para>
+</listitem>
+            <listitem><para>class <link linkend="_class_m_s_d_1_1_molecule">Molecule</link></para>
+</listitem>
+            <listitem><para>class <link linkend="_class_m_s_d_1_1_m_s_d">MSD</link></para>
+</listitem>
+            <listitem><para>class <link linkend="_class_m_s_d_1_1_vector">Vector</link></para>
+
+<para>Python version of <link linkend="_classudc_1_1_vector">udc::Vector</link> class in <link linkend="__vector_8h">Vector.h</link>. </para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Variables    </title>
+        <itemizedlist>
+            <listitem><para><link linkend="_namespace_m_s_d_1a8893e2ba6d4249cf4262be28c0f089ec">MSD_EXPORT_DLL_PATH</link> = os.path.join(os.path.realpath(os.path.dirname(__file__)), &quot;MSD-export.dll&quot;)</para>
+</listitem>
+            <listitem><para><link linkend="_namespace_m_s_d_1a46a9adbfe86657baee2dde058b055f93">msd_clib</link> = CDLL(<link linkend="_namespace_m_s_d_1a8893e2ba6d4249cf4262be28c0f089ec">MSD_EXPORT_DLL_PATH</link>)</para>
+</listitem>
+            <listitem><para><link linkend="_namespace_m_s_d_1af5a4dfeebf5c52e4547773c6203c100d">PI</link> = c_double.in_dll(<link linkend="_namespace_m_s_d_1a46a9adbfe86657baee2dde058b055f93">msd_clib</link>, &quot;PI&quot;).value</para>
+</listitem>
+            <listitem><para><link linkend="_namespace_m_s_d_1aa565ab8c9a921e88dae806ba8189f862">E</link> = c_double.in_dll(<link linkend="_namespace_m_s_d_1a46a9adbfe86657baee2dde058b055f93">msd_clib</link>, &quot;E&quot;).value</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Variable Documentation</title>
+<anchor xml:id="_namespace_m_s_d_1aa565ab8c9a921e88dae806ba8189f862"/><section>
+    <title>E</title>
+<indexterm><primary>E</primary><secondary>MSD</secondary></indexterm>
+<indexterm><primary>MSD</primary><secondary>E</secondary></indexterm>
+<para><computeroutput>MSD.E = c_double.in_dll(<link linkend="_namespace_m_s_d_1a46a9adbfe86657baee2dde058b055f93">msd_clib</link>, &quot;E&quot;).value</computeroutput></para></section>
+<anchor xml:id="_namespace_m_s_d_1a46a9adbfe86657baee2dde058b055f93"/><section>
+    <title>msd_clib</title>
+<indexterm><primary>msd_clib</primary><secondary>MSD</secondary></indexterm>
+<indexterm><primary>MSD</primary><secondary>msd_clib</secondary></indexterm>
+<para><computeroutput>MSD.msd_clib = CDLL(<link linkend="_namespace_m_s_d_1a8893e2ba6d4249cf4262be28c0f089ec">MSD_EXPORT_DLL_PATH</link>)</computeroutput></para></section>
+<anchor xml:id="_namespace_m_s_d_1a8893e2ba6d4249cf4262be28c0f089ec"/><section>
+    <title>MSD_EXPORT_DLL_PATH</title>
+<indexterm><primary>MSD_EXPORT_DLL_PATH</primary><secondary>MSD</secondary></indexterm>
+<indexterm><primary>MSD</primary><secondary>MSD_EXPORT_DLL_PATH</secondary></indexterm>
+<para><computeroutput>MSD.MSD_EXPORT_DLL_PATH = os.path.join(os.path.realpath(os.path.dirname(__file__)), &quot;MSD-export.dll&quot;)</computeroutput></para></section>
+<anchor xml:id="_namespace_m_s_d_1af5a4dfeebf5c52e4547773c6203c100d"/><section>
+    <title>PI</title>
+<indexterm><primary>PI</primary><secondary>MSD</secondary></indexterm>
+<indexterm><primary>MSD</primary><secondary>PI</secondary></indexterm>
+<para><computeroutput>MSD.PI = c_double.in_dll(<link linkend="_namespace_m_s_d_1a46a9adbfe86657baee2dde058b055f93">msd_clib</link>, &quot;PI&quot;).value</computeroutput></para></section>
+</section>
+</section>

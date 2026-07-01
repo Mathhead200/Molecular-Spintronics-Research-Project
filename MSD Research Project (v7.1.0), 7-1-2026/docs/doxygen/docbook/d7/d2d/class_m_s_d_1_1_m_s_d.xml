@@ -1,0 +1,764 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_class_m_s_d_1_1_m_s_d" xml:lang="en-US">
+<title>MSD.MSD Class Reference</title>
+<indexterm><primary>MSD.MSD</primary></indexterm>
+<simplesect>
+    <title>Classes    </title>
+        <itemizedlist>
+            <listitem><para>class <link linkend="_class_m_s_d_1_1_m_s_d_1_1___iterator">_Iterator</link></para>
+</listitem>
+            <listitem><para>class <link linkend="_class_m_s_d_1_1_m_s_d_1_1_parameters">Parameters</link></para>
+</listitem>
+            <listitem><para>class <link linkend="_class_m_s_d_1_1_m_s_d_1_1_results">Results</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_m_s_d_1a7bed296381bbd3db1142dbacf4c941f9">__init__</link> (self, <link linkend="_class_m_s_d_1_1_m_s_d_1a92f137951d6a8c96fcdd394306233b37">width</link>, <link linkend="_class_m_s_d_1_1_m_s_d_1aa5c0f86375d417373d82d1e525da22f8">height</link>, <link linkend="_class_m_s_d_1_1_m_s_d_1af6491462b7c4a42065ca4702c5c9dede">depth</link>, Optional[<link linkend="__m_s_d-export_8cpp_1aec2cc3918e5933a0bad019dd661cdbef">MolProto</link>] <link linkend="_class_m_s_d_1_1_m_s_d_1a1a336015781f61fdc2801db7f41ba6c1">molProto</link>=None, Optional[c_void_p] molType=None, <link linkend="_class_m_s_d_1_1_m_s_d_1a662ce530dcae91ef12db654854a593ac">molPosL</link>=None, <link linkend="_class_m_s_d_1_1_m_s_d_1a7a77ef37969d8ba83c2713eb728f6680">molPosR</link>=None, <link linkend="_class_m_s_d_1_1_m_s_d_1ab5a63d3be26fc829a7b7fac6893e8101">topL</link>=None, <link linkend="_class_m_s_d_1_1_m_s_d_1a4cbcf9f1a9a5c5a72377c9774cbed276">bottomL</link>=None, <link linkend="_class_m_s_d_1_1_m_s_d_1a4caeca7ce3bf3b2d63ab046928b6f795">frontR</link>=None, <link linkend="_class_m_s_d_1_1_m_s_d_1af4e7da67554d6947e7a1d2e9778508e4">backR</link>=None, <link linkend="_class_m_s_d_1_1_m_s_d_1aa0e88dbff648e7ea4e0bf0808a568173">molPos</link>=None, molLen=None, heightL=None, depthR=None)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_m_s_d_1a18678fff2e71861306a69457eb5ef01c">__del__</link> (self)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_m_s_d_1a2976cb0fc09f7f247943f8dd7a287b81">record</link> (self)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_m_s_d_1a3105f8a5528cb1610c2975aaba157c67">record</link> (self, record)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_m_s_d_1ae5baa7bc3c0fcd53312018a20e9f53a7">getParameters</link> (self)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_m_s_d_1ad6dfe08912bc8c61ecf2ad3f81f0212a">setParameters</link> (self, <link linkend="_class_m_s_d_1_1_m_s_d_1abfb5adadc78b3b845471b46e6f620cd2">parameters</link>)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_m_s_d_1a054be0ce01dcba6e630ad208d333d87d">getResults</link> (self)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_m_s_d_1a92eb48bec5cc26777f2f663aeed1f6b2">set_kT</link> (self, <link linkend="_class_m_s_d_1_1_m_s_d_1a6ff9c2017204730a03c19b5fe005c3df">kT</link>)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_m_s_d_1a83d4886be1452d838ea6ff9a3c9461c4">setB</link> (self, <link linkend="_class_m_s_d_1_1_m_s_d_1ae8887fc7a32ecae4b885af3388551f92">B</link>)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_m_s_d_1ace8a17af4da2e496c10e79277cb1e8bf">getMolProto</link> (self)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_m_s_d_1add9bcfbb5a1dfd30d53892b784306e7d">setMolProto</link> (self, <link linkend="_class_m_s_d_1_1_molecule">Molecule</link> mol)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_m_s_d_1a7936c3fd9f393ef9735da8cc105df5ce">setMolParameters</link> (self, nodeParams=<link linkend="_class_m_s_d_1_1_molecule_1_1_node_parameters">Molecule.NodeParameters</link>(), edgeParams=<link linkend="_class_m_s_d_1_1_molecule_1_1_edge_parameters">Molecule.EdgeParameters</link>())</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_m_s_d_1a8c2b13c5bc16964c5fa808479afb1669">getSpin</link> (self, x, y=None, z=None)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_m_s_d_1a64a17b06916b92c16cbe9712f7751442">getFlux</link> (self, x, y=None, z=None)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_m_s_d_1a0ae9b44d14132c7da3fb6ef4f20584b1">getLocalM</link> (self, x, y=None, z=None)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_m_s_d_1aeba37ca94a0719e692d7f7b0df1ad9ed">setSpin</link> (self, x, y=None, z=None, spin=None)</para>
+
+<para>Version 1: setSpin(a, spin) Version 2: setSpin(x, y, z, spin) </para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_m_s_d_1aa97896d5bc636b6995a58b85130e851c">setFlux</link> (self, x, y=None, z=None, flux=None)</para>
+
+<para>Version 1: setFlux(a, flux) Version 2: setFlux(x, y, z, flux) </para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_m_s_d_1ad0aafddb1cff6bdd870e61ff01fee7be">setLocalM</link> (self, x, y=None, z=None, spin=None, flux=None)</para>
+
+<para>Version 1: setLocalM(a, spin, flux) Version 2: setLocalM(x, y, z, spin, flux) </para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_m_s_d_1ae8c341f83e06f0b3db293d0c9e364db2">__getitem__</link> (self, idx)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_m_s_d_1afa0370594236d0aa15285c4249ce4a13">__setitem__</link> (self, idx, localM)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_m_s_d_1a84e75e64da53457502c81ca049021304">reinitialize</link> (self, reseed=True)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_m_s_d_1a87ada619f96330f950b52231450ae127">randomize</link> (self, reseed=True)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_m_s_d_1a10615b0f372c8c81edeec992e3b2e326">metropolis</link> (self, N, freq=None)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_m_s_d_1a3071d85c97544cb787dfbc6a070dc1ab">__iter__</link> (self)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_m_s_d_1a22d38fc5e37b96252b53e50fb1cc52ec">__reversed__</link> (self)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_m_s_d_1ac7808e554cf1e46718b4dc4974874084">__len__</link> (self)</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Static Public Attributes    </title>
+        <itemizedlist>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a5c5d2b7ac6d31b944ecac6e63e7d85dc">MolProto</link> = <link linkend="_class_m_s_d_1_1_molecule">Molecule</link></para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1affd2d11683b814c610a2c959744c20a7">LINEAR_MOL</link> = c_void_p.in_dll(<link linkend="_namespace_m_s_d_1a46a9adbfe86657baee2dde058b055f93">msd_clib</link>, &quot;LINEAR_MOL&quot;)</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1afa39e62547cab3b7894124ba9054c777">CIRCULAR_MOL</link> = c_void_p.in_dll(<link linkend="_namespace_m_s_d_1a46a9adbfe86657baee2dde058b055f93">msd_clib</link>, &quot;CIRCULAR_MOL&quot;)</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a3a8553318e481dedf0e3423c202cfe6c">UP_DOWN_MODEL</link> = c_void_p.in_dll(<link linkend="_namespace_m_s_d_1a46a9adbfe86657baee2dde058b055f93">msd_clib</link>, &quot;UP_DOWN_MODEL&quot;)</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1ac919520db724540271752f954bc8e9b6">CONTINUOUS_SPIN_MODEL</link> = c_void_p.in_dll(<link linkend="_namespace_m_s_d_1a46a9adbfe86657baee2dde058b055f93">msd_clib</link>, &quot;CONTINUOUS_SPIN_MODEL&quot;)</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Properties    </title>
+        <itemizedlist>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a41b827ad8ca8fa83e059f21ca449b7e8">flippingAlgorithm</link> = property(fset = lambda self, algo: msd_clib.setFlippingAlgorithm(self._msd, algo))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1abfb5adadc78b3b845471b46e6f620cd2">parameters</link> = property(fset = <link linkend="_class_m_s_d_1_1_m_s_d_1ad6dfe08912bc8c61ecf2ad3f81f0212a">setParameters</link>)</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1ab3a92106983e22b49465c009717766ec">results</link> = property(fget = <link linkend="_class_m_s_d_1_1_m_s_d_1a054be0ce01dcba6e630ad208d333d87d">getResults</link>)</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a6ff9c2017204730a03c19b5fe005c3df">kT</link> = property(fset = <link linkend="_class_m_s_d_1_1_m_s_d_1a92eb48bec5cc26777f2f663aeed1f6b2">set_kT</link>)</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1ae8887fc7a32ecae4b885af3388551f92">B</link> = property(fset = <link linkend="_class_m_s_d_1_1_m_s_d_1a83d4886be1452d838ea6ff9a3c9461c4">setB</link>)</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a1a336015781f61fdc2801db7f41ba6c1">molProto</link> = property(fset = <link linkend="_class_m_s_d_1_1_m_s_d_1add9bcfbb5a1dfd30d53892b784306e7d">setMolProto</link>)</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a08b6ae07e1e19d5bf554fcac7153d172">molParameters</link> = property(fset = lambda self, params: self.setMolParameters(*params))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1aee3a585a9a60dd28deb0a7d84376a20a">n</link> = property(fget = lambda self: msd_clib.getN(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a4da10d815de0aab2e6fe37b718adf274">nL</link> = property(fget = lambda self: msd_clib.getNL(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1ad3611297b5502e7f478261bb23773bfd">nR</link> = property(fget = lambda self: msd_clib.getNR(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a8acba99d51fbecfdbd47f6dfce95dced">n_m</link> = property(fget = lambda self: msd_clib.getNm(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a0fb2ebb550c319845b7e7e8ce9e25f85">n_mL</link> = property(fget = lambda self: msd_clib.getNmL(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a6b60e1c56e96bb08629b0ef29bf77dbd">n_mR</link> = property(fget = lambda self: msd_clib.getNmR(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a792e7f1ab106048e9e58137b53bbec82">nLR</link> = property(fget = lambda self: msd_clib.getNLR(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a92f137951d6a8c96fcdd394306233b37">width</link> = property(fget = lambda self: msd_clib.getWidth(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1aa5c0f86375d417373d82d1e525da22f8">height</link> = property(fget = lambda self: msd_clib.getHeight(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1af6491462b7c4a42065ca4702c5c9dede">depth</link> = property(fget = lambda self: msd_clib.getDepth(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a0f2c407500cac385c8a5fcb611f37e15">dimensions</link> = property(fget = lambda self : _tupler(msd_clib.getDimensions, self._msd, 3 * [c_uint]))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a662ce530dcae91ef12db654854a593ac">molPosL</link> = property(fget = lambda self: msd_clib.getMolPosL(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a7a77ef37969d8ba83c2713eb728f6680">molPosR</link> = property(fget = lambda self: msd_clib.getMolPosR(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1aa0e88dbff648e7ea4e0bf0808a568173">molPos</link> = property(fget = lambda self: _tupler(msd_clib.getMolPos, self._msd, 2 * [c_uint]))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1ab5a63d3be26fc829a7b7fac6893e8101">topL</link> = property(fget = lambda self: msd_clib.getTopL(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a4cbcf9f1a9a5c5a72377c9774cbed276">bottomL</link> = property(fget = lambda self: msd_clib.getBottomL(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a4caeca7ce3bf3b2d63ab046928b6f795">frontR</link> = property(fget = lambda self: msd_clib.getFrontR(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1af4e7da67554d6947e7a1d2e9778508e4">backR</link> = property(fget = lambda self: msd_clib.getBackR(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a96dedebd31db32638d01d4a48ec1692d">innerBounds</link> = property(fget = lambda self: _tupler(msd_clib.getInnerBounds, self._msd, 4 * [c_uint]))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a8d0810a9019e541cf349f5b3f5c2c13b">FM_L_exists</link> = property(fget = lambda self: msd_clib.getFM_L_exists(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1ad126bb8f1f9732045578b1935bf930c1">FM_R_exists</link> = property(fget = lambda self: msd_clib.getFM_R_exists(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a79d25193a3bdb09a55ee9fdf136e5a9e">mol_exists</link> = property(fget = lambda self: msd_clib.getMol_exists(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1af09aed34231c5ffe456d27bfe3cb3992">regions</link> = property(fget = lambda self: _tupler(msd_clib.getRegions, self._msd, 3 * [c_bool]))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1ad4ae0233e22f42bc1d502ea99af6da90">seed</link></para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1aa097724a7f7087de43a12a730d64c700">specificHeat</link> = property(fget = lambda self : msd_clib.specificHeat(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a77614239751eb955d9ae8326cd0a615b">specificHeat_L</link> = property(fget = lambda self : msd_clib.specificHeat_L(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1abb502809ccca6c41b6098e4f8dc335f1">specificHeat_R</link> = property(fget = lambda self : msd_clib.specificHeat_R(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a191ba692b2e5b1cd2c769dd52a2dc1d3">specificHeat_m</link> = property(fget = lambda self : msd_clib.specificHeat_m(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a20c45bbc7e75ab6651033bb194a6b3dc">specificHeat_mL</link> = property(fget = lambda self : msd_clib.specificHeat_mL(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1ae9729b0e5b0266a6bc076e25a3745762">specificHeat_mR</link> = property(fget = lambda self : msd_clib.specificHeat_mR(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a563b40feee77af61bd7cb53e5880106a">specificHeat_LR</link> = property(fget = lambda self : msd_clib.specificHeat_LR(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a993890319c998c65112070ed37f9a4f6">magneticSusceptibility</link> = property(fget = lambda self: msd_clib.magneticSusceptibility(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a6b579d38867d112552ea0294ae1032da">magneticSusceptibility_L</link> = property(fget = lambda self: msd_clib.magneticSusceptibility_L(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a8be54d1a6082f8723a40640c674bbf63">magneticSusceptibility_R</link> = property(fget = lambda self: msd_clib.magneticSusceptibility_R(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a591bedccf21ff2f1d5a6a9a02d0d90ca">magneticSusceptibility_m</link> = property(fget = lambda self: msd_clib.magneticSusceptibility_m(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a1fe525deab1fbe82d953f1f59cabab01">meanM</link> = property(fget = lambda self : msd_clib.meanM(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a913e8969ac06e3002d359cdc15fcfd75">meanML</link> = property(fget = lambda self : msd_clib.meanML(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1ae632c9ec29ade517e1ae088143ede416">meanMR</link> = property(fget = lambda self : msd_clib.meanMR(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a2cf3c93470ffe6f80bd3557a71edec02">meanMm</link> = property(fget = lambda self : msd_clib.meanMm(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a5fd91cfb45ddb9a1bff4163fc696b606">meanMS</link> = property(fget = lambda self : msd_clib.meanMS(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a761d797ea0d2e94f6c16d7bfba4a94e3">meanMSL</link> = property(fget = lambda self : msd_clib.meanMSL(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a5e94ec0e6e063b7d683d0b219dcf0ce6">meanMSR</link> = property(fget = lambda self : msd_clib.meanMSR(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a4d8e8e028d787988dce996ddb0c355a6">meanMSm</link> = property(fget = lambda self : msd_clib.meanMSm(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1ab1e02dc08f63af093003e6a546aeb84f">meanMF</link> = property(fget = lambda self : msd_clib.meanMF(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1add3f1bd3c92557a55bb3b5e4f573bc3a">meanMFL</link> = property(fget = lambda self : msd_clib.meanMFL(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1ad81d9b45f5fdf9c7a8a549a8ec93f7ab">meanMFR</link> = property(fget = lambda self : msd_clib.meanMFR(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1abe84fa91e25ba13daeaa3c31e387908f">meanMFm</link> = property(fget = lambda self : msd_clib.meanMFm(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1ab426b44f3c902e2b818e584a83890fa3">meanU</link> = property(fget = lambda self : msd_clib.meanU(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1aad62ff14eccec247cbc338951f28beaa">meanUL</link> = property(fget = lambda self : msd_clib.meanUL(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a6144e21b6cf950c85b31406a2ea061d1">meanUR</link> = property(fget = lambda self : msd_clib.meanUR(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a10a029be77605fcadf2dddf99e921af6">meanUm</link> = property(fget = lambda self : msd_clib.meanUm(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a5e6cc143a8ea0fd35a2919632f0cf20f">meanUmL</link> = property(fget = lambda self : msd_clib.meanUmL(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1ab541edd88c61bae369b948395832aac1">meanUmR</link> = property(fget = lambda self : msd_clib.meanUmR(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1a1d220ed70351c2e83ff09ee0ec7fe237">meanULR</link> = property(fget = lambda self : msd_clib.meanULR(self._msd))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1ade96bf5044c11fb1a11a6f369afd510b">begin</link> = property(fget = lambda self: <link linkend="_class_m_s_d_1_1_m_s_d_1_1___iterator">MSD._Iterator</link>(msd = self))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1ab9f2886ac0a4124b87798f0aa36b99f5">end</link> = property(fget = lambda self: <link linkend="_class_m_s_d_1_1_m_s_d_1_1___iterator">MSD._Iterator</link>(msd = self, start = (self._end, len(self))))</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Constructor &amp; Destructor Documentation</title>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a7bed296381bbd3db1142dbacf4c941f9"/><section>
+    <title>__init__()</title>
+<indexterm><primary>__init__</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>__init__</secondary></indexterm>
+<para><computeroutput>def MSD.MSD.__init__ ( self,  width,  height,  depth, Optional[<link linkend="__m_s_d-export_8cpp_1aec2cc3918e5933a0bad019dd661cdbef">MolProto</link>]  molProto = <computeroutput>None</computeroutput>
+, Optional[c_void_p]  molType = <computeroutput>None</computeroutput>
+,  molPosL = <computeroutput>None</computeroutput>
+,  molPosR = <computeroutput>None</computeroutput>
+,  topL = <computeroutput>None</computeroutput>
+,  bottomL = <computeroutput>None</computeroutput>
+,  frontR = <computeroutput>None</computeroutput>
+,  backR = <computeroutput>None</computeroutput>
+,  molPos = <computeroutput>None</computeroutput>
+,  molLen = <computeroutput>None</computeroutput>
+,  heightL = <computeroutput>None</computeroutput>
+,  depthR = <computeroutput>None</computeroutput>
+)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a18678fff2e71861306a69457eb5ef01c"/><section>
+    <title>__del__()</title>
+<indexterm><primary>__del__</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>__del__</secondary></indexterm>
+<para><computeroutput>def MSD.MSD.__del__ ( self)</computeroutput></para></section>
+</section>
+<section>
+<title>Member Function Documentation</title>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1ae8c341f83e06f0b3db293d0c9e364db2"/><section>
+    <title>__getitem__()</title>
+<indexterm><primary>__getitem__</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>__getitem__</secondary></indexterm>
+<para><computeroutput>def MSD.MSD.__getitem__ ( self,  idx)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a3071d85c97544cb787dfbc6a070dc1ab"/><section>
+    <title>__iter__()</title>
+<indexterm><primary>__iter__</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>__iter__</secondary></indexterm>
+<para><computeroutput>def MSD.MSD.__iter__ ( self)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1ac7808e554cf1e46718b4dc4974874084"/><section>
+    <title>__len__()</title>
+<indexterm><primary>__len__</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>__len__</secondary></indexterm>
+<para><computeroutput>def MSD.MSD.__len__ ( self)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a22d38fc5e37b96252b53e50fb1cc52ec"/><section>
+    <title>__reversed__()</title>
+<indexterm><primary>__reversed__</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>__reversed__</secondary></indexterm>
+<para><computeroutput>def MSD.MSD.__reversed__ ( self)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1afa0370594236d0aa15285c4249ce4a13"/><section>
+    <title>__setitem__()</title>
+<indexterm><primary>__setitem__</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>__setitem__</secondary></indexterm>
+<para><computeroutput>def MSD.MSD.__setitem__ ( self,  idx,  localM)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a64a17b06916b92c16cbe9712f7751442"/><section>
+    <title>getFlux()</title>
+<indexterm><primary>getFlux</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>getFlux</secondary></indexterm>
+<para><computeroutput>def MSD.MSD.getFlux ( self,  x,  y = <computeroutput>None</computeroutput>
+,  z = <computeroutput>None</computeroutput>
+)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a0ae9b44d14132c7da3fb6ef4f20584b1"/><section>
+    <title>getLocalM()</title>
+<indexterm><primary>getLocalM</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>getLocalM</secondary></indexterm>
+<para><computeroutput>def MSD.MSD.getLocalM ( self,  x,  y = <computeroutput>None</computeroutput>
+,  z = <computeroutput>None</computeroutput>
+)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1ace8a17af4da2e496c10e79277cb1e8bf"/><section>
+    <title>getMolProto()</title>
+<indexterm><primary>getMolProto</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>getMolProto</secondary></indexterm>
+<para><computeroutput>def MSD.MSD.getMolProto ( self)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1ae5baa7bc3c0fcd53312018a20e9f53a7"/><section>
+    <title>getParameters()</title>
+<indexterm><primary>getParameters</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>getParameters</secondary></indexterm>
+<para><computeroutput>def MSD.MSD.getParameters ( self)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a054be0ce01dcba6e630ad208d333d87d"/><section>
+    <title>getResults()</title>
+<indexterm><primary>getResults</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>getResults</secondary></indexterm>
+<para><computeroutput>def MSD.MSD.getResults ( self)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a8c2b13c5bc16964c5fa808479afb1669"/><section>
+    <title>getSpin()</title>
+<indexterm><primary>getSpin</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>getSpin</secondary></indexterm>
+<para><computeroutput>def MSD.MSD.getSpin ( self,  x,  y = <computeroutput>None</computeroutput>
+,  z = <computeroutput>None</computeroutput>
+)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a10615b0f372c8c81edeec992e3b2e326"/><section>
+    <title>metropolis()</title>
+<indexterm><primary>metropolis</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>metropolis</secondary></indexterm>
+<para><computeroutput>def MSD.MSD.metropolis ( self,  N,  freq = <computeroutput>None</computeroutput>
+)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a87ada619f96330f950b52231450ae127"/><section>
+    <title>randomize()</title>
+<indexterm><primary>randomize</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>randomize</secondary></indexterm>
+<para><computeroutput>def MSD.MSD.randomize ( self,  reseed = <computeroutput>True</computeroutput>
+)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a2976cb0fc09f7f247943f8dd7a287b81"/><section>
+    <title>record()<computeroutput>[1/2]</computeroutput></title>
+<indexterm><primary>record</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>record</secondary></indexterm>
+<para><computeroutput>def MSD.MSD.record ( self)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a3105f8a5528cb1610c2975aaba157c67"/><section>
+    <title>record()<computeroutput>[2/2]</computeroutput></title>
+<indexterm><primary>record</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>record</secondary></indexterm>
+<para><computeroutput>def MSD.MSD.record ( self,  record)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a84e75e64da53457502c81ca049021304"/><section>
+    <title>reinitialize()</title>
+<indexterm><primary>reinitialize</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>reinitialize</secondary></indexterm>
+<para><computeroutput>def MSD.MSD.reinitialize ( self,  reseed = <computeroutput>True</computeroutput>
+)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a92eb48bec5cc26777f2f663aeed1f6b2"/><section>
+    <title>set_kT()</title>
+<indexterm><primary>set_kT</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>set_kT</secondary></indexterm>
+<para><computeroutput>def MSD.MSD.set_kT ( self,  kT)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a83d4886be1452d838ea6ff9a3c9461c4"/><section>
+    <title>setB()</title>
+<indexterm><primary>setB</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>setB</secondary></indexterm>
+<para><computeroutput>def MSD.MSD.setB ( self,  B)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1aa97896d5bc636b6995a58b85130e851c"/><section>
+    <title>setFlux()</title>
+<indexterm><primary>setFlux</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>setFlux</secondary></indexterm>
+<para><computeroutput>def MSD.MSD.setFlux ( self,  x,  y = <computeroutput>None</computeroutput>
+,  z = <computeroutput>None</computeroutput>
+,  flux = <computeroutput>None</computeroutput>
+)</computeroutput></para><para>
+
+<para>Version 1: setFlux(a, flux) Version 2: setFlux(x, y, z, flux) </para>
+</para>
+
+<para>Note: flux can be passed as a positional argument or a named argument </para>
+</section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1ad0aafddb1cff6bdd870e61ff01fee7be"/><section>
+    <title>setLocalM()</title>
+<indexterm><primary>setLocalM</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>setLocalM</secondary></indexterm>
+<para><computeroutput>def MSD.MSD.setLocalM ( self,  x,  y = <computeroutput>None</computeroutput>
+,  z = <computeroutput>None</computeroutput>
+,  spin = <computeroutput>None</computeroutput>
+,  flux = <computeroutput>None</computeroutput>
+)</computeroutput></para><para>
+
+<para>Version 1: setLocalM(a, spin, flux) Version 2: setLocalM(x, y, z, spin, flux) </para>
+</para>
+
+<para>Note: spin and flux can be passed as positional arguments or named arguments </para>
+</section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a7936c3fd9f393ef9735da8cc105df5ce"/><section>
+    <title>setMolParameters()</title>
+<indexterm><primary>setMolParameters</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>setMolParameters</secondary></indexterm>
+<para><computeroutput>def MSD.MSD.setMolParameters ( self,  nodeParams = <computeroutput><link linkend="_class_m_s_d_1_1_molecule_1_1_node_parameters">Molecule.NodeParameters</link>()</computeroutput>
+,  edgeParams = <computeroutput><link linkend="_class_m_s_d_1_1_molecule_1_1_edge_parameters">Molecule.EdgeParameters</link>()</computeroutput>
+)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1add9bcfbb5a1dfd30d53892b784306e7d"/><section>
+    <title>setMolProto()</title>
+<indexterm><primary>setMolProto</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>setMolProto</secondary></indexterm>
+<para><computeroutput>def MSD.MSD.setMolProto ( self, <link linkend="_class_m_s_d_1_1_molecule">Molecule</link> mol)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1ad6dfe08912bc8c61ecf2ad3f81f0212a"/><section>
+    <title>setParameters()</title>
+<indexterm><primary>setParameters</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>setParameters</secondary></indexterm>
+<para><computeroutput>def MSD.MSD.setParameters ( self,  parameters)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1aeba37ca94a0719e692d7f7b0df1ad9ed"/><section>
+    <title>setSpin()</title>
+<indexterm><primary>setSpin</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>setSpin</secondary></indexterm>
+<para><computeroutput>def MSD.MSD.setSpin ( self,  x,  y = <computeroutput>None</computeroutput>
+,  z = <computeroutput>None</computeroutput>
+,  spin = <computeroutput>None</computeroutput>
+)</computeroutput></para><para>
+
+<para>Version 1: setSpin(a, spin) Version 2: setSpin(x, y, z, spin) </para>
+</para>
+
+<para>Note: spin can be passed as a positional argument or a named argument </para>
+</section>
+</section>
+<section>
+<title>Member Data Documentation</title>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1afa39e62547cab3b7894124ba9054c777"/><section>
+    <title>CIRCULAR_MOL</title>
+<indexterm><primary>CIRCULAR_MOL</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>CIRCULAR_MOL</secondary></indexterm>
+<para><computeroutput>MSD.MSD.CIRCULAR_MOL = c_void_p.in_dll(<link linkend="_namespace_m_s_d_1a46a9adbfe86657baee2dde058b055f93">msd_clib</link>, &quot;CIRCULAR_MOL&quot;)<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1ac919520db724540271752f954bc8e9b6"/><section>
+    <title>CONTINUOUS_SPIN_MODEL</title>
+<indexterm><primary>CONTINUOUS_SPIN_MODEL</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>CONTINUOUS_SPIN_MODEL</secondary></indexterm>
+<para><computeroutput>MSD.MSD.CONTINUOUS_SPIN_MODEL = c_void_p.in_dll(<link linkend="_namespace_m_s_d_1a46a9adbfe86657baee2dde058b055f93">msd_clib</link>, &quot;CONTINUOUS_SPIN_MODEL&quot;)<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1affd2d11683b814c610a2c959744c20a7"/><section>
+    <title>LINEAR_MOL</title>
+<indexterm><primary>LINEAR_MOL</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>LINEAR_MOL</secondary></indexterm>
+<para><computeroutput>MSD.MSD.LINEAR_MOL = c_void_p.in_dll(<link linkend="_namespace_m_s_d_1a46a9adbfe86657baee2dde058b055f93">msd_clib</link>, &quot;LINEAR_MOL&quot;)<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a5c5d2b7ac6d31b944ecac6e63e7d85dc"/><section>
+    <title>MolProto</title>
+<indexterm><primary>MolProto</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>MolProto</secondary></indexterm>
+<para><computeroutput>MSD.MSD.MolProto = <link linkend="_class_m_s_d_1_1_molecule">Molecule</link><computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a3a8553318e481dedf0e3423c202cfe6c"/><section>
+    <title>UP_DOWN_MODEL</title>
+<indexterm><primary>UP_DOWN_MODEL</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>UP_DOWN_MODEL</secondary></indexterm>
+<para><computeroutput>MSD.MSD.UP_DOWN_MODEL = c_void_p.in_dll(<link linkend="_namespace_m_s_d_1a46a9adbfe86657baee2dde058b055f93">msd_clib</link>, &quot;UP_DOWN_MODEL&quot;)<computeroutput>[static]</computeroutput></computeroutput></para></section>
+</section>
+<section>
+<title>Property Documentation</title>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1ae8887fc7a32ecae4b885af3388551f92"/><section>
+    <title>B</title>
+<indexterm><primary>B</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>B</secondary></indexterm>
+<para><computeroutput>MSD.MSD.B = property(fset = <link linkend="_class_m_s_d_1_1_m_s_d_1a83d4886be1452d838ea6ff9a3c9461c4">setB</link>)<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1af4e7da67554d6947e7a1d2e9778508e4"/><section>
+    <title>backR</title>
+<indexterm><primary>backR</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>backR</secondary></indexterm>
+<para><computeroutput>MSD.MSD.backR = property(fget = lambda self: msd_clib.getBackR(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1ade96bf5044c11fb1a11a6f369afd510b"/><section>
+    <title>begin</title>
+<indexterm><primary>begin</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>begin</secondary></indexterm>
+<para><computeroutput>MSD.MSD.begin = property(fget = lambda self: <link linkend="_class_m_s_d_1_1_m_s_d_1_1___iterator">MSD._Iterator</link>(msd = self))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a4cbcf9f1a9a5c5a72377c9774cbed276"/><section>
+    <title>bottomL</title>
+<indexterm><primary>bottomL</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>bottomL</secondary></indexterm>
+<para><computeroutput>MSD.MSD.bottomL = property(fget = lambda self: msd_clib.getBottomL(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1af6491462b7c4a42065ca4702c5c9dede"/><section>
+    <title>depth</title>
+<indexterm><primary>depth</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>depth</secondary></indexterm>
+<para><computeroutput>MSD.MSD.depth = property(fget = lambda self: msd_clib.getDepth(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a0f2c407500cac385c8a5fcb611f37e15"/><section>
+    <title>dimensions</title>
+<indexterm><primary>dimensions</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>dimensions</secondary></indexterm>
+<para><computeroutput>MSD.MSD.dimensions = property(fget = lambda self : _tupler(msd_clib.getDimensions, self._msd, 3 * [c_uint]))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1ab9f2886ac0a4124b87798f0aa36b99f5"/><section>
+    <title>end</title>
+<indexterm><primary>end</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>end</secondary></indexterm>
+<para><computeroutput>MSD.MSD.end = property(fget = lambda self: <link linkend="_class_m_s_d_1_1_m_s_d_1_1___iterator">MSD._Iterator</link>(msd = self, start = (self._end, len(self))))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a41b827ad8ca8fa83e059f21ca449b7e8"/><section>
+    <title>flippingAlgorithm</title>
+<indexterm><primary>flippingAlgorithm</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>flippingAlgorithm</secondary></indexterm>
+<para><computeroutput>MSD.MSD.flippingAlgorithm = property(fset = lambda self, algo: msd_clib.setFlippingAlgorithm(self._msd, algo))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a8d0810a9019e541cf349f5b3f5c2c13b"/><section>
+    <title>FM_L_exists</title>
+<indexterm><primary>FM_L_exists</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>FM_L_exists</secondary></indexterm>
+<para><computeroutput>MSD.MSD.FM_L_exists = property(fget = lambda self: msd_clib.getFM_L_exists(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1ad126bb8f1f9732045578b1935bf930c1"/><section>
+    <title>FM_R_exists</title>
+<indexterm><primary>FM_R_exists</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>FM_R_exists</secondary></indexterm>
+<para><computeroutput>MSD.MSD.FM_R_exists = property(fget = lambda self: msd_clib.getFM_R_exists(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a4caeca7ce3bf3b2d63ab046928b6f795"/><section>
+    <title>frontR</title>
+<indexterm><primary>frontR</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>frontR</secondary></indexterm>
+<para><computeroutput>MSD.MSD.frontR = property(fget = lambda self: msd_clib.getFrontR(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1aa5c0f86375d417373d82d1e525da22f8"/><section>
+    <title>height</title>
+<indexterm><primary>height</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>height</secondary></indexterm>
+<para><computeroutput>MSD.MSD.height = property(fget = lambda self: msd_clib.getHeight(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a96dedebd31db32638d01d4a48ec1692d"/><section>
+    <title>innerBounds</title>
+<indexterm><primary>innerBounds</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>innerBounds</secondary></indexterm>
+<para><computeroutput>MSD.MSD.innerBounds = property(fget = lambda self: _tupler(msd_clib.getInnerBounds, self._msd, 4 * [c_uint]))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a6ff9c2017204730a03c19b5fe005c3df"/><section>
+    <title>kT</title>
+<indexterm><primary>kT</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>kT</secondary></indexterm>
+<para><computeroutput>MSD.MSD.kT = property(fset = <link linkend="_class_m_s_d_1_1_m_s_d_1a92eb48bec5cc26777f2f663aeed1f6b2">set_kT</link>)<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a993890319c998c65112070ed37f9a4f6"/><section>
+    <title>magneticSusceptibility</title>
+<indexterm><primary>magneticSusceptibility</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>magneticSusceptibility</secondary></indexterm>
+<para><computeroutput>MSD.MSD.magneticSusceptibility = property(fget = lambda self: msd_clib.magneticSusceptibility(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a6b579d38867d112552ea0294ae1032da"/><section>
+    <title>magneticSusceptibility_L</title>
+<indexterm><primary>magneticSusceptibility_L</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>magneticSusceptibility_L</secondary></indexterm>
+<para><computeroutput>MSD.MSD.magneticSusceptibility_L = property(fget = lambda self: msd_clib.magneticSusceptibility_L(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a591bedccf21ff2f1d5a6a9a02d0d90ca"/><section>
+    <title>magneticSusceptibility_m</title>
+<indexterm><primary>magneticSusceptibility_m</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>magneticSusceptibility_m</secondary></indexterm>
+<para><computeroutput>MSD.MSD.magneticSusceptibility_m = property(fget = lambda self: msd_clib.magneticSusceptibility_m(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a8be54d1a6082f8723a40640c674bbf63"/><section>
+    <title>magneticSusceptibility_R</title>
+<indexterm><primary>magneticSusceptibility_R</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>magneticSusceptibility_R</secondary></indexterm>
+<para><computeroutput>MSD.MSD.magneticSusceptibility_R = property(fget = lambda self: msd_clib.magneticSusceptibility_R(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a1fe525deab1fbe82d953f1f59cabab01"/><section>
+    <title>meanM</title>
+<indexterm><primary>meanM</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>meanM</secondary></indexterm>
+<para><computeroutput>MSD.MSD.meanM = property(fget = lambda self : msd_clib.meanM(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1ab1e02dc08f63af093003e6a546aeb84f"/><section>
+    <title>meanMF</title>
+<indexterm><primary>meanMF</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>meanMF</secondary></indexterm>
+<para><computeroutput>MSD.MSD.meanMF = property(fget = lambda self : msd_clib.meanMF(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1add3f1bd3c92557a55bb3b5e4f573bc3a"/><section>
+    <title>meanMFL</title>
+<indexterm><primary>meanMFL</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>meanMFL</secondary></indexterm>
+<para><computeroutput>MSD.MSD.meanMFL = property(fget = lambda self : msd_clib.meanMFL(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1abe84fa91e25ba13daeaa3c31e387908f"/><section>
+    <title>meanMFm</title>
+<indexterm><primary>meanMFm</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>meanMFm</secondary></indexterm>
+<para><computeroutput>MSD.MSD.meanMFm = property(fget = lambda self : msd_clib.meanMFm(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1ad81d9b45f5fdf9c7a8a549a8ec93f7ab"/><section>
+    <title>meanMFR</title>
+<indexterm><primary>meanMFR</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>meanMFR</secondary></indexterm>
+<para><computeroutput>MSD.MSD.meanMFR = property(fget = lambda self : msd_clib.meanMFR(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a913e8969ac06e3002d359cdc15fcfd75"/><section>
+    <title>meanML</title>
+<indexterm><primary>meanML</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>meanML</secondary></indexterm>
+<para><computeroutput>MSD.MSD.meanML = property(fget = lambda self : msd_clib.meanML(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a2cf3c93470ffe6f80bd3557a71edec02"/><section>
+    <title>meanMm</title>
+<indexterm><primary>meanMm</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>meanMm</secondary></indexterm>
+<para><computeroutput>MSD.MSD.meanMm = property(fget = lambda self : msd_clib.meanMm(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1ae632c9ec29ade517e1ae088143ede416"/><section>
+    <title>meanMR</title>
+<indexterm><primary>meanMR</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>meanMR</secondary></indexterm>
+<para><computeroutput>MSD.MSD.meanMR = property(fget = lambda self : msd_clib.meanMR(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a5fd91cfb45ddb9a1bff4163fc696b606"/><section>
+    <title>meanMS</title>
+<indexterm><primary>meanMS</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>meanMS</secondary></indexterm>
+<para><computeroutput>MSD.MSD.meanMS = property(fget = lambda self : msd_clib.meanMS(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a761d797ea0d2e94f6c16d7bfba4a94e3"/><section>
+    <title>meanMSL</title>
+<indexterm><primary>meanMSL</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>meanMSL</secondary></indexterm>
+<para><computeroutput>MSD.MSD.meanMSL = property(fget = lambda self : msd_clib.meanMSL(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a4d8e8e028d787988dce996ddb0c355a6"/><section>
+    <title>meanMSm</title>
+<indexterm><primary>meanMSm</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>meanMSm</secondary></indexterm>
+<para><computeroutput>MSD.MSD.meanMSm = property(fget = lambda self : msd_clib.meanMSm(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a5e94ec0e6e063b7d683d0b219dcf0ce6"/><section>
+    <title>meanMSR</title>
+<indexterm><primary>meanMSR</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>meanMSR</secondary></indexterm>
+<para><computeroutput>MSD.MSD.meanMSR = property(fget = lambda self : msd_clib.meanMSR(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1ab426b44f3c902e2b818e584a83890fa3"/><section>
+    <title>meanU</title>
+<indexterm><primary>meanU</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>meanU</secondary></indexterm>
+<para><computeroutput>MSD.MSD.meanU = property(fget = lambda self : msd_clib.meanU(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1aad62ff14eccec247cbc338951f28beaa"/><section>
+    <title>meanUL</title>
+<indexterm><primary>meanUL</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>meanUL</secondary></indexterm>
+<para><computeroutput>MSD.MSD.meanUL = property(fget = lambda self : msd_clib.meanUL(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a1d220ed70351c2e83ff09ee0ec7fe237"/><section>
+    <title>meanULR</title>
+<indexterm><primary>meanULR</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>meanULR</secondary></indexterm>
+<para><computeroutput>MSD.MSD.meanULR = property(fget = lambda self : msd_clib.meanULR(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a10a029be77605fcadf2dddf99e921af6"/><section>
+    <title>meanUm</title>
+<indexterm><primary>meanUm</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>meanUm</secondary></indexterm>
+<para><computeroutput>MSD.MSD.meanUm = property(fget = lambda self : msd_clib.meanUm(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a5e6cc143a8ea0fd35a2919632f0cf20f"/><section>
+    <title>meanUmL</title>
+<indexterm><primary>meanUmL</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>meanUmL</secondary></indexterm>
+<para><computeroutput>MSD.MSD.meanUmL = property(fget = lambda self : msd_clib.meanUmL(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1ab541edd88c61bae369b948395832aac1"/><section>
+    <title>meanUmR</title>
+<indexterm><primary>meanUmR</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>meanUmR</secondary></indexterm>
+<para><computeroutput>MSD.MSD.meanUmR = property(fget = lambda self : msd_clib.meanUmR(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a6144e21b6cf950c85b31406a2ea061d1"/><section>
+    <title>meanUR</title>
+<indexterm><primary>meanUR</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>meanUR</secondary></indexterm>
+<para><computeroutput>MSD.MSD.meanUR = property(fget = lambda self : msd_clib.meanUR(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a79d25193a3bdb09a55ee9fdf136e5a9e"/><section>
+    <title>mol_exists</title>
+<indexterm><primary>mol_exists</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>mol_exists</secondary></indexterm>
+<para><computeroutput>MSD.MSD.mol_exists = property(fget = lambda self: msd_clib.getMol_exists(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a08b6ae07e1e19d5bf554fcac7153d172"/><section>
+    <title>molParameters</title>
+<indexterm><primary>molParameters</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>molParameters</secondary></indexterm>
+<para><computeroutput>MSD.MSD.molParameters = property(fset = lambda self, params: self.setMolParameters(*params))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1aa0e88dbff648e7ea4e0bf0808a568173"/><section>
+    <title>molPos</title>
+<indexterm><primary>molPos</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>molPos</secondary></indexterm>
+<para><computeroutput>MSD.MSD.molPos = property(fget = lambda self: _tupler(msd_clib.getMolPos, self._msd, 2 * [c_uint]))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a662ce530dcae91ef12db654854a593ac"/><section>
+    <title>molPosL</title>
+<indexterm><primary>molPosL</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>molPosL</secondary></indexterm>
+<para><computeroutput>MSD.MSD.molPosL = property(fget = lambda self: msd_clib.getMolPosL(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a7a77ef37969d8ba83c2713eb728f6680"/><section>
+    <title>molPosR</title>
+<indexterm><primary>molPosR</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>molPosR</secondary></indexterm>
+<para><computeroutput>MSD.MSD.molPosR = property(fget = lambda self: msd_clib.getMolPosR(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a1a336015781f61fdc2801db7f41ba6c1"/><section>
+    <title>molProto</title>
+<indexterm><primary>molProto</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>molProto</secondary></indexterm>
+<para><computeroutput>MSD.MSD.molProto = property(fset = <link linkend="_class_m_s_d_1_1_m_s_d_1add9bcfbb5a1dfd30d53892b784306e7d">setMolProto</link>)<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1aee3a585a9a60dd28deb0a7d84376a20a"/><section>
+    <title>n</title>
+<indexterm><primary>n</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>n</secondary></indexterm>
+<para><computeroutput>MSD.MSD.n = property(fget = lambda self: msd_clib.getN(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a8acba99d51fbecfdbd47f6dfce95dced"/><section>
+    <title>n_m</title>
+<indexterm><primary>n_m</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>n_m</secondary></indexterm>
+<para><computeroutput>MSD.MSD.n_m = property(fget = lambda self: msd_clib.getNm(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a0fb2ebb550c319845b7e7e8ce9e25f85"/><section>
+    <title>n_mL</title>
+<indexterm><primary>n_mL</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>n_mL</secondary></indexterm>
+<para><computeroutput>MSD.MSD.n_mL = property(fget = lambda self: msd_clib.getNmL(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a6b60e1c56e96bb08629b0ef29bf77dbd"/><section>
+    <title>n_mR</title>
+<indexterm><primary>n_mR</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>n_mR</secondary></indexterm>
+<para><computeroutput>MSD.MSD.n_mR = property(fget = lambda self: msd_clib.getNmR(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a4da10d815de0aab2e6fe37b718adf274"/><section>
+    <title>nL</title>
+<indexterm><primary>nL</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>nL</secondary></indexterm>
+<para><computeroutput>MSD.MSD.nL = property(fget = lambda self: msd_clib.getNL(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a792e7f1ab106048e9e58137b53bbec82"/><section>
+    <title>nLR</title>
+<indexterm><primary>nLR</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>nLR</secondary></indexterm>
+<para><computeroutput>MSD.MSD.nLR = property(fget = lambda self: msd_clib.getNLR(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1ad3611297b5502e7f478261bb23773bfd"/><section>
+    <title>nR</title>
+<indexterm><primary>nR</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>nR</secondary></indexterm>
+<para><computeroutput>MSD.MSD.nR = property(fget = lambda self: msd_clib.getNR(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1abfb5adadc78b3b845471b46e6f620cd2"/><section>
+    <title>parameters</title>
+<indexterm><primary>parameters</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>parameters</secondary></indexterm>
+<para><computeroutput>MSD.MSD.parameters = property(fset = <link linkend="_class_m_s_d_1_1_m_s_d_1ad6dfe08912bc8c61ecf2ad3f81f0212a">setParameters</link>)<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1af09aed34231c5ffe456d27bfe3cb3992"/><section>
+    <title>regions</title>
+<indexterm><primary>regions</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>regions</secondary></indexterm>
+<para><computeroutput>MSD.MSD.regions = property(fget = lambda self: _tupler(msd_clib.getRegions, self._msd, 3 * [c_bool]))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1ab3a92106983e22b49465c009717766ec"/><section>
+    <title>results</title>
+<indexterm><primary>results</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>results</secondary></indexterm>
+<para><computeroutput>MSD.MSD.results = property(fget = <link linkend="_class_m_s_d_1_1_m_s_d_1a054be0ce01dcba6e630ad208d333d87d">getResults</link>)<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1ad4ae0233e22f42bc1d502ea99af6da90"/><section>
+    <title>seed</title>
+<indexterm><primary>seed</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>seed</secondary></indexterm>
+<para><computeroutput>MSD.MSD.seed<computeroutput>[static]</computeroutput></computeroutput></para><emphasis role="strong">Initial value:</emphasis><programlisting linenumbering="unnumbered">=&#32;&#32;property(
+&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fget&#32;=&#32;<emphasis role="keyword">lambda</emphasis>&#32;self&#32;:&#32;msd_clib.getSeed(self._msd),
+&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;fset&#32;=&#32;<emphasis role="keyword">lambda</emphasis>&#32;self,&#32;seed:&#32;msd_clib.setSeed(self._msd,&#32;seed)
+&#32;&#32;&#32;&#32;&#32;&#32;&#32;&#32;)
+</programlisting></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1aa097724a7f7087de43a12a730d64c700"/><section>
+    <title>specificHeat</title>
+<indexterm><primary>specificHeat</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>specificHeat</secondary></indexterm>
+<para><computeroutput>MSD.MSD.specificHeat = property(fget = lambda self : msd_clib.specificHeat(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a77614239751eb955d9ae8326cd0a615b"/><section>
+    <title>specificHeat_L</title>
+<indexterm><primary>specificHeat_L</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>specificHeat_L</secondary></indexterm>
+<para><computeroutput>MSD.MSD.specificHeat_L = property(fget = lambda self : msd_clib.specificHeat_L(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a563b40feee77af61bd7cb53e5880106a"/><section>
+    <title>specificHeat_LR</title>
+<indexterm><primary>specificHeat_LR</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>specificHeat_LR</secondary></indexterm>
+<para><computeroutput>MSD.MSD.specificHeat_LR = property(fget = lambda self : msd_clib.specificHeat_LR(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a191ba692b2e5b1cd2c769dd52a2dc1d3"/><section>
+    <title>specificHeat_m</title>
+<indexterm><primary>specificHeat_m</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>specificHeat_m</secondary></indexterm>
+<para><computeroutput>MSD.MSD.specificHeat_m = property(fget = lambda self : msd_clib.specificHeat_m(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a20c45bbc7e75ab6651033bb194a6b3dc"/><section>
+    <title>specificHeat_mL</title>
+<indexterm><primary>specificHeat_mL</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>specificHeat_mL</secondary></indexterm>
+<para><computeroutput>MSD.MSD.specificHeat_mL = property(fget = lambda self : msd_clib.specificHeat_mL(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1ae9729b0e5b0266a6bc076e25a3745762"/><section>
+    <title>specificHeat_mR</title>
+<indexterm><primary>specificHeat_mR</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>specificHeat_mR</secondary></indexterm>
+<para><computeroutput>MSD.MSD.specificHeat_mR = property(fget = lambda self : msd_clib.specificHeat_mR(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1abb502809ccca6c41b6098e4f8dc335f1"/><section>
+    <title>specificHeat_R</title>
+<indexterm><primary>specificHeat_R</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>specificHeat_R</secondary></indexterm>
+<para><computeroutput>MSD.MSD.specificHeat_R = property(fget = lambda self : msd_clib.specificHeat_R(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1ab5a63d3be26fc829a7b7fac6893e8101"/><section>
+    <title>topL</title>
+<indexterm><primary>topL</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>topL</secondary></indexterm>
+<para><computeroutput>MSD.MSD.topL = property(fget = lambda self: msd_clib.getTopL(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1a92f137951d6a8c96fcdd394306233b37"/><section>
+    <title>width</title>
+<indexterm><primary>width</primary><secondary>MSD.MSD</secondary></indexterm>
+<indexterm><primary>MSD.MSD</primary><secondary>width</secondary></indexterm>
+<para><computeroutput>MSD.MSD.width = property(fget = lambda self: msd_clib.getWidth(self._msd))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<para>
+The documentation for this class was generated from the following file:</para>
+C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/lib/python/<link linkend="__m_s_d_8py">MSD.py</link></section>
+</section>

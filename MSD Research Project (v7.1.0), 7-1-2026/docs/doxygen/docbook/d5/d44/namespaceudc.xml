@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_namespaceudc" xml:lang="en-US">
+<title>udc Namespace Reference</title>
+<indexterm><primary>udc</primary></indexterm>
+<simplesect>
+    <title>Classes    </title>
+        <itemizedlist>
+            <listitem><para>class <link linkend="_classudc_1_1_molecule">Molecule</link></para>
+
+<para>An abstract molecule. </para>
+</listitem>
+            <listitem><para>class <link linkend="_classudc_1_1_m_s_d">MSD</link></para>
+
+<para>An abstract Molecular Spintronic Device. </para>
+</listitem>
+            <listitem><para>class <link linkend="_classudc_1_1_sparse_array">SparseArray</link></para>
+</listitem>
+            <listitem><para>struct <link linkend="_structudc_1_1_sparse_array_value">SparseArrayValue</link></para>
+</listitem>
+            <listitem><para>class <link linkend="_classudc_1_1_u_d_c_exception">UDCException</link></para>
+</listitem>
+            <listitem><para>class <link linkend="_classudc_1_1_vector">Vector</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Functions    </title>
+        <itemizedlist>
+            <listitem><para>ostream &amp; <link linkend="_namespaceudc_1a6b685c21976ba81485ee5434b8a7ca41">operator&lt;&lt;</link> (ostream &amp;out, const <link linkend="_structudc_1_1_m_s_d_1_1_parameters">MSD::Parameters</link> &amp;p)</para>
+</listitem>
+            <listitem><para>ostream &amp; <link linkend="_namespaceudc_1ada41040df7a93e1901296b334ebde2f3">operator&lt;&lt;</link> (ostream &amp;out, const <link linkend="_structudc_1_1_m_s_d_1_1_results">MSD::Results</link> &amp;r)</para>
+</listitem>
+            <listitem><para>template&lt;typename T &gt; </para><para>T <link linkend="_namespaceudc_1a03752c8f5c571a06fc1c32e823a319a5">parseline</link> (istream &amp;in)</para>
+</listitem>
+            <listitem><para>template&lt;&gt; </para><para>string <link linkend="_namespaceudc_1aa53d390897b2cbbeb3f336b31ca8b121">parseline</link> (istream &amp;in)</para>
+</listitem>
+            <listitem><para>template&lt;&gt; </para><para>istringstream <link linkend="_namespaceudc_1aa3ecd4349a02127aebcf910ebab2e4e4">parseline</link> (istream &amp;in)</para>
+</listitem>
+            <listitem><para>template&lt;&gt; </para><para>void <link linkend="_namespaceudc_1a502730a2d07ef150a01ed02b6c116846">parseline</link> (istream &amp;in)</para>
+</listitem>
+            <listitem><para>template&lt;typename T &gt; </para><para>T <link linkend="_namespaceudc_1ab5d1642f2042aa4f999a47f2de0db959">parseline</link> (const string &amp;str)</para>
+</listitem>
+            <listitem><para>istream &amp; <link linkend="_namespaceudc_1a6a73767fbbacbcfa2f4d7db36e6c4230">operator&gt;&gt;</link> (istream &amp;in, <link linkend="_classudc_1_1_vector">udc::Vector</link> &amp;v)</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_m_s_d_1a7266f08d021d5a06960b152c95a9213e">MSD::MolProto</link> <link linkend="_namespaceudc_1a2479706554f64b21239dca95b3c1465c">readMMT</link> (istream &amp;src)</para>
+
+<para>Parses MMT file data from the given text istream, and saves it as a <link linkend="_classudc_1_1_m_s_d_1a7266f08d021d5a06960b152c95a9213e">MSD::MolProto</link> object. </para>
+</listitem>
+            <listitem><para>double <link linkend="_namespaceudc_1aa7cee595bc6a15bdd189f00553c92349">sq</link> (double x)</para>
+
+<para>square a number fast </para>
+</listitem>
+            <listitem><para>double <link linkend="_namespaceudc_1a6d899413865bed9b0346dc4a2b6ed4b5">cube</link> (double x)</para>
+
+<para>cube a number fast </para>
+</listitem>
+            <listitem><para>void <link linkend="_namespaceudc_1a51cb94811213523405b27e375b7a1b33">bread</link> (void *destination, size_t dSize, const unsigned char *&amp;buffer)</para>
+
+<para>Buffer/Binary Read: </para>
+</listitem>
+            <listitem><para>template&lt;typename T &gt; </para><para>void <link linkend="_namespaceudc_1a6f17d107671fb6c3d5e2044d346e45c5">bread</link> (T &amp;destination, const unsigned char *&amp;buffer)</para>
+
+<para>Templated version: determines the approprate number of bytes by calling &quot;sizeof(T)&quot;. </para>
+</listitem>
+            <listitem><para>void <link linkend="_namespaceudc_1a1e040d8326f2ad3b600f8f66a8de6305">bwrite</link> (const void *source, size_t sSize, unsigned char *&amp;buffer)</para>
+
+<para>Buffer/Binary Write: </para>
+</listitem>
+            <listitem><para>template&lt;typename T &gt; </para><para>void <link linkend="_namespaceudc_1a0a7d84b783b302ce21db57fd497817d0">bwrite</link> (const T &amp;source, unsigned char *&amp;buffer)</para>
+
+<para>Templated version: determines the approprate number of bytes by calling &quot;sizeof(T)&quot;. </para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_namespaceudc_1a6105effafda7b50687a43e471e65aa14">operator*</link> (double k, const <link linkend="_classudc_1_1_vector">Vector</link> &amp;v)</para>
+</listitem>
+            <listitem><para>ostream &amp; <link linkend="_namespaceudc_1a63b2f819645f99897b6f35bb1daf8134">operator&lt;&lt;</link> (ostream &amp;out, const <link linkend="_classudc_1_1_vector">Vector</link> &amp;v)</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Variables    </title>
+        <itemizedlist>
+            <listitem><para>const double <link linkend="_namespaceudc_1aa4b4d55516f1e34de5dc8b228f160597">E</link> = 2.71828182845904523536</para>
+
+<para>Mathematical constant: Euler&apos;s Number. </para>
+</listitem>
+            <listitem><para>const double <link linkend="_namespaceudc_1a1757f9fc50446243658974977dd95e7c">PI</link> = 3.14159265358979323846</para>
+
+<para>Mathematical constant. </para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Function Documentation</title>
+<anchor xml:id="_namespaceudc_1a6f17d107671fb6c3d5e2044d346e45c5"/><section>
+    <title>bread()<computeroutput>[1/2]</computeroutput></title>
+<indexterm><primary>bread</primary><secondary>udc</secondary></indexterm>
+<indexterm><primary>udc</primary><secondary>bread</secondary></indexterm>
+<computeroutput>template&lt;typename T &gt; </computeroutput><para><computeroutput>void udc::bread (T &amp; destination, const unsigned char *&amp; buffer)<computeroutput>[inline]</computeroutput></computeroutput></para><para>
+
+<para>Templated version: determines the approprate number of bytes by calling &quot;sizeof(T)&quot;. </para>
+</para>
+</section>
+<anchor xml:id="_namespaceudc_1a51cb94811213523405b27e375b7a1b33"/><section>
+    <title>bread()<computeroutput>[2/2]</computeroutput></title>
+<indexterm><primary>bread</primary><secondary>udc</secondary></indexterm>
+<indexterm><primary>udc</primary><secondary>bread</secondary></indexterm>
+<para><computeroutput>void udc::bread (void * destination, size_t dSize, const unsigned char *&amp; buffer)<computeroutput>[inline]</computeroutput></computeroutput></para><para>
+
+<para>Buffer/Binary Read: </para>
+</para>
+
+<para>Reads the given number of bytes from the buffer and stores it into the destination, advancing the buffer pointer in the process. </para>
+</section>
+<anchor xml:id="_namespaceudc_1a0a7d84b783b302ce21db57fd497817d0"/><section>
+    <title>bwrite()<computeroutput>[1/2]</computeroutput></title>
+<indexterm><primary>bwrite</primary><secondary>udc</secondary></indexterm>
+<indexterm><primary>udc</primary><secondary>bwrite</secondary></indexterm>
+<computeroutput>template&lt;typename T &gt; </computeroutput><para><computeroutput>void udc::bwrite (const T &amp; source, unsigned char *&amp; buffer)<computeroutput>[inline]</computeroutput></computeroutput></para><para>
+
+<para>Templated version: determines the approprate number of bytes by calling &quot;sizeof(T)&quot;. </para>
+</para>
+</section>
+<anchor xml:id="_namespaceudc_1a1e040d8326f2ad3b600f8f66a8de6305"/><section>
+    <title>bwrite()<computeroutput>[2/2]</computeroutput></title>
+<indexterm><primary>bwrite</primary><secondary>udc</secondary></indexterm>
+<indexterm><primary>udc</primary><secondary>bwrite</secondary></indexterm>
+<para><computeroutput>void udc::bwrite (const void * source, size_t sSize, unsigned char *&amp; buffer)<computeroutput>[inline]</computeroutput></computeroutput></para><para>
+
+<para>Buffer/Binary Write: </para>
+</para>
+
+<para>Writes the given number of bytes from the source and stores it into the buffer, advancing the buffer pointer in the process. </para>
+</section>
+<anchor xml:id="_namespaceudc_1a6d899413865bed9b0346dc4a2b6ed4b5"/><section>
+    <title>cube()</title>
+<indexterm><primary>cube</primary><secondary>udc</secondary></indexterm>
+<indexterm><primary>udc</primary><secondary>cube</secondary></indexterm>
+<para><computeroutput>double udc::cube (double x)<computeroutput>[inline]</computeroutput></computeroutput></para><para>
+
+<para>cube a number fast </para>
+</para>
+</section>
+<anchor xml:id="_namespaceudc_1a6105effafda7b50687a43e471e65aa14"/><section>
+    <title>operator*()</title>
+<indexterm><primary>operator*</primary><secondary>udc</secondary></indexterm>
+<indexterm><primary>udc</primary><secondary>operator*</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::operator* (double k, const <link linkend="_classudc_1_1_vector">Vector</link> &amp; v)</computeroutput></para></section>
+<anchor xml:id="_namespaceudc_1a6b685c21976ba81485ee5434b8a7ca41"/><section>
+    <title>operator&lt;&lt;()<computeroutput>[1/3]</computeroutput></title>
+<indexterm><primary>operator&lt;&lt;</primary><secondary>udc</secondary></indexterm>
+<indexterm><primary>udc</primary><secondary>operator&lt;&lt;</secondary></indexterm>
+<para><computeroutput>ostream &amp; udc::operator&lt;&lt; (ostream &amp; out, const <link linkend="_structudc_1_1_m_s_d_1_1_parameters">MSD::Parameters</link> &amp; p)</computeroutput></para></section>
+<anchor xml:id="_namespaceudc_1ada41040df7a93e1901296b334ebde2f3"/><section>
+    <title>operator&lt;&lt;()<computeroutput>[2/3]</computeroutput></title>
+<indexterm><primary>operator&lt;&lt;</primary><secondary>udc</secondary></indexterm>
+<indexterm><primary>udc</primary><secondary>operator&lt;&lt;</secondary></indexterm>
+<para><computeroutput>ostream &amp; udc::operator&lt;&lt; (ostream &amp; out, const <link linkend="_structudc_1_1_m_s_d_1_1_results">MSD::Results</link> &amp; r)</computeroutput></para></section>
+<anchor xml:id="_namespaceudc_1a63b2f819645f99897b6f35bb1daf8134"/><section>
+    <title>operator&lt;&lt;()<computeroutput>[3/3]</computeroutput></title>
+<indexterm><primary>operator&lt;&lt;</primary><secondary>udc</secondary></indexterm>
+<indexterm><primary>udc</primary><secondary>operator&lt;&lt;</secondary></indexterm>
+<para><computeroutput>ostream &amp; udc::operator&lt;&lt; (ostream &amp; out, const <link linkend="_classudc_1_1_vector">Vector</link> &amp; v)</computeroutput></para></section>
+<anchor xml:id="_namespaceudc_1a6a73767fbbacbcfa2f4d7db36e6c4230"/><section>
+    <title>operator&gt;&gt;()</title>
+<indexterm><primary>operator&gt;&gt;</primary><secondary>udc</secondary></indexterm>
+<indexterm><primary>udc</primary><secondary>operator&gt;&gt;</secondary></indexterm>
+<para><computeroutput>istream &amp; udc::operator&gt;&gt; (istream &amp; in, <link linkend="_classudc_1_1_vector">udc::Vector</link> &amp; v)</computeroutput></para></section>
+<anchor xml:id="_namespaceudc_1ab5d1642f2042aa4f999a47f2de0db959"/><section>
+    <title>parseline()<computeroutput>[1/5]</computeroutput></title>
+<indexterm><primary>parseline</primary><secondary>udc</secondary></indexterm>
+<indexterm><primary>udc</primary><secondary>parseline</secondary></indexterm>
+<computeroutput>template&lt;typename T &gt; </computeroutput><para><computeroutput>T udc::parseline (const string &amp; str)</computeroutput></para></section>
+<anchor xml:id="_namespaceudc_1a03752c8f5c571a06fc1c32e823a319a5"/><section>
+    <title>parseline()<computeroutput>[2/5]</computeroutput></title>
+<indexterm><primary>parseline</primary><secondary>udc</secondary></indexterm>
+<indexterm><primary>udc</primary><secondary>parseline</secondary></indexterm>
+<computeroutput>template&lt;typename T &gt; </computeroutput><para><computeroutput>T udc::parseline (istream &amp; in)</computeroutput></para></section>
+<anchor xml:id="_namespaceudc_1aa53d390897b2cbbeb3f336b31ca8b121"/><section>
+    <title>parseline()<computeroutput>[3/5]</computeroutput></title>
+<indexterm><primary>parseline</primary><secondary>udc</secondary></indexterm>
+<indexterm><primary>udc</primary><secondary>parseline</secondary></indexterm>
+<computeroutput>template&lt;&gt; </computeroutput><para><computeroutput>string udc::parseline (istream &amp; in)</computeroutput></para></section>
+<anchor xml:id="_namespaceudc_1aa3ecd4349a02127aebcf910ebab2e4e4"/><section>
+    <title>parseline()<computeroutput>[4/5]</computeroutput></title>
+<indexterm><primary>parseline</primary><secondary>udc</secondary></indexterm>
+<indexterm><primary>udc</primary><secondary>parseline</secondary></indexterm>
+<computeroutput>template&lt;&gt; </computeroutput><para><computeroutput>istringstream udc::parseline (istream &amp; in)</computeroutput></para></section>
+<anchor xml:id="_namespaceudc_1a502730a2d07ef150a01ed02b6c116846"/><section>
+    <title>parseline()<computeroutput>[5/5]</computeroutput></title>
+<indexterm><primary>parseline</primary><secondary>udc</secondary></indexterm>
+<indexterm><primary>udc</primary><secondary>parseline</secondary></indexterm>
+<computeroutput>template&lt;&gt; </computeroutput><para><computeroutput>void udc::parseline (istream &amp; in)</computeroutput></para></section>
+<anchor xml:id="_namespaceudc_1a2479706554f64b21239dca95b3c1465c"/><section>
+    <title>readMMT()</title>
+<indexterm><primary>readMMT</primary><secondary>udc</secondary></indexterm>
+<indexterm><primary>udc</primary><secondary>readMMT</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_m_s_d_1a7266f08d021d5a06960b152c95a9213e">MSD::MolProto</link> udc::readMMT (istream &amp; src)</computeroutput></para><para>
+
+<para>Parses MMT file data from the given text istream, and saves it as a <link linkend="_classudc_1_1_m_s_d_1a7266f08d021d5a06960b152c95a9213e">MSD::MolProto</link> object. </para>
+</para>
+
+<para>
+                <formalpara>
+                    <title>
+Parameters</title>
+                    <para>
+                    <table frame="all">
+                        <tgroup cols="2" align="left" colsep="1" rowsep="1">
+                        <colspec colwidth="1*"/>
+                        <colspec colwidth="4*"/>
+                        <tbody>
+                            <row>
+<entry>src</entry><entry>
+<para>The source data (or file) as a text stream. </para>
+</entry>
+                            </row>
+                        </tbody>
+                        </tgroup>
+                    </table>
+                    </para>
+                </formalpara>
+                <formalpara><title>Returns</title>
+
+<para><link linkend="_classudc_1_1_m_s_d_1a7266f08d021d5a06960b152c95a9213e">MSD::MolProto</link> </para>
+</formalpara>
+</para>
+</section>
+<anchor xml:id="_namespaceudc_1aa7cee595bc6a15bdd189f00553c92349"/><section>
+    <title>sq()</title>
+<indexterm><primary>sq</primary><secondary>udc</secondary></indexterm>
+<indexterm><primary>udc</primary><secondary>sq</secondary></indexterm>
+<para><computeroutput>double udc::sq (double x)<computeroutput>[inline]</computeroutput></computeroutput></para><para>
+
+<para>square a number fast </para>
+</para>
+</section>
+</section>
+<section>
+<title>Variable Documentation</title>
+<anchor xml:id="_namespaceudc_1aa4b4d55516f1e34de5dc8b228f160597"/><section>
+    <title>E</title>
+<indexterm><primary>E</primary><secondary>udc</secondary></indexterm>
+<indexterm><primary>udc</primary><secondary>E</secondary></indexterm>
+<para><computeroutput>const double udc::E = 2.71828182845904523536</computeroutput></para><para>
+
+<para>Mathematical constant: Euler&apos;s Number. </para>
+</para>
+</section>
+<anchor xml:id="_namespaceudc_1a1757f9fc50446243658974977dd95e7c"/><section>
+    <title>PI</title>
+<indexterm><primary>PI</primary><secondary>udc</secondary></indexterm>
+<indexterm><primary>udc</primary><secondary>PI</secondary></indexterm>
+<para><computeroutput>const double udc::PI = 3.14159265358979323846</computeroutput></para><para>
+
+<para>Mathematical constant. </para>
+</para>
+</section>
+</section>
+</section>

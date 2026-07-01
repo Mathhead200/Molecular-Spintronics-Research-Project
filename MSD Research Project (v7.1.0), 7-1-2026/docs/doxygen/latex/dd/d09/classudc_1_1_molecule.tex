@@ -1,0 +1,360 @@
+\hypertarget{classudc_1_1_molecule}{}\doxysection{udc\+::Molecule Class Reference}
+\label{classudc_1_1_molecule}\index{udc::Molecule@{udc::Molecule}}
+
+
+An abstract molecule.  
+
+
+
+
+{\ttfamily \#include $<$MSD.\+h$>$}
+
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classudc_1_1_molecule_1_1_deserialization_exception}{Deserialization\+Exception}}
+\item 
+class \mbox{\hyperlink{classudc_1_1_molecule_1_1_edge_iterable}{Edge\+Iterable}}
+\item 
+class \mbox{\hyperlink{classudc_1_1_molecule_1_1_edge_iterator}{Edge\+Iterator}}
+\item 
+struct \mbox{\hyperlink{structudc_1_1_molecule_1_1_edge_parameters}{Edge\+Parameters}}
+\begin{DoxyCompactList}\small\item\em Information about an edge between two Nodes. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classudc_1_1_molecule_1_1_node_iterable}{Node\+Iterable}}
+\item 
+class \mbox{\hyperlink{classudc_1_1_molecule_1_1_node_iterator}{Node\+Iterator}}
+\item 
+struct \mbox{\hyperlink{structudc_1_1_molecule_1_1_node_parameters}{Node\+Parameters}}
+\begin{DoxyCompactList}\small\item\em local parameters \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classudc_1_1_molecule_a4a38e660030e37a46905b99fb87be886}{Molecule}} ()
+\begin{DoxyCompactList}\small\item\em Create a default molecule with no nodes or edges. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classudc_1_1_molecule_abc1afaa168255b7e8a3a54136e9e47e2}{Molecule}} (size\+\_\+t \mbox{\hyperlink{classudc_1_1_molecule_abedb9f1c61ee095af402a365207eacef}{node\+Count}}, const \mbox{\hyperlink{structudc_1_1_molecule_1_1_node_parameters}{Node\+Parameters}} \&node\+Params=\mbox{\hyperlink{structudc_1_1_molecule_1_1_node_parameters}{Node\+Parameters}}())
+\begin{DoxyCompactList}\small\item\em Create a molecule with the given number of nodes, but no edges. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classudc_1_1_molecule_a682c1855e517d0c2b68118b114d31d15}{serialize}} (unsigned char $\ast$buffer) const
+\item 
+void \mbox{\hyperlink{classudc_1_1_molecule_ac8c39d99187f0dae0b0fe7ef7e935a0d}{deserialize}} (const unsigned char $\ast$buffer)
+\item 
+size\+\_\+t \mbox{\hyperlink{classudc_1_1_molecule_a9fc6cbb7d10939477c3abcefd319ae54}{serialization\+Size}} () const
+\item 
+istream \& \mbox{\hyperlink{classudc_1_1_molecule_aedb314ce8b1dff4ecf156d6e739d170f}{read}} (istream \&in)
+\item 
+ostream \& \mbox{\hyperlink{classudc_1_1_molecule_a59ea4534de4d263562db48eac48a68cc}{write}} (ostream \&out) const
+\item 
+unsigned int \mbox{\hyperlink{classudc_1_1_molecule_ab18585360b5c1577f6be8cc1f565b260}{create\+Node}} (const \mbox{\hyperlink{structudc_1_1_molecule_1_1_node_parameters}{Node\+Parameters}} \&parameters=\mbox{\hyperlink{structudc_1_1_molecule_1_1_node_parameters}{Node\+Parameters}}())
+\begin{DoxyCompactList}\small\item\em Returns the new node\textquotesingle{}s index. \end{DoxyCompactList}\item 
+unsigned int \mbox{\hyperlink{classudc_1_1_molecule_abedb9f1c61ee095af402a365207eacef}{node\+Count}} () const
+\begin{DoxyCompactList}\small\item\em (i.\+e. \end{DoxyCompactList}\item 
+unsigned int \mbox{\hyperlink{classudc_1_1_molecule_ae1411a791a83503073a9dc8a7b1d3b33}{connect\+Nodes}} (unsigned int nodeA, unsigned int nodeB, const \mbox{\hyperlink{structudc_1_1_molecule_1_1_edge_parameters}{Edge\+Parameters}} \&parameters=\mbox{\hyperlink{structudc_1_1_molecule_1_1_edge_parameters}{Edge\+Parameters}}())
+\begin{DoxyCompactList}\small\item\em Creates a connection (Edge) between the two given nodes, and returns the new Edge\textquotesingle{}s index. \end{DoxyCompactList}\item 
+unsigned int \mbox{\hyperlink{classudc_1_1_molecule_a41ffa48f091303c3178c8e783cc3142e}{edge\+Index}} (unsigned int nodeA, unsigned int nodeB) const
+\begin{DoxyCompactList}\small\item\em Search for and return the index of the edge connecting the given nodes if one exists, or \mbox{\hyperlink{classudc_1_1_molecule_a1b9d46a0051e4ddbb66f8b0322844dda}{Molecule\+::\+NOT\+\_\+\+FOUND}} if one doesn\textquotesingle{}t. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{structudc_1_1_molecule_1_1_edge_parameters}{Edge\+Parameters}} \mbox{\hyperlink{classudc_1_1_molecule_a012b0e0a805476ae9e80673b9070db86}{get\+Edge\+Parameters}} (unsigned int index) const
+\item 
+void \mbox{\hyperlink{classudc_1_1_molecule_a303bb5e1cc934255220e58949e345065}{set\+Edge\+Parameters}} (unsigned int index, const \mbox{\hyperlink{structudc_1_1_molecule_1_1_edge_parameters}{Edge\+Parameters}} \&p)
+\item 
+\mbox{\hyperlink{structudc_1_1_molecule_1_1_node_parameters}{Node\+Parameters}} \mbox{\hyperlink{classudc_1_1_molecule_aee4baa13cfc0b0584ec8e2c5000a76be}{get\+Node\+Parameters}} (unsigned int index) const
+\item 
+void \mbox{\hyperlink{classudc_1_1_molecule_ad13bc013a1031b8379ee7f134ce4724e}{set\+Node\+Parameters}} (unsigned int index, const \mbox{\hyperlink{structudc_1_1_molecule_1_1_node_parameters}{Node\+Parameters}} \&p)
+\item 
+void \mbox{\hyperlink{classudc_1_1_molecule_a401ed0509649570cc636b5a08735cbd6}{set\+All\+Parameters}} (const \mbox{\hyperlink{structudc_1_1_molecule_1_1_node_parameters}{Molecule\+::\+Node\+Parameters}} \&node\+Params, const \mbox{\hyperlink{structudc_1_1_molecule_1_1_edge_parameters}{Molecule\+::\+Edge\+Parameters}} \&edge\+Params)
+\item 
+void \mbox{\hyperlink{classudc_1_1_molecule_a055eb97e7305e44ebb8a0d22a23f6752}{set\+Left\+Lead}} (unsigned int node)
+\item 
+void \mbox{\hyperlink{classudc_1_1_molecule_a549536b6815dd4ffcedb3ab3895a064f}{set\+Right\+Lead}} (unsigned int node)
+\item 
+void \mbox{\hyperlink{classudc_1_1_molecule_a57552dd57e092b3d7bc5e2e13e2a419a}{set\+Leads}} (unsigned int left, unsigned int right)
+\item 
+unsigned int \mbox{\hyperlink{classudc_1_1_molecule_ab2718d472f48420e4ae77827c2753f9a}{get\+Left\+Lead}} () const
+\item 
+unsigned int \mbox{\hyperlink{classudc_1_1_molecule_a09895cda60e964b18e0c38384e5f3a89}{get\+Right\+Lead}} () const
+\item 
+void \mbox{\hyperlink{classudc_1_1_molecule_a8eacb4f3318b2d68c571cafb56a956ba}{get\+Leads}} (unsigned int \&left, unsigned int \&right) const
+\item 
+\mbox{\hyperlink{classudc_1_1_molecule_1_1_node_iterable}{Node\+Iterable}} \mbox{\hyperlink{classudc_1_1_molecule_a57560cc5b9d4d5971c16566f77e2e279}{get\+Nodes}} () const
+\item 
+\mbox{\hyperlink{classudc_1_1_molecule_1_1_edge_iterable}{Edge\+Iterable}} \mbox{\hyperlink{classudc_1_1_molecule_afc512c8f695a33e8918bd20912beb8cd}{get\+Edges}} () const
+\item 
+\mbox{\hyperlink{classudc_1_1_molecule_1_1_edge_iterable}{Edge\+Iterable}} \mbox{\hyperlink{classudc_1_1_molecule_a48c40b90cb716c63b0a3c6b2a39d4805}{get\+Adjacency\+List}} (unsigned int node\+Index) const
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \mbox{\hyperlink{classudc_1_1_molecule}{Molecule}} \mbox{\hyperlink{classudc_1_1_molecule_a97742a892262f853a7ec68d982d68fae}{load}} (istream \&in)
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const char $\ast$const \mbox{\hyperlink{classudc_1_1_molecule_a5d2f40b3d48330e1345c68b8b05a18ad}{HEADER}} = \char`\"{}MMB\char`\"{}
+\item 
+static const size\+\_\+t \mbox{\hyperlink{classudc_1_1_molecule_a5c178c3e3abe344b6019877b4e877dfa}{HEADER\+\_\+\+SIZE}} = 3
+\item 
+static const unsigned int \mbox{\hyperlink{classudc_1_1_molecule_a1b9d46a0051e4ddbb66f8b0322844dda}{NOT\+\_\+\+FOUND}} = (unsigned int) -\/1
+\end{DoxyCompactItemize}
+\doxysubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classudc_1_1_molecule_ae07ea2a91e156116726c0b3533020fdb}{MSD}}
+\item 
+class \mbox{\hyperlink{classudc_1_1_molecule_a9732a33ce91da70ce956205fc603c31c}{Node\+Iterable}}
+\item 
+class \mbox{\hyperlink{classudc_1_1_molecule_ac5a1d2c6036b7ba1894a7c3b8d96a312}{Node\+Iterator}}
+\item 
+class \mbox{\hyperlink{classudc_1_1_molecule_a42f28c138ebcdfdd1e070af8f413a19e}{Edge\+Iterable}}
+\item 
+class \mbox{\hyperlink{classudc_1_1_molecule_a265a85b438f4a316627f37c1c2d442e8}{Edge\+Iterator}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+An abstract molecule. 
+
+Used in \mbox{\hyperlink{classudc_1_1_m_s_d}{MSD}}. A \char`\"{}\+Molecule\char`\"{} object only represents a prototype for a molecule design. Use the instantiate() method to create a Molecule\+::\+Instance which has a unique spin state. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classudc_1_1_molecule_a4a38e660030e37a46905b99fb87be886}\label{classudc_1_1_molecule_a4a38e660030e37a46905b99fb87be886}} 
+\index{udc::Molecule@{udc::Molecule}!Molecule@{Molecule}}
+\index{Molecule@{Molecule}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{Molecule()}{Molecule()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily udc\+::\+Molecule\+::\+Molecule (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Create a default molecule with no nodes or edges. 
+
+Both the left and right leads are initalize to 0. \mbox{\Hypertarget{classudc_1_1_molecule_abc1afaa168255b7e8a3a54136e9e47e2}\label{classudc_1_1_molecule_abc1afaa168255b7e8a3a54136e9e47e2}} 
+\index{udc::Molecule@{udc::Molecule}!Molecule@{Molecule}}
+\index{Molecule@{Molecule}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{Molecule()}{Molecule()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily udc\+::\+Molecule\+::\+Molecule (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{node\+Count,  }\item[{const \mbox{\hyperlink{structudc_1_1_molecule_1_1_node_parameters}{Node\+Parameters}} \&}]{node\+Params = {\ttfamily \mbox{\hyperlink{structudc_1_1_molecule_1_1_node_parameters}{Node\+Parameters}}()} }\end{DoxyParamCaption})}
+
+
+
+Create a molecule with the given number of nodes, but no edges. 
+
+Both the left and right leads are initalized to 0.
+
+May also supply a set of parameters to use for each node. By default, the default node parameters are used. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classudc_1_1_molecule_ae1411a791a83503073a9dc8a7b1d3b33}\label{classudc_1_1_molecule_ae1411a791a83503073a9dc8a7b1d3b33}} 
+\index{udc::Molecule@{udc::Molecule}!connectNodes@{connectNodes}}
+\index{connectNodes@{connectNodes}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{connectNodes()}{connectNodes()}}
+{\footnotesize\ttfamily unsigned int udc\+::\+Molecule\+::connect\+Nodes (\begin{DoxyParamCaption}\item[{unsigned int}]{nodeA,  }\item[{unsigned int}]{nodeB,  }\item[{const \mbox{\hyperlink{structudc_1_1_molecule_1_1_edge_parameters}{Edge\+Parameters}} \&}]{parameters = {\ttfamily \mbox{\hyperlink{structudc_1_1_molecule_1_1_edge_parameters}{Edge\+Parameters}}()} }\end{DoxyParamCaption})}
+
+
+
+Creates a connection (Edge) between the two given nodes, and returns the new Edge\textquotesingle{}s index. 
+
+Note\+: this method does not check if the two nodes are already connected. It is possible to creates more then one edge connecting the same two nodes. \mbox{\Hypertarget{classudc_1_1_molecule_ab18585360b5c1577f6be8cc1f565b260}\label{classudc_1_1_molecule_ab18585360b5c1577f6be8cc1f565b260}} 
+\index{udc::Molecule@{udc::Molecule}!createNode@{createNode}}
+\index{createNode@{createNode}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{createNode()}{createNode()}}
+{\footnotesize\ttfamily unsigned int udc\+::\+Molecule\+::create\+Node (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structudc_1_1_molecule_1_1_node_parameters}{Node\+Parameters}} \&}]{parameters = {\ttfamily \mbox{\hyperlink{structudc_1_1_molecule_1_1_node_parameters}{Node\+Parameters}}()} }\end{DoxyParamCaption})}
+
+
+
+Returns the new node\textquotesingle{}s index. 
+
+\mbox{\Hypertarget{classudc_1_1_molecule_ac8c39d99187f0dae0b0fe7ef7e935a0d}\label{classudc_1_1_molecule_ac8c39d99187f0dae0b0fe7ef7e935a0d}} 
+\index{udc::Molecule@{udc::Molecule}!deserialize@{deserialize}}
+\index{deserialize@{deserialize}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{deserialize()}{deserialize()}}
+{\footnotesize\ttfamily void udc\+::\+Molecule\+::deserialize (\begin{DoxyParamCaption}\item[{const unsigned char $\ast$}]{buffer }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classudc_1_1_molecule_a41ffa48f091303c3178c8e783cc3142e}\label{classudc_1_1_molecule_a41ffa48f091303c3178c8e783cc3142e}} 
+\index{udc::Molecule@{udc::Molecule}!edgeIndex@{edgeIndex}}
+\index{edgeIndex@{edgeIndex}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{edgeIndex()}{edgeIndex()}}
+{\footnotesize\ttfamily unsigned int udc\+::\+Molecule\+::edge\+Index (\begin{DoxyParamCaption}\item[{unsigned int}]{nodeA,  }\item[{unsigned int}]{nodeB }\end{DoxyParamCaption}) const}
+
+
+
+Search for and return the index of the edge connecting the given nodes if one exists, or \mbox{\hyperlink{classudc_1_1_molecule_a1b9d46a0051e4ddbb66f8b0322844dda}{Molecule\+::\+NOT\+\_\+\+FOUND}} if one doesn\textquotesingle{}t. 
+
+\mbox{\Hypertarget{classudc_1_1_molecule_a48c40b90cb716c63b0a3c6b2a39d4805}\label{classudc_1_1_molecule_a48c40b90cb716c63b0a3c6b2a39d4805}} 
+\index{udc::Molecule@{udc::Molecule}!getAdjacencyList@{getAdjacencyList}}
+\index{getAdjacencyList@{getAdjacencyList}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{getAdjacencyList()}{getAdjacencyList()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classudc_1_1_molecule_1_1_edge_iterable}{Molecule\+::\+Edge\+Iterable}} udc\+::\+Molecule\+::get\+Adjacency\+List (\begin{DoxyParamCaption}\item[{unsigned int}]{node\+Index }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_molecule_a012b0e0a805476ae9e80673b9070db86}\label{classudc_1_1_molecule_a012b0e0a805476ae9e80673b9070db86}} 
+\index{udc::Molecule@{udc::Molecule}!getEdgeParameters@{getEdgeParameters}}
+\index{getEdgeParameters@{getEdgeParameters}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{getEdgeParameters()}{getEdgeParameters()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structudc_1_1_molecule_1_1_edge_parameters}{Molecule\+::\+Edge\+Parameters}} udc\+::\+Molecule\+::get\+Edge\+Parameters (\begin{DoxyParamCaption}\item[{unsigned int}]{index }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_molecule_afc512c8f695a33e8918bd20912beb8cd}\label{classudc_1_1_molecule_afc512c8f695a33e8918bd20912beb8cd}} 
+\index{udc::Molecule@{udc::Molecule}!getEdges@{getEdges}}
+\index{getEdges@{getEdges}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{getEdges()}{getEdges()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classudc_1_1_molecule_1_1_edge_iterable}{Molecule\+::\+Edge\+Iterable}} udc\+::\+Molecule\+::get\+Edges (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_molecule_a8eacb4f3318b2d68c571cafb56a956ba}\label{classudc_1_1_molecule_a8eacb4f3318b2d68c571cafb56a956ba}} 
+\index{udc::Molecule@{udc::Molecule}!getLeads@{getLeads}}
+\index{getLeads@{getLeads}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{getLeads()}{getLeads()}}
+{\footnotesize\ttfamily void udc\+::\+Molecule\+::get\+Leads (\begin{DoxyParamCaption}\item[{unsigned int \&}]{left,  }\item[{unsigned int \&}]{right }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_molecule_ab2718d472f48420e4ae77827c2753f9a}\label{classudc_1_1_molecule_ab2718d472f48420e4ae77827c2753f9a}} 
+\index{udc::Molecule@{udc::Molecule}!getLeftLead@{getLeftLead}}
+\index{getLeftLead@{getLeftLead}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{getLeftLead()}{getLeftLead()}}
+{\footnotesize\ttfamily unsigned int udc\+::\+Molecule\+::get\+Left\+Lead (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_molecule_aee4baa13cfc0b0584ec8e2c5000a76be}\label{classudc_1_1_molecule_aee4baa13cfc0b0584ec8e2c5000a76be}} 
+\index{udc::Molecule@{udc::Molecule}!getNodeParameters@{getNodeParameters}}
+\index{getNodeParameters@{getNodeParameters}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{getNodeParameters()}{getNodeParameters()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structudc_1_1_molecule_1_1_node_parameters}{Molecule\+::\+Node\+Parameters}} udc\+::\+Molecule\+::get\+Node\+Parameters (\begin{DoxyParamCaption}\item[{unsigned int}]{index }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_molecule_a57560cc5b9d4d5971c16566f77e2e279}\label{classudc_1_1_molecule_a57560cc5b9d4d5971c16566f77e2e279}} 
+\index{udc::Molecule@{udc::Molecule}!getNodes@{getNodes}}
+\index{getNodes@{getNodes}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{getNodes()}{getNodes()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classudc_1_1_molecule_1_1_node_iterable}{Molecule\+::\+Node\+Iterable}} udc\+::\+Molecule\+::get\+Nodes (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_molecule_a09895cda60e964b18e0c38384e5f3a89}\label{classudc_1_1_molecule_a09895cda60e964b18e0c38384e5f3a89}} 
+\index{udc::Molecule@{udc::Molecule}!getRightLead@{getRightLead}}
+\index{getRightLead@{getRightLead}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{getRightLead()}{getRightLead()}}
+{\footnotesize\ttfamily unsigned int udc\+::\+Molecule\+::get\+Right\+Lead (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_molecule_a97742a892262f853a7ec68d982d68fae}\label{classudc_1_1_molecule_a97742a892262f853a7ec68d982d68fae}} 
+\index{udc::Molecule@{udc::Molecule}!load@{load}}
+\index{load@{load}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{load()}{load()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classudc_1_1_molecule}{Molecule}} udc\+::\+Molecule\+::load (\begin{DoxyParamCaption}\item[{istream \&}]{in }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classudc_1_1_molecule_abedb9f1c61ee095af402a365207eacef}\label{classudc_1_1_molecule_abedb9f1c61ee095af402a365207eacef}} 
+\index{udc::Molecule@{udc::Molecule}!nodeCount@{nodeCount}}
+\index{nodeCount@{nodeCount}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{nodeCount()}{nodeCount()}}
+{\footnotesize\ttfamily unsigned int udc\+::\+Molecule\+::node\+Count (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+
+
+(i.\+e. 
+
+\char`\"{}n\+\_\+m\char`\"{}) Returns the number of nodes/atoms in this molecule. \mbox{\Hypertarget{classudc_1_1_molecule_aedb314ce8b1dff4ecf156d6e739d170f}\label{classudc_1_1_molecule_aedb314ce8b1dff4ecf156d6e739d170f}} 
+\index{udc::Molecule@{udc::Molecule}!read@{read}}
+\index{read@{read}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{read()}{read()}}
+{\footnotesize\ttfamily istream \& udc\+::\+Molecule\+::read (\begin{DoxyParamCaption}\item[{istream \&}]{in }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classudc_1_1_molecule_a9fc6cbb7d10939477c3abcefd319ae54}\label{classudc_1_1_molecule_a9fc6cbb7d10939477c3abcefd319ae54}} 
+\index{udc::Molecule@{udc::Molecule}!serializationSize@{serializationSize}}
+\index{serializationSize@{serializationSize}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{serializationSize()}{serializationSize()}}
+{\footnotesize\ttfamily size\+\_\+t udc\+::\+Molecule\+::serialization\+Size (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_molecule_a682c1855e517d0c2b68118b114d31d15}\label{classudc_1_1_molecule_a682c1855e517d0c2b68118b114d31d15}} 
+\index{udc::Molecule@{udc::Molecule}!serialize@{serialize}}
+\index{serialize@{serialize}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{serialize()}{serialize()}}
+{\footnotesize\ttfamily void udc\+::\+Molecule\+::serialize (\begin{DoxyParamCaption}\item[{unsigned char $\ast$}]{buffer }\end{DoxyParamCaption}) const}
+
+\mbox{\Hypertarget{classudc_1_1_molecule_a401ed0509649570cc636b5a08735cbd6}\label{classudc_1_1_molecule_a401ed0509649570cc636b5a08735cbd6}} 
+\index{udc::Molecule@{udc::Molecule}!setAllParameters@{setAllParameters}}
+\index{setAllParameters@{setAllParameters}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{setAllParameters()}{setAllParameters()}}
+{\footnotesize\ttfamily void udc\+::\+Molecule\+::set\+All\+Parameters (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structudc_1_1_molecule_1_1_node_parameters}{Molecule\+::\+Node\+Parameters}} \&}]{node\+Params,  }\item[{const \mbox{\hyperlink{structudc_1_1_molecule_1_1_edge_parameters}{Molecule\+::\+Edge\+Parameters}} \&}]{edge\+Params }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classudc_1_1_molecule_a303bb5e1cc934255220e58949e345065}\label{classudc_1_1_molecule_a303bb5e1cc934255220e58949e345065}} 
+\index{udc::Molecule@{udc::Molecule}!setEdgeParameters@{setEdgeParameters}}
+\index{setEdgeParameters@{setEdgeParameters}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{setEdgeParameters()}{setEdgeParameters()}}
+{\footnotesize\ttfamily void udc\+::\+Molecule\+::set\+Edge\+Parameters (\begin{DoxyParamCaption}\item[{unsigned int}]{index,  }\item[{const \mbox{\hyperlink{structudc_1_1_molecule_1_1_edge_parameters}{Edge\+Parameters}} \&}]{p }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classudc_1_1_molecule_a57552dd57e092b3d7bc5e2e13e2a419a}\label{classudc_1_1_molecule_a57552dd57e092b3d7bc5e2e13e2a419a}} 
+\index{udc::Molecule@{udc::Molecule}!setLeads@{setLeads}}
+\index{setLeads@{setLeads}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{setLeads()}{setLeads()}}
+{\footnotesize\ttfamily void udc\+::\+Molecule\+::set\+Leads (\begin{DoxyParamCaption}\item[{unsigned int}]{left,  }\item[{unsigned int}]{right }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classudc_1_1_molecule_a055eb97e7305e44ebb8a0d22a23f6752}\label{classudc_1_1_molecule_a055eb97e7305e44ebb8a0d22a23f6752}} 
+\index{udc::Molecule@{udc::Molecule}!setLeftLead@{setLeftLead}}
+\index{setLeftLead@{setLeftLead}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{setLeftLead()}{setLeftLead()}}
+{\footnotesize\ttfamily void udc\+::\+Molecule\+::set\+Left\+Lead (\begin{DoxyParamCaption}\item[{unsigned int}]{node }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classudc_1_1_molecule_ad13bc013a1031b8379ee7f134ce4724e}\label{classudc_1_1_molecule_ad13bc013a1031b8379ee7f134ce4724e}} 
+\index{udc::Molecule@{udc::Molecule}!setNodeParameters@{setNodeParameters}}
+\index{setNodeParameters@{setNodeParameters}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{setNodeParameters()}{setNodeParameters()}}
+{\footnotesize\ttfamily void udc\+::\+Molecule\+::set\+Node\+Parameters (\begin{DoxyParamCaption}\item[{unsigned int}]{index,  }\item[{const \mbox{\hyperlink{structudc_1_1_molecule_1_1_node_parameters}{Node\+Parameters}} \&}]{p }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classudc_1_1_molecule_a549536b6815dd4ffcedb3ab3895a064f}\label{classudc_1_1_molecule_a549536b6815dd4ffcedb3ab3895a064f}} 
+\index{udc::Molecule@{udc::Molecule}!setRightLead@{setRightLead}}
+\index{setRightLead@{setRightLead}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{setRightLead()}{setRightLead()}}
+{\footnotesize\ttfamily void udc\+::\+Molecule\+::set\+Right\+Lead (\begin{DoxyParamCaption}\item[{unsigned int}]{node }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classudc_1_1_molecule_a59ea4534de4d263562db48eac48a68cc}\label{classudc_1_1_molecule_a59ea4534de4d263562db48eac48a68cc}} 
+\index{udc::Molecule@{udc::Molecule}!write@{write}}
+\index{write@{write}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{write()}{write()}}
+{\footnotesize\ttfamily ostream \& udc\+::\+Molecule\+::write (\begin{DoxyParamCaption}\item[{ostream \&}]{out }\end{DoxyParamCaption}) const}
+
+
+
+\doxysubsection{Friends And Related Function Documentation}
+\mbox{\Hypertarget{classudc_1_1_molecule_a42f28c138ebcdfdd1e070af8f413a19e}\label{classudc_1_1_molecule_a42f28c138ebcdfdd1e070af8f413a19e}} 
+\index{udc::Molecule@{udc::Molecule}!EdgeIterable@{EdgeIterable}}
+\index{EdgeIterable@{EdgeIterable}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{EdgeIterable}{EdgeIterable}}
+{\footnotesize\ttfamily friend class \mbox{\hyperlink{classudc_1_1_molecule_1_1_edge_iterable}{Edge\+Iterable}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+\mbox{\Hypertarget{classudc_1_1_molecule_a265a85b438f4a316627f37c1c2d442e8}\label{classudc_1_1_molecule_a265a85b438f4a316627f37c1c2d442e8}} 
+\index{udc::Molecule@{udc::Molecule}!EdgeIterator@{EdgeIterator}}
+\index{EdgeIterator@{EdgeIterator}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{EdgeIterator}{EdgeIterator}}
+{\footnotesize\ttfamily friend class \mbox{\hyperlink{classudc_1_1_molecule_1_1_edge_iterator}{Edge\+Iterator}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+\mbox{\Hypertarget{classudc_1_1_molecule_ae07ea2a91e156116726c0b3533020fdb}\label{classudc_1_1_molecule_ae07ea2a91e156116726c0b3533020fdb}} 
+\index{udc::Molecule@{udc::Molecule}!MSD@{MSD}}
+\index{MSD@{MSD}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{MSD}{MSD}}
+{\footnotesize\ttfamily friend class \mbox{\hyperlink{classudc_1_1_m_s_d}{MSD}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+\mbox{\Hypertarget{classudc_1_1_molecule_a9732a33ce91da70ce956205fc603c31c}\label{classudc_1_1_molecule_a9732a33ce91da70ce956205fc603c31c}} 
+\index{udc::Molecule@{udc::Molecule}!NodeIterable@{NodeIterable}}
+\index{NodeIterable@{NodeIterable}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{NodeIterable}{NodeIterable}}
+{\footnotesize\ttfamily friend class \mbox{\hyperlink{classudc_1_1_molecule_1_1_node_iterable}{Node\+Iterable}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+\mbox{\Hypertarget{classudc_1_1_molecule_ac5a1d2c6036b7ba1894a7c3b8d96a312}\label{classudc_1_1_molecule_ac5a1d2c6036b7ba1894a7c3b8d96a312}} 
+\index{udc::Molecule@{udc::Molecule}!NodeIterator@{NodeIterator}}
+\index{NodeIterator@{NodeIterator}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{NodeIterator}{NodeIterator}}
+{\footnotesize\ttfamily friend class \mbox{\hyperlink{classudc_1_1_molecule_1_1_node_iterator}{Node\+Iterator}}\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{classudc_1_1_molecule_a5d2f40b3d48330e1345c68b8b05a18ad}\label{classudc_1_1_molecule_a5d2f40b3d48330e1345c68b8b05a18ad}} 
+\index{udc::Molecule@{udc::Molecule}!HEADER@{HEADER}}
+\index{HEADER@{HEADER}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{HEADER}{HEADER}}
+{\footnotesize\ttfamily const char $\ast$const udc\+::\+Molecule\+::\+HEADER = \char`\"{}MMB\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classudc_1_1_molecule_a5c178c3e3abe344b6019877b4e877dfa}\label{classudc_1_1_molecule_a5c178c3e3abe344b6019877b4e877dfa}} 
+\index{udc::Molecule@{udc::Molecule}!HEADER\_SIZE@{HEADER\_SIZE}}
+\index{HEADER\_SIZE@{HEADER\_SIZE}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{HEADER\_SIZE}{HEADER\_SIZE}}
+{\footnotesize\ttfamily const size\+\_\+t udc\+::\+Molecule\+::\+HEADER\+\_\+\+SIZE = 3\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{classudc_1_1_molecule_a1b9d46a0051e4ddbb66f8b0322844dda}\label{classudc_1_1_molecule_a1b9d46a0051e4ddbb66f8b0322844dda}} 
+\index{udc::Molecule@{udc::Molecule}!NOT\_FOUND@{NOT\_FOUND}}
+\index{NOT\_FOUND@{NOT\_FOUND}!udc::Molecule@{udc::Molecule}}
+\doxysubsubsection{\texorpdfstring{NOT\_FOUND}{NOT\_FOUND}}
+{\footnotesize\ttfamily const unsigned int udc\+::\+Molecule\+::\+NOT\+\_\+\+FOUND = (unsigned int) -\/1\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/mathh/\+Git\+Hub/\+Molecular-\/\+Spintronics-\/\+Research-\/\+Project/\+MSD Research Project -\/ Latest Development Version/src/\mbox{\hyperlink{_m_s_d_8h}{MSD.\+h}}\end{DoxyCompactItemize}

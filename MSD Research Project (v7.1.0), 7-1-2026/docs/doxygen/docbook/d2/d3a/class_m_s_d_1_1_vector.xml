@@ -1,0 +1,288 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_class_m_s_d_1_1_vector" xml:lang="en-US">
+<title>MSD.Vector Class Reference</title>
+<indexterm><primary>MSD.Vector</primary></indexterm>
+<para>
+
+<para>Python version of <link linkend="_classudc_1_1_vector">udc::Vector</link> class in <link linkend="__vector_8h">Vector.h</link>. </para>
+ 
+</para>
+<para>Inheritance diagram for MSD.Vector:    <informalfigure>
+        <mediaobject>
+            <imageobject>
+                <imagedata width="50%" align="center" valign="middle" scalefit="0" fileref="../../d2/d3a/class_m_s_d_1_1_vector.png"></imagedata>
+            </imageobject>
+        </mediaobject>
+    </informalfigure>
+</para>
+<simplesect>
+    <title>Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_vector_1ad6a0e3a5cedc32f604dcd7a7893158ce">__init__</link> (self, *args, **kw)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_vector_1a7c7efb9980120d2c9970221e951ecf0d">__iter__</link> (self)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_vector_1adda732637ef06f300fb4b5e2b5ad248f">__len__</link> (self)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_vector_1ac027dc2501288bfaeda2a62ffd65151d">__getitem__</link> (self, idx)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_vector_1a4b81f15e64174ac0e85239639c477f0d">__repr__</link> (self)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_vector_1a7b42ff8546d7b45c166c5e7d9467f50d">cylindricalForm</link> (cls, r, <link linkend="_class_m_s_d_1_1_vector_1aa30f03c2df297bcea809ea2f74126a92">theta</link>, z)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_vector_1a4354da4fe4b8dd8cc6d09a3f6181b1db">polarForm</link> (cls, r, <link linkend="_class_m_s_d_1_1_vector_1aa30f03c2df297bcea809ea2f74126a92">theta</link>)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_vector_1a3b6cecb03131316ec18ae7b9e83c8658">sphericalForm</link> (cls, rho, <link linkend="_class_m_s_d_1_1_vector_1aa30f03c2df297bcea809ea2f74126a92">theta</link>, <link linkend="_class_m_s_d_1_1_vector_1a6d81eb8bf7d7cdf7fa0cd27025b9589b">phi</link>)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_vector_1a3b0a7ca7e9280bd2767d9f19d1be8732">__eq__</link> (self, other)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_vector_1a378fad475383b7524010b017fa9db051">__ne__</link> (self, other)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_vector_1ab77f3ed32818f12a725c424047e0c08b">__add__</link> (self, other)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_vector_1aedc87fc37719b2d2a5f14781ca0ff114">__neg__</link> (self)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_vector_1aa0afe6af4687b001f9f7dc67c69b23bd">__sub__</link> (self, other)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_vector_1a16672483e11b2c2613f3766161816508">__mul__</link> (self, other)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_vector_1a703fbe2b077da91af13338e58320f08b">distanceSq</link> (self, other)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_vector_1a3deccfeb32bd25ae17bfdadf02fb00fb">distance</link> (self, other)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_vector_1a86145adf50f296557ffe0908aa009d5d">dotProduct</link> (self, other)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_vector_1a7cef661eb427847674d5e0418269a78a">angleBetween</link> (self, other)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_vector_1a3a59db128dde8cc113e5c729da117299">crossProduct</link> (self, other)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_vector_1acd9e32ee1d01ae3f6ed4624faf73f5d4">__iadd__</link> (self, other)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_vector_1a0d19bdaee9722344d23e0106532db7a2">__isub__</link> (self, other)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_vector_1a68c4408fbbf3f1be4719512f937935cd">__imul__</link> (self, other)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_vector_1ac95993b1819848372ed594ce785732c7">negate</link> (self)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_vector_1a879eeed55fe5ec2588093703db14604e">rotate</link> (self, <link linkend="_class_m_s_d_1_1_vector_1aa30f03c2df297bcea809ea2f74126a92">theta</link>, <link linkend="_class_m_s_d_1_1_vector_1a6d81eb8bf7d7cdf7fa0cd27025b9589b">phi</link>=None)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_vector_1ab7334587a1478b43205cd160a7ed4d4f">normalize</link> (self)</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Static Public Attributes    </title>
+        <itemizedlist>
+            <listitem><para><link linkend="_class_m_s_d_1_1_vector_1ad8ee5e3853182bb6ae07e0f118b62dbc">I</link></para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_vector_1a1474c6824a7406a8485857d0baca6662">J</link></para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_vector_1abdfef51a25abee857d8ab43ead39bd57">K</link></para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_vector_1a86750d2fbb51695c7a1d65d3488bda06">ZERO</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Properties    </title>
+        <itemizedlist>
+            <listitem><para><link linkend="_class_m_s_d_1_1_vector_1acc7b468b4e4431561cb53fecdae8d992">normSq</link> = property(fget = lambda self: msd_clib.normSq(byref(self)))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_vector_1a9f97cc4b888e14409b62782970ad8ffc">norm</link> = property(fget = lambda self: msd_clib.norm(byref(self)))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_vector_1aa30f03c2df297bcea809ea2f74126a92">theta</link> = property(fget = lambda self: msd_clib.theta(byref(self)))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_vector_1a6d81eb8bf7d7cdf7fa0cd27025b9589b">phi</link> = property(fget = lambda self: msd_clib.phi(byref(self)))</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Detailed Description</title>
+
+<para>Python version of <link linkend="_classudc_1_1_vector">udc::Vector</link> class in <link linkend="__vector_8h">Vector.h</link>. </para>
+</section>
+<section>
+<title>Constructor &amp; Destructor Documentation</title>
+<anchor xml:id="_class_m_s_d_1_1_vector_1ad6a0e3a5cedc32f604dcd7a7893158ce"/><section>
+    <title>__init__()</title>
+<indexterm><primary>__init__</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>__init__</secondary></indexterm>
+<para><computeroutput>def MSD.Vector.__init__ ( self, * args, ** kw)</computeroutput></para><para>
+Reimplemented from <link linkend="_class_m_s_d_1_1___struct_with_dict_1a7c5722a237df5039317d31c528d04128">MSD._StructWithDict</link>.</para>
+</section>
+</section>
+<section>
+<title>Member Function Documentation</title>
+<anchor xml:id="_class_m_s_d_1_1_vector_1ab77f3ed32818f12a725c424047e0c08b"/><section>
+    <title>__add__()</title>
+<indexterm><primary>__add__</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>__add__</secondary></indexterm>
+<para><computeroutput>def MSD.Vector.__add__ ( self,  other)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_vector_1a3b0a7ca7e9280bd2767d9f19d1be8732"/><section>
+    <title>__eq__()</title>
+<indexterm><primary>__eq__</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>__eq__</secondary></indexterm>
+<para><computeroutput>def MSD.Vector.__eq__ ( self,  other)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_vector_1ac027dc2501288bfaeda2a62ffd65151d"/><section>
+    <title>__getitem__()</title>
+<indexterm><primary>__getitem__</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>__getitem__</secondary></indexterm>
+<para><computeroutput>def MSD.Vector.__getitem__ ( self,  idx)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_vector_1acd9e32ee1d01ae3f6ed4624faf73f5d4"/><section>
+    <title>__iadd__()</title>
+<indexterm><primary>__iadd__</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>__iadd__</secondary></indexterm>
+<para><computeroutput>def MSD.Vector.__iadd__ ( self,  other)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_vector_1a68c4408fbbf3f1be4719512f937935cd"/><section>
+    <title>__imul__()</title>
+<indexterm><primary>__imul__</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>__imul__</secondary></indexterm>
+<para><computeroutput>def MSD.Vector.__imul__ ( self,  other)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_vector_1a0d19bdaee9722344d23e0106532db7a2"/><section>
+    <title>__isub__()</title>
+<indexterm><primary>__isub__</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>__isub__</secondary></indexterm>
+<para><computeroutput>def MSD.Vector.__isub__ ( self,  other)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_vector_1a7c7efb9980120d2c9970221e951ecf0d"/><section>
+    <title>__iter__()</title>
+<indexterm><primary>__iter__</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>__iter__</secondary></indexterm>
+<para><computeroutput>def MSD.Vector.__iter__ ( self)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_vector_1adda732637ef06f300fb4b5e2b5ad248f"/><section>
+    <title>__len__()</title>
+<indexterm><primary>__len__</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>__len__</secondary></indexterm>
+<para><computeroutput>def MSD.Vector.__len__ ( self)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_vector_1a16672483e11b2c2613f3766161816508"/><section>
+    <title>__mul__()</title>
+<indexterm><primary>__mul__</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>__mul__</secondary></indexterm>
+<para><computeroutput>def MSD.Vector.__mul__ ( self,  other)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_vector_1a378fad475383b7524010b017fa9db051"/><section>
+    <title>__ne__()</title>
+<indexterm><primary>__ne__</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>__ne__</secondary></indexterm>
+<para><computeroutput>def MSD.Vector.__ne__ ( self,  other)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_vector_1aedc87fc37719b2d2a5f14781ca0ff114"/><section>
+    <title>__neg__()</title>
+<indexterm><primary>__neg__</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>__neg__</secondary></indexterm>
+<para><computeroutput>def MSD.Vector.__neg__ ( self)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_vector_1a4b81f15e64174ac0e85239639c477f0d"/><section>
+    <title>__repr__()</title>
+<indexterm><primary>__repr__</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>__repr__</secondary></indexterm>
+<para><computeroutput>def MSD.Vector.__repr__ ( self)</computeroutput></para><para>
+Reimplemented from <link linkend="_class_m_s_d_1_1___struct_with_dict">MSD._StructWithDict</link>.</para>
+</section>
+<anchor xml:id="_class_m_s_d_1_1_vector_1aa0afe6af4687b001f9f7dc67c69b23bd"/><section>
+    <title>__sub__()</title>
+<indexterm><primary>__sub__</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>__sub__</secondary></indexterm>
+<para><computeroutput>def MSD.Vector.__sub__ ( self,  other)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_vector_1a7cef661eb427847674d5e0418269a78a"/><section>
+    <title>angleBetween()</title>
+<indexterm><primary>angleBetween</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>angleBetween</secondary></indexterm>
+<para><computeroutput>def MSD.Vector.angleBetween ( self,  other)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_vector_1a3a59db128dde8cc113e5c729da117299"/><section>
+    <title>crossProduct()</title>
+<indexterm><primary>crossProduct</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>crossProduct</secondary></indexterm>
+<para><computeroutput>def MSD.Vector.crossProduct ( self,  other)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_vector_1a7b42ff8546d7b45c166c5e7d9467f50d"/><section>
+    <title>cylindricalForm()</title>
+<indexterm><primary>cylindricalForm</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>cylindricalForm</secondary></indexterm>
+<para><computeroutput>def MSD.Vector.cylindricalForm ( cls,  r,  theta,  z)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_vector_1a3deccfeb32bd25ae17bfdadf02fb00fb"/><section>
+    <title>distance()</title>
+<indexterm><primary>distance</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>distance</secondary></indexterm>
+<para><computeroutput>def MSD.Vector.distance ( self,  other)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_vector_1a703fbe2b077da91af13338e58320f08b"/><section>
+    <title>distanceSq()</title>
+<indexterm><primary>distanceSq</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>distanceSq</secondary></indexterm>
+<para><computeroutput>def MSD.Vector.distanceSq ( self,  other)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_vector_1a86145adf50f296557ffe0908aa009d5d"/><section>
+    <title>dotProduct()</title>
+<indexterm><primary>dotProduct</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>dotProduct</secondary></indexterm>
+<para><computeroutput>def MSD.Vector.dotProduct ( self,  other)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_vector_1ac95993b1819848372ed594ce785732c7"/><section>
+    <title>negate()</title>
+<indexterm><primary>negate</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>negate</secondary></indexterm>
+<para><computeroutput>def MSD.Vector.negate ( self)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_vector_1ab7334587a1478b43205cd160a7ed4d4f"/><section>
+    <title>normalize()</title>
+<indexterm><primary>normalize</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>normalize</secondary></indexterm>
+<para><computeroutput>def MSD.Vector.normalize ( self)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_vector_1a4354da4fe4b8dd8cc6d09a3f6181b1db"/><section>
+    <title>polarForm()</title>
+<indexterm><primary>polarForm</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>polarForm</secondary></indexterm>
+<para><computeroutput>def MSD.Vector.polarForm ( cls,  r,  theta)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_vector_1a879eeed55fe5ec2588093703db14604e"/><section>
+    <title>rotate()</title>
+<indexterm><primary>rotate</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>rotate</secondary></indexterm>
+<para><computeroutput>def MSD.Vector.rotate ( self,  theta,  phi = <computeroutput>None</computeroutput>
+)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_vector_1a3b6cecb03131316ec18ae7b9e83c8658"/><section>
+    <title>sphericalForm()</title>
+<indexterm><primary>sphericalForm</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>sphericalForm</secondary></indexterm>
+<para><computeroutput>def MSD.Vector.sphericalForm ( cls,  rho,  theta,  phi)</computeroutput></para></section>
+</section>
+<section>
+<title>Member Data Documentation</title>
+<anchor xml:id="_class_m_s_d_1_1_vector_1ad8ee5e3853182bb6ae07e0f118b62dbc"/><section>
+    <title>I</title>
+<indexterm><primary>I</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>I</secondary></indexterm>
+<para><computeroutput>MSD.Vector.I<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_vector_1a1474c6824a7406a8485857d0baca6662"/><section>
+    <title>J</title>
+<indexterm><primary>J</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>J</secondary></indexterm>
+<para><computeroutput>MSD.Vector.J<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_vector_1abdfef51a25abee857d8ab43ead39bd57"/><section>
+    <title>K</title>
+<indexterm><primary>K</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>K</secondary></indexterm>
+<para><computeroutput>MSD.Vector.K<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_vector_1a86750d2fbb51695c7a1d65d3488bda06"/><section>
+    <title>ZERO</title>
+<indexterm><primary>ZERO</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>ZERO</secondary></indexterm>
+<para><computeroutput>MSD.Vector.ZERO<computeroutput>[static]</computeroutput></computeroutput></para></section>
+</section>
+<section>
+<title>Property Documentation</title>
+<anchor xml:id="_class_m_s_d_1_1_vector_1a9f97cc4b888e14409b62782970ad8ffc"/><section>
+    <title>norm</title>
+<indexterm><primary>norm</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>norm</secondary></indexterm>
+<para><computeroutput>MSD.Vector.norm = property(fget = lambda self: msd_clib.norm(byref(self)))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_vector_1acc7b468b4e4431561cb53fecdae8d992"/><section>
+    <title>normSq</title>
+<indexterm><primary>normSq</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>normSq</secondary></indexterm>
+<para><computeroutput>MSD.Vector.normSq = property(fget = lambda self: msd_clib.normSq(byref(self)))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_vector_1a6d81eb8bf7d7cdf7fa0cd27025b9589b"/><section>
+    <title>phi</title>
+<indexterm><primary>phi</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>phi</secondary></indexterm>
+<para><computeroutput>MSD.Vector.phi = property(fget = lambda self: msd_clib.phi(byref(self)))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_vector_1aa30f03c2df297bcea809ea2f74126a92"/><section>
+    <title>theta</title>
+<indexterm><primary>theta</primary><secondary>MSD.Vector</secondary></indexterm>
+<indexterm><primary>MSD.Vector</primary><secondary>theta</secondary></indexterm>
+<para><computeroutput>MSD.Vector.theta = property(fget = lambda self: msd_clib.theta(byref(self)))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<para>
+The documentation for this class was generated from the following file:</para>
+C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/lib/python/<link linkend="__m_s_d_8py">MSD.py</link></section>
+</section>

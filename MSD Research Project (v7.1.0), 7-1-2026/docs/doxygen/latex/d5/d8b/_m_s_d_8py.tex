@@ -1,0 +1,49 @@
+\hypertarget{_m_s_d_8py}{}\doxysection{C\+:/\+Users/mathh/\+Git\+Hub/\+Molecular-\/\+Spintronics-\/\+Research-\/\+Project/\+MSD Research Project -\/ Latest Development Version/lib/python/\+MSD.py File Reference}
+\label{_m_s_d_8py}\index{C:/Users/mathh/GitHub/Molecular-\/Spintronics-\/Research-\/Project/MSD Research Project -\/ Latest Development Version/lib/python/MSD.py@{C:/Users/mathh/GitHub/Molecular-\/Spintronics-\/Research-\/Project/MSD Research Project -\/ Latest Development Version/lib/python/MSD.py}}
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_m_s_d_1_1___struct_with_dict}{MSD.\+\_\+\+Struct\+With\+Dict}}
+\begin{DoxyCompactList}\small\item\em Version of ctypes.\+Structure that defines {\bfseries{dict}} and overrides {\bfseries{repr}} \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_m_s_d_1_1___m_m_t_struct}{MSD.\+\_\+\+MMTStruct}}
+\begin{DoxyCompactList}\small\item\em Adds the MSD-\/\+Molecule-\/\+Text, \mbox{\hyperlink{class_m_s_d_1_1___m_m_t_struct_a3f795dd08944c744bf10060d8e7a74a3}{mmt()}} method for subclasses. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_m_s_d_1_1_vector}{MSD.\+Vector}}
+\begin{DoxyCompactList}\small\item\em Python version of \mbox{\hyperlink{classudc_1_1_vector}{udc\+::\+Vector}} class in \mbox{\hyperlink{_vector_8h}{Vector.\+h}}. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_m_s_d_1_1_molecule}{MSD.\+Molecule}}
+\item 
+class \mbox{\hyperlink{class_m_s_d_1_1_molecule_1_1_edge_parameters}{MSD.\+Molecule.\+Edge\+Parameters}}
+\item 
+class \mbox{\hyperlink{class_m_s_d_1_1_molecule_1_1_node_parameters}{MSD.\+Molecule.\+Node\+Parameters}}
+\item 
+class \mbox{\hyperlink{class_m_s_d_1_1_molecule_1_1___node_iterable}{MSD.\+Molecule.\+\_\+\+Node\+Iterable}}
+\begin{DoxyCompactList}\small\item\em Represents an iterable collection of molecule nodes. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_m_s_d_1_1_molecule_1_1___node}{MSD.\+Molecule.\+\_\+\+Node}}
+\begin{DoxyCompactList}\small\item\em Represents a specific molecule node. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_m_s_d_1_1_molecule_1_1___edge_iterable}{MSD.\+Molecule.\+\_\+\+Edge\+Iterable}}
+\begin{DoxyCompactList}\small\item\em Represents an iterable collection of molecule edges. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_m_s_d_1_1_molecule_1_1___edge}{MSD.\+Molecule.\+\_\+\+Edge}}
+\begin{DoxyCompactList}\small\item\em Represents a specific molecule edge. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_m_s_d_1_1_m_s_d}{MSD.\+MSD}}
+\item 
+class \mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1_parameters}{MSD.\+MSD.\+Parameters}}
+\item 
+class \mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1_results}{MSD.\+MSD.\+Results}}
+\item 
+class \mbox{\hyperlink{class_m_s_d_1_1_m_s_d_1_1___iterator}{MSD.\+MSD.\+\_\+\+Iterator}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespace_m_s_d}{MSD}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{namespace_m_s_d_a8893e2ba6d4249cf4262be28c0f089ec}{MSD.\+MSD\+\_\+\+EXPORT\+\_\+\+DLL\+\_\+\+PATH}} = os.\+path.\+join(os.\+path.\+realpath(os.\+path.\+dirname(\+\_\+\+\_\+file\+\_\+\+\_\+)), \char`\"{}MSD-\/export.\+dll\char`\"{})
+\item 
+\mbox{\hyperlink{namespace_m_s_d_a46a9adbfe86657baee2dde058b055f93}{MSD.\+msd\+\_\+clib}} = CDLL(MSD\+\_\+\+EXPORT\+\_\+\+DLL\+\_\+\+PATH)
+\item 
+\mbox{\hyperlink{namespace_m_s_d_af5a4dfeebf5c52e4547773c6203c100d}{MSD.\+PI}} = c\+\_\+double.\+in\+\_\+dll(msd\+\_\+clib, \char`\"{}PI\char`\"{}).value
+\item 
+\mbox{\hyperlink{namespace_m_s_d_aa565ab8c9a921e88dae806ba8189f862}{MSD.\+E}} = c\+\_\+double.\+in\+\_\+dll(msd\+\_\+clib, \char`\"{}E\char`\"{}).value
+\end{DoxyCompactItemize}

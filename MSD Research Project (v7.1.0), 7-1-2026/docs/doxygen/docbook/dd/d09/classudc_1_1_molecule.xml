@@ -1,0 +1,366 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_classudc_1_1_molecule" xml:lang="en-US">
+<title>udc::Molecule Class Reference</title>
+<indexterm><primary>udc::Molecule</primary></indexterm>
+<para>
+
+<para>An abstract molecule. </para>
+ 
+</para>
+<para>
+<computeroutput>#include &lt;MSD.h&gt;</computeroutput>
+</para>
+<simplesect>
+    <title>Classes    </title>
+        <itemizedlist>
+            <listitem><para>class <link linkend="_classudc_1_1_molecule_1_1_deserialization_exception">DeserializationException</link></para>
+</listitem>
+            <listitem><para>class <link linkend="_classudc_1_1_molecule_1_1_edge_iterable">EdgeIterable</link></para>
+</listitem>
+            <listitem><para>class <link linkend="_classudc_1_1_molecule_1_1_edge_iterator">EdgeIterator</link></para>
+</listitem>
+            <listitem><para>struct <link linkend="_structudc_1_1_molecule_1_1_edge_parameters">EdgeParameters</link></para>
+
+<para>Information about an edge between two Nodes. </para>
+</listitem>
+            <listitem><para>class <link linkend="_classudc_1_1_molecule_1_1_node_iterable">NodeIterable</link></para>
+</listitem>
+            <listitem><para>class <link linkend="_classudc_1_1_molecule_1_1_node_iterator">NodeIterator</link></para>
+</listitem>
+            <listitem><para>struct <link linkend="_structudc_1_1_molecule_1_1_node_parameters">NodeParameters</link></para>
+
+<para>local parameters </para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para><link linkend="_classudc_1_1_molecule_1a4a38e660030e37a46905b99fb87be886">Molecule</link> ()</para>
+
+<para>Create a default molecule with no nodes or edges. </para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_molecule_1abc1afaa168255b7e8a3a54136e9e47e2">Molecule</link> (size_t <link linkend="_classudc_1_1_molecule_1abedb9f1c61ee095af402a365207eacef">nodeCount</link>, const <link linkend="_structudc_1_1_molecule_1_1_node_parameters">NodeParameters</link> &amp;nodeParams=<link linkend="_structudc_1_1_molecule_1_1_node_parameters">NodeParameters</link>())</para>
+
+<para>Create a molecule with the given number of nodes, but no edges. </para>
+</listitem>
+            <listitem><para>void <link linkend="_classudc_1_1_molecule_1a682c1855e517d0c2b68118b114d31d15">serialize</link> (unsigned char *buffer) const</para>
+</listitem>
+            <listitem><para>void <link linkend="_classudc_1_1_molecule_1ac8c39d99187f0dae0b0fe7ef7e935a0d">deserialize</link> (const unsigned char *buffer)</para>
+</listitem>
+            <listitem><para>size_t <link linkend="_classudc_1_1_molecule_1a9fc6cbb7d10939477c3abcefd319ae54">serializationSize</link> () const</para>
+</listitem>
+            <listitem><para>istream &amp; <link linkend="_classudc_1_1_molecule_1aedb314ce8b1dff4ecf156d6e739d170f">read</link> (istream &amp;in)</para>
+</listitem>
+            <listitem><para>ostream &amp; <link linkend="_classudc_1_1_molecule_1a59ea4534de4d263562db48eac48a68cc">write</link> (ostream &amp;out) const</para>
+</listitem>
+            <listitem><para>unsigned int <link linkend="_classudc_1_1_molecule_1ab18585360b5c1577f6be8cc1f565b260">createNode</link> (const <link linkend="_structudc_1_1_molecule_1_1_node_parameters">NodeParameters</link> &amp;parameters=<link linkend="_structudc_1_1_molecule_1_1_node_parameters">NodeParameters</link>())</para>
+
+<para>Returns the new node&apos;s index. </para>
+</listitem>
+            <listitem><para>unsigned int <link linkend="_classudc_1_1_molecule_1abedb9f1c61ee095af402a365207eacef">nodeCount</link> () const</para>
+
+<para>(i.e. </para>
+</listitem>
+            <listitem><para>unsigned int <link linkend="_classudc_1_1_molecule_1ae1411a791a83503073a9dc8a7b1d3b33">connectNodes</link> (unsigned int nodeA, unsigned int nodeB, const <link linkend="_structudc_1_1_molecule_1_1_edge_parameters">EdgeParameters</link> &amp;parameters=<link linkend="_structudc_1_1_molecule_1_1_edge_parameters">EdgeParameters</link>())</para>
+
+<para>Creates a connection (Edge) between the two given nodes, and returns the new Edge&apos;s index. </para>
+</listitem>
+            <listitem><para>unsigned int <link linkend="_classudc_1_1_molecule_1a41ffa48f091303c3178c8e783cc3142e">edgeIndex</link> (unsigned int nodeA, unsigned int nodeB) const</para>
+
+<para>Search for and return the index of the edge connecting the given nodes if one exists, or <link linkend="_classudc_1_1_molecule_1a1b9d46a0051e4ddbb66f8b0322844dda">Molecule::NOT_FOUND</link> if one doesn&apos;t. </para>
+</listitem>
+            <listitem><para><link linkend="_structudc_1_1_molecule_1_1_edge_parameters">EdgeParameters</link> <link linkend="_classudc_1_1_molecule_1a012b0e0a805476ae9e80673b9070db86">getEdgeParameters</link> (unsigned int index) const</para>
+</listitem>
+            <listitem><para>void <link linkend="_classudc_1_1_molecule_1a303bb5e1cc934255220e58949e345065">setEdgeParameters</link> (unsigned int index, const <link linkend="_structudc_1_1_molecule_1_1_edge_parameters">EdgeParameters</link> &amp;p)</para>
+</listitem>
+            <listitem><para><link linkend="_structudc_1_1_molecule_1_1_node_parameters">NodeParameters</link> <link linkend="_classudc_1_1_molecule_1aee4baa13cfc0b0584ec8e2c5000a76be">getNodeParameters</link> (unsigned int index) const</para>
+</listitem>
+            <listitem><para>void <link linkend="_classudc_1_1_molecule_1ad13bc013a1031b8379ee7f134ce4724e">setNodeParameters</link> (unsigned int index, const <link linkend="_structudc_1_1_molecule_1_1_node_parameters">NodeParameters</link> &amp;p)</para>
+</listitem>
+            <listitem><para>void <link linkend="_classudc_1_1_molecule_1a401ed0509649570cc636b5a08735cbd6">setAllParameters</link> (const <link linkend="_structudc_1_1_molecule_1_1_node_parameters">Molecule::NodeParameters</link> &amp;nodeParams, const <link linkend="_structudc_1_1_molecule_1_1_edge_parameters">Molecule::EdgeParameters</link> &amp;edgeParams)</para>
+</listitem>
+            <listitem><para>void <link linkend="_classudc_1_1_molecule_1a055eb97e7305e44ebb8a0d22a23f6752">setLeftLead</link> (unsigned int node)</para>
+</listitem>
+            <listitem><para>void <link linkend="_classudc_1_1_molecule_1a549536b6815dd4ffcedb3ab3895a064f">setRightLead</link> (unsigned int node)</para>
+</listitem>
+            <listitem><para>void <link linkend="_classudc_1_1_molecule_1a57552dd57e092b3d7bc5e2e13e2a419a">setLeads</link> (unsigned int left, unsigned int right)</para>
+</listitem>
+            <listitem><para>unsigned int <link linkend="_classudc_1_1_molecule_1ab2718d472f48420e4ae77827c2753f9a">getLeftLead</link> () const</para>
+</listitem>
+            <listitem><para>unsigned int <link linkend="_classudc_1_1_molecule_1a09895cda60e964b18e0c38384e5f3a89">getRightLead</link> () const</para>
+</listitem>
+            <listitem><para>void <link linkend="_classudc_1_1_molecule_1a8eacb4f3318b2d68c571cafb56a956ba">getLeads</link> (unsigned int &amp;left, unsigned int &amp;right) const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_molecule_1_1_node_iterable">NodeIterable</link> <link linkend="_classudc_1_1_molecule_1a57560cc5b9d4d5971c16566f77e2e279">getNodes</link> () const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_molecule_1_1_edge_iterable">EdgeIterable</link> <link linkend="_classudc_1_1_molecule_1afc512c8f695a33e8918bd20912beb8cd">getEdges</link> () const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_molecule_1_1_edge_iterable">EdgeIterable</link> <link linkend="_classudc_1_1_molecule_1a48c40b90cb716c63b0a3c6b2a39d4805">getAdjacencyList</link> (unsigned int nodeIndex) const</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Static Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para>static <link linkend="_classudc_1_1_molecule">Molecule</link> <link linkend="_classudc_1_1_molecule_1a97742a892262f853a7ec68d982d68fae">load</link> (istream &amp;in)</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Static Public Attributes    </title>
+        <itemizedlist>
+            <listitem><para>static const char *const <link linkend="_classudc_1_1_molecule_1a5d2f40b3d48330e1345c68b8b05a18ad">HEADER</link> = &quot;MMB&quot;</para>
+</listitem>
+            <listitem><para>static const size_t <link linkend="_classudc_1_1_molecule_1a5c178c3e3abe344b6019877b4e877dfa">HEADER_SIZE</link> = 3</para>
+</listitem>
+            <listitem><para>static const unsigned int <link linkend="_classudc_1_1_molecule_1a1b9d46a0051e4ddbb66f8b0322844dda">NOT_FOUND</link> = (unsigned int) -1</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Friends    </title>
+        <itemizedlist>
+            <listitem><para>class <link linkend="_classudc_1_1_molecule_1ae07ea2a91e156116726c0b3533020fdb">MSD</link></para>
+</listitem>
+            <listitem><para>class <link linkend="_classudc_1_1_molecule_1a9732a33ce91da70ce956205fc603c31c">NodeIterable</link></para>
+</listitem>
+            <listitem><para>class <link linkend="_classudc_1_1_molecule_1ac5a1d2c6036b7ba1894a7c3b8d96a312">NodeIterator</link></para>
+</listitem>
+            <listitem><para>class <link linkend="_classudc_1_1_molecule_1a42f28c138ebcdfdd1e070af8f413a19e">EdgeIterable</link></para>
+</listitem>
+            <listitem><para>class <link linkend="_classudc_1_1_molecule_1a265a85b438f4a316627f37c1c2d442e8">EdgeIterator</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Detailed Description</title>
+
+<para>An abstract molecule. </para>
+
+
+
+<para>Used in <link linkend="_classudc_1_1_m_s_d">MSD</link>. A &quot;Molecule&quot; object only represents a prototype for a molecule design. Use the instantiate() method to create a Molecule::Instance which has a unique spin state. </para>
+</section>
+<section>
+<title>Constructor &amp; Destructor Documentation</title>
+<anchor xml:id="_classudc_1_1_molecule_1a4a38e660030e37a46905b99fb87be886"/><section>
+    <title>Molecule()<computeroutput>[1/2]</computeroutput></title>
+<indexterm><primary>Molecule</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>Molecule</secondary></indexterm>
+<para><computeroutput>udc::Molecule::Molecule ( )</computeroutput></para><para>
+
+<para>Create a default molecule with no nodes or edges. </para>
+</para>
+
+<para>Both the left and right leads are initalize to 0. </para>
+</section>
+<anchor xml:id="_classudc_1_1_molecule_1abc1afaa168255b7e8a3a54136e9e47e2"/><section>
+    <title>Molecule()<computeroutput>[2/2]</computeroutput></title>
+<indexterm><primary>Molecule</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>Molecule</secondary></indexterm>
+<para><computeroutput>udc::Molecule::Molecule (size_t nodeCount, const <link linkend="_structudc_1_1_molecule_1_1_node_parameters">NodeParameters</link> &amp; nodeParams = <computeroutput><link linkend="_structudc_1_1_molecule_1_1_node_parameters">NodeParameters</link>()</computeroutput>
+)</computeroutput></para><para>
+
+<para>Create a molecule with the given number of nodes, but no edges. </para>
+</para>
+
+<para>Both the left and right leads are initalized to 0.</para>
+
+<para>May also supply a set of parameters to use for each node. By default, the default node parameters are used. </para>
+</section>
+</section>
+<section>
+<title>Member Function Documentation</title>
+<anchor xml:id="_classudc_1_1_molecule_1ae1411a791a83503073a9dc8a7b1d3b33"/><section>
+    <title>connectNodes()</title>
+<indexterm><primary>connectNodes</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>connectNodes</secondary></indexterm>
+<para><computeroutput>unsigned int udc::Molecule::connectNodes (unsigned int nodeA, unsigned int nodeB, const <link linkend="_structudc_1_1_molecule_1_1_edge_parameters">EdgeParameters</link> &amp; parameters = <computeroutput><link linkend="_structudc_1_1_molecule_1_1_edge_parameters">EdgeParameters</link>()</computeroutput>
+)</computeroutput></para><para>
+
+<para>Creates a connection (Edge) between the two given nodes, and returns the new Edge&apos;s index. </para>
+</para>
+
+<para>Note: this method does not check if the two nodes are already connected. It is possible to creates more then one edge connecting the same two nodes. </para>
+</section>
+<anchor xml:id="_classudc_1_1_molecule_1ab18585360b5c1577f6be8cc1f565b260"/><section>
+    <title>createNode()</title>
+<indexterm><primary>createNode</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>createNode</secondary></indexterm>
+<para><computeroutput>unsigned int udc::Molecule::createNode (const <link linkend="_structudc_1_1_molecule_1_1_node_parameters">NodeParameters</link> &amp; parameters = <computeroutput><link linkend="_structudc_1_1_molecule_1_1_node_parameters">NodeParameters</link>()</computeroutput>
+)</computeroutput></para><para>
+
+<para>Returns the new node&apos;s index. </para>
+</para>
+</section>
+<anchor xml:id="_classudc_1_1_molecule_1ac8c39d99187f0dae0b0fe7ef7e935a0d"/><section>
+    <title>deserialize()</title>
+<indexterm><primary>deserialize</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>deserialize</secondary></indexterm>
+<para><computeroutput>void udc::Molecule::deserialize (const unsigned char * buffer)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1a41ffa48f091303c3178c8e783cc3142e"/><section>
+    <title>edgeIndex()</title>
+<indexterm><primary>edgeIndex</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>edgeIndex</secondary></indexterm>
+<para><computeroutput>unsigned int udc::Molecule::edgeIndex (unsigned int nodeA, unsigned int nodeB) const</computeroutput></para><para>
+
+<para>Search for and return the index of the edge connecting the given nodes if one exists, or <link linkend="_classudc_1_1_molecule_1a1b9d46a0051e4ddbb66f8b0322844dda">Molecule::NOT_FOUND</link> if one doesn&apos;t. </para>
+</para>
+</section>
+<anchor xml:id="_classudc_1_1_molecule_1a48c40b90cb716c63b0a3c6b2a39d4805"/><section>
+    <title>getAdjacencyList()</title>
+<indexterm><primary>getAdjacencyList</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>getAdjacencyList</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_molecule_1_1_edge_iterable">Molecule::EdgeIterable</link> udc::Molecule::getAdjacencyList (unsigned int nodeIndex) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1a012b0e0a805476ae9e80673b9070db86"/><section>
+    <title>getEdgeParameters()</title>
+<indexterm><primary>getEdgeParameters</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>getEdgeParameters</secondary></indexterm>
+<para><computeroutput><link linkend="_structudc_1_1_molecule_1_1_edge_parameters">Molecule::EdgeParameters</link> udc::Molecule::getEdgeParameters (unsigned int index) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1afc512c8f695a33e8918bd20912beb8cd"/><section>
+    <title>getEdges()</title>
+<indexterm><primary>getEdges</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>getEdges</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_molecule_1_1_edge_iterable">Molecule::EdgeIterable</link> udc::Molecule::getEdges ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1a8eacb4f3318b2d68c571cafb56a956ba"/><section>
+    <title>getLeads()</title>
+<indexterm><primary>getLeads</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>getLeads</secondary></indexterm>
+<para><computeroutput>void udc::Molecule::getLeads (unsigned int &amp; left, unsigned int &amp; right) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1ab2718d472f48420e4ae77827c2753f9a"/><section>
+    <title>getLeftLead()</title>
+<indexterm><primary>getLeftLead</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>getLeftLead</secondary></indexterm>
+<para><computeroutput>unsigned int udc::Molecule::getLeftLead ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1aee4baa13cfc0b0584ec8e2c5000a76be"/><section>
+    <title>getNodeParameters()</title>
+<indexterm><primary>getNodeParameters</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>getNodeParameters</secondary></indexterm>
+<para><computeroutput><link linkend="_structudc_1_1_molecule_1_1_node_parameters">Molecule::NodeParameters</link> udc::Molecule::getNodeParameters (unsigned int index) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1a57560cc5b9d4d5971c16566f77e2e279"/><section>
+    <title>getNodes()</title>
+<indexterm><primary>getNodes</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>getNodes</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_molecule_1_1_node_iterable">Molecule::NodeIterable</link> udc::Molecule::getNodes ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1a09895cda60e964b18e0c38384e5f3a89"/><section>
+    <title>getRightLead()</title>
+<indexterm><primary>getRightLead</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>getRightLead</secondary></indexterm>
+<para><computeroutput>unsigned int udc::Molecule::getRightLead ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1a97742a892262f853a7ec68d982d68fae"/><section>
+    <title>load()</title>
+<indexterm><primary>load</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>load</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_molecule">Molecule</link> udc::Molecule::load (istream &amp; in)<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1abedb9f1c61ee095af402a365207eacef"/><section>
+    <title>nodeCount()</title>
+<indexterm><primary>nodeCount</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>nodeCount</secondary></indexterm>
+<para><computeroutput>unsigned int udc::Molecule::nodeCount ( ) const</computeroutput></para><para>
+
+<para>(i.e. </para>
+</para>
+
+<para>&quot;n_m&quot;) Returns the number of nodes/atoms in this molecule. </para>
+</section>
+<anchor xml:id="_classudc_1_1_molecule_1aedb314ce8b1dff4ecf156d6e739d170f"/><section>
+    <title>read()</title>
+<indexterm><primary>read</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>read</secondary></indexterm>
+<para><computeroutput>istream &amp; udc::Molecule::read (istream &amp; in)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1a9fc6cbb7d10939477c3abcefd319ae54"/><section>
+    <title>serializationSize()</title>
+<indexterm><primary>serializationSize</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>serializationSize</secondary></indexterm>
+<para><computeroutput>size_t udc::Molecule::serializationSize ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1a682c1855e517d0c2b68118b114d31d15"/><section>
+    <title>serialize()</title>
+<indexterm><primary>serialize</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>serialize</secondary></indexterm>
+<para><computeroutput>void udc::Molecule::serialize (unsigned char * buffer) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1a401ed0509649570cc636b5a08735cbd6"/><section>
+    <title>setAllParameters()</title>
+<indexterm><primary>setAllParameters</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>setAllParameters</secondary></indexterm>
+<para><computeroutput>void udc::Molecule::setAllParameters (const <link linkend="_structudc_1_1_molecule_1_1_node_parameters">Molecule::NodeParameters</link> &amp; nodeParams, const <link linkend="_structudc_1_1_molecule_1_1_edge_parameters">Molecule::EdgeParameters</link> &amp; edgeParams)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1a303bb5e1cc934255220e58949e345065"/><section>
+    <title>setEdgeParameters()</title>
+<indexterm><primary>setEdgeParameters</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>setEdgeParameters</secondary></indexterm>
+<para><computeroutput>void udc::Molecule::setEdgeParameters (unsigned int index, const <link linkend="_structudc_1_1_molecule_1_1_edge_parameters">EdgeParameters</link> &amp; p)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1a57552dd57e092b3d7bc5e2e13e2a419a"/><section>
+    <title>setLeads()</title>
+<indexterm><primary>setLeads</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>setLeads</secondary></indexterm>
+<para><computeroutput>void udc::Molecule::setLeads (unsigned int left, unsigned int right)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1a055eb97e7305e44ebb8a0d22a23f6752"/><section>
+    <title>setLeftLead()</title>
+<indexterm><primary>setLeftLead</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>setLeftLead</secondary></indexterm>
+<para><computeroutput>void udc::Molecule::setLeftLead (unsigned int node)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1ad13bc013a1031b8379ee7f134ce4724e"/><section>
+    <title>setNodeParameters()</title>
+<indexterm><primary>setNodeParameters</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>setNodeParameters</secondary></indexterm>
+<para><computeroutput>void udc::Molecule::setNodeParameters (unsigned int index, const <link linkend="_structudc_1_1_molecule_1_1_node_parameters">NodeParameters</link> &amp; p)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1a549536b6815dd4ffcedb3ab3895a064f"/><section>
+    <title>setRightLead()</title>
+<indexterm><primary>setRightLead</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>setRightLead</secondary></indexterm>
+<para><computeroutput>void udc::Molecule::setRightLead (unsigned int node)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1a59ea4534de4d263562db48eac48a68cc"/><section>
+    <title>write()</title>
+<indexterm><primary>write</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>write</secondary></indexterm>
+<para><computeroutput>ostream &amp; udc::Molecule::write (ostream &amp; out) const</computeroutput></para></section>
+</section>
+<section>
+<title>Friends And Related Function Documentation</title>
+<anchor xml:id="_classudc_1_1_molecule_1a42f28c138ebcdfdd1e070af8f413a19e"/><section>
+    <title>EdgeIterable</title>
+<indexterm><primary>EdgeIterable</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>EdgeIterable</secondary></indexterm>
+<para><computeroutput>friend class <link linkend="_classudc_1_1_molecule_1_1_edge_iterable">EdgeIterable</link><computeroutput>[friend]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1a265a85b438f4a316627f37c1c2d442e8"/><section>
+    <title>EdgeIterator</title>
+<indexterm><primary>EdgeIterator</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>EdgeIterator</secondary></indexterm>
+<para><computeroutput>friend class <link linkend="_classudc_1_1_molecule_1_1_edge_iterator">EdgeIterator</link><computeroutput>[friend]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1ae07ea2a91e156116726c0b3533020fdb"/><section>
+    <title>MSD</title>
+<indexterm><primary>MSD</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>MSD</secondary></indexterm>
+<para><computeroutput>friend class <link linkend="_classudc_1_1_m_s_d">MSD</link><computeroutput>[friend]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1a9732a33ce91da70ce956205fc603c31c"/><section>
+    <title>NodeIterable</title>
+<indexterm><primary>NodeIterable</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>NodeIterable</secondary></indexterm>
+<para><computeroutput>friend class <link linkend="_classudc_1_1_molecule_1_1_node_iterable">NodeIterable</link><computeroutput>[friend]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1ac5a1d2c6036b7ba1894a7c3b8d96a312"/><section>
+    <title>NodeIterator</title>
+<indexterm><primary>NodeIterator</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>NodeIterator</secondary></indexterm>
+<para><computeroutput>friend class <link linkend="_classudc_1_1_molecule_1_1_node_iterator">NodeIterator</link><computeroutput>[friend]</computeroutput></computeroutput></para></section>
+</section>
+<section>
+<title>Member Data Documentation</title>
+<anchor xml:id="_classudc_1_1_molecule_1a5d2f40b3d48330e1345c68b8b05a18ad"/><section>
+    <title>HEADER</title>
+<indexterm><primary>HEADER</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>HEADER</secondary></indexterm>
+<para><computeroutput>const char *const udc::Molecule::HEADER = &quot;MMB&quot;<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1a5c178c3e3abe344b6019877b4e877dfa"/><section>
+    <title>HEADER_SIZE</title>
+<indexterm><primary>HEADER_SIZE</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>HEADER_SIZE</secondary></indexterm>
+<para><computeroutput>const size_t udc::Molecule::HEADER_SIZE = 3<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1a1b9d46a0051e4ddbb66f8b0322844dda"/><section>
+    <title>NOT_FOUND</title>
+<indexterm><primary>NOT_FOUND</primary><secondary>udc::Molecule</secondary></indexterm>
+<indexterm><primary>udc::Molecule</primary><secondary>NOT_FOUND</secondary></indexterm>
+<para><computeroutput>const unsigned int udc::Molecule::NOT_FOUND = (unsigned int) -1<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<para>
+The documentation for this class was generated from the following file:</para>
+C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/src/<link linkend="__m_s_d_8h">MSD.h</link></section>
+</section>

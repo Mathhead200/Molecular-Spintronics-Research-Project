@@ -1,0 +1,103 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__m_s_d_8h" xml:lang="en-US">
+<title>C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/src/MSD.h File Reference</title>
+<indexterm><primary>C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/src/MSD.h</primary></indexterm>
+<para>
+
+<para>The core logic which all the apps use to run <link linkend="_namespace_m_s_d">MSD</link> simulations. Includes definitions and calculations. </para>
+ 
+</para>
+<programlisting linenumbering="unnumbered">#include &lt;cstdlib&gt;<?linebreak?>#include &lt;cmath&gt;<?linebreak?>#include &lt;ctime&gt;<?linebreak?>#include &lt;cstring&gt;<?linebreak?>#include &lt;exception&gt;<?linebreak?>#include &lt;functional&gt;<?linebreak?>#include &lt;iostream&gt;<?linebreak?>#include &lt;memory&gt;<?linebreak?>#include &lt;random&gt;<?linebreak?>#include &lt;stdexcept&gt;<?linebreak?>#include &lt;string&gt;<?linebreak?>#include &lt;vector&gt;<?linebreak?>#include &quot;Vector.h&quot;<?linebreak?>#include &quot;udc.h&quot;<?linebreak?>#include &quot;SparseArray.h&quot;<?linebreak?></programlisting><simplesect>
+    <title>Classes    </title>
+        <itemizedlist>
+            <listitem><para>class <link linkend="_classudc_1_1_molecule">udc::Molecule</link></para>
+
+<para>An abstract molecule. </para>
+</listitem>
+            <listitem><para>struct <link linkend="_structudc_1_1_molecule_1_1_edge_parameters">udc::Molecule::EdgeParameters</link></para>
+
+<para>Information about an edge between two Nodes. </para>
+</listitem>
+            <listitem><para>struct <link linkend="_structudc_1_1_molecule_1_1_node_parameters">udc::Molecule::NodeParameters</link></para>
+
+<para>local parameters </para>
+</listitem>
+            <listitem><para>class <link linkend="_classudc_1_1_molecule_1_1_deserialization_exception">udc::Molecule::DeserializationException</link></para>
+</listitem>
+            <listitem><para>class <link linkend="_classudc_1_1_molecule_1_1_node_iterator">udc::Molecule::NodeIterator</link></para>
+</listitem>
+            <listitem><para>class <link linkend="_classudc_1_1_molecule_1_1_node_iterable">udc::Molecule::NodeIterable</link></para>
+</listitem>
+            <listitem><para>class <link linkend="_classudc_1_1_molecule_1_1_edge_iterator">udc::Molecule::EdgeIterator</link></para>
+</listitem>
+            <listitem><para>class <link linkend="_classudc_1_1_molecule_1_1_edge_iterable">udc::Molecule::EdgeIterable</link></para>
+</listitem>
+            <listitem><para>class <link linkend="_classudc_1_1_m_s_d">udc::MSD</link></para>
+
+<para>An abstract Molecular Spintronic Device. </para>
+</listitem>
+            <listitem><para>struct <link linkend="_structudc_1_1_m_s_d_1_1_parameters">udc::MSD::Parameters</link></para>
+</listitem>
+            <listitem><para>struct <link linkend="_structudc_1_1_m_s_d_1_1_results">udc::MSD::Results</link></para>
+</listitem>
+            <listitem><para>class <link linkend="_classudc_1_1_m_s_d_1_1_iterator">udc::MSD::Iterator</link></para>
+</listitem>
+            <listitem><para>class <link linkend="_classudc_1_1_m_s_d_1_1_molecule_exception">udc::MSD::MoleculeException</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Namespaces    </title>
+        <itemizedlist>
+            <listitem><para>namespace <link linkend="_namespaceudc">udc</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Macros    </title>
+        <itemizedlist>
+            <listitem><para>#define <link linkend="__m_s_d_8h_1aed08a6e3241c31dccac6a5bbbe306447">UDC_MSD_VERSION</link>&#160;&#160;&#160;&quot;6.2&quot;</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Functions    </title>
+        <itemizedlist>
+            <listitem><para>ostream &amp; <link linkend="_namespaceudc_1a6b685c21976ba81485ee5434b8a7ca41">udc::operator&lt;&lt;</link> (ostream &amp;out, const MSD::Parameters &amp;p)</para>
+</listitem>
+            <listitem><para>ostream &amp; <link linkend="_namespaceudc_1ada41040df7a93e1901296b334ebde2f3">udc::operator&lt;&lt;</link> (ostream &amp;out, const MSD::Results &amp;r)</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Detailed Description</title>
+
+<para>The core logic which all the apps use to run <link linkend="_namespace_m_s_d">MSD</link> simulations. Includes definitions and calculations. </para>
+
+<para><formalpara><title>Author</title>
+
+<para>Christopher D&apos;Angelo </para>
+</formalpara>
+<formalpara><title>Version</title>
+
+<para>6.2 </para>
+</formalpara>
+<formalpara><title>Date</title>
+
+<para>2022-11-29</para>
+</formalpara>
+<formalpara><title>Copyright</title>
+
+<para>Copyright (c) 2022 </para>
+</formalpara>
+</para>
+</section>
+<section>
+<title>Macro Definition Documentation</title>
+<anchor xml:id="__m_s_d_8h_1aed08a6e3241c31dccac6a5bbbe306447"/><section>
+    <title>UDC_MSD_VERSION</title>
+<indexterm><primary>UDC_MSD_VERSION</primary><secondary>MSD.h</secondary></indexterm>
+<indexterm><primary>MSD.h</primary><secondary>UDC_MSD_VERSION</secondary></indexterm>
+<para><computeroutput>#define UDC_MSD_VERSION&#160;&#160;&#160;&quot;6.2&quot;</computeroutput></para></section>
+</section>
+</section>

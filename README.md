@@ -12,7 +12,7 @@ and Vladimir Vinarskiy for bug testing mcheisenberg (v7).
 
 <hr>
 
-Version 7.0.3 is the current & latest version as of 3-20-2026  
+Version 7.1.0 is the current & latest version as of 7-1-2026  
   
 Testing needed:  
 	v6.0.0: The custom molecule features have not yet been fully tested, but preliminary results are promising.  
@@ -53,3 +53,4 @@ Version history (see ~/change-log.txt for more details):
 (2-17-2023) Version 6.2.4 Added MMT support to all apps  
 (1-4-2024) Version 6.3.0 Created HTTP Server to run simulations concurrently  
 (3-5-2026) Version 7.0.0 mcheisenberg Python/x64 rebuild  
+(7-1-2026) Version 7.1.0 Added dB and dkT, and fixed bug

@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_dir_68267d1309a1af8e8297ef4c3efbcdba" xml:lang="en-US">
+<title>C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/src Directory Reference</title>
+<indexterm><primary>C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/src Directory Reference</primary></indexterm>
+<simplesect>
+    <title>Files    </title>
+        <itemizedlist>
+            <listitem><para>file <link linkend="_mmt_8h">mmt.h</link></para>
+
+<para>Contains functions for reading and parsing MMT (<link linkend="_namespace_m_s_d">MSD</link> Molecule Text) files, such as those created by the <link linkend="_namespace_m_s_d">MSD</link> Molecule Builder webtool. </para>
+</listitem>
+            <listitem><para>file <link linkend="__m_s_d-export_8cpp">MSD-export.cpp</link></para>
+
+<para>The extern &quot;C&quot; version of <link linkend="_namespace_m_s_d">MSD</link>. May not contain the full functionality of <link linkend="__m_s_d_8h">MSD.h</link>. To be used for Python3 (ctypes) binding, as well as any future bindings that require a C (cdecl) DLL. </para>
+</listitem>
+            <listitem><para>file <link linkend="__m_s_d_8h">MSD.h</link></para>
+
+<para>The core logic which all the apps use to run <link linkend="_namespace_m_s_d">MSD</link> simulations. Includes definitions and calculations. </para>
+</listitem>
+            <listitem><para>file <link linkend="__sparse_array_8h">SparseArray.h</link></para>
+</listitem>
+            <listitem><para>file <link linkend="_udc_8h">udc.h</link></para>
+</listitem>
+            <listitem><para>file <link linkend="__vector_8h">Vector.h</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+</section>

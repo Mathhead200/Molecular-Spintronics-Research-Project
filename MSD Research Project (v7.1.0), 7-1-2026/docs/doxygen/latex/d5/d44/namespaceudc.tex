@@ -1,0 +1,232 @@
+\hypertarget{namespaceudc}{}\doxysection{udc Namespace Reference}
+\label{namespaceudc}\index{udc@{udc}}
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classudc_1_1_molecule}{Molecule}}
+\begin{DoxyCompactList}\small\item\em An abstract molecule. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classudc_1_1_m_s_d}{MSD}}
+\begin{DoxyCompactList}\small\item\em An abstract Molecular Spintronic Device. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classudc_1_1_sparse_array}{Sparse\+Array}}
+\item 
+struct \mbox{\hyperlink{structudc_1_1_sparse_array_value}{Sparse\+Array\+Value}}
+\item 
+class \mbox{\hyperlink{classudc_1_1_u_d_c_exception}{UDCException}}
+\item 
+class \mbox{\hyperlink{classudc_1_1_vector}{Vector}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+ostream \& \mbox{\hyperlink{namespaceudc_a6b685c21976ba81485ee5434b8a7ca41}{operator$<$$<$}} (ostream \&out, const \mbox{\hyperlink{structudc_1_1_m_s_d_1_1_parameters}{MSD\+::\+Parameters}} \&p)
+\item 
+ostream \& \mbox{\hyperlink{namespaceudc_ada41040df7a93e1901296b334ebde2f3}{operator$<$$<$}} (ostream \&out, const \mbox{\hyperlink{structudc_1_1_m_s_d_1_1_results}{MSD\+::\+Results}} \&r)
+\item 
+{\footnotesize template$<$typename T $>$ }\\T \mbox{\hyperlink{namespaceudc_a03752c8f5c571a06fc1c32e823a319a5}{parseline}} (istream \&in)
+\item 
+template$<$$>$ string \mbox{\hyperlink{namespaceudc_aa53d390897b2cbbeb3f336b31ca8b121}{parseline}} (istream \&in)
+\item 
+template$<$$>$ istringstream \mbox{\hyperlink{namespaceudc_aa3ecd4349a02127aebcf910ebab2e4e4}{parseline}} (istream \&in)
+\item 
+template$<$$>$ void \mbox{\hyperlink{namespaceudc_a502730a2d07ef150a01ed02b6c116846}{parseline}} (istream \&in)
+\item 
+{\footnotesize template$<$typename T $>$ }\\T \mbox{\hyperlink{namespaceudc_ab5d1642f2042aa4f999a47f2de0db959}{parseline}} (const string \&str)
+\item 
+istream \& \mbox{\hyperlink{namespaceudc_a6a73767fbbacbcfa2f4d7db36e6c4230}{operator$>$$>$}} (istream \&in, \mbox{\hyperlink{classudc_1_1_vector}{udc\+::\+Vector}} \&v)
+\item 
+\mbox{\hyperlink{classudc_1_1_m_s_d_a7266f08d021d5a06960b152c95a9213e}{MSD\+::\+Mol\+Proto}} \mbox{\hyperlink{namespaceudc_a2479706554f64b21239dca95b3c1465c}{read\+MMT}} (istream \&src)
+\begin{DoxyCompactList}\small\item\em Parses MMT file data from the given text istream, and saves it as a \mbox{\hyperlink{classudc_1_1_m_s_d_a7266f08d021d5a06960b152c95a9213e}{MSD\+::\+Mol\+Proto}} object. \end{DoxyCompactList}\item 
+double \mbox{\hyperlink{namespaceudc_aa7cee595bc6a15bdd189f00553c92349}{sq}} (double x)
+\begin{DoxyCompactList}\small\item\em square a number fast \end{DoxyCompactList}\item 
+double \mbox{\hyperlink{namespaceudc_a6d899413865bed9b0346dc4a2b6ed4b5}{cube}} (double x)
+\begin{DoxyCompactList}\small\item\em cube a number fast \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespaceudc_a51cb94811213523405b27e375b7a1b33}{bread}} (void $\ast$destination, size\+\_\+t d\+Size, const unsigned char $\ast$\&buffer)
+\begin{DoxyCompactList}\small\item\em Buffer/\+Binary Read\+: \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename T $>$ }\\void \mbox{\hyperlink{namespaceudc_a6f17d107671fb6c3d5e2044d346e45c5}{bread}} (T \&destination, const unsigned char $\ast$\&buffer)
+\begin{DoxyCompactList}\small\item\em Templated version\+: determines the approprate number of bytes by calling \char`\"{}sizeof(\+T)\char`\"{}. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{namespaceudc_a1e040d8326f2ad3b600f8f66a8de6305}{bwrite}} (const void $\ast$source, size\+\_\+t s\+Size, unsigned char $\ast$\&buffer)
+\begin{DoxyCompactList}\small\item\em Buffer/\+Binary Write\+: \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename T $>$ }\\void \mbox{\hyperlink{namespaceudc_a0a7d84b783b302ce21db57fd497817d0}{bwrite}} (const T \&source, unsigned char $\ast$\&buffer)
+\begin{DoxyCompactList}\small\item\em Templated version\+: determines the approprate number of bytes by calling \char`\"{}sizeof(\+T)\char`\"{}. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classudc_1_1_vector}{Vector}} \mbox{\hyperlink{namespaceudc_a6105effafda7b50687a43e471e65aa14}{operator$\ast$}} (double k, const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&v)
+\item 
+ostream \& \mbox{\hyperlink{namespaceudc_a63b2f819645f99897b6f35bb1daf8134}{operator$<$$<$}} (ostream \&out, const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&v)
+\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const double \mbox{\hyperlink{namespaceudc_aa4b4d55516f1e34de5dc8b228f160597}{E}} = 2.\+71828182845904523536
+\begin{DoxyCompactList}\small\item\em Mathematical constant\+: Euler\textquotesingle{}s Number. \end{DoxyCompactList}\item 
+const double \mbox{\hyperlink{namespaceudc_a1757f9fc50446243658974977dd95e7c}{PI}} = 3.\+14159265358979323846
+\begin{DoxyCompactList}\small\item\em Mathematical constant. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{namespaceudc_a6f17d107671fb6c3d5e2044d346e45c5}\label{namespaceudc_a6f17d107671fb6c3d5e2044d346e45c5}} 
+\index{udc@{udc}!bread@{bread}}
+\index{bread@{bread}!udc@{udc}}
+\doxysubsubsection{\texorpdfstring{bread()}{bread()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+void udc\+::bread (\begin{DoxyParamCaption}\item[{T \&}]{destination,  }\item[{const unsigned char $\ast$\&}]{buffer }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Templated version\+: determines the approprate number of bytes by calling \char`\"{}sizeof(\+T)\char`\"{}. 
+
+\mbox{\Hypertarget{namespaceudc_a51cb94811213523405b27e375b7a1b33}\label{namespaceudc_a51cb94811213523405b27e375b7a1b33}} 
+\index{udc@{udc}!bread@{bread}}
+\index{bread@{bread}!udc@{udc}}
+\doxysubsubsection{\texorpdfstring{bread()}{bread()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void udc\+::bread (\begin{DoxyParamCaption}\item[{void $\ast$}]{destination,  }\item[{size\+\_\+t}]{d\+Size,  }\item[{const unsigned char $\ast$\&}]{buffer }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Buffer/\+Binary Read\+: 
+
+Reads the given number of bytes from the buffer and stores it into the destination, advancing the buffer pointer in the process. \mbox{\Hypertarget{namespaceudc_a0a7d84b783b302ce21db57fd497817d0}\label{namespaceudc_a0a7d84b783b302ce21db57fd497817d0}} 
+\index{udc@{udc}!bwrite@{bwrite}}
+\index{bwrite@{bwrite}!udc@{udc}}
+\doxysubsubsection{\texorpdfstring{bwrite()}{bwrite()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+void udc\+::bwrite (\begin{DoxyParamCaption}\item[{const T \&}]{source,  }\item[{unsigned char $\ast$\&}]{buffer }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Templated version\+: determines the approprate number of bytes by calling \char`\"{}sizeof(\+T)\char`\"{}. 
+
+\mbox{\Hypertarget{namespaceudc_a1e040d8326f2ad3b600f8f66a8de6305}\label{namespaceudc_a1e040d8326f2ad3b600f8f66a8de6305}} 
+\index{udc@{udc}!bwrite@{bwrite}}
+\index{bwrite@{bwrite}!udc@{udc}}
+\doxysubsubsection{\texorpdfstring{bwrite()}{bwrite()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void udc\+::bwrite (\begin{DoxyParamCaption}\item[{const void $\ast$}]{source,  }\item[{size\+\_\+t}]{s\+Size,  }\item[{unsigned char $\ast$\&}]{buffer }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Buffer/\+Binary Write\+: 
+
+Writes the given number of bytes from the source and stores it into the buffer, advancing the buffer pointer in the process. \mbox{\Hypertarget{namespaceudc_a6d899413865bed9b0346dc4a2b6ed4b5}\label{namespaceudc_a6d899413865bed9b0346dc4a2b6ed4b5}} 
+\index{udc@{udc}!cube@{cube}}
+\index{cube@{cube}!udc@{udc}}
+\doxysubsubsection{\texorpdfstring{cube()}{cube()}}
+{\footnotesize\ttfamily double udc\+::cube (\begin{DoxyParamCaption}\item[{double}]{x }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+cube a number fast 
+
+\mbox{\Hypertarget{namespaceudc_a6105effafda7b50687a43e471e65aa14}\label{namespaceudc_a6105effafda7b50687a43e471e65aa14}} 
+\index{udc@{udc}!operator$\ast$@{operator$\ast$}}
+\index{operator$\ast$@{operator$\ast$}!udc@{udc}}
+\doxysubsubsection{\texorpdfstring{operator$\ast$()}{operator*()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classudc_1_1_vector}{Vector}} udc\+::operator$\ast$ (\begin{DoxyParamCaption}\item[{double}]{k,  }\item[{const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&}]{v }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespaceudc_a6b685c21976ba81485ee5434b8a7ca41}\label{namespaceudc_a6b685c21976ba81485ee5434b8a7ca41}} 
+\index{udc@{udc}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!udc@{udc}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily ostream \& udc\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{ostream \&}]{out,  }\item[{const \mbox{\hyperlink{structudc_1_1_m_s_d_1_1_parameters}{MSD\+::\+Parameters}} \&}]{p }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespaceudc_ada41040df7a93e1901296b334ebde2f3}\label{namespaceudc_ada41040df7a93e1901296b334ebde2f3}} 
+\index{udc@{udc}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!udc@{udc}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily ostream \& udc\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{ostream \&}]{out,  }\item[{const \mbox{\hyperlink{structudc_1_1_m_s_d_1_1_results}{MSD\+::\+Results}} \&}]{r }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespaceudc_a63b2f819645f99897b6f35bb1daf8134}\label{namespaceudc_a63b2f819645f99897b6f35bb1daf8134}} 
+\index{udc@{udc}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!udc@{udc}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily ostream \& udc\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{ostream \&}]{out,  }\item[{const \mbox{\hyperlink{classudc_1_1_vector}{Vector}} \&}]{v }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespaceudc_a6a73767fbbacbcfa2f4d7db36e6c4230}\label{namespaceudc_a6a73767fbbacbcfa2f4d7db36e6c4230}} 
+\index{udc@{udc}!operator$>$$>$@{operator$>$$>$}}
+\index{operator$>$$>$@{operator$>$$>$}!udc@{udc}}
+\doxysubsubsection{\texorpdfstring{operator$>$$>$()}{operator>>()}}
+{\footnotesize\ttfamily istream \& udc\+::operator$>$$>$ (\begin{DoxyParamCaption}\item[{istream \&}]{in,  }\item[{\mbox{\hyperlink{classudc_1_1_vector}{udc\+::\+Vector}} \&}]{v }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespaceudc_ab5d1642f2042aa4f999a47f2de0db959}\label{namespaceudc_ab5d1642f2042aa4f999a47f2de0db959}} 
+\index{udc@{udc}!parseline@{parseline}}
+\index{parseline@{parseline}!udc@{udc}}
+\doxysubsubsection{\texorpdfstring{parseline()}{parseline()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+T udc\+::parseline (\begin{DoxyParamCaption}\item[{const string \&}]{str }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespaceudc_a03752c8f5c571a06fc1c32e823a319a5}\label{namespaceudc_a03752c8f5c571a06fc1c32e823a319a5}} 
+\index{udc@{udc}!parseline@{parseline}}
+\index{parseline@{parseline}!udc@{udc}}
+\doxysubsubsection{\texorpdfstring{parseline()}{parseline()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily template$<$typename T $>$ \\
+T udc\+::parseline (\begin{DoxyParamCaption}\item[{istream \&}]{in }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespaceudc_aa53d390897b2cbbeb3f336b31ca8b121}\label{namespaceudc_aa53d390897b2cbbeb3f336b31ca8b121}} 
+\index{udc@{udc}!parseline@{parseline}}
+\index{parseline@{parseline}!udc@{udc}}
+\doxysubsubsection{\texorpdfstring{parseline()}{parseline()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily template$<$$>$ \\
+string udc\+::parseline (\begin{DoxyParamCaption}\item[{istream \&}]{in }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespaceudc_aa3ecd4349a02127aebcf910ebab2e4e4}\label{namespaceudc_aa3ecd4349a02127aebcf910ebab2e4e4}} 
+\index{udc@{udc}!parseline@{parseline}}
+\index{parseline@{parseline}!udc@{udc}}
+\doxysubsubsection{\texorpdfstring{parseline()}{parseline()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily template$<$$>$ \\
+istringstream udc\+::parseline (\begin{DoxyParamCaption}\item[{istream \&}]{in }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespaceudc_a502730a2d07ef150a01ed02b6c116846}\label{namespaceudc_a502730a2d07ef150a01ed02b6c116846}} 
+\index{udc@{udc}!parseline@{parseline}}
+\index{parseline@{parseline}!udc@{udc}}
+\doxysubsubsection{\texorpdfstring{parseline()}{parseline()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily template$<$$>$ \\
+void udc\+::parseline (\begin{DoxyParamCaption}\item[{istream \&}]{in }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{namespaceudc_a2479706554f64b21239dca95b3c1465c}\label{namespaceudc_a2479706554f64b21239dca95b3c1465c}} 
+\index{udc@{udc}!readMMT@{readMMT}}
+\index{readMMT@{readMMT}!udc@{udc}}
+\doxysubsubsection{\texorpdfstring{readMMT()}{readMMT()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classudc_1_1_m_s_d_a7266f08d021d5a06960b152c95a9213e}{MSD\+::\+Mol\+Proto}} udc\+::read\+MMT (\begin{DoxyParamCaption}\item[{istream \&}]{src }\end{DoxyParamCaption})}
+
+
+
+Parses MMT file data from the given text istream, and saves it as a \mbox{\hyperlink{classudc_1_1_m_s_d_a7266f08d021d5a06960b152c95a9213e}{MSD\+::\+Mol\+Proto}} object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em src} & The source data (or file) as a text stream. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{\hyperlink{classudc_1_1_m_s_d_a7266f08d021d5a06960b152c95a9213e}{MSD\+::\+Mol\+Proto}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{namespaceudc_aa7cee595bc6a15bdd189f00553c92349}\label{namespaceudc_aa7cee595bc6a15bdd189f00553c92349}} 
+\index{udc@{udc}!sq@{sq}}
+\index{sq@{sq}!udc@{udc}}
+\doxysubsubsection{\texorpdfstring{sq()}{sq()}}
+{\footnotesize\ttfamily double udc\+::sq (\begin{DoxyParamCaption}\item[{double}]{x }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+square a number fast 
+
+
+
+\doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{namespaceudc_aa4b4d55516f1e34de5dc8b228f160597}\label{namespaceudc_aa4b4d55516f1e34de5dc8b228f160597}} 
+\index{udc@{udc}!E@{E}}
+\index{E@{E}!udc@{udc}}
+\doxysubsubsection{\texorpdfstring{E}{E}}
+{\footnotesize\ttfamily const double udc\+::E = 2.\+71828182845904523536}
+
+
+
+Mathematical constant\+: Euler\textquotesingle{}s Number. 
+
+\mbox{\Hypertarget{namespaceudc_a1757f9fc50446243658974977dd95e7c}\label{namespaceudc_a1757f9fc50446243658974977dd95e7c}} 
+\index{udc@{udc}!PI@{PI}}
+\index{PI@{PI}!udc@{udc}}
+\doxysubsubsection{\texorpdfstring{PI}{PI}}
+{\footnotesize\ttfamily const double udc\+::\+PI = 3.\+14159265358979323846}
+
+
+
+Mathematical constant. 
+

@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__vector_8h" xml:lang="en-US">
+<title>C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/src/Vector.h File Reference</title>
+<indexterm><primary>C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/src/Vector.h</primary></indexterm>
+<programlisting linenumbering="unnumbered">#include &lt;cmath&gt;<?linebreak?>#include &lt;iostream&gt;<?linebreak?>#include &quot;udc.h&quot;<?linebreak?></programlisting><simplesect>
+    <title>Classes    </title>
+        <itemizedlist>
+            <listitem><para>class <link linkend="_classudc_1_1_vector">udc::Vector</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Namespaces    </title>
+        <itemizedlist>
+            <listitem><para>namespace <link linkend="_namespaceudc">udc</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Functions    </title>
+        <itemizedlist>
+            <listitem><para>Vector <link linkend="_namespaceudc_1a6105effafda7b50687a43e471e65aa14">udc::operator*</link> (double k, const Vector &amp;v)</para>
+</listitem>
+            <listitem><para>ostream &amp; <link linkend="_namespaceudc_1a63b2f819645f99897b6f35bb1daf8134">udc::operator&lt;&lt;</link> (ostream &amp;out, const Vector &amp;v)</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+</section>

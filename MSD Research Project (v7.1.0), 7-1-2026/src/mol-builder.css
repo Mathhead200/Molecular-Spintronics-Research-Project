@@ -1,0 +1,135 @@
+:root {
+	--svg-size: min(65vw, 65vh);
+}
+
+body {
+	font: 12pt Helvetica, Arial, sans-serif;
+	background-color: whitesmoke;
+
+	padding: 0;
+	border-width: 0;
+	margin: 0;
+}
+
+main {
+	display: flex;
+	align-items: center;
+	justify-content: space-evenly;
+	text-align: center;	
+}
+
+@media (min-aspect-ratio: 3/2) {
+	/* "Landscape" */
+	main {
+		flex-direction: row;
+	}
+}
+
+@media (max-aspect-ratio: 3/2) {
+	/* "Portrait" */
+	main {
+		flex-direction: column;
+	}
+}
+
+main section {
+	margin: 0.5em;
+}
+
+#form {
+	min-width: calc(0.75 * var(--svg-size));
+	box-sizing: border-box;
+	padding: 1em;
+	border: 1px solid black;
+	border-radius: 10px;
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+	font: 10.5pt monospace; 
+}
+
+#form form > * {
+	margin: 0.25em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	display: block;
+	font-size: 1.5rem;
+	margin: 1em 0em;
+	text-align: center;
+}
+
+h2, h3, h4, h5, h6 {
+	font-size: 1rem
+}
+
+#mol-editor form {
+	margin: 0.5em;
+	font-size: 1.25rem;
+	font-weight: lighter;
+}
+
+#mol-editor form input {
+	width: 4em;
+	font-size: 1.25rem;
+	font-weight: lighter;
+}
+
+#mol-canvas {
+	width: var(--svg-size);
+	height: var(--svg-size);
+
+	display: inline-block;
+	box-sizing: border-box;
+	border: 1px solid black;
+	background-color: white;
+}
+
+#mol-canvas circle {
+	fill: black;
+	stroke: white;
+	stroke-width: 1.5;
+}
+
+#mol-canvas line {
+	stroke: black;
+	stroke-width: 4;
+}
+
+#mol-canvas circle:hover, #mol-canvas line:hover {
+	stroke: cyan;
+	cursor: pointer;
+}
+
+#mol-canvas .selected {
+	stroke: yellow;
+	stroke-width: 4;
+}
+
+#mol-canvas .dragging {
+	stroke: cyan;
+}
+
+#mol-canvas .shadow, #mol-canvas line.shadow:hover {
+	fill: lightgray;
+	stroke: darkgray;
+}
+
+#mol-canvas .trash {
+	fill: red;
+	stroke: white;
+	stroke-width: 1.5;
+}
+
+#mol-canvas .trash-text {
+	font: bold 20px arial;
+	fill: white;
+}
+
+aside {
+	box-sizing: border-box;
+	border-top: 0.5em double black;
+	padding: 0em 4em;
+	margin: 3em auto;
+	max-width: calc(1.5 * var(--svg-size));
+}

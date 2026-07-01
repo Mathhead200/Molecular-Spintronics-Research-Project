@@ -1,0 +1,106 @@
+\hypertarget{_sparse_array_8h_source}{}\doxysection{Sparse\+Array.\+h}
+\label{_sparse_array_8h_source}\index{C:/Users/mathh/GitHub/Molecular-\/Spintronics-\/Research-\/Project/MSD Research Project -\/ Latest Development Version/src/SparseArray.h@{C:/Users/mathh/GitHub/Molecular-\/Spintronics-\/Research-\/Project/MSD Research Project -\/ Latest Development Version/src/SparseArray.h}}
+\mbox{\hyperlink{_sparse_array_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{preprocessor}{\#ifndef UDC\_HASHMAP}}
+\DoxyCodeLine{2 \textcolor{preprocessor}{\#define UDC\_HASHMAP}}
+\DoxyCodeLine{3 }
+\DoxyCodeLine{4 \textcolor{preprocessor}{\#include <stdexcept>}}
+\DoxyCodeLine{5 }
+\DoxyCodeLine{6 \textcolor{keyword}{namespace }\mbox{\hyperlink{namespaceudc}{udc}} \{}
+\DoxyCodeLine{7 }
+\DoxyCodeLine{8 \textcolor{keyword}{using }std::out\_of\_range;}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{struct }\mbox{\hyperlink{structudc_1_1_sparse_array_value}{SparseArrayValue}} \{}
+\DoxyCodeLine{11     \textcolor{keywordtype}{bool} \mbox{\hyperlink{structudc_1_1_sparse_array_value_af9f5e4a41eaf287226a160a0a0ee364c}{set}};}
+\DoxyCodeLine{12     T \mbox{\hyperlink{structudc_1_1_sparse_array_value_a8aa0b6b7a654f78737afcf7520f4733f}{value}};}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14     \mbox{\hyperlink{structudc_1_1_sparse_array_value_ab1ffe7e06c634e2f52998250131a9713}{SparseArrayValue}}() : \mbox{\hyperlink{structudc_1_1_sparse_array_value_af9f5e4a41eaf287226a160a0a0ee364c}{set}}(false), \mbox{\hyperlink{structudc_1_1_sparse_array_value_a8aa0b6b7a654f78737afcf7520f4733f}{value}}() \{ \textcolor{comment}{/* empty */} \}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16     T\& \mbox{\hyperlink{structudc_1_1_sparse_array_value_a1a9f4655ad0c7b13ce4c9a8fa25789bb}{create}}();}
+\DoxyCodeLine{17     \textcolor{keywordtype}{void} \mbox{\hyperlink{structudc_1_1_sparse_array_value_a4da48ea04f68479e9c094535a49e3c95}{clear}}();}
+\DoxyCodeLine{18 \};}
+\DoxyCodeLine{19 }
+\DoxyCodeLine{20 \textcolor{comment}{/*}}
+\DoxyCodeLine{21 \textcolor{comment}{ * A fixed-\/sized data structure, which maps (unsigned int -\/> value type, T).}}
+\DoxyCodeLine{22 \textcolor{comment}{ * Not all elements need to contain values.}}
+\DoxyCodeLine{23 \textcolor{comment}{ * Uses std::out\_of\_range exception.}}
+\DoxyCodeLine{24 \textcolor{comment}{ */}}
+\DoxyCodeLine{25 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{class }\mbox{\hyperlink{classudc_1_1_sparse_array}{SparseArray}} \{}
+\DoxyCodeLine{26  \textcolor{keyword}{private}:}
+\DoxyCodeLine{27     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} \_capacity;}
+\DoxyCodeLine{28     \mbox{\hyperlink{structudc_1_1_sparse_array_value}{SparseArrayValue<T>}} *values;}
+\DoxyCodeLine{29 }
+\DoxyCodeLine{30  \textcolor{keyword}{public}:}
+\DoxyCodeLine{31     \mbox{\hyperlink{classudc_1_1_sparse_array_a6b2c69b5e882d6041ceef3a37fe15a02}{SparseArray}}() : \_capacity(0), values(NULL) \{ \textcolor{comment}{/* empty */} \}}
+\DoxyCodeLine{32     \mbox{\hyperlink{classudc_1_1_sparse_array_a16578c6d4a9e74cac96d74789c5f0a48}{SparseArray}}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} \mbox{\hyperlink{classudc_1_1_sparse_array_a9403a23fa88896d44b49e515d68f04f6}{capacity}}) : \_capacity(\mbox{\hyperlink{classudc_1_1_sparse_array_a9403a23fa88896d44b49e515d68f04f6}{capacity}}) \{ values = \textcolor{keyword}{new} \mbox{\hyperlink{structudc_1_1_sparse_array_value}{SparseArrayValue<T>}}[\mbox{\hyperlink{classudc_1_1_sparse_array_a9403a23fa88896d44b49e515d68f04f6}{capacity}}]; \}}
+\DoxyCodeLine{33     \mbox{\hyperlink{classudc_1_1_sparse_array_a50dde7858264e15303f7e90ae8bc240d}{\string~SparseArray}}() \{ \textcolor{keyword}{delete}[] values; \}}
+\DoxyCodeLine{34 }
+\DoxyCodeLine{35     \mbox{\hyperlink{classudc_1_1_sparse_array_a23594c1825bf065889a54187a3491071}{SparseArray}}(\textcolor{keyword}{const} \mbox{\hyperlink{classudc_1_1_sparse_array}{SparseArray<T>}} \&);  \textcolor{comment}{// do not use: not implemented!}}
+\DoxyCodeLine{36     \mbox{\hyperlink{classudc_1_1_sparse_array}{SparseArray<T>}}\& \mbox{\hyperlink{classudc_1_1_sparse_array_a7ca09645d3083b5dc1001fa44b8608f2}{operator=}}(\textcolor{keyword}{const} \mbox{\hyperlink{classudc_1_1_sparse_array}{SparseArray<T>}} \&);  \textcolor{comment}{// do not use: not implemented!}}
+\DoxyCodeLine{37 }
+\DoxyCodeLine{38     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} \mbox{\hyperlink{classudc_1_1_sparse_array_a9403a23fa88896d44b49e515d68f04f6}{capacity}}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} \_capacity; \}}
+\DoxyCodeLine{39     \textcolor{keywordtype}{void} \mbox{\hyperlink{classudc_1_1_sparse_array_afdf642eb989638bb62e21563f83baa1c}{resize}}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} \mbox{\hyperlink{classudc_1_1_sparse_array_a9403a23fa88896d44b49e515d68f04f6}{capacity}});  \textcolor{comment}{// will clear the array}}
+\DoxyCodeLine{40 }
+\DoxyCodeLine{41     \textcolor{comment}{// does NO bounds checking}}
+\DoxyCodeLine{42     T\& \mbox{\hyperlink{classudc_1_1_sparse_array_a489dd0cd13e71c62645789d320ce1bc6}{operator[]}}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} index) \{ \textcolor{keywordflow}{return} values[index].\mbox{\hyperlink{structudc_1_1_sparse_array_value_a1a9f4655ad0c7b13ce4c9a8fa25789bb}{create}}(); \}  \textcolor{comment}{// creates an element at index if it has not yet been created}}
+\DoxyCodeLine{43     \textcolor{keyword}{const} T\& \mbox{\hyperlink{classudc_1_1_sparse_array_ac4053a55e9b52246fd78e998631dcd98}{operator[]}}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} index)\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} values[index].\mbox{\hyperlink{structudc_1_1_sparse_array_value_a8aa0b6b7a654f78737afcf7520f4733f}{value}}; \}  \textcolor{comment}{// Undefined behaviour if index has not been set, or if out of bounds.}}
+\DoxyCodeLine{44     \textcolor{keywordtype}{void} \mbox{\hyperlink{classudc_1_1_sparse_array_ae18b55e238a3a96a733b3caff3dd9ae8}{clear}}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} index) \{ values[index].\mbox{\hyperlink{structudc_1_1_sparse_array_value_a4da48ea04f68479e9c094535a49e3c95}{clear}}(); \}  \textcolor{comment}{// has no effect if the element was not yet created}}
+\DoxyCodeLine{45 }
+\DoxyCodeLine{46     \textcolor{comment}{// DOES bounds checking:}}
+\DoxyCodeLine{47     \textcolor{comment}{// throws an out\_of\_range exception if the given index is out of range or}}
+\DoxyCodeLine{48     \textcolor{comment}{// if the element has not yet been created.}}
+\DoxyCodeLine{49     T\& \mbox{\hyperlink{classudc_1_1_sparse_array_a9a89430f9cb6b03bfaf249a0ebcbfc8c}{at}}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} index);}
+\DoxyCodeLine{50     \textcolor{keyword}{const} T\& \mbox{\hyperlink{classudc_1_1_sparse_array_ad68e7e0bc27b653427c9091de3e421b9}{at}}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} index) \textcolor{keyword}{const};}
+\DoxyCodeLine{51     \textcolor{keywordtype}{void} \mbox{\hyperlink{classudc_1_1_sparse_array_a550a858fba0596aeedf061bc068ae062}{clearAt}}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} index);}
+\DoxyCodeLine{52 \};}
+\DoxyCodeLine{53 }
+\DoxyCodeLine{54 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> T\& \mbox{\hyperlink{structudc_1_1_sparse_array_value_a1a9f4655ad0c7b13ce4c9a8fa25789bb}{SparseArrayValue<T>::create}}() \{}
+\DoxyCodeLine{55     set = \textcolor{keyword}{true};}
+\DoxyCodeLine{56     \textcolor{keywordflow}{return} value;}
+\DoxyCodeLine{57 \}}
+\DoxyCodeLine{58 }
+\DoxyCodeLine{59 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keywordtype}{void} \mbox{\hyperlink{structudc_1_1_sparse_array_value_a4da48ea04f68479e9c094535a49e3c95}{SparseArrayValue<T>::clear}}() \{}
+\DoxyCodeLine{60     set = \textcolor{keyword}{false};}
+\DoxyCodeLine{61     value = value();}
+\DoxyCodeLine{62 \}}
+\DoxyCodeLine{63 }
+\DoxyCodeLine{64 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keywordtype}{void} \mbox{\hyperlink{classudc_1_1_sparse_array_afdf642eb989638bb62e21563f83baa1c}{SparseArray<T>::resize}}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} capacity) \{}
+\DoxyCodeLine{65     \textcolor{keyword}{delete}[] values;}
+\DoxyCodeLine{66     \_capacity = capacity;}
+\DoxyCodeLine{67     values = \textcolor{keyword}{new} \mbox{\hyperlink{structudc_1_1_sparse_array_value}{SparseArrayValue<T>}}[capacity];}
+\DoxyCodeLine{68 \}}
+\DoxyCodeLine{69 }
+\DoxyCodeLine{70 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> T\& \mbox{\hyperlink{classudc_1_1_sparse_array_a9a89430f9cb6b03bfaf249a0ebcbfc8c}{SparseArray<T>::at}}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} index) \{}
+\DoxyCodeLine{71     \textcolor{keywordflow}{if} (index < 0 || index >= capacity())}
+\DoxyCodeLine{72         \textcolor{keywordflow}{throw} out\_of\_range(\textcolor{stringliteral}{"{}SparseArray::at(unsigned int): illegal index"{}});}
+\DoxyCodeLine{73     \mbox{\hyperlink{structudc_1_1_sparse_array_value}{SparseArrayValue<T>}} \&v = values[index];}
+\DoxyCodeLine{74     \textcolor{keywordflow}{if} (!v.\mbox{\hyperlink{structudc_1_1_sparse_array_value_af9f5e4a41eaf287226a160a0a0ee364c}{set}})}
+\DoxyCodeLine{75         \textcolor{keywordflow}{throw} out\_of\_range(\textcolor{stringliteral}{"{}SparseArray::at(unsigned int): index not yet set"{}});}
+\DoxyCodeLine{76     \textcolor{keywordflow}{return} v.\mbox{\hyperlink{structudc_1_1_sparse_array_value_a8aa0b6b7a654f78737afcf7520f4733f}{value}};}
+\DoxyCodeLine{77 \}}
+\DoxyCodeLine{78 }
+\DoxyCodeLine{79 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keyword}{const} T\& \mbox{\hyperlink{classudc_1_1_sparse_array_a9a89430f9cb6b03bfaf249a0ebcbfc8c}{SparseArray<T>::at}}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} index)\textcolor{keyword}{ const }\{}
+\DoxyCodeLine{80     \textcolor{keywordflow}{if} (index < 0 || index >= capacity())}
+\DoxyCodeLine{81         \textcolor{keywordflow}{throw} out\_of\_range(\textcolor{stringliteral}{"{}SparseArray::at(unsigned int): illegal index"{}});}
+\DoxyCodeLine{82     \textcolor{keyword}{const} \mbox{\hyperlink{structudc_1_1_sparse_array_value}{SparseArrayValue<T>}} \&v = values[index];}
+\DoxyCodeLine{83     \textcolor{keywordflow}{if} (!v.\mbox{\hyperlink{structudc_1_1_sparse_array_value_af9f5e4a41eaf287226a160a0a0ee364c}{set}})}
+\DoxyCodeLine{84         \textcolor{keywordflow}{throw} out\_of\_range(\textcolor{stringliteral}{"{}SparseArray::at(unsigned int): index not yet set"{}});}
+\DoxyCodeLine{85     \textcolor{keywordflow}{return} v.\mbox{\hyperlink{structudc_1_1_sparse_array_value_a8aa0b6b7a654f78737afcf7520f4733f}{value}};}
+\DoxyCodeLine{86 \}}
+\DoxyCodeLine{87 }
+\DoxyCodeLine{88 \textcolor{keyword}{template} <\textcolor{keyword}{typename} T> \textcolor{keywordtype}{void} \mbox{\hyperlink{classudc_1_1_sparse_array_a550a858fba0596aeedf061bc068ae062}{SparseArray<T>::clearAt}}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} index) \{}
+\DoxyCodeLine{89     \textcolor{keywordflow}{if} (index < 0 || index >= capacity())}
+\DoxyCodeLine{90         \textcolor{keywordflow}{throw} out\_of\_range(\textcolor{stringliteral}{"{}SparseArray::at(unsigned int): illegal index"{}});}
+\DoxyCodeLine{91     \textcolor{keyword}{const} \mbox{\hyperlink{structudc_1_1_sparse_array_value}{SparseArrayValue<T>}} \&v = values[index];}
+\DoxyCodeLine{92     \textcolor{keywordflow}{if} (!v.\mbox{\hyperlink{structudc_1_1_sparse_array_value_af9f5e4a41eaf287226a160a0a0ee364c}{set}})}
+\DoxyCodeLine{93         \textcolor{keywordflow}{throw} out\_of\_range(\textcolor{stringliteral}{"{}SparseArray::at(unsigned int): index not yet set"{}});}
+\DoxyCodeLine{94     v.\mbox{\hyperlink{structudc_1_1_sparse_array_value_a4da48ea04f68479e9c094535a49e3c95}{clear}}();}
+\DoxyCodeLine{95 }
+\DoxyCodeLine{96 \}}
+\DoxyCodeLine{97 }
+\DoxyCodeLine{98 \}  \textcolor{comment}{// end of namespace udc}}
+\DoxyCodeLine{99 }
+\DoxyCodeLine{100 \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

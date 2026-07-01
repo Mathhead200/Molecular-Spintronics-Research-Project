@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="__m_s_d_8py" xml:lang="en-US">
+<title>C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/lib/python/MSD.py File Reference</title>
+<indexterm><primary>C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/lib/python/MSD.py</primary></indexterm>
+<simplesect>
+    <title>Classes    </title>
+        <itemizedlist>
+            <listitem><para>class <link linkend="_class_m_s_d_1_1___struct_with_dict">MSD._StructWithDict</link></para>
+
+<para>Version of ctypes.Structure that defines <emphasis role="bold">dict</emphasis> and overrides <emphasis role="bold">repr</emphasis> </para>
+</listitem>
+            <listitem><para>class <link linkend="_class_m_s_d_1_1___m_m_t_struct">MSD._MMTStruct</link></para>
+
+<para>Adds the MSD-Molecule-Text, <link linkend="_class_m_s_d_1_1___m_m_t_struct_1a3f795dd08944c744bf10060d8e7a74a3">mmt()</link> method for subclasses. </para>
+</listitem>
+            <listitem><para>class <link linkend="_class_m_s_d_1_1_vector">MSD.Vector</link></para>
+
+<para>Python version of <link linkend="_classudc_1_1_vector">udc::Vector</link> class in <link linkend="__vector_8h">Vector.h</link>. </para>
+</listitem>
+            <listitem><para>class <link linkend="_class_m_s_d_1_1_molecule">MSD.Molecule</link></para>
+</listitem>
+            <listitem><para>class <link linkend="_class_m_s_d_1_1_molecule_1_1_edge_parameters">MSD.Molecule.EdgeParameters</link></para>
+</listitem>
+            <listitem><para>class <link linkend="_class_m_s_d_1_1_molecule_1_1_node_parameters">MSD.Molecule.NodeParameters</link></para>
+</listitem>
+            <listitem><para>class <link linkend="_class_m_s_d_1_1_molecule_1_1___node_iterable">MSD.Molecule._NodeIterable</link></para>
+
+<para>Represents an iterable collection of molecule nodes. </para>
+</listitem>
+            <listitem><para>class <link linkend="_class_m_s_d_1_1_molecule_1_1___node">MSD.Molecule._Node</link></para>
+
+<para>Represents a specific molecule node. </para>
+</listitem>
+            <listitem><para>class <link linkend="_class_m_s_d_1_1_molecule_1_1___edge_iterable">MSD.Molecule._EdgeIterable</link></para>
+
+<para>Represents an iterable collection of molecule edges. </para>
+</listitem>
+            <listitem><para>class <link linkend="_class_m_s_d_1_1_molecule_1_1___edge">MSD.Molecule._Edge</link></para>
+
+<para>Represents a specific molecule edge. </para>
+</listitem>
+            <listitem><para>class <link linkend="_class_m_s_d_1_1_m_s_d">MSD.MSD</link></para>
+</listitem>
+            <listitem><para>class <link linkend="_class_m_s_d_1_1_m_s_d_1_1_parameters">MSD.MSD.Parameters</link></para>
+</listitem>
+            <listitem><para>class <link linkend="_class_m_s_d_1_1_m_s_d_1_1_results">MSD.MSD.Results</link></para>
+</listitem>
+            <listitem><para>class <link linkend="_class_m_s_d_1_1_m_s_d_1_1___iterator">MSD.MSD._Iterator</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Namespaces    </title>
+        <itemizedlist>
+            <listitem><para>namespace <link linkend="_namespace_m_s_d">MSD</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Variables    </title>
+        <itemizedlist>
+            <listitem><para><link linkend="_namespace_m_s_d_1a8893e2ba6d4249cf4262be28c0f089ec">MSD.MSD_EXPORT_DLL_PATH</link> = os.path.join(os.path.realpath(os.path.dirname(__file__)), &quot;MSD-export.dll&quot;)</para>
+</listitem>
+            <listitem><para><link linkend="_namespace_m_s_d_1a46a9adbfe86657baee2dde058b055f93">MSD.msd_clib</link> = CDLL(MSD_EXPORT_DLL_PATH)</para>
+</listitem>
+            <listitem><para><link linkend="_namespace_m_s_d_1af5a4dfeebf5c52e4547773c6203c100d">MSD.PI</link> = c_double.in_dll(msd_clib, &quot;PI&quot;).value</para>
+</listitem>
+            <listitem><para><link linkend="_namespace_m_s_d_1aa565ab8c9a921e88dae806ba8189f862">MSD.E</link> = c_double.in_dll(msd_clib, &quot;E&quot;).value</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+</section>

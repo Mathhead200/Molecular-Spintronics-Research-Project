@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_class_m_s_d_1_1_m_s_d_1_1_results" xml:lang="en-US">
+<title>MSD.MSD.Results Class Reference</title>
+<indexterm><primary>MSD.MSD.Results</primary></indexterm>
+<para>Inheritance diagram for MSD.MSD.Results:    <informalfigure>
+        <mediaobject>
+            <imageobject>
+                <imagedata width="50%" align="center" valign="middle" scalefit="0" fileref="../../d4/dba/class_m_s_d_1_1_m_s_d_1_1_results.png"></imagedata>
+            </imageobject>
+        </mediaobject>
+    </informalfigure>
+</para>
+<simplesect>
+    <title>Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_m_s_d_1_1_results_1a0bfbf627aef6b4ad4a1b1e2ce55c1e7e">__init__</link> (self, *args, **kw)</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Public Attributes    </title>
+        <itemizedlist>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1_1_results_1a6bf655915709f203dc0d493f7258ad2a">t</link></para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1_1_results_1ad197a8e481a60c98b2fc7c75036a8c85">Mm</link></para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1_1_results_1abca35650717ca8879d8501fe0cfb4379">MSm</link></para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1_1_results_1aa4d6a720502117170255f4d621a3c5a7">MFm</link></para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_m_s_d_1_1_results_1ac5c7039e3ed3c58256c51bbd87dfc300">ULR</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Constructor &amp; Destructor Documentation</title>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1_1_results_1a0bfbf627aef6b4ad4a1b1e2ce55c1e7e"/><section>
+    <title>__init__()</title>
+<indexterm><primary>__init__</primary><secondary>MSD.MSD.Results</secondary></indexterm>
+<indexterm><primary>MSD.MSD.Results</primary><secondary>__init__</secondary></indexterm>
+<para><computeroutput>def MSD.MSD.Results.__init__ ( self, * args, ** kw)</computeroutput></para><para>
+Reimplemented from <link linkend="_class_m_s_d_1_1___struct_with_dict_1a7c5722a237df5039317d31c528d04128">MSD._StructWithDict</link>.</para>
+</section>
+</section>
+<section>
+<title>Member Data Documentation</title>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1_1_results_1aa4d6a720502117170255f4d621a3c5a7"/><section>
+    <title>MFm</title>
+<indexterm><primary>MFm</primary><secondary>MSD.MSD.Results</secondary></indexterm>
+<indexterm><primary>MSD.MSD.Results</primary><secondary>MFm</secondary></indexterm>
+<para><computeroutput>MSD.MSD.Results.MFm</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1_1_results_1ad197a8e481a60c98b2fc7c75036a8c85"/><section>
+    <title>Mm</title>
+<indexterm><primary>Mm</primary><secondary>MSD.MSD.Results</secondary></indexterm>
+<indexterm><primary>MSD.MSD.Results</primary><secondary>Mm</secondary></indexterm>
+<para><computeroutput>MSD.MSD.Results.Mm</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1_1_results_1abca35650717ca8879d8501fe0cfb4379"/><section>
+    <title>MSm</title>
+<indexterm><primary>MSm</primary><secondary>MSD.MSD.Results</secondary></indexterm>
+<indexterm><primary>MSD.MSD.Results</primary><secondary>MSm</secondary></indexterm>
+<para><computeroutput>MSD.MSD.Results.MSm</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1_1_results_1a6bf655915709f203dc0d493f7258ad2a"/><section>
+    <title>t</title>
+<indexterm><primary>t</primary><secondary>MSD.MSD.Results</secondary></indexterm>
+<indexterm><primary>MSD.MSD.Results</primary><secondary>t</secondary></indexterm>
+<para><computeroutput>MSD.MSD.Results.t</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_m_s_d_1_1_results_1ac5c7039e3ed3c58256c51bbd87dfc300"/><section>
+    <title>ULR</title>
+<indexterm><primary>ULR</primary><secondary>MSD.MSD.Results</secondary></indexterm>
+<indexterm><primary>MSD.MSD.Results</primary><secondary>ULR</secondary></indexterm>
+<para><computeroutput>MSD.MSD.Results.ULR</computeroutput></para></section>
+<para>
+The documentation for this class was generated from the following file:</para>
+C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/lib/python/<link linkend="__m_s_d_8py">MSD.py</link></section>
+</section>
