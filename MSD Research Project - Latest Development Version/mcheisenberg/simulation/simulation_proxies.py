@@ -298,7 +298,7 @@ class StateProxy(SumProxy[Node, Node|Region, numpy_vec], Vector):
 	@override
 	@property
 	def value(self) -> numpy_vec:
-		if len(self._elements) > 1:
+		if len(self._elements) != 1:
 			return np.sum(self.values(), axis=0)  # add all the row (i.e. axis=0) vectors
 		else:
 			node = [*self._elements][0]
@@ -333,7 +333,7 @@ class MProxy(SumProxy[Node, Node|Region, numpy_vec], Vector):
 	@override
 	@property
 	def value(self) -> numpy_vec:
-		if len(self._elements) > 1:
+		if len(self._elements) != 1:
 			return np.sum(self.values(), axis=0)  # add all the row (i.e. axis=0) vectors
 		else:
 			view = self._data.view

@@ -472,15 +472,10 @@ class ParameterProxy:
 			return getattr(data.node[key], param)
 		if param in config.localEdgeParameters.get(key, {}):
 			return getattr(data.edge[key], param)
-		# TODO: config.getUnambiguous... only checks for compile-time (static) consistancy.
-		#	Have we also enforced runtime consistancy anywhere?
-		_, region = config.getUnambiguousRegionNodeParameter(key, param)  # we don't need value, only region
-		if region is not None:
-			return getattr(data.region[region], param)
-		if isinstance(key, Sequence) and len(key) == 2:
-			_, eregion = config.getUnambiguousRegionEdgeParameter(key, param)  # we don't need value, only edge-region
-			if eregion is not None:
-				return getattr(data.eregion[eregion], param)
+		if param in config.regionNodeParameters.get(key, {}):
+			return getattr(data.region[key], param)
+		if param in config.regionEdgeParameters.get(key, {}):
+			return getattr(data.eregion[key], param)
 		return self.value  # global parameter
 
 	def __setitem__(self, key, value) -> None:
@@ -491,13 +486,10 @@ class ParameterProxy:
 			return setattr(data.node[key], param, value)
 		if param in config.localEdgeParameters.get(key, {}):
 			return setattr(data.edge[key], param, value)
-		_, region = config.getUnambiguousRegionNodeParameter(key, param)  # we don't need value, only region
-		if region is not None:
+		if param in config.regionNodeParameters.get(key, {}):
 			return setattr(data.region[key], param, value)
-		if isinstance(key, Sequence) and len(key) == 2:
-			_, eregion = config.getUnambiguousRegionEdgeParameter(key, param)  # we don't need value, only edge-region
-			if eregion is not None:
-				return setattr(data.eregion[key], param, value)
+		if param in config.regionEdgeParameters.get(key, {}):
+			return setattr(data.eregion[key], param, value)
 		raise KeyError(f"Parameter {param} is not defined for (node, edge, region, or edge-region) {key}")
 	
 	def __str__(self) -> str:  return str(self.value)

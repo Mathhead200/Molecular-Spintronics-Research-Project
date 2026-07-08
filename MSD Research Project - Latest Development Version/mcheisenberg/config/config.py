@@ -1376,7 +1376,7 @@ class Config:
 							else:
 								src2 += f"\tvfmadd231sd {resx}, {tmpx}, {load_insn}  ; {load_cmnt}\n"
 					src2 += "\n"
-				# compute -ΔU_Jee = Σ_j{Jee Δf_i·f_j}: 
+				# compute -ΔU_Jee = Σ_j{Jee Δf_i·f_j}:
 				if "Jee" in self.allKeys:
 					src2 += "\t; -deltaU_Jee calculation\n"
 					# figure out where all neighboring edges load Jee from, and group the common load instructions
