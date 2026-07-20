@@ -674,7 +674,7 @@ class Config:
 		src += "OPTION CASEMAP:NONE\n\n"
 		# includes
 		if len(self.debug) != 0:
-			src += "include dumpreg.inc\n"  # DEBUG
+			src += "include dumpreg.inc\n"
 		src += "include vec.inc  ; _vdotp, etc.\n"
 		src += "include prng.inc  ; splitmix64, xoshiro256ss, etc. \n"
 		src += "include ln.inc  ; _vln\n\n"

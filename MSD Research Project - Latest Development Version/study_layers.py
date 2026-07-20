@@ -6,13 +6,13 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-repetitions = 5
+repetitions = 20
 out = unique_path(dir="out", prefix="study-layers-full", suffix=".csv")
 
 # width=7 had 1 anomaly in 10
 # width=11 had 1 anomaly in 10
-# width=15 appear to enter a frustrainted state in approximently 50% of runs
-widths_and_t_eqs = [(3, 3_000_000), (7, 80_000_000), (11, 310_000_000), (15, 1_000_000_000), (19, 250_000_000)]
+# width=15 appear to enter a frustrainted state in approximently ~< 50% of runs
+widths_and_t_eqs = [(3, 10_000_000), (7, 100_000_000), (11, 500_000_000), (15, 1_000_000_000), (19, 1_000_000_000)]
 kTs = [0.05, 0.1, 0.25]
 J01s = [-1.0, -0.1, 0, 0.1, 1.0]
 As = [0, 0.01, 0.05, 0.1, 0.2, 0.4, 1.0]

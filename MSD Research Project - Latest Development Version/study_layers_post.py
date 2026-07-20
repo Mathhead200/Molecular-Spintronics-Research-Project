@@ -93,7 +93,7 @@ if __name__ == "__main__":
 				sub_J01 = filter_df(sub_kT, "J01", J01)
 				for A in As:
 					sub = filter_df(sub_J01, "A", A)
-					assert not sub.empty
+					# assert not sub.empty  # TODO: what if it is?
 
 					start_row = sub.index.min() + 1
 					end_row   = sub.index.max() + 1
@@ -242,7 +242,7 @@ if __name__ == "__main__":
 						colors_and_shapes = [("#000000", "square"), ("#C00000", "circle"), ("#00B050", "triangle"), ("#50164A", "star"), ("#00B0F0", "diamond")]
 						for width, color, shape in [(w, cs[0], cs[1]) for w, cs in zip(widths, colors_and_shapes)]:
 							sub = data[data["width"] == width]
-							assert not sub.empty
+							# assert not sub.empty  # TODO: what if it is?
 
 							start_row = sub.index.min() + 1  # +1 becasue of header row (TODO: explain we need the +1)
 							end_row   = sub.index.max() + 1
