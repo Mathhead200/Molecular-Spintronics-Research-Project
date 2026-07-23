@@ -3,9 +3,8 @@ import argparse
 from pathlib import Path
 from math import ceil
 import pandas as pd
-from xlsxwriter.utility import xl_col_to_name
+from xlsxwriter.utility import xl_col_to_name, xl_range_formula
 from tqdm import tqdm
-from mcheisenberg.io import unique_path
 
 regions, region_colors = ["M", "M0", "M1", "ML", "MR", "Mm"], ["#156082", "#E97132", "#196B24", "#0F9ED5", "#A02B93", "#4EA72E"]
 axises, axis_shapes = ["", "_x", "_y", "_z"], ["circle", "diamond", "triangle", "square"]
@@ -33,20 +32,23 @@ if __name__ == "__main__":
 	N1 = len(kTs)
 	N2 = len(J01s)
 	N3 = len(As)
-	N = N0 + N1 + N2 + N3
+	N = N0 * N1 * N2 * N3
 
 	JmLs = sorted(df["JmL"].unique())
 	default_cell_width = 65
 	default_cell_height = 20
-	chart_width = 7 * default_cell_height
+	chart_width = 7 * default_cell_width
 	chart_height = min(max(len(JmLs) - 1, 9), 16) * default_cell_height
 	chart_size = { "width": chart_width, "height": chart_height }
 	chart_col_width = ceil(chart_width / default_cell_width)  # approximate number of columns per chart
 	chart_row_height = ceil(chart_height / default_cell_height)  # approximate number of rows per chart
-	
-	progress_bar = tqdm(total=((N + (N - N0) + (N - N1) + (N - N2) + (N - N3)) * len(regions) + N) * len(axises), desc="Plotting")
+	JmL_min = min(JmLs)
+	JmL_max = max(JmLs)
+
+	progress_bar = tqdm(total=N + (N // N0) + (N // N1) + (N // N2) + (N // N3), desc="Plotting")
 
 	# 0. (Single) Scatter for each parameter combination with 1*sigma and 2*sigma bars to show variance
+	print("0. (Single) Scatter for each parameter combination with 1*sigma and 2*sigma bars to show variance")
 	sheet_name = "All data"
 	
 	out = csv_in.with_suffix(".xlsx")
@@ -54,13 +56,13 @@ if __name__ == "__main__":
 	data = df.copy(deep=True)  # copy data before adding sigma bands
 	
 	for region in regions:  # add []-2*sigma, []-1*sigma, [mean], []+1*sigma, and []+2*sigma columns inserted after mean and sigma column for M, M_x, M_y, M_z, ML_x, etc.
-		for axis in ["", "_x", "_y", "_z"]:
+		for axis in axises:
 			region_axis = region + axis
-			loc = data.columns.get_loc(f"{region_axis}_sigma") + 1
-			data.insert(loc, f"{region_axis}-1*sigma", "")
-			data.insert(loc, f"{region_axis}+1*sigma", "")	
-			data.insert(loc, f"{region_axis}-2*sigma", "")
-			data.insert(loc, f"{region_axis}+2*sigma", "")
+			loc = data.columns.get_loc(f"{region_axis}_sigma")
+			data.insert(loc + 1, f"{region_axis}-1*sigma", "")
+			data.insert(loc + 2, f"{region_axis}+1*sigma", "")
+			data.insert(loc + 3, f"{region_axis}-2*sigma", "")
+			data.insert(loc + 4, f"{region_axis}+2*sigma", "")
 	
 	data.sort_values(["width", "kT", "J01", "A", "JmL"], inplace=True)
 	data.reset_index(drop=True, inplace=True)
@@ -69,18 +71,20 @@ if __name__ == "__main__":
 	worksheet = writer.sheets[sheet_name]
 
 	# add formula for sigma bands
+	print("add formula for sigma bands")
 	for region in regions:
-		for axis in ["", "_x", "_y", "_z"]:
+		for axis in axises:
 			region_axis = region + axis
 			col_M = data.columns.get_loc(region_axis)
+			col_M_sigma = data.columns.get_loc(f"{region_axis}_sigma")
 			for coef, op in [(1, ""), (2, "2*")]:
 				for sign in ["-", "+"]:
-					col_M_sigma = data.columns.get_loc(f"{region_axis}{sign}{coef}*sigma")
+					col_M_sigma_band = data.columns.get_loc(f"{region_axis}{sign}{coef}*sigma")  # destinaion for the sigma band formula, e.g. M-1*sigma, M+2*sigma, etc.
 					for pd_row in range(1, len(data) + 1):  # (row index in pandas) skip headers on row 0
 						xl_row = pd_row + 1                 # (row # in excel) +1 because pandas is 0 indexed, but excel is 1 indexed
 						mean_cell  = f"{xl_col_to_name(col_M      )}{xl_row}"
 						sigma_cell = f"{xl_col_to_name(col_M_sigma)}{xl_row}"
-						worksheet.write_formula(pd_row, col_M_sigma, f"={mean_cell}{sign}{op}{sigma_cell}")  # e.g. =A2-B2, =A5+2*B5
+						worksheet.write_formula(pd_row, col_M_sigma_band, f"={mean_cell}{sign}{op}{sigma_cell}")  # e.g. =A2-B2, =A5+2*B5
 
 	col_JmL = data.columns.get_loc("JmL")
 	col_charts = len(data.columns) + 1  # where to start placing the charts
@@ -94,13 +98,16 @@ if __name__ == "__main__":
 				for A in As:
 					sub = filter_df(sub_J01, "A", A)
 					# assert not sub.empty  # TODO: what if it is?
+					if sub.empty:
+						continue
 
 					start_row = sub.index.min() + 1
 					end_row   = sub.index.max() + 1
-					x_range = [sheet_name, start_row, col_JmL, end_row, col_JmL]
+					x_range = xl_range_formula(sheet_name, start_row, col_JmL, end_row, col_JmL)
 					
 					xl_row = start_row + 1  # Excel version of start_row (excel is 1-based, pandas is 0-based)
-					
+					chart_count = 0
+
 					# all regions on one graph
 					for axis, shape in zip(axises, axis_shapes):
 						chart = writer.book.add_chart({ "type": "scatter" })
@@ -110,8 +117,8 @@ if __name__ == "__main__":
 							
 							col_M = data.columns.get_loc(region_axis)
 							col_M_error = data.columns.get_loc(f"{region_axis}_error")
-							y_range = [sheet_name, start_row, col_M, end_row, col_M]
-							error_range = [sheet_name, start_row, col_M_error, end_row, col_M_error]
+							y_range = xl_range_formula(sheet_name, start_row, col_M, end_row, col_M)
+							error_range = xl_range_formula(sheet_name, start_row, col_M_error, end_row, col_M_error)
 
 							chart.add_series({
 								"name": region_axis,
@@ -136,18 +143,24 @@ if __name__ == "__main__":
 							})
 
 						chart.set_title({ "name": f"M{axis} vs. JmL curves by region ({width}x10x10, kT={kT}, J01={J01}, A={A})" })
-						chart.set_x_axis({ "name": "JmL", "position": "low" })
-						chart.set_y_axis({ "name": f"M{axis}", "position": "low" })
+						chart.set_x_axis({
+							"name": "JmL",
+							"position": "low",
+							"min": JmL_min,
+							"max": JmL_max
+						})
+						chart.set_y_axis({
+							"name": f"M{axis}",
+							"position": "low"
+						})
 						chart.set_legend({ "position": "bottom" })
 						chart.set_size(chart_size)
 
-						xl_col = xl_col_to_name(col_charts)  # right of data. +1 is padding
+						xl_col = xl_col_to_name(col_charts + chart_count * chart_col_width)  # right of data
+						chart_count += 1
 						worksheet.insert_chart(f"{xl_col}{xl_row}", chart, { "x_offset": 0, "y_offset": 0 })
 
-						progress_bar.update(1)
-
 					# individual axis graphs for each region
-					chart_count = 1
 					for region, color in zip(regions, region_colors):
 						for axis, shape in zip(axises, axis_shapes):
 							region_axis = region + axis
@@ -155,8 +168,8 @@ if __name__ == "__main__":
 
 							col_M = data.columns.get_loc(region_axis)
 							col_M_error = data.columns.get_loc(f"{region_axis}_error")
-							y_range = [sheet_name, start_row, col_M, end_row, col_M]
-							error_range = [sheet_name, start_row, col_M_error, end_row, col_M_error]
+							y_range = xl_range_formula(sheet_name, start_row, col_M, end_row, col_M)
+							error_range = xl_range_formula(sheet_name, start_row, col_M_error, end_row, col_M_error)
 
 							chart.add_series({
 								"name": region_axis,
@@ -199,8 +212,16 @@ if __name__ == "__main__":
 									})
 							
 							chart.set_title({ "name": f"{region_axis} vs. JmL ({width}x10x10, kT={kT}, J01={J01}, A={A})" })
-							chart.set_x_axis({ "name": "JmL", "position": "low" })
-							chart.set_y_axis({ "name": region_axis, "position": "low" })
+							chart.set_x_axis({
+								"name": "JmL",
+								"position": "low",
+								"min": JmL_min,
+								"max": JmL_max
+							})
+							chart.set_y_axis({
+								"name": region_axis,
+								"position": "low"
+							})
 							chart.set_legend({ "position": "bottom" })
 							chart.set_size(chart_size)
 
@@ -208,10 +229,11 @@ if __name__ == "__main__":
 							chart_count += 1
 							worksheet.insert_chart(f"{xl_col}{xl_row}", chart, { "x_offset": 0, "y_offset": 0 })
 
-							progress_bar.update(1)
+					progress_bar.update(1)
 	writer.close()
 
 	# 1. compare M vs. JmL curves for different widths (fix kT, J01, and A)
+	print("1. compare M vs. JmL curves for different widths (fix kT, J01, and A)")
 	sub_dir = out_dir / f"{csv_in.stem}-more"
 	sub_dir.mkdir(exist_ok=True)
 
@@ -243,13 +265,15 @@ if __name__ == "__main__":
 						for width, color, shape in [(w, cs[0], cs[1]) for w, cs in zip(widths, colors_and_shapes)]:
 							sub = data[data["width"] == width]
 							# assert not sub.empty  # TODO: what if it is?
+							if sub.empty:
+								continue
 
 							start_row = sub.index.min() + 1  # +1 becasue of header row (TODO: explain we need the +1)
 							end_row   = sub.index.max() + 1
-							x_range = [sheet_name, start_row, col_JmL, end_row, col_JmL]
+							x_range = xl_range_formula(sheet_name, start_row, col_JmL, end_row, col_JmL)
 
-							y_range = [sheet_name, start_row, col_M, end_row, col_M]
-							error_range = [sheet_name, start_row, col_M_error, end_row, col_M_error]
+							y_range = xl_range_formula(sheet_name, start_row, col_M, end_row, col_M)
+							error_range = xl_range_formula(sheet_name, start_row, col_M_error, end_row, col_M_error)
 							
 							chart.add_series({
 								"name": f"{width}x10x10",
@@ -272,20 +296,33 @@ if __name__ == "__main__":
 									"width": 1.5
 								}
 							})
-						chart.set_title({ "name": f"M vs. JmL curves for different widths" })
-						chart.set_x_axis({ "name": "JmL", "position": "low" })
-						chart.set_y_axis({ "name": "M", "position": "low" })
+						chart.set_title({ "name": f"M{region}{axis} vs. JmL curves for different widths" })
+						chart.set_x_axis({
+							"name": "JmL",
+							"position": "low",
+							"min": JmL_min,
+							"max": JmL_max
+						})
+						chart.set_y_axis({
+							"name": f"M{region}{axis}",
+							"position": "low"
+						})
 						chart.set_legend({ "position": "bottom" })
 						chart.set_size(chart_size)
 						xl_col = xl_col_to_name(col_charts + idx_a * chart_col_width)
 						xl_row = 1 + idx_r * chart_row_height
 						worksheet.insert_chart(f"{xl_col}{xl_row}", chart, { "x_offset": 0, "y_offset": 0 })
 
-						progress_bar.update(1)
 				writer.close()
+				progress_bar.update(1)
 	
 	# TODO: 2. compare M vs. JmL curves for different kT (fix width, J01, and A)
+	progress_bar.update(N // N1)
 
 	# TODO: 3. compare M vs. JmL curves for different J01 (fix width, kT, and A)
+	progress_bar.update(N // N2)
 
 	# TODO: 4. compare M vs. JmL curves for different A (fix width, kT, J01)
+	progress_bar.update(N // N3)
+
+	progress_bar.close()
