@@ -256,10 +256,12 @@ if __name__ == "__main__":
 
 				for idx_a, axis in enumerate(axises):
 					for idx_r, region in enumerate(regions):
-						chart = writer.book.add_chart({ "type": "scatter" })  # TODO: connect points with straight lines
+						region_axis = region + axis
+
+						chart = writer.book.add_chart({ "type": "scatter" })
 						
-						col_M = data.columns.get_loc(region)
-						col_M_error = data.columns.get_loc(f"{region}_error")
+						col_M = data.columns.get_loc(region_axis)
+						col_M_error = data.columns.get_loc(f"{region_axis}_error")
 
 						colors_and_shapes = [("#000000", "square"), ("#C00000", "circle"), ("#00B050", "triangle"), ("#50164A", "star"), ("#00B0F0", "diamond")]
 						for width, color, shape in [(w, cs[0], cs[1]) for w, cs in zip(widths, colors_and_shapes)]:
@@ -296,7 +298,7 @@ if __name__ == "__main__":
 									"width": 1.5
 								}
 							})
-						chart.set_title({ "name": f"M{region}{axis} vs. JmL curves for different widths" })
+						chart.set_title({ "name": f"{region_axis} vs. JmL curves for different widths" })
 						chart.set_x_axis({
 							"name": "JmL",
 							"position": "low",
@@ -304,7 +306,7 @@ if __name__ == "__main__":
 							"max": JmL_max
 						})
 						chart.set_y_axis({
-							"name": f"M{region}{axis}",
+							"name": f"{region_axis}",
 							"position": "low"
 						})
 						chart.set_legend({ "position": "bottom" })
@@ -316,13 +318,255 @@ if __name__ == "__main__":
 				writer.close()
 				progress_bar.update(1)
 	
-	# TODO: 2. compare M vs. JmL curves for different kT (fix width, J01, and A)
-	progress_bar.update(N // N1)
+	# AI: sections, 2, 3, and 4, were fully AI generated using Claude based on above sections 0 and 1
 
-	# TODO: 3. compare M vs. JmL curves for different J01 (fix width, kT, and A)
-	progress_bar.update(N // N2)
+	# 2. compare M vs. JmL curves for different kT (fix width, J01, and A)
+	print("2. compare M vs. JmL curves for different kT (fix width, J01, and A)")
+	for width in widths:
+		sub_w = filter_df(df, "width", width)
+		for J01 in J01s:
+			sub_J01 = filter_df(sub_w, "J01", J01)
+			for A in As:
+				data = filter_df(sub_J01, "A", A)
+				data.sort_values(["kT", "JmL"], inplace=True)
+				data.reset_index(drop=True, inplace=True)
 
-	# TODO: 4. compare M vs. JmL curves for different A (fix width, kT, J01)
-	progress_bar.update(N // N3)
+				sheet_name = f"width={width}, J01={J01}, A={A}"
+				writer = pd.ExcelWriter(sub_dir / f"kT, {sheet_name}.xlsx", engine="xlsxwriter")
+				data.to_excel(writer, sheet_name=sheet_name, index=False)
+				worksheet = writer.sheets[sheet_name]
+
+				col_JmL = data.columns.get_loc("JmL")
+				col_charts = len(data.columns) + 1  # where to start placing the charts
+
+				for idx_a, axis in enumerate(axises):
+					for idx_r, region in enumerate(regions):
+						region_axis = region + axis
+
+						chart = writer.book.add_chart({ "type": "scatter" })
+
+						col_M = data.columns.get_loc(region_axis)
+						col_M_error = data.columns.get_loc(f"{region_axis}_error")
+
+						colors_and_shapes = [("#000000", "square"), ("#C00000", "circle"), ("#00B050", "triangle"), ("#50164A", "star"), ("#00B0F0", "diamond"), ("#7030A0", "x"), ("#FFC000", "plus")]
+						for kT, color, shape in [(k, cs[0], cs[1]) for k, cs in zip(kTs, colors_and_shapes)]:
+							sub = data[data["kT"] == kT]
+							# assert not sub.empty  # TODO: what if it is?
+							if sub.empty:
+								continue
+
+							start_row = sub.index.min() + 1  # +1 becasue of header row (TODO: explain we need the +1)
+							end_row   = sub.index.max() + 1
+							x_range = xl_range_formula(sheet_name, start_row, col_JmL, end_row, col_JmL)
+
+							y_range = xl_range_formula(sheet_name, start_row, col_M, end_row, col_M)
+							error_range = xl_range_formula(sheet_name, start_row, col_M_error, end_row, col_M_error)
+
+							chart.add_series({
+								"name": f"kT={kT}",
+								"categories": x_range,
+								"values": y_range,
+								"y_error_bars": {
+									"type": "custom",
+									"plus_values":  error_range,
+									"minus_values": error_range
+								},
+								"marker": {
+									"type": shape,
+									"border": { "color": color },
+									"fill":   { "color": color },
+									"size": 5
+								},
+								"line": {
+									"dash_type": "solid",
+									"color": color,
+									"width": 1.5
+								}
+							})
+						chart.set_title({ "name": f"{region_axis} vs. JmL curves for different kT" })
+						chart.set_x_axis({
+							"name": "JmL",
+							"position": "low",
+							"min": JmL_min,
+							"max": JmL_max
+						})
+						chart.set_y_axis({
+							"name": f"{region_axis}",
+							"position": "low"
+						})
+						chart.set_legend({ "position": "bottom" })
+						chart.set_size(chart_size)
+						xl_col = xl_col_to_name(col_charts + idx_a * chart_col_width)
+						xl_row = 1 + idx_r * chart_row_height
+						worksheet.insert_chart(f"{xl_col}{xl_row}", chart, { "x_offset": 0, "y_offset": 0 })
+
+				writer.close()
+				progress_bar.update(1)
+
+	# 3. compare M vs. JmL curves for different J01 (fix width, kT, and A)
+	print("3. compare M vs. JmL curves for different J01 (fix width, kT, and A)")
+	for width in widths:
+		sub_w = filter_df(df, "width", width)
+		for kT in kTs:
+			sub_kT = filter_df(sub_w, "kT", kT)
+			for A in As:
+				data = filter_df(sub_kT, "A", A)
+				data.sort_values(["J01", "JmL"], inplace=True)
+				data.reset_index(drop=True, inplace=True)
+
+				sheet_name = f"width={width}, kT={kT}, A={A}"
+				writer = pd.ExcelWriter(sub_dir / f"J01, {sheet_name}.xlsx", engine="xlsxwriter")
+				data.to_excel(writer, sheet_name=sheet_name, index=False)
+				worksheet = writer.sheets[sheet_name]
+
+				col_JmL = data.columns.get_loc("JmL")
+				col_charts = len(data.columns) + 1  # where to start placing the charts
+
+				for idx_a, axis in enumerate(axises):
+					for idx_r, region in enumerate(regions):
+						region_axis = region + axis
+
+						chart = writer.book.add_chart({ "type": "scatter" })
+
+						col_M = data.columns.get_loc(region_axis)
+						col_M_error = data.columns.get_loc(f"{region_axis}_error")
+
+						colors_and_shapes = [("#000000", "square"), ("#C00000", "circle"), ("#00B050", "triangle"), ("#50164A", "star"), ("#00B0F0", "diamond"), ("#7030A0", "x"), ("#FFC000", "plus")]
+						for J01, color, shape in [(j, cs[0], cs[1]) for j, cs in zip(J01s, colors_and_shapes)]:
+							sub = data[data["J01"] == J01]
+							# assert not sub.empty  # TODO: what if it is?
+							if sub.empty:
+								continue
+
+							start_row = sub.index.min() + 1  # +1 becasue of header row (TODO: explain we need the +1)
+							end_row   = sub.index.max() + 1
+							x_range = xl_range_formula(sheet_name, start_row, col_JmL, end_row, col_JmL)
+
+							y_range = xl_range_formula(sheet_name, start_row, col_M, end_row, col_M)
+							error_range = xl_range_formula(sheet_name, start_row, col_M_error, end_row, col_M_error)
+
+							chart.add_series({
+								"name": f"J01={J01}",
+								"categories": x_range,
+								"values": y_range,
+								"y_error_bars": {
+									"type": "custom",
+									"plus_values":  error_range,
+									"minus_values": error_range
+								},
+								"marker": {
+									"type": shape,
+									"border": { "color": color },
+									"fill":   { "color": color },
+									"size": 5
+								},
+								"line": {
+									"dash_type": "solid",
+									"color": color,
+									"width": 1.5
+								}
+							})
+						chart.set_title({ "name": f"{region_axis} vs. JmL curves for different J01" })
+						chart.set_x_axis({
+							"name": "JmL",
+							"position": "low",
+							"min": JmL_min,
+							"max": JmL_max
+						})
+						chart.set_y_axis({
+							"name": f"{region_axis}",
+							"position": "low"
+						})
+						chart.set_legend({ "position": "bottom" })
+						chart.set_size(chart_size)
+						xl_col = xl_col_to_name(col_charts + idx_a * chart_col_width)
+						xl_row = 1 + idx_r * chart_row_height
+						worksheet.insert_chart(f"{xl_col}{xl_row}", chart, { "x_offset": 0, "y_offset": 0 })
+
+				writer.close()
+				progress_bar.update(1)
+
+	# 4. compare M vs. JmL curves for different A (fix width, kT, J01)
+	print("4. compare M vs. JmL curves for different A (fix width, kT, and J01)")
+	for width in widths:
+		sub_w = filter_df(df, "width", width)
+		for kT in kTs:
+			sub_kT = filter_df(sub_w, "kT", kT)
+			for J01 in J01s:
+				data = filter_df(sub_kT, "J01", J01)
+				data.sort_values(["A", "JmL"], inplace=True)
+				data.reset_index(drop=True, inplace=True)
+
+				sheet_name = f"width={width}, kT={kT}, J01={J01}"
+				writer = pd.ExcelWriter(sub_dir / f"A, {sheet_name}.xlsx", engine="xlsxwriter")
+				data.to_excel(writer, sheet_name=sheet_name, index=False)
+				worksheet = writer.sheets[sheet_name]
+
+				col_JmL = data.columns.get_loc("JmL")
+				col_charts = len(data.columns) + 1  # where to start placing the charts
+
+				for idx_a, axis in enumerate(axises):
+					for idx_r, region in enumerate(regions):
+						region_axis = region + axis
+
+						chart = writer.book.add_chart({ "type": "scatter" })
+
+						col_M = data.columns.get_loc(region_axis)
+						col_M_error = data.columns.get_loc(f"{region_axis}_error")
+
+						colors_and_shapes = [("#000000", "square"), ("#C00000", "circle"), ("#00B050", "triangle"), ("#50164A", "star"), ("#00B0F0", "diamond"), ("#7030A0", "x"), ("#FFC000", "plus")]
+						for A, color, shape in [(a, cs[0], cs[1]) for a, cs in zip(As, colors_and_shapes)]:
+							sub = data[data["A"] == A]
+							# assert not sub.empty  # TODO: what if it is?
+							if sub.empty:
+								continue
+
+							start_row = sub.index.min() + 1  # +1 becasue of header row (TODO: explain we need the +1)
+							end_row   = sub.index.max() + 1
+							x_range = xl_range_formula(sheet_name, start_row, col_JmL, end_row, col_JmL)
+
+							y_range = xl_range_formula(sheet_name, start_row, col_M, end_row, col_M)
+							error_range = xl_range_formula(sheet_name, start_row, col_M_error, end_row, col_M_error)
+
+							chart.add_series({
+								"name": f"A={A}",
+								"categories": x_range,
+								"values": y_range,
+								"y_error_bars": {
+									"type": "custom",
+									"plus_values":  error_range,
+									"minus_values": error_range
+								},
+								"marker": {
+									"type": shape,
+									"border": { "color": color },
+									"fill":   { "color": color },
+									"size": 5
+								},
+								"line": {
+									"dash_type": "solid",
+									"color": color,
+									"width": 1.5
+								}
+							})
+						chart.set_title({ "name": f"{region_axis} vs. JmL curves for different A" })
+						chart.set_x_axis({
+							"name": "JmL",
+							"position": "low",
+							"min": JmL_min,
+							"max": JmL_max
+						})
+						chart.set_y_axis({
+							"name": f"{region_axis}",
+							"position": "low"
+						})
+						chart.set_legend({ "position": "bottom" })
+						chart.set_size(chart_size)
+						xl_col = xl_col_to_name(col_charts + idx_a * chart_col_width)
+						xl_row = 1 + idx_r * chart_row_height
+						worksheet.insert_chart(f"{xl_col}{xl_row}", chart, { "x_offset": 0, "y_offset": 0 })
+
+				writer.close()
+				progress_bar.update(1)
 
 	progress_bar.close()

@@ -141,8 +141,8 @@ class Config:
 		if "nodeId" not in self.__dict__:
 			self.nodeId = lambda node: str(node)
 		if "regionId" not in self.__dict__:
-			self.regionId = lambda region: str(region) 
-		# fields set durring compilation 
+			self.regionId = lambda region: str(region)
+		# fields set durring compilation
 		self.localNodeKeys: set[str] = None    # set[str]: which localNodeParameters are being used?
 		self.localEdgeKeys: set[str] = None    # set[str]: which localEdgeParameters are being used?
 		self.regionNodeKeys: set[str] = None   # set[str]: which regionNodeParameters are being used?
@@ -448,7 +448,13 @@ class Config:
 			return v
 		return self.globalParameters.get(k, None)
 	
-	def compile(self, tool=VisualStudio(), asm: str=None, def_: str=None, obj: str=None, dll: str=None, dir: str=None, copy_config: bool=True, progress_bars: bool=False) -> Runtime:
+	def precompile(self, progress_bars: bool=False) -> tuple[str, list]:
+		"""
+		Validate, update Config object fields, and generate ASM.
+		Do everything except run the assembler and linker.
+		Return: src (ASM), exports (DEF)
+		"""
+
 		# Check for and fix missing required attributes;
 		if "nodes"                not in self.__dict__:  self.nodes = []
 		if "mutableNodes"         not in self.__dict__:  self.mutableNodes = self.nodes
@@ -2323,7 +2329,11 @@ class Config:
 			src += f"PUBLIC {symbol}\n"
 
 		src += "END"  # absolute end of ASM file
+		return src, exports
 
+	def compile(self, tool=VisualStudio(), asm: str=None, def_: str=None, obj: str=None, dll: str=None, dir: str=None, copy_config: bool=True, progress_bars: bool=False) -> Runtime:
+		src, exports = self.precompile(progress_bars=progress_bars)
+		
 		# ---------------------------------------------------------------------
 		def reserve_tempfile(suffix):
 			""" Create an empty temp file for later use. """

@@ -6,8 +6,9 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-repetitions = 20
+repetitions = 3
 out = unique_path(dir="out", prefix="study-layers-full", suffix=".csv")
+tool = VisualStudio(year=2026)  # assembler/linker version
 
 # width=7 had 1 anomaly in 10
 # width=11 had 1 anomaly in 10
@@ -59,7 +60,7 @@ if __name__ == "__main__":
 		msd.regionEdgeParameters[(OuterLayer_, InnerLayer_)] = { "J": 0.0 }  # variable
 		msd.regionEdgeParameters[(InnerLayer_, InnerLayer_)] = { "J": JL }
 
-		with msd.compile(tool=VisualStudio(year=2022), asm=f"out/study-layers, {width}.asm") as runtime:
+		with msd.compile(tool=tool, asm=f"out/study-layers, {width}.asm") as runtime:
 			sim = Simulation(runtime)
 
 			for kT in kTs:
@@ -115,5 +116,3 @@ if __name__ == "__main__":
 							pd.DataFrame([row]).to_csv(out, mode="a", header=False, index=False)
 
 	progress_bar.close()
-
-	
