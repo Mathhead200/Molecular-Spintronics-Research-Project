@@ -2331,9 +2331,7 @@ class Config:
 		src += "END"  # absolute end of ASM file
 		return src, exports
 
-	def compile(self, tool=VisualStudio(), asm: str=None, def_: str=None, obj: str=None, dll: str=None, dir: str=None, copy_config: bool=True, progress_bars: bool=False) -> Runtime:
-		src, exports = self.precompile(progress_bars=progress_bars)
-		
+	def assemble(self, src: str, exports: list, tool=VisualStudio(), asm: str=None, def_: str=None, obj: str=None, dll: str=None, dir: str=None) -> tuple[str, bool]:
 		# ---------------------------------------------------------------------
 		def reserve_tempfile(suffix):
 			""" Create an empty temp file for later use. """
@@ -2381,6 +2379,12 @@ class Config:
 		if obj_temp:  os.remove(obj)
 		if def_temp:  os.remove(def_)
 
+		return dll, dll_temp
+
+	def compile(self, tool=VisualStudio(), asm: str=None, def_: str=None, obj: str=None, dll: str=None, dir: str=None, copy_config: bool=True, progress_bars: bool=False) -> Runtime:
+		src, exports = self.precompile(progress_bars=progress_bars)
+		dll, dll_temp = self.assemble(src, exports, tool, asm, def_, obj, dll, dir)
+		
 		# dynamically link to python
 		c = self
 		if copy_config:

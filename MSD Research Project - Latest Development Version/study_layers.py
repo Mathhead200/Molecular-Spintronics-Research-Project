@@ -1,5 +1,5 @@
 from mcheisenberg import Simulation, VisualStudio
-from mcheisenberg.model import MSD, FML_, FMR_, mol_
+from mcheisenberg.models import MSD, FML_, FMR_, mol_
 from mcheisenberg.io import unique_path
 from math import sqrt
 import numpy as np

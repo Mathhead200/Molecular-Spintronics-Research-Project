@@ -5,23 +5,23 @@ randomize = True
 # seed = 200
 
 simCount = 100000000000
-freq = 25000000
+freq = 1000000
 
 # dimensions of bounding box
-width  = 15
+width  = 11
 height = 10
 depth  = 10
 
 # boundaries which define the exact dimensions of FM_L, FM_R, and mol.
-molPosL = 7
-molPosR = 7
-topL    = 0
-bottomL = 9
-frontR  = 0
-backR   = 9
+molPosL = 5
+molPosR = 5
+topL    = 3
+bottomL = 6
+frontR  = 3
+backR   = 6
 
 # Tempurature
-kT = 0.05
+kT = 0.1
 
 # External Magnetic Field
 # B = 0 0 0
@@ -66,7 +66,7 @@ JmR = -1
 # JeeLR = 0
 
 # Anisotropy constant(s), as vectors 
-AL = 1.0 0 0
+AL = 2.0 0 0
 # AR = 0 0 0
 # Am = 0 0 0
 

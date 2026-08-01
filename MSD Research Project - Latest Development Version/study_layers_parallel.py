@@ -4,7 +4,7 @@
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from tqdm import tqdm
 from mcheisenberg import Runtime, Simulation, VisualStudio
-from mcheisenberg.model import MSD, FML_, FMR_, mol_
+from mcheisenberg.models import MSD, FML_, FMR_, mol_
 from mcheisenberg.io import unique_path
 import numpy as np
 import pandas as pd

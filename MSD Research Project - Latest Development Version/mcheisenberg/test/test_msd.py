@@ -1,5 +1,5 @@
 from .. import Simulation, NODES_, EDGES_, VisualStudio
-from ..model import MSD, FML_, FMR_, mol_
+from ..models import MSD, FML_, FMR_, mol_
 
 TOOL = VisualStudio(year=2022)
 

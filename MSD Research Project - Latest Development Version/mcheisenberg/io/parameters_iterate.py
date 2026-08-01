@@ -2,7 +2,7 @@ from __future__ import annotations
 from . import CSV
 from ..build import VisualStudio
 from ..config import Config
-from ..model import MSD, FML_, FMR_, mol_
+from ..models import MSD, FML_, FMR_, mol_
 from ..runtime import Runtime
 from ..simulation import Simulation, Snapshot
 from ..util import report_date, TypeCheckedAny as Any, TypeCheckedSequence as Sequence, TypeCheckedTuple as TTuple
