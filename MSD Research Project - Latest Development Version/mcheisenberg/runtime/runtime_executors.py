@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 from ..build import VisualStudio
 from ..runtime import Runtime
 import atexit
+import os
 if TYPE_CHECKING:
 	from concurrent.futures import Future
 	from typing import Any, Callable
@@ -179,7 +180,7 @@ class RuntimePoolExecutor:
 		self.free_runtimes()
 	
 	def terminate_workers(self):
-		self.terminate_workers()
+		self.executor.terminate_workers()
 
 
 class BalancedRuntimePoolExecutor:

@@ -90,6 +90,7 @@ class Simulation(DataViewWrapper):
 	def clear_history(self) -> None:
 		self.t = 0
 		self.history = {}
+		# TODO: I think we need to free snapshots here? (potential MEMORY LEAK!!)
 
 for param in ["x", "c"]:
 	setattr(DataViewWrapper, param, property(

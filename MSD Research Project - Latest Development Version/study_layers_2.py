@@ -9,6 +9,8 @@ import mcheisenberg as mc
 t_eq = 10_000_000  # TODO: determine with iterate
 freq = 100_000  # TODO: determin with auto_correlation
 sim_count = 100 * freq
+tool = VisualStudio(2026)
+max_workers = 25
 
 def build_config(x0):
 	msd = AsymmetricTwoLayerMSD(11, 10, 10, 5, 5, 3, 6, 3, 6, x0)
@@ -29,33 +31,33 @@ def task(runtime, x0, J01, A0):
 	#	Simple fix: stop caching runtimes.
 	#	Maybe better fix, allow each metropolis to use a single shared buffer for all snapshots and only grab needed data??
 
-	# def get_stats(m_history):
-	# 	m_x = m_history[:, 0]
-	# 	m_y = m_history[:, 1]
-	# 	m_z = m_history[:, 2]
-	# 	m = np.linalg.norm(m_history, axis=1)
-	# 	n = m_history.shape[0]
+	def get_stats(m_history):
+		m_x = m_history[:, 0]
+		m_y = m_history[:, 1]
+		m_z = m_history[:, 2]
+		m = np.linalg.norm(m_history, axis=1)
+		n = m_history.shape[0]
 		
-	# 	stats = {}
-	# 	stats["m"]
+		stats = {}
+		stats["m"]
 
-	# 	return stats
+		return stats
 
-	# output = {}
-	# m_bar = mc.mean(sim.m)
-	# output["M"] = np.linalg.norm(m_bar)
-	# output["M_x"] = m_bar[0]
-	# output["M_y"] = m_bar[1]
-	# output["M_z"] = m_bar[2]
-	# for region in [OuterLayer_, InnerLayer_, FML_, FMR_, mol_]:
-	# 	m_bar = mc.mean(sim.m[region])
-	# 	output[f"M{region}"] = np.linalg.norm(m_bar)
-	# 	output[f"M{region}_sigma"] = 
-	# 	output[f"M{region}_x"] = m_bar[0]
-	# 	output[f"M{region}_y"] = m_bar[1]
-	# 	output[f"M{region}_z"] = m_bar[2]
+	output = {}
+	m_bar = mc.mean(sim.m)
+	output["M"] = np.linalg.norm(m_bar)
+	output["M_x"] = m_bar[0]
+	output["M_y"] = m_bar[1]
+	output["M_z"] = m_bar[2]
+	for region in [OuterLayer_, InnerLayer_, FML_, FMR_, mol_]:
+		m_bar = mc.mean(sim.m[region])
+		output[f"M{region}"] = np.linalg.norm(m_bar)
+		output[f"M{region}_sigma"] = 
+		output[f"M{region}_x"] = m_bar[0]
+		output[f"M{region}_y"] = m_bar[1]
+		output[f"M{region}_z"] = m_bar[2]
 
-	return (x0, J01, A0, sim.m.value)  # TODO: stub
+	return None  # TODO: stub
 
 
 if __name__ == "__main__":
@@ -70,7 +72,7 @@ if __name__ == "__main__":
 			A0 = _a0 / 100  # e.g. 0, 0.02, 0.04, ..., 2.00
 			tasks_per_config.append((J01, A0))  # add parameter list as tuple
 
-	with BRPE(build_config, configs, max_workers=25, tool=VisualStudio(2022)) as exe:
+	with BRPE(build_config, configs, max_workers=max_workers, tool=tool) as exe:
 		# submit tasks
 		for config_args in configs:
 			for task_args in tasks_per_config:
@@ -80,9 +82,9 @@ if __name__ == "__main__":
 		pbar = tqdm(total=len(exe.futures), desc="Simulating")
 		for future in exe.as_completed():
 			try:
-				x0, J01, A0, m = future.result()
-				# print(f"x0={x0}, J01={J01}, A0={A0} -> m={m}")  # TODO: stub
-			except:
+				_ = future.result()  # TODO: stub
+				# TODO: record ...
+			except Exception:
 				traceback.print_exc()
 			pbar.update(1)
 
