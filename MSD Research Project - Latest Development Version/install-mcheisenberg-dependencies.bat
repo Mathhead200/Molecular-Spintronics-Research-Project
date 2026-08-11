@@ -4,6 +4,7 @@ rem Must install python (add to PATH)
 
 pip install numpy
 pip install tqdm
+rem TODO: psutil
 rem TODO: matplotlib
 
 rem For build_ln which uses remez

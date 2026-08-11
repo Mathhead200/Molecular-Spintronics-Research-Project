@@ -7,7 +7,7 @@ from .config import \
 	Config
 
 from .runtime import \
-	Runtime, Buffer, MutableStateBuffer
+	Runtime, RuntimePoolExecutor, BalancedRuntimePoolExecutor, Buffer, MutableStateBuffer
 
 from .simulation import \
 	Simulation, Snapshot, \
