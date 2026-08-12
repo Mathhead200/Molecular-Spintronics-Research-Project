@@ -1,10 +1,9 @@
+from math import sqrt
 from tqdm import tqdm
-from scipy import stats
 from mcheisenberg import BalancedRuntimePoolExecutor as BRPE, Simulation, VisualStudio, kT_, J_, A_
 from mcheisenberg.models import AsymmetricTwoLayerMSD, FML_, FMR_, mol_, OuterLayer_, InnerLayer_
 import traceback
 import numpy as np
-import mcheisenberg as mc
 
 t_eq = 10_000_000  # TODO: determine with iterate
 freq = 100_000  # TODO: determin with auto_correlation
@@ -31,33 +30,22 @@ def task(runtime, x0, J01, A0):
 	#	Simple fix: stop caching runtimes.
 	#	Maybe better fix, allow each metropolis to use a single shared buffer for all snapshots and only grab needed data??
 
-	def get_stats(m_history):
-		m_x = m_history[:, 0]
-		m_y = m_history[:, 1]
-		m_z = m_history[:, 2]
-		m = np.linalg.norm(m_history, axis=1)
-		n = m_history.shape[0]
-		
-		stats = {}
-		stats["m"]
+	REGIONS = [OuterLayer_, InnerLayer_, FML_, FMR_, mol_]
+	m_history_        = np.array([ss.m.value for ss in sim.history])[:, None, :]                       # shape=(T, 1, 3) -- Aggrigate state of full system indexed as [time][0][axis]
+	m_history_regions = np.array([ [ss.m[r].value for ss in sim.history.values()] for r in REGIONS ])  # shape=(T, R, 3) -- Aggrigate state of each region indexed as [time][region][axis]
+	m_history_atoms   = np.array([ss.m.values() for ss in sim.history.values()])                       # shape=(T, n, 3) -- Full state of "atoms" in system indexed as [time][location][axis]	
+	m_history = np.concatenate((m_history_, m_history_regions, m_history_atoms), axis=0)               # shape=(T, 1+R+n, 3)
+	t_history = np.array([t for t in sim.history])  # shape=(T,) -- All timestamps in order
+	t_len = len(sim.history)             # number of smaples
+	T = t_history[-1] - t_history[0]     # interval length for integration/summation
+	dt = t_history[1:] - t_history[:-1]  # delta time
+	m_mean = (0.5 / T) * np.sum((m_history[:-1, :, :] + m_history[1:, :, :]) * dt[:, None, None], axis=0)  # shape=(1+R+n, 3) -- approx. avg. using trapizoidal method
+	m_std = np.sqrt((1.0 / (t_len - 1)) * np.sum((m_history - m_mean[None, :, :]) ** 2, axis=0))           # shape=(1+R+n, 3) -- sample std. dev. assuming saples are uncorrelated (i.e. auto-correlation is negligible)
+	m_se = m_std / sqrt(t_len)                                                                             # shape=(1+R+n, 3) -- standard error
 
-		return stats
+	# TODO: stats on |m|
 
-	output = {}
-	m_bar = mc.mean(sim.m)
-	output["M"] = np.linalg.norm(m_bar)
-	output["M_x"] = m_bar[0]
-	output["M_y"] = m_bar[1]
-	output["M_z"] = m_bar[2]
-	for region in [OuterLayer_, InnerLayer_, FML_, FMR_, mol_]:
-		m_bar = mc.mean(sim.m[region])
-		output[f"M{region}"] = np.linalg.norm(m_bar)
-		output[f"M{region}_sigma"] = 
-		output[f"M{region}_x"] = m_bar[0]
-		output[f"M{region}_y"] = m_bar[1]
-		output[f"M{region}_z"] = m_bar[2]
-
-	return None  # TODO: stub
+	return (m_mean, m_std, m_se)
 
 
 if __name__ == "__main__":
