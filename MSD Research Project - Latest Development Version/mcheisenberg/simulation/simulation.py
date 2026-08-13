@@ -38,7 +38,7 @@ class Simulation(DataViewWrapper):
 		self.rt.randomize(*seed)
 		if clear_history:  self.clear_history()
 
-	def metropolis(self, iterations: int, freq: int=0, callback: Callable[[Snapshot], None]=None, bookend: bool=True, reuse_buffer: MutableStateBuffer|bool=False, progress_bar: bool|str=None) -> None:
+	def metropolis(self, iterations: int, freq: int=0, callback: Callable[[Snapshot], None]=None, bookend: bool=True, reuse_buffer: MutableStateBuffer|bool=False, progress_bar: bool|str=None, pbar_args: dict={}) -> None:
 		"""
 		Run the metropolis algorithm on this model for the given number of iterations.
 		May specify a recording/sampling period (freq), i.e. record a snapshot every freq iterations.
@@ -53,7 +53,7 @@ class Simulation(DataViewWrapper):
 
 		if progress_bar is not None and progress_bar is not False:
 			if progress_bar is True:  progress_bar = "Metropolis"
-			progress_bar = tqdm(total=iterations, desc=progress_bar)
+			progress_bar = tqdm(total=iterations, desc=progress_bar, **pbar_args)
 		
 		if not freq:
 			self.rt.metropolis(iterations)

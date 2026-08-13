@@ -448,7 +448,7 @@ class Config:
 			return v
 		return self.globalParameters.get(k, None)
 	
-	def precompile(self, progress_bars: bool=False) -> tuple[str, list]:
+	def precompile(self, progress_bars: bool=False, pbar_args: dict={}) -> tuple[str, list]:
 		"""
 		Validate, update Config object fields, and generate ASM.
 		Do everything except run the assembler and linker.
@@ -491,7 +491,8 @@ class Config:
 				len(self.globalParameters) + len(self.programParameters) + 1 + len(seed) if seed is not None else 0 + \
 				1 + len(self.localNodeParameters) + len(self.localEdgeParameters) + len(self.regionNodeParameters) + \
 				len(self.regionEdgeParameters) + 2*(len(self.mutableNodes) + len(self.regions) + 1),
-			desc="[Compiling] Validating config"
+			desc="[Compiling] Validating config",
+			**pbar_args
 		) if progress_bars else None
 		def tqdm_check_update(n=1):
 			if tqdm_check is not None:  tqdm_check.update(n)
@@ -669,7 +670,7 @@ class Config:
 
 		def tqdm_(iterable, desc):
 			if progress_bars:
-				return tqdm(iterable, desc=desc)
+				return tqdm(iterable, desc=desc, **pbar_args)
 			return iterable
 
 		exports = []  # [(symbol: str, data: bool), ...]
@@ -2381,8 +2382,8 @@ class Config:
 
 		return dll, dll_temp
 
-	def compile(self, tool=VisualStudio(), asm: str=None, def_: str=None, obj: str=None, dll: str=None, dir: str=None, copy_config: bool=True, progress_bars: bool=False) -> Runtime:
-		src, exports = self.precompile(progress_bars=progress_bars)
+	def compile(self, tool=VisualStudio(), asm: str=None, def_: str=None, obj: str=None, dll: str=None, dir: str=None, copy_config: bool=True, progress_bars: bool=False, pbar_args: dict={}) -> Runtime:
+		src, exports = self.precompile(progress_bars=progress_bars, pbar_args=pbar_args)
 		dll, dll_temp = self.assemble(src, exports, tool, asm, def_, obj, dll, dir)
 		
 		# dynamically link to python

@@ -3,11 +3,13 @@ from collections.abc import Sequence
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from copy import deepcopy
 from pathlib import Path
+from tqdm import tqdm
 from typing import TYPE_CHECKING
 from ..build import VisualStudio
 from ..runtime import Runtime
 import atexit
 import os
+import multiprocessing
 if TYPE_CHECKING:
 	from concurrent.futures import Future
 	from typing import Any, Callable
@@ -23,12 +25,19 @@ class RuntimePoolExecutor:
 	# static:
 	_dll_paths: dict = None      # worker input: contains .dll paths
 	_runtime_cache: dict = None  # worker state
+	WORKER_ID: int = 0           # worker state
 
 	@staticmethod
-	def _initialize_worker(dll_paths):
+	def _initialize_worker(dll_paths, worker_id, tqdm_lock, initializer, initargs):
 		RuntimePoolExecutor._dll_paths = dll_paths
 		RuntimePoolExecutor._runtime_cache = {}
+		with worker_id.get_lock():
+			worker_id.value += 1
+			RuntimePoolExecutor.WORKER_ID = int(worker_id.value)
+		tqdm.set_lock(tqdm_lock)
 		atexit.register(RuntimePoolExecutor._destruct_worker)
+		if initializer is not None:
+			initializer(*initargs)
 
 	@staticmethod
 	def _destruct_worker():
@@ -48,12 +57,12 @@ class RuntimePoolExecutor:
 		else:                   return args
 
 	@staticmethod
-	def _task_wrapper(task: Callable[..., Any], config_fn, config_args, task_args, use_cache, runtime_initializer, progress_bars):
+	def _task_wrapper(task: Callable[..., Any], config_fn, config_args, task_args, use_cache, runtime_initializer, progress_bars, pbar_args):
 		key = RuntimePoolExecutor._key(config_args)
 
 		def new_runtime():
 			config = RuntimePoolExecutor._build_config(config_fn, config_args)
-			config.precompile(progress_bars=progress_bars)  # to initialize fields like SIZEOF_NODE for runtime validation
+			config.precompile(progress_bars=progress_bars, pbar_args=pbar_args)  # to initialize fields like SIZEOF_NODE for runtime validation
 			dll = RuntimePoolExecutor._dll_paths[key]
 			runtime = Runtime(config, dll, delete=False)
 			if runtime_initializer is not None:
@@ -87,7 +96,7 @@ class RuntimePoolExecutor:
 
 		return result
 
-	def __init__(self, config_fn: Callable[..., Config], config_list: list=[()], max_workers: int=None, tool=VisualStudio(), asm: str=None, def_: str=None, obj: str=None, dll: str=None, dir: str=None, progress_bars: bool=False):
+	def __init__(self, config_fn: Callable[..., Config], config_list: list=[()], max_workers: int=None, tool=VisualStudio(), asm: str=None, def_: str=None, obj: str=None, dll: str=None, dir: str=None, progress_bars: bool=False, pbar_args: dict={}, tqdm_lock=None, initializer: Callable[..., None]=None, initargs: tuple=()):
 		"""
 		@param config_fn: This function returns a configuration.
 			Preconditions: picklable, and pure function
@@ -98,6 +107,10 @@ class RuntimePoolExecutor:
 			3. Else, args are treated as a single object ans passed as the sole argument.
 			Prconditions: picklable, and (if not dict) should be a valid dict key.
 		"""
+		if tqdm_lock is None:
+			tqdm_lock = multiprocessing.RLock()
+		tqdm.set_lock(tqdm_lock)
+
 		self.config_fn = config_fn
 
 		self.runtimes: list[Runtime] = []
@@ -108,15 +121,16 @@ class RuntimePoolExecutor:
 			_def = None if def_ is None else str(Path(def_).with_suffix(f".{n}.def"))
 			_obj = None if obj  is None else str(Path(obj).with_suffix(f".{n}.obj"))
 			_dll = None if dll  is None else str(Path(dll).with_suffix(f".{n}.dll"))
-			runtime = config.compile(tool=tool, asm=_asm, def_=_def, obj=_obj, dll=_dll, dir=dir, copy_config=False, progress_bars=progress_bars)
+			runtime = config.compile(tool=tool, asm=_asm, def_=_def, obj=_obj, dll=_dll, dir=dir, copy_config=False, progress_bars=progress_bars, pbar_args=pbar_args)
 			self.runtimes.append(runtime)
 			dll_paths[RuntimePoolExecutor._key(args)] = runtime.dll
 
-		self.executor = ProcessPoolExecutor(max_workers=max_workers, initializer=RuntimePoolExecutor._initialize_worker, initargs=(dll_paths,))
+		worker_id = multiprocessing.Value("i", 0)  # "i": signed integer
+		self.executor = ProcessPoolExecutor(max_workers=max_workers, initializer=RuntimePoolExecutor._initialize_worker, initargs=(dll_paths, worker_id, tqdm_lock, initializer, initargs))
 
 		self.futures: list[Future] = []
 
-	def submit(self, task: Callable[..., Any], config_args=(), task_args=(), use_cache: bool=False, runtime_initializer: Callable[..., None]=None, progress_bars: bool=False):
+	def submit(self, task: Callable[..., Any], config_args=(), task_args=(), use_cache: bool=False, runtime_initializer: Callable[..., None]=None, progress_bars: bool=False, pbar_args: dict={}):
 		"""
 		Submit a task to the underlying process pool.
 		
@@ -145,7 +159,7 @@ class RuntimePoolExecutor:
 			Allows for any configurating required on a per-runtime basis as opposed to a per-task basis.
 			Precondition: picklable
 		"""
-		future = self.executor.submit(RuntimePoolExecutor._task_wrapper, task, self.config_fn, config_args, task_args, use_cache, runtime_initializer, progress_bars)
+		future = self.executor.submit(RuntimePoolExecutor._task_wrapper, task, self.config_fn, config_args, task_args, use_cache, runtime_initializer, progress_bars, pbar_args)
 		self.futures.append(future)
 		return future
 
@@ -189,15 +203,22 @@ class BalancedRuntimePoolExecutor:
 	_config_args = None  # worker input
 	_dll = None          # worker input
 	_runtime = None      # worker state
+	WORKER_ID: int = 0        # worker state
 
 	@staticmethod
-	def _initialize_worker(config_fn, config_args, dll):
+	def _initialize_worker(config_fn, config_args, dll, worker_id, tqdm_lock, initializer, initargs):
 		# TODO: set sub-process priority (pip psutil)
 		BRPE._config_fn = config_fn
 		BRPE._config_args = config_args
 		BRPE._dll = dll
 		BRPE._runtime = None  # lazy constructed
+		with worker_id.get_lock():
+			worker_id.value += 1
+			BRPE.WORKER_ID = int(worker_id.value)
+		tqdm.set_lock(tqdm_lock)
 		atexit.register(BRPE._destruct_worker)
+		if initializer is not None:
+			initializer(*initargs)
 
 	@staticmethod
 	def _destruct_worker():
@@ -216,7 +237,7 @@ class BalancedRuntimePoolExecutor:
 		if type(args) is dict:  return frozenset(args.items())
 		else:                   return args
 
-	def __init__(self, config_fn: Callable[..., Config], config_list: list=[()], max_workers: int|Sequence=None, tool=VisualStudio(), asm: str=None, def_: str=None, obj: str=None, dll: str=None, dir: str=None, progress_bars: bool=False):
+	def __init__(self, config_fn: Callable[..., Config], config_list: list=[()], max_workers: int|Sequence=None, tool=VisualStudio(), asm: str=None, def_: str=None, obj: str=None, dll: str=None, dir: str=None, progress_bars: bool=False, pbar_args: dict={}, tqdm_lock=None, initializer: Callable[..., None]=None, initargs: tuple=()):
 		"""
 		@param config_fn: This function returns a configuration.
 			Preconditions: picklable, and pure function
@@ -230,6 +251,10 @@ class BalancedRuntimePoolExecutor:
 		if max_workers is None:
 			max_workers = os.cpu_count() or 1
 
+		if tqdm_lock is None:
+			tqdm_lock = multiprocessing.RLock()
+		tqdm.set_lock(tqdm_lock)
+
 		# convert max_workers to a sequence (if not already)
 		N = len(config_list)
 		if isinstance(max_workers, Sequence):
@@ -242,17 +267,18 @@ class BalancedRuntimePoolExecutor:
 
 		self.runtimes: list[Runtime] = []
 		self.executors: dict[Any, ProcessPoolExecutor] = {}
+		worker_id = multiprocessing.Value("i", 0)  # "i": signed int
 		for n, (args, w) in enumerate(zip(config_list, max_workers), start=1):
 			config = BRPE._build_config(config_fn, args)
 			_asm = None if asm   is None else str(Path(asm ).with_suffix(f".{n}.asm"))
 			_def = None if def_  is None else str(Path(def_).with_suffix(f".{n}.def"))
 			_obj = None if obj   is None else str(Path(obj ).with_suffix(f".{n}.obj"))
 			_dll = None if dll   is None else str(Path(dll ).with_suffix(f".{n}.dll"))
-			runtime = config.compile(tool=tool, asm=_asm, def_=_def, obj=_obj, dll=_dll, dir=dir, copy_config=False, progress_bars=progress_bars)
+			runtime = config.compile(tool=tool, asm=_asm, def_=_def, obj=_obj, dll=_dll, dir=dir, copy_config=False, progress_bars=progress_bars, pbar_args=pbar_args)
 			self.runtimes.append(runtime)  # for cleanup
 
 			key = BRPE._key(args)
-			self.executors[key] = ProcessPoolExecutor(max_workers=w, initializer=BRPE._initialize_worker, initargs=(config_fn, args, runtime.dll))
+			self.executors[key] = ProcessPoolExecutor(max_workers=w, initializer=BRPE._initialize_worker, initargs=(config_fn, args, runtime.dll, worker_id, tqdm_lock, initializer, initargs))
 
 		self.futures: list[Future] = []
 
