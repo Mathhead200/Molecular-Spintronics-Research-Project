@@ -1,3 +1,5 @@
+# Note: see mcheisenberg.models.AsymetricTwoLayerMSD for easier config setup
+
 from mcheisenberg import Simulation, VisualStudio
 from mcheisenberg.models import MSD, FML_, FMR_, mol_
 from mcheisenberg.io import unique_path

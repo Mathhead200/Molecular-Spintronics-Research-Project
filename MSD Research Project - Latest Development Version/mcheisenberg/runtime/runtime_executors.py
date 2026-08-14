@@ -3,6 +3,7 @@ from collections.abc import Sequence
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from copy import deepcopy
 from pathlib import Path
+from psutil import Process, NORMAL_PRIORITY_CLASS
 from tqdm import tqdm
 from typing import TYPE_CHECKING
 from ..build import VisualStudio
@@ -24,24 +25,27 @@ class RuntimePoolExecutor:
 
 	# static:
 	_dll_paths: dict = None      # worker input: contains .dll paths
+	_nice: int = None            # worker input: (default) worker process priority
 	_runtime_cache: dict = None  # worker state
-	WORKER_ID: int = 0           # worker state
+	WORKER_ID: int = 0           # worker state (const, calculated)
+	TASK_ID: int = 0             # worker state (const)
 
 	@staticmethod
-	def _initialize_worker(dll_paths, worker_id, tqdm_lock, initializer, initargs):
-		RuntimePoolExecutor._dll_paths = dll_paths
-		RuntimePoolExecutor._runtime_cache = {}
+	def _initialize_worker(dll_paths, worker_id, tqdm_lock, initializer, initargs, nice):
+		Process(os.getpid()).nice(nice)
+		RPE._dll_paths = dll_paths
+		RPE._runtime_cache = {}
 		with worker_id.get_lock():
 			worker_id.value += 1
-			RuntimePoolExecutor.WORKER_ID = int(worker_id.value)
+			RPE.WORKER_ID = int(worker_id.value)
 		tqdm.set_lock(tqdm_lock)
-		atexit.register(RuntimePoolExecutor._destruct_worker)
+		atexit.register(RPE._destruct_worker)
 		if initializer is not None:
 			initializer(*initargs)
 
 	@staticmethod
 	def _destruct_worker():
-		for runtime in RuntimePoolExecutor._runtime_cache.values():
+		for runtime in RPE._runtime_cache.values():
 			runtime.shutdown()
 
 	@staticmethod
@@ -57,13 +61,17 @@ class RuntimePoolExecutor:
 		else:                   return args
 
 	@staticmethod
-	def _task_wrapper(task: Callable[..., Any], config_fn, config_args, task_args, use_cache, runtime_initializer, progress_bars, pbar_args):
-		key = RuntimePoolExecutor._key(config_args)
+	def _task_wrapper(task: Callable[..., Any], config_fn, config_args, task_args, task_id, use_cache, runtime_initializer, progress_bars, pbar_args, nice):
+		if nice is not None:
+			proc = Process(os.getpid())
+			proc.nice(nice)
+		RPE.TASK_ID = task_id
+		key = RPE._key(config_args)
 
 		def new_runtime():
-			config = RuntimePoolExecutor._build_config(config_fn, config_args)
+			config = RPE._build_config(config_fn, config_args)
 			config.precompile(progress_bars=progress_bars, pbar_args=pbar_args)  # to initialize fields like SIZEOF_NODE for runtime validation
-			dll = RuntimePoolExecutor._dll_paths[key]
+			dll = RPE._dll_paths[key]
 			runtime = Runtime(config, dll, delete=False)
 			if runtime_initializer is not None:
 				if   type(config_args) is tuple:  runtime_initializer(runtime,  *config_args)
@@ -72,11 +80,11 @@ class RuntimePoolExecutor:
 			return runtime
 		
 		if use_cache:
-			if key in RuntimePoolExecutor._runtime_cache:
-				runtime = RuntimePoolExecutor._runtime_cache[key]
+			if key in RPE._runtime_cache:
+				runtime = RPE._runtime_cache[key]
 			else:
 				runtime = new_runtime()
-				RuntimePoolExecutor._runtime_cache[key] = runtime
+				RPE._runtime_cache[key] = runtime
 		else:
 			runtime = new_runtime()
 
@@ -93,10 +101,12 @@ class RuntimePoolExecutor:
 		finally:
 			if not use_cache:
 				runtime.shutdown()
+			if nice is not None:
+				proc.nice(RPE._nice)
 
 		return result
 
-	def __init__(self, config_fn: Callable[..., Config], config_list: list=[()], max_workers: int=None, tool=VisualStudio(), asm: str=None, def_: str=None, obj: str=None, dll: str=None, dir: str=None, progress_bars: bool=False, pbar_args: dict={}, tqdm_lock=None, initializer: Callable[..., None]=None, initargs: tuple=()):
+	def __init__(self, config_fn: Callable[..., Config], config_list: list=[()], max_workers: int=None, tool=VisualStudio(), asm: str=None, def_: str=None, obj: str=None, dll: str=None, dir: str=None, progress_bars: bool=False, pbar_args: dict={}, tqdm_lock=None, initializer: Callable[..., None]=None, initargs: tuple=(), nice: int=NORMAL_PRIORITY_CLASS):
 		"""
 		@param config_fn: This function returns a configuration.
 			Preconditions: picklable, and pure function
@@ -106,6 +116,7 @@ class RuntimePoolExecutor:
 			2. If type is dict, args are **unpacked as keyword args.
 			3. Else, args are treated as a single object ans passed as the sole argument.
 			Prconditions: picklable, and (if not dict) should be a valid dict key.
+		@param nice: worker subprocess OS priority
 		"""
 		if tqdm_lock is None:
 			tqdm_lock = multiprocessing.RLock()
@@ -116,21 +127,22 @@ class RuntimePoolExecutor:
 		self.runtimes: list[Runtime] = []
 		dll_paths: dict[Any, str] = {}
 		for n, args in enumerate(config_list, start=1):
-			config = RuntimePoolExecutor._build_config(config_fn, args)
+			config = RPE._build_config(config_fn, args)
 			_asm = None if asm  is None else str(Path(asm).with_suffix(f".{n}.asm"))
 			_def = None if def_ is None else str(Path(def_).with_suffix(f".{n}.def"))
 			_obj = None if obj  is None else str(Path(obj).with_suffix(f".{n}.obj"))
 			_dll = None if dll  is None else str(Path(dll).with_suffix(f".{n}.dll"))
 			runtime = config.compile(tool=tool, asm=_asm, def_=_def, obj=_obj, dll=_dll, dir=dir, copy_config=False, progress_bars=progress_bars, pbar_args=pbar_args)
 			self.runtimes.append(runtime)
-			dll_paths[RuntimePoolExecutor._key(args)] = runtime.dll
+			dll_paths[RPE._key(args)] = runtime.dll
 
 		worker_id = multiprocessing.Value("i", 0)  # "i": signed integer
-		self.executor = ProcessPoolExecutor(max_workers=max_workers, initializer=RuntimePoolExecutor._initialize_worker, initargs=(dll_paths, worker_id, tqdm_lock, initializer, initargs))
+		self.executor = ProcessPoolExecutor(max_workers=max_workers, initializer=RuntimePoolExecutor._initialize_worker, initargs=(dll_paths, worker_id, tqdm_lock, initializer, initargs, nice))
 
+		self.task_id = 0  # counter for next RPE.TASK_ID in worker
 		self.futures: list[Future] = []
 
-	def submit(self, task: Callable[..., Any], config_args=(), task_args=(), use_cache: bool=False, runtime_initializer: Callable[..., None]=None, progress_bars: bool=False, pbar_args: dict={}):
+	def submit(self, task: Callable[..., Any], config_args=(), task_args=(), use_cache: bool=False, runtime_initializer: Callable[..., None]=None, progress_bars: bool=False, pbar_args: dict={}, nice: int=None):
 		"""
 		Submit a task to the underlying process pool.
 		
@@ -158,8 +170,11 @@ class RuntimePoolExecutor:
 		@param runtime_initializer called when a new runtime must be created.
 			Allows for any configurating required on a per-runtime basis as opposed to a per-task basis.
 			Precondition: picklable
+		
+		@param nice: change worker subprocess OS priority for this task
 		"""
-		future = self.executor.submit(RuntimePoolExecutor._task_wrapper, task, self.config_fn, config_args, task_args, use_cache, runtime_initializer, progress_bars, pbar_args)
+		self.task_id += 1
+		future = self.executor.submit(RPE._task_wrapper, task, self.config_fn, config_args, task_args, self.task_id, use_cache, runtime_initializer, progress_bars, pbar_args, nice)
 		self.futures.append(future)
 		return future
 
@@ -202,12 +217,14 @@ class BalancedRuntimePoolExecutor:
 	_config_fn = None    # worker input 
 	_config_args = None  # worker input
 	_dll = None          # worker input
+	_nice = None         # worker input
 	_runtime = None      # worker state
-	WORKER_ID: int = 0        # worker state
+	WORKER_ID: int = 0   # worker state
+	TASK_ID: int = 0
 
 	@staticmethod
-	def _initialize_worker(config_fn, config_args, dll, worker_id, tqdm_lock, initializer, initargs):
-		# TODO: set sub-process priority (pip psutil)
+	def _initialize_worker(config_fn, config_args, dll, worker_id, tqdm_lock, initializer, initargs, nice):
+		Process(os.getpid()).nice(nice)
 		BRPE._config_fn = config_fn
 		BRPE._config_args = config_args
 		BRPE._dll = dll
@@ -237,7 +254,7 @@ class BalancedRuntimePoolExecutor:
 		if type(args) is dict:  return frozenset(args.items())
 		else:                   return args
 
-	def __init__(self, config_fn: Callable[..., Config], config_list: list=[()], max_workers: int|Sequence=None, tool=VisualStudio(), asm: str=None, def_: str=None, obj: str=None, dll: str=None, dir: str=None, progress_bars: bool=False, pbar_args: dict={}, tqdm_lock=None, initializer: Callable[..., None]=None, initargs: tuple=()):
+	def __init__(self, config_fn: Callable[..., Config], config_list: list=[()], max_workers: int|Sequence=None, tool=VisualStudio(), asm: str=None, def_: str=None, obj: str=None, dll: str=None, dir: str=None, progress_bars: bool=False, pbar_args: dict={}, tqdm_lock=None, initializer: Callable[..., None]=None, initargs: tuple=(), nice: int=NORMAL_PRIORITY_CLASS):
 		"""
 		@param config_fn: This function returns a configuration.
 			Preconditions: picklable, and pure function
@@ -278,12 +295,17 @@ class BalancedRuntimePoolExecutor:
 			self.runtimes.append(runtime)  # for cleanup
 
 			key = BRPE._key(args)
-			self.executors[key] = ProcessPoolExecutor(max_workers=w, initializer=BRPE._initialize_worker, initargs=(config_fn, args, runtime.dll, worker_id, tqdm_lock, initializer, initargs))
+			self.executors[key] = ProcessPoolExecutor(max_workers=w, initializer=BRPE._initialize_worker, initargs=(config_fn, args, runtime.dll, worker_id, tqdm_lock, initializer, initargs, nice))
 
+		self.task_id = 0  # counter for next BRPE.TASK_ID in worker
 		self.futures: list[Future] = []
 
 	@staticmethod
-	def _task_wrapper(task: Callable[..., Any], task_args, use_cache, runtime_initializer, progress_bars):
+	def _task_wrapper(task: Callable[..., Any], task_args, task_id, use_cache, runtime_initializer, progress_bars, nice):
+		if nice is not None:
+			proc = Process(os.getpid())
+			proc.nice(nice)
+		BRPE.TASK_ID = task_id
 		config_args = BRPE._config_args
 
 		def initialize_runtime(runtime):
@@ -318,10 +340,12 @@ class BalancedRuntimePoolExecutor:
 		finally:
 			if not use_cache:
 				runtime.shutdown()
+			if nice is not None:
+				proc.nice(BRPE._nice)
 
 		return result
 
-	def submit(self, task: Callable[..., Any], config_args=(), task_args=(), use_cache: bool=False, runtime_initializer: Callable[..., None]=None, progress_bars: bool=False):
+	def submit(self, task: Callable[..., Any], config_args=(), task_args=(), use_cache: bool=False, runtime_initializer: Callable[..., None]=None, progress_bars: bool=False, nice: int=None):
 		"""
 		Submit a task to the underlying process pool.
 		
@@ -350,8 +374,9 @@ class BalancedRuntimePoolExecutor:
 			Allows for any configurating required on a per-runtime basis as opposed to a per-task basis.
 			Precondition: picklable
 		"""
+		self.task_id += 1
 		key = BRPE._key(config_args)
-		future = self.executors[key].submit(BRPE._task_wrapper, task, task_args, use_cache, runtime_initializer, progress_bars)
+		future = self.executors[key].submit(BRPE._task_wrapper, task, task_args, self.task_id, use_cache, runtime_initializer, progress_bars, nice)
 		self.futures.append(future)
 		return future
 
@@ -397,4 +422,5 @@ class BalancedRuntimePoolExecutor:
 		for executor in self.executors.values():
 			executor.terminate_workers()
 
+RPE = RuntimePoolExecutor
 BRPE = BalancedRuntimePoolExecutor

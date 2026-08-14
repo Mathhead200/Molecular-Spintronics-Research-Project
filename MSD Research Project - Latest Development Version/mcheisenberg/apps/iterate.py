@@ -14,7 +14,7 @@ def main(argv=sys.argv):
 	parser.add_argument("--out", dest="out_dir", type=str, default="out", help="Output directory for CSV")
 	parser.add_argument("--temp", dest="temp_dir", type=str, default=None, help="Directory for temp files: .asm, .obj, .def, .dll")
 	parser.add_argument("--asm", dest="asm", type=str, nargs="?", default=None, const=True, help="Save .asm file (for debugging)")
-	parser.add_argument("--year", dest="year", type=int, default=None, help="Select versio of Visual Studio (e.g. 2022, 2026)")
+	parser.add_argument("--year", dest="year", type=int, default=None, help="Select version of Visual Studio (e.g. 2022, 2026)")
 	parser.add_argument("--edition", dest="edition", type=str, default=None, help="Select edition of Visual Studio (e.g. Community)")
 	args = parser.parse_args(argv[1:])
 	if args.edition is not None and args.year is None:

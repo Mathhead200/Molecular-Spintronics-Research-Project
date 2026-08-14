@@ -1,7 +1,7 @@
 from ..models import MSD, FML_, FMR_, mol_
 
-OuterLayer_ = "Outer"
-InnerLayer_ = "Inner"
+OuterLayer_ = "O"
+InnerLayer_ = "I"
 
 def AsymmetricTwoLayerMSD(width: int, height: int, depth: int,
 		molPosL: int=None, molPosR: int=None,
