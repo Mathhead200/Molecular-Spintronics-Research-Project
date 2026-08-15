@@ -1,4 +1,5 @@
 from argparse import ArgumentParser
+from itertools import product
 from math import sqrt
 from pathlib import Path
 from typing import Any
@@ -12,18 +13,7 @@ import sys
 import numpy as np
 import pandas as pd
 
-# parameters:
-x0s = range(5)
-J01s = [-1.0, -0.1, 0, 0.1, 1.0]
-A0s = [numerator / 100 for numerator in range(0, 201, 2)]  # e.g. 0, 0.02, 0.04, ..., 2.00
-
-t_eq = 10_000_000  # TODO: determine with iterate
-freq = 100_000  # TODO: determin with auto_correlation
-sim_count = 100 * freq
-
-max_workers = 20
-nice = HIGH_PRIORITY_CLASS
-
+# model parameters (const)
 width = 11
 height = 10
 depth = 10
@@ -34,6 +24,37 @@ bottomL = 6
 frontR = 3
 backR = 6
 
+kT = 0.1
+
+# model parameters (variable)
+x0s = list(range(molPosL))
+J01s = [-1.0, -0.1, 0, 0.1, 1.0]
+A0s = [numerator / 100 for numerator in range(0, 201, 2)]  # e.g. 0, 0.02, 0.04, ..., 2.00
+
+# simulation parameters (const)
+t_eq = 1_000_000_000  # TODO: determine with iterate
+freq = 50_000_000     # TODO: determin with auto_correlation
+sim_count = 100 * freq
+
+max_workers = 16  # excludes main thread (i.e. parent process)
+worker_nice = HIGH_PRIORITY_CLASS  # priority (Windows)
+
+# formatting prameters
+fx0_width = max(*[len(str(x0)) for x0 in x0s])                         # width of x0 field
+fx0 = f"0{fx0_width}"                                                  # formatter for x0 field
+
+fJ01_decimals = 1                                                      # decimals for J01 field
+fJ01_width = max(*[len(f"{J01:+.{fJ01_decimals}f}") for J01 in J01s])  # width of J01 field
+fJ01 = f"+{fJ01_width}.{fJ01_decimals}f"                               # formatter for J01 field
+
+fA0_decimals = 2                                                       # decimals for A0 field
+fA0_width = max(*[len(f"{A0:.{fA0_decimals}f}") for A0 in A0s])        # width of A0 field
+fA0 = f".{fA0_decimals}f"                                              # formatter for A0 field
+
+ftid_width = len(str( len(x0s) * len(J01s) * len(A0s) ))  # width for task_id field
+ftid = f"0{ftid_width}"                                   # formatter for task_id field
+
+# const
 REGIONS = [OuterLayer_, InnerLayer_, FML_, FMR_, mol_]
 
 def init_worker():
@@ -41,7 +62,7 @@ def init_worker():
 
 def build_config(x0):
 	msd = AsymmetricTwoLayerMSD(width, height, depth, molPosL, molPosR, topL, bottomL, frontR, backR, x0)
-	msd.globalParameters[kT_] = 0.1
+	msd.globalParameters[kT_] = kT
 	msd.regionNodeParameters[OuterLayer_] = { A_: (0.0, 0.0, 0.0) }
 	return msd
 
@@ -50,19 +71,20 @@ def task(runtime, x0, J01, A0):
 	sim.J[OuterLayer_, InnerLayer_] = J01
 	sim.A[OuterLayer_] = (A0, 0.0, 0.0)
 
-	tag = f"J01={J01:.1f}, x0={x0:01}, A0={A0:.2f}"
+	tag = f"J01={J01:{fJ01}}, x0={x0:{fx0}}, A0={A0:{fA0}}"
 
 	sim.randomize()
-	sim.metropolis(t_eq,            progress_bar=f"#{BRPE.TASK_ID:04}: 1. Equilibriate {tag}", pbar_args={ "leave": False, "position": BRPE.WORKER_ID })
-	sim.metropolis(sim_count, freq, progress_bar=f"#{BRPE.TASK_ID:04}: 2. Record data  {tag}", pbar_args={ "leave": False, "position": BRPE.WORKER_ID })
+	sim.metropolis(t_eq,            progress_bar=f"#{BRPE.TASK_ID:{ftid}}: 1. Equilibriate {tag}", pbar_args={ "leave": False, "position": BRPE.WORKER_ID })
+	sim.metropolis(sim_count, freq, progress_bar=f"#{BRPE.TASK_ID:{ftid}}: 2. Record data  {tag}", pbar_args={ "leave": False, "position": BRPE.WORKER_ID })
 	# TODO: fix memory error.
 	# 	Buffers don't get freed until Runtime is shutdown. Since runtime is cashed, this is never (end of program)
 	#	Simple fix: stop caching runtimes.
 	#	Maybe better fix, allow each metropolis to use a single shared buffer for all snapshots and only grab needed data??
 
-	progress_bar = tqdm(total=1+7+11+1, desc=f"#{BRPE.TASK_ID:04}: 3. Calc. stats  {tag}", leave=False, position=BRPE.WORKER_ID)
+	progress_bar = tqdm(total=1+7+11+1, desc=f"#{BRPE.TASK_ID:{ftid}}: 3. Calc. stats  {tag}", leave=False, position=BRPE.WORKER_ID)
 
 	# TODO: optimize calculating stats. It currently takes ~2hr for ~2500 tasks. Too long!!
+	#	(~30 min on HIGH_PRIORITY_CLASS)
 
 	t_history = np.array([t for t in sim.history.keys()])  # shape=(T,) -- All timestamps in order
 	progress_bar.update(1)
@@ -133,11 +155,40 @@ if __name__ == "__main__":
 	handler = logging.FileHandler(log_path, delay=True)
 	logging.basicConfig(handlers=[handler], level=logging.ERROR)
 
-	# combinations of config and tast parameters (i.e. args)
-	configs: list[tuple] = [(x0,) for x0 in x0s]  # parameter list as tuple
-	tasks_per_config: list[tuple] = [(J01, A0) for J01 in J01s for A0 in A0s]  # parameter list as tuple
+	# create parameters file
+	with open(out / "PARAMS.txt", "w", encoding="utf-8") as file:
+		file.write(f"width   = {width}\n")
+		file.write(f"height  = {height}\n")
+		file.write(f"depth   = {depth}\n")
+		file.write(f"molPosL = {molPosL}\n")
+		file.write(f"molPosR = {molPosR}\n")
+		file.write(f"topL    = {topL}\n")
+		file.write(f"bottomL = {bottomL}\n")
+		file.write(f"frontR  = {frontR}\n")
+		file.write(f"backR   = {backR}\n")
+		file.write("\n")
 
-	with BRPE(build_config, configs, max_workers=max_workers, tool=tool, initializer=init_worker, nice=nice) as exe:
+		file.write(f"kT = {kT}\n")
+		file.write("\n")
+
+		len_x0  = str(len(x0s ))
+		len_J01 = str(len(J01s))
+		len_A0  = str(len(A0s ))
+		L = max(len(len_x0), len(len_J01), len(len_A0))
+		file.write(f"x0  (len={len_x0 :<{L}}): {list(x0s)}\n")
+		file.write(f"J01 (len={len_J01:<{L}}): {list(J01s)}\n")
+		file.write(f"A0  (len={len_A0 :<{L}}): {list(A0s)}\n")
+		file.write("\n")
+
+		file.write(f"t_eq = {t_eq:_}\n")
+		file.write(f"freq = {freq:_}\n")
+		file.write(f"sim_count = {sim_count // freq:_} * freq\n")
+
+	# combinations of config and tast parameters (i.e. args)
+	configs = [(x0,) for x0 in x0s]                               # parameter list as tuples
+	tasks_per_config = [(J01, A0) for J01 in J01s for A0 in A0s]  # parameter list as tuples
+
+	with BRPE(build_config, configs, max_workers=max_workers, tool=tool, initializer=init_worker, nice=worker_nice) as exe:
 		print("Output directory:", out)
 
 		# submit tasks
@@ -159,11 +210,11 @@ if __name__ == "__main__":
 				N = nodes.shape[0]
 
 				# save aggrigate info (i.e. "...A0=(variable).xlsx")
-				with tqdm(total=1+R, desc=f"#{task_id:04} 4. Output plots {tag}", leave=False, position=worker_id) as task_pbar:
+				with tqdm(total=1+R, desc=f"#{task_id:{ftid}} 4. Output plots {tag}", leave=False, position=worker_id) as task_pbar:
 					data = {}
 					for idx, region in enumerate([""] + REGIONS):
 						data.update({
-							"A0":                  A0,
+							"A0":                   A0,
 							f"<M{region}_norm>":    m_norm_mean[idx],
 							f"<M{region}_x>":       m_mean[idx][0],
 							f"<M{region}_y>":       m_mean[idx][1],
@@ -189,7 +240,7 @@ if __name__ == "__main__":
 						dfs[key].sort_values(by="A0")
 
 					# write to .xlsx
-					with pd.ExcelWriter(out / f"plots J01={J01:.1f}, x0={x0:01}, A0=(variable).xlsx", "xlsxwriter") as writer:
+					with pd.ExcelWriter(out / f"plots J01={J01:+.{fJ01_decimals}f}, x0={x0}, A0=(variable).xlsx", "xlsxwriter") as writer:
 						dfs[key].to_excel(writer, index=False)
 						worksheet = next(iter(writer.sheets.values()))
 						# TODO: add sigma bands
@@ -197,7 +248,7 @@ if __name__ == "__main__":
 						# TODO: task_pbar.update()
 
 				# save atoms (i.e. "...A0=0.00.xlsx")
-				with tqdm(total=N, desc=f"#{task_id:04} 5. Output atoms {tag}", leave=False, position=worker_id) as task_pbar:
+				with tqdm(total=N, desc=f"#{task_id:{ftid}} 5. Output atoms {tag}", leave=False, position=worker_id) as task_pbar:
 					data = []
 					for idx, (x, y, z) in enumerate(nodes, start=1+R): 
 						data.append({
@@ -222,7 +273,7 @@ if __name__ == "__main__":
 						task_pbar.update(1)
 					df = pd.DataFrame(data)
 
-					with pd.ExcelWriter(out / f"atoms J01={J01:.1f}, x0={x0:01}, A0={A0:.2f}.xlsx", "xlsxwriter") as writer:
+					with pd.ExcelWriter(out / f"atoms J01={J01:+.{fJ01_decimals}f}, x0={x0}, A0={A0:.{fA0_decimals}f}.xlsx", "xlsxwriter") as writer:
 						df.to_excel(writer, index=False)
 
 			except Exception as ex:
