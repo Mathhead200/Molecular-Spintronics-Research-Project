@@ -5,9 +5,10 @@ from mcheisenberg.util import report_date
 
 simCount = 10_000_000_000
 freq = 1_000_000
+x0 = 0
 
 if __name__ == "__main__":
-	msd = AsymmetricTwoLayerMSD(11, 10, 10, 5, 5, 3, 6, 3, 6, 1)
+	msd = AsymmetricTwoLayerMSD(11, 10, 10, 5, 5, 3, 6, 3, 6, x0)
 	msd.globalParameters[kT_] = 0.1
 	msd.regionNodeParameters[OuterLayer_] = { "A": (0.005, 0, 0) }
 	msd.regionEdgeParameters[OuterLayer_, InnerLayer_]["J"] = 0.1
@@ -16,7 +17,7 @@ if __name__ == "__main__":
 		sim = Simulation(rt)
 
 		# for logging
-		params = {}
+		params = { "x0": x0 }
 		for p in msd.globalParameters:
 			params[f"{p}"] = str(getattr(sim, p).value)
 		for r in sim.regions:

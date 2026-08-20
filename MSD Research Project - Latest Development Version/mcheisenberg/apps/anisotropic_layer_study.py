@@ -32,9 +32,9 @@ J01s = [-1.0, -0.1, 0, 0.1, 1.0]
 A0s = [numerator / 1000 for numerator in range(0, 2001, 5)]  # e.g. 0, 0.005, 0.010, ..., 2.000
 
 # simulation parameters (const)
-t_eq = 1_000_000_000  # TODO: determine with iterate
-freq = 50_000_000     # TODO: determin with auto_correlation
-sim_count = 100 * freq
+t_eq = 50_000_000
+freq = 1_000_000     # TODO: determin with auto_correlation
+sim_count = 1000 * freq
 
 max_workers = 16  # excludes main thread (i.e. parent process)
 worker_nice = HIGH_PRIORITY_CLASS  # priority (Windows)
@@ -93,11 +93,11 @@ def task(runtime, x0, J01, A0):
 	dt = t_history[1:] - t_history[:-1]                    # delta time
 	
 	m_history_        = np.array([ss.m.value for ss in sim.history.values()])[:, None, :]                  # shape=(T, 1, 3) -- Aggrigate state of full system indexed as [time][0][axis]
-	progress_bar.update(1)
+	progress_bar.update(1)  # 10% Expensive
 	m_history_regions = np.array([ [ss.m[r].value for r in REGIONS] for ss in sim.history.values() ])      # shape=(T, R, 3) -- Aggrigate state of each region indexed as [time][region][axis]
-	progress_bar.update(1)
+	progress_bar.update(1)  # 15% Expensive
 	m_history_atoms   = np.array([ss.m.values() for ss in sim.history.values()])                           # shape=(T, N, 3) -- Full state of "atoms" in system indexed as [time][location][axis]	
-	progress_bar.update(1)
+	progress_bar.update(1)  # 20% Expensive
 	m_history = np.concatenate((m_history_, m_history_regions, m_history_atoms), axis=1)                   # shape=(T, 1+R+N, 3)
 	progress_bar.update(1)
 	m_mean = (0.5 / T) * np.sum((m_history[:-1, :, :] + m_history[1:, :, :]) * dt[:, None, None], axis=0)  # shape=(1+R+N, 3) -- approx. avg. using trapizoidal method
@@ -111,7 +111,7 @@ def task(runtime, x0, J01, A0):
 		return np.dot(v, v)
 
 	m_norm2_history_        = np.array([dot_sq(ss.m.value) for ss in sim.history.values()])[:, None]                 # shape=(T, 1)
-	progress_bar.update(1)
+	progress_bar.update(1)  # 45% Expensive
 	m_norm2_history_regions = np.array([ [dot_sq(ss.m[r].value) for r in REGIONS] for ss in sim.history.values() ])  # shape=(T, R)
 	progress_bar.update(1)
 	m_norm2_history = np.concatenate((m_norm2_history_, m_norm2_history_regions), axis=1)                            # shape=(T, 1+R)
