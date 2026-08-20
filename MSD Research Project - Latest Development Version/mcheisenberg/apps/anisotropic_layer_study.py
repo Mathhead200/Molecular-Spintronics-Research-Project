@@ -29,7 +29,7 @@ kT = 0.1
 # model parameters (variable)
 x0s = list(range(molPosL))
 J01s = [-1.0, -0.1, 0, 0.1, 1.0]
-A0s = [numerator / 100 for numerator in range(0, 201, 2)]  # e.g. 0, 0.02, 0.04, ..., 2.00
+A0s = [numerator / 1000 for numerator in range(0, 2001, 5)]  # e.g. 0, 0.005, 0.010, ..., 2.000
 
 # simulation parameters (const)
 t_eq = 1_000_000_000  # TODO: determine with iterate

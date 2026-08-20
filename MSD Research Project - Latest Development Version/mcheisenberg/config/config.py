@@ -2351,34 +2351,37 @@ class Config:
 		print("OBJ:", obj)
 		print("DEF:", def_)
 		print("DLL:", dll)
+
+		try:
+			with open(asm, "w", encoding="utf-8") as file:
+				file.write(str(src))
+			
+			with open(def_, "w", encoding="utf-8") as file:
+				file.write("EXPORTS\n")
+				for symbol, data in exports:
+					file.write(symbol)
+					if data:
+						file.write("\tDATA")
+					file.write("\n")
+			
+			# compile/assemble
+			with resources.as_file(resources.files(__package__)) as package_path:
+				try:
+					tool.assemble(asm, out=obj, include=[str(package_path)])
+					if len(self.debug) == 0:
+						tool.dlink(obj, out=dll, entry="DllMain", exports=def_)
+					else:
+						tool.dlink(obj, "ucrt.lib", "legacy_stdio_definitions.lib", out=dll, exports=def_)  # DEBUG
+				except CalledProcessError as ex:
+					ex.add_note(f"Error running {tool}. Are you sure this version is installed?")
+					if dll_temp:  os.remove(dll)  # remove empty .dll
+					raise
 		
-		with open(asm, "w", encoding="utf-8") as file:
-			file.write(str(src))
-		
-		with open(def_, "w", encoding="utf-8") as file:
-			file.write("EXPORTS\n")
-			for symbol, data in exports:
-				file.write(symbol)
-				if data:
-					file.write("\tDATA")
-				file.write("\n")
-		
-		# compile/assemble
-		with resources.as_file(resources.files(__package__)) as package_path:
-			try:
-				tool.assemble(asm, out=obj, include=[str(package_path)])
-				if len(self.debug) == 0:
-					tool.dlink(obj, out=dll, entry="DllMain", exports=def_)
-				else:
-					tool.dlink(obj, "ucrt.lib", "legacy_stdio_definitions.lib", out=dll, exports=def_)  # DEBUG
-			except CalledProcessError as ex:
-				ex.add_note(f"Error running {tool}. Are you sure this version is installed?")
-				raise
-		
-		# clean up temp files
-		if asm_temp:  os.remove(asm)
-		if obj_temp:  os.remove(obj)
-		if def_temp:  os.remove(def_)
+		finally:
+			# clean up temp files
+			if asm_temp:  os.remove(asm)
+			if obj_temp:  os.remove(obj)
+			if def_temp:  os.remove(def_)
 
 		return dll, dll_temp
 
