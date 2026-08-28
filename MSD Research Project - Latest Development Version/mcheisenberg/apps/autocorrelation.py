@@ -12,53 +12,15 @@ import numpy as np
 from argparse import ArgumentParser
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-from numpy.typing import NDArray
+from mcheisenberg.math import acf, ndindex_as_array
 from pandas import DataFrame, ExcelWriter, read_csv, read_excel
 from psutil import Process, IDLE_PRIORITY_CLASS, BELOW_NORMAL_PRIORITY_CLASS, NORMAL_PRIORITY_CLASS, ABOVE_NORMAL_PRIORITY_CLASS, HIGH_PRIORITY_CLASS, REALTIME_PRIORITY_CLASS
 from tqdm import tqdm
-from scipy.signal import fftconvolve
 
 _local = threading.local()
 _lock = threading.Lock()
 _next_worker_id = 1
 _pbar_desc_width = 0
-
-def acf(signal: NDArray, mask: NDArray=None) -> NDArray:
-	"""
-	Computes the (normalized) autocorrelation function of the given signal.
-
-	@param signal - A single (potential multidimensional) discrete finite signal/sequence.
-
-	@param mask - (Optional) mask defining irregular boundaries.
-		Precondition: all elements are either 1.0 (True) or 0.0 (False).
-		Precondition: mask.shape == signal.shape
-	
-	@return All elements are well defined regaurdless of mask.
-		Postcondition: acf().shape == signal.shape
-	"""
-	_REVERSED = (slice(None, None, -1),) * signal.ndim  # i.e. [::-1, ::-1, ...] for all axes in signal
-	_HALF = tuple(slice(n - 1, None, None) for n in signal.shape)  # center after convolution; i.e. [m-1:, n-1:, ...]
-	_ZERO = (0,) * signal.ndim
-
-	# center data around mean. NOTE: numpy broadcasting rules make this work as expected
-	if mask is None:
-		signal = signal - np.mean(signal)
-	else:
-		n = np.sum(mask)  # number of (in bounds) samples. Counts the number of 1.0 elements.
-		mean = np.sum(signal * mask) / n
-		signal = (signal - mean) * mask
-
-	# autocovariance achieved by convolution
-	signal = fftconvolve(signal, signal[_REVERSED])
-
-	# data is symetric around n - 1 in all dimensions, which correspond to delay/shift=0, since negative and positive shifts are equivalent
-	signal = signal[_HALF]
-
-	# signal[0, 0, ...] is the variance of each signal (i.e. column) since it corresponds to delay/shift=0
-	with np.errstate(invalid="ignore", divide="ignore"):
-		signal /= signal[_ZERO]
-
-	return signal
 
 def compute_acf(df: DataFrame, pbar: tqdm):
 	pbar_n = pbar.n
@@ -118,19 +80,28 @@ def compute_acf(df: DataFrame, pbar: tqdm):
 				signal = np.zeros(shape=lengths, dtype=flattened_signal.dtype)  # pad missing samples with 0's
 				for idx, x in enumerate(xs):  # for each batch of samples; i.e. row (idx) in DataFrame associated with spacial coordinates (x)
 					signal[tuple(x - offsets)] = flattened_signal[idx]
+				del flattened_signal
 
 				# compute normalized autocorrelation signal for this signal
 				signal = acf(signal, mask=np.asarray(spatial_mask, dtype=signal.dtype))
 
 				# flatten output
 				flattened_acfxs[col] = signal.ravel()  # store flattened signal as series with appropriate header
+				del signal
 			pbar.update(1)
+		del col, idx, x
+		del xs, xs_notna, offsets
 
 		# convert to DataFrame where each row is a spacial coordinate, x, followed by an associated batch of samples
 		# Note: all possible spatial shifts are represented, not those given as xs, even though we reuse the labels
-		acfx = DataFrame(list(np.ndindex(*lengths)), columns=x_labels)
-		acfx = acfx.assign(**flattened_acfxs)
+		xs_all = ndindex_as_array(shape=lengths)
+		acfx = DataFrame({
+			**{ x_labels[i]: xs_all[:, i] for i in range(D) },
+			**flattened_acfxs
+		})														
+		del xs_all
 		pbar.update(D)
+	del x_labels
 
 	# temporal autocorrelation, i.e. time series signals
 	t_loc = col_pos("t")
@@ -141,18 +112,28 @@ def compute_acf(df: DataFrame, pbar: tqdm):
 		# Assumption: ts and associated signals are in order
 		step = ts[1] - ts[0]  # Assumption: regular sampling period
 
-		acfts = { "t": list(range(0, n * step, step)) }
+		acfts = {}
+		tau_ints = {}  # also compute the \tau_int "integrated autocorrelation" sequence of partial sums for each temporal signal
 		for col in df.columns[t_loc + 1:x_loc]:
 			signal = df[col]
 			if all(signal.notna().to_numpy() == ts_notna):  # skip columns that are inconsistent with column "t"
 				signal = signal.dropna().to_numpy()
 
 				# compute normalized autocorrelation signal for this signal
-				acfts[col] = acf(signal)
+				signal = acf(signal)
+				acfts[col] = signal
+ 
+				# compute integrated autocorrelation as sequence of partial sums
+				tau_ints[f"int({col})"] = step * (0.5 + np.cumsum(signal) - signal[0])
 			pbar.update(1)
 
 		# convert to DataFrame where each row is a temporal coordinate, t, followed by an associated batch of samples
-		acft = DataFrame(acfts)
+		acft = DataFrame({
+			"t": list(range(0, n * step, step)),
+			**acfts,
+			"i": list(range(n)),
+			**tau_ints
+		})
 		pbar.update(1)
 
 	# sync pbar in case of missing t or x section
@@ -170,22 +151,35 @@ def process_file(in_path: Path) -> str|None:
 		if file_type == ".csv":
 			if in_path.stem[:-1].endswith(".acf"):
 				return f"Ignoring .acf file: {in_path.name}."
+			
 			df = read_csv(in_path)
+
 			acft, acfx = compute_acf(df, pbar)
+
 			if acft is not None:  acft.to_csv(in_path.with_suffix(".acft.csv"), index=False)
+			del acft
 			pbar.update(1)
+
 			if acfx is not None:  acfx.to_csv(in_path.with_suffix(".acfx.csv"), index=False)
+			del acfx
 			pbar.update(1)
+
 			return None
 
 		if file_type == ".xlsx":
 			df = read_excel(in_path)  # TODO: loop sheets?
+
 			acft, acfx = compute_acf(df, pbar)
+
 			with ExcelWriter(in_path, engine="openpyxl", mode="a", if_sheet_exists="replace") as writer:
 				if acft is not None:  acft.to_excel(writer, sheet_name="acft (Autocorrelation, Temporal)", index=False)
+				del acft
 				pbar.update(1)
+
 				if acfx is not None:  acfx.to_excel(writer, sheet_name="acfx (Autocorrelation, Spacial)" , index=False)
+				del acfx
 				pbar.update(1)
+			
 			return None
 
 		# else:
