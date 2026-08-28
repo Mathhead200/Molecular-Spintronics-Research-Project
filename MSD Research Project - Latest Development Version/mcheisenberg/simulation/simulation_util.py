@@ -214,7 +214,6 @@ class Arrangeable:
 	def __dtype__(self) -> type:
 		return None  # default impl.
 	
-	@property
 	def values(self, out: NDArray=None) -> NDArray:
 		raise NotImplementedError("abstract")
 

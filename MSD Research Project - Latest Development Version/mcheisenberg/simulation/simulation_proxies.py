@@ -167,20 +167,57 @@ def _history_filter(sim: Simulation, param: str, key: int|slice|tuple) -> Iterab
 class HistoryProxy[H](NumericProxy[int, int|slice|tuple, H]):
 	_data: Simulation
 
-	def __init__(self, data: DataViewWrapper, sim_name: str, evaluate: Callable[[Snapshot], H]):
+	def __init__(self, data: DataViewWrapper, sim_name: str, shape: Callable[[int], tuple], evaluate: Callable[[Snapshot], H]):
 		if not hasattr(data, "history"):  # if not isinstance(data, Simulation):
 			raise ValueError(f"History only exists for Simulations: {type(data)}")
 		super().__init__(data, sim_name, elements=ordered_set(data.history), filter=_history_filter)
+		self._shape = shape
 		self._evaluate = evaluate
 	
 	@override
 	@property
 	def value(self) -> H:
 		if len(self._elements) != 1:
-			raise ValueError(f"History can not be evaluated unless fully specified: len(indices)={len(self._elements)}")
+			# raise ValueError(f"Use .values() -- History can not be evaluated unless fully specified: len(indices)={len(self._elements)}\n")
+			return self.values()
 		t = next(iter(self._elements))  # self._elements may not be any Collection type (e.g. ordered_set)
 		return self._evaluate(self._data.history[t])
 
+	@override
+	def values(self, out: NDArray=None) -> NDArray:
+		timestamps = self._elements
+		if out is None:
+			out = np.empty(self._shape(len(timestamps)), dtype=float)
+		for idx, t in enumerate(timestamps):
+			out[idx] = self._evaluate(self._data.history[t])
+		return out
+
+	def array(self, out: NDArray=None) -> NDArray:
+		"""
+		Similar to values(), but always returns a 2D matrix who's first column
+		contain all the timestamps, t[i], associated with each value.
+		"""
+
+		timestamps = self._elements
+		shape = self._shape(len(timestamps))
+		_2D = len(shape) > 1
+		if out is None:
+			rows = shape[0]
+			cols = shape[1] + 1 if _2D else 2
+			out = np.empty((rows, cols), dtype=float)
+		
+		if _2D:
+			def store(idx, value): out[idx][1:] = value
+		else:
+			assert len(shape) == 1  # must be 1D (i.e. scalar evaluation)
+			def store(idx, value): out[idx][1] = value
+		
+		for idx, t in enumerate(timestamps):
+			out[idx][0] = t  # let numpy cast t to float
+			store(idx, self._evaluate(self._data.history[t]))
+		
+		return out
+	
 class Historical[H]:
 	@property
 	def history(self) -> HistoryProxy[H]:
@@ -199,8 +236,8 @@ class ParameterProxy[E: Node|Edge, K: Node|Edge|Region|ERegion, V: numpy_vec|flo
 		param: str,
 		elements: Collection[E],
 		filter: Filter,
-		to_sim: Callable[[R_out], V],     # for getting simulation value from runtime
-		to_rt: Callable[[V], R_in],       # for updating runtime value from simualtion
+		to_sim: Callable[[R_out], V],  # for getting simulation value from runtime
+		to_rt: Callable[[V], R_in],    # for updating runtime value from simualtion
 		shape: Callable[[int], tuple]  # for values shape (given len(_elements))
 	):
 		super().__init__(data, param, elements, filter)
@@ -259,24 +296,27 @@ class ParameterProxy[E: Node|Edge, K: Node|Edge|Region|ERegion, V: numpy_vec|flo
 	@override
 	@property
 	def history(self) -> HistoryProxy[V]:
-		return HistoryProxy(self._data, self._name, lambda snapshot: self._get_consistant_value(snapshot))
+		return HistoryProxy(self._data, self._name, self._shape, lambda snapshot: self._get_consistant_value(snapshot))
 
+
+SHAPE_1D = lambda n: (n,)
+SHAPE_2D = lambda n: (n, 3)
 
 class VectorNodeParameterProxy(ParameterProxy[Node, Node|Region, numpy_vec, vec_in, vec_out], Vector):
 	def __init__(self, sim: Simulation, param: str):
-		super().__init__(sim, param, elements=sim.nodes, filter=_node_filter, to_sim=simvec, to_rt=rtvec, shape=lambda n: (n, 3))
+		super().__init__(sim, param, elements=sim.nodes, filter=_node_filter, to_sim=simvec, to_rt=rtvec, shape=SHAPE_2D)
 
 class ScalarNodeParameterProxy(ParameterProxy[Node, Node|Region, float, scal_in, scal_out], Scalar):
 	def __init__(self, sim: Simulation, param: str):
-		super().__init__(sim, param, elements=sim.nodes, filter=_node_filter, to_sim=simscal, to_rt=rtscal, shape=lambda n: (n,))
+		super().__init__(sim, param, elements=sim.nodes, filter=_node_filter, to_sim=simscal, to_rt=rtscal, shape=SHAPE_1D)
 
 class VectorEdgeParameterProxy(ParameterProxy[Edge, Edge|ERegion, numpy_vec, vec_in, vec_out], Vector):
 	def __init__(self, sim: Simulation, param: str):
-		super().__init__(sim, param, elements=sim.edges, filter=_edge_filter, to_sim=simvec, to_rt=rtvec, shape=lambda n: (n, 3))
+		super().__init__(sim, param, elements=sim.edges, filter=_edge_filter, to_sim=simvec, to_rt=rtvec, shape=SHAPE_2D)
 
 class ScalarEdgeParameterProxy(ParameterProxy[Edge, Edge|ERegion, float, scal_in, scal_out], Scalar):
 	def __init__(self, sim: Simulation, param: str):
-		super().__init__(sim, param, elements=sim.edges, filter=_edge_filter, to_sim=simscal, to_rt=rtscal, shape=lambda n: (n,))
+		super().__init__(sim, param, elements=sim.edges, filter=_edge_filter, to_sim=simscal, to_rt=rtscal, shape=SHAPE_1D)
 
 
 def _sum(proxy: Proxy, snapshot: Snapshot):
@@ -287,7 +327,7 @@ class SumProxy[E, K, H](HistoricalNumericProxy[E, K, H]):
 	@override
 	@property
 	def history(self) -> HistoryProxy[numpy_vec]:
-		return HistoryProxy(self._data, self._name, lambda snapshot: _sum(self, snapshot))
+		return HistoryProxy(self._data, self._name, SHAPE_2D, lambda snapshot: _sum(self, snapshot))
 
 # For spin and flux
 class StateProxy(SumProxy[Node, Node|Region, numpy_vec], Vector):
@@ -386,7 +426,7 @@ class NProxy(HistoricalNumericProxy[Node|Edge, Node|Edge|Region|ERegion, int], I
 	@property
 	def history(self) -> HistoryProxy[int]:
 		# n can't change over time
-		return HistoryProxy(self._data, self._name, lambda snapshot: self.value)
+		return HistoryProxy(self._data, self._name, SHAPE_1D, lambda snapshot: self.value)
 
 
 class UTypeProxy(NumericProxy[Node|Edge|Parameter, Node|Edge|Region|ERegion|Parameter, float], Scalar):
@@ -562,7 +602,7 @@ class UProxy(UTypeProxy, Historical[float]):
 	@override
 	@property
 	def history(self) -> HistoryProxy[float]:
-		return HistoryProxy(self._data, self._name, lambda snapshot: float(_sum(self, snapshot)))  # float(...) converts numpy float to python float
+		return HistoryProxy(self._data, self._name, SHAPE_1D, lambda snapshot: float(_sum(self, snapshot)))  # float(...) converts numpy float to python float (TODO: Why?)
 
 # TODO: revisit these! I don't know if they are correct.
 class CProxy(UTypeProxy):

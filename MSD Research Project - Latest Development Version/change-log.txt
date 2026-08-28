@@ -246,6 +246,7 @@ Second bug fix. In MSD::setParameters()
 
 7.1.1:
 (8-20-2026) Fixed bug in config.py::compile. Temp files now deleted even on error.
+(8-24-2026) Added .values() and .array() to HistoryProxy
 TODO: Fix NaN energy bug in iterate!!
 
 ------------------------------------ TODOs ------------------------------------
