@@ -4,8 +4,8 @@ randomize = True
 # Seed for pseudo-random number generator. (One or more numbers. Omit for unique seeds.)
 # seed = 200
 
-simCount = 10000000000
-freq = 1000000
+simCount = 150000000
+freq = 10000
 
 # dimensions of bounding box
 width  = 11

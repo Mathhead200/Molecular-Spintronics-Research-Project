@@ -3,15 +3,17 @@ from mcheisenberg.models import AsymmetricTwoLayerMSD, OuterLayer_, InnerLayer_
 from mcheisenberg.io import CSV
 from mcheisenberg.util import report_date
 
-simCount = 10_000_000_000
-freq = 1_000_000
+simCount = 100_000_000
+freq = 10_000
 x0 = 0
+A0 = 0.005
+J01 = 0.1
 
 if __name__ == "__main__":
 	msd = AsymmetricTwoLayerMSD(11, 10, 10, 5, 5, 3, 6, 3, 6, x0)
 	msd.globalParameters[kT_] = 0.1
-	msd.regionNodeParameters[OuterLayer_] = { "A": (0.005, 0, 0) }
-	msd.regionEdgeParameters[OuterLayer_, InnerLayer_]["J"] = 0.1
+	msd.regionNodeParameters[OuterLayer_] = { "A": (A0, 0, 0) }
+	msd.regionEdgeParameters[OuterLayer_, InnerLayer_]["J"] = J01
 
 	with msd.compile(tool=VisualStudio(2022)) as rt:
 		sim = Simulation(rt)

@@ -249,6 +249,7 @@ Second bug fix. In MSD::setParameters()
 (8-24-2026) Added .values() and .array() to HistoryProxy
 (8-27-2026) Created autocorrelation app which processes entire ~/out directory and generates both temporal and spatial autocorrelation files.
 	The autocorrelation is normalized, but biased.
+(8-28-2026) autocorrelation now computes cumulative integrated autocorrelation time for temporal (acft) signal.
 TODO: Fix NaN energy bug in iterate!!
 
 ------------------------------------ TODOs ------------------------------------
