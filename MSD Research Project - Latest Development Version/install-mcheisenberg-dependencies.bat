@@ -5,12 +5,12 @@ rem Must install python (add to PATH)
 rem used in runtime_executors.py, and some apps
 pip install psutil
 
-rem Used extensively in the simulation sub-package. Also a dependancy for any apps using pandas.
+rem Used extensively in the simulation sub-package. Also numpy is a dependancy for any apps using pandas.
 pip install numpy
 pip install tqdm
 
-rem TODO: used in plot sub-package
-rem TODO: matplotlib
+rem used in plot sub-package
+pip install matplotlib
 
 rem For build_ln which uses remez, also some apps
 pip install scipy
