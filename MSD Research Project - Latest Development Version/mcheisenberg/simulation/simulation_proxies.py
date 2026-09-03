@@ -238,13 +238,17 @@ class ParameterProxy[E: Node|Edge, K: Node|Edge|Region|ERegion, V: numpy_vec|flo
 		filter: Filter,
 		to_sim: Callable[[R_out], V],  # for getting simulation value from runtime
 		to_rt: Callable[[V], R_in],    # for updating runtime value from simualtion
-		shape: Callable[[int], tuple]  # for values shape (given len(_elements))
+		shape: Callable[[int], tuple],  # for values shape (given len(_elements))
+		keys_cols: int,                     # number of columns needed for keys
+		keys_array: Callable[[], NDArray]]  # either DataViewWrapper.nodes_array or DataViewWrapper.edges_array
 	):
 		super().__init__(data, param, elements, filter)
 		self._runtime_proxy = getattr(data.view, param)  # Returned proxy should be const(-esk). Get once and store.
 		self._to_sim = to_sim
 		self._to_rt = to_rt
 		self._shape = shape
+		self._keys_cols = keys_cols
+		self._keys_array = keys_array
 	
 	@property
 	def _key(self) -> K:
@@ -272,8 +276,7 @@ class ParameterProxy[E: Node|Edge, K: Node|Edge|Region|ERegion, V: numpy_vec|flo
 		if self._parent is None:
 			values = self._data._ready_cache.get(self._name, None)
 			if values is not None:
-				# TODO: augment array
-				return self._data.nodes_array() (augment) values
+				return values  # Note: out is not used/modified in this case
 		keys = self._elements
 		# Don't bother using the buffer if we are in a sub-proxy since it's more
 		#	work to build the dict then to just read these values from memory directly.
@@ -289,13 +292,19 @@ class ParameterProxy[E: Node|Edge, K: Node|Edge|Region|ERegion, V: numpy_vec|flo
 		Similar to values(), but always returns a 2D matrix who's first three columns
 		contain all the coordinates, x[i], y[i], z[i], associated with each value.
 		"""
+		keys = self._elements
+		if out is None:
+			rows, value_cols = self._shape(len(keys))
+			out = np.empty(shape=(rows, self._key_cols + value_cols), dtype=np.result_type(self._data._array_dtype, float))
 		if self._parent is None:
 			values = self._data._ready_cache.get(self._name, None)
 			if values is not None:
-				return keys | values  # TODO
+				out[:, :self._keys_cols] = self._keys_array
+				out[:, self._keys_cols:] = values
+				return out
 		# Don't bother using the buffer if we are in a sub-proxy since it's more
 		#	work to build the dict then to just read these values from memory directly.
-		keys = self._elements
+		# TODO: ...
 	
 	def _get_consistant_value(self, snapshot: Snapshot) -> V:
 		result = None

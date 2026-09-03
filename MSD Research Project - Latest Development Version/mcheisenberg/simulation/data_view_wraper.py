@@ -129,6 +129,14 @@ class DataViewWrapper[T=Driver|MutableStateBuffer]:
 
 		self._nodes_array = None  # lazy constuction
 		self._edges_array = None
+		try:
+			node = next(iter(self.nodes))  # first node used as representative
+		except StopIteration:
+			node = None
+		can_expand = all(isinstance(node, T) for T in [Sized, Iterable])
+		self._array_rows = len(self.nodes)
+		self._array_cols = len(node) if can_expand else 1  # double for edges
+		self._array_dtype = type( next(iter(node)) if can_expand else node )
 
 	def ready(self, *params: Parameter) -> None:
 		"""
@@ -178,27 +186,25 @@ class DataViewWrapper[T=Driver|MutableStateBuffer]:
 			will contain len(nodes[i]) columns. Otherwise, the array will contain 1 column.
 		"""
 		if self._nodes_array is None:
-			nodes = self.nodes
-			first_node = next(iter(nodes))
-			can_expand = all(isinstance(first_node, T) for T in [Sized, Iterable])
-
-			rows = len(nodes)
-			cols = len(first_node) if can_expand else 1
-			dtype = type( next(iter(first_node)) if can_expand else first_node )
-
-			array = np.empty(shape=(rows, cols), dtype=dtype)
-			for i, node in enumerate(nodes):
+			array = np.empty(shape=(self._array_rows, self._array_cols), dtype=self._array_dtype)
+			for i, node in enumerate(self.nodes):
 				array[i] = node  # raises exception if node can not be broadcast into array[i] (i.e. ragged nodes array)
-
 			self._nodes_array = array  # cache only after initialization is complete to avoid setting invalid empty array on error
-		
 		return self._nodes_array
 
 	def edges_array(self) -> NDArray:
-		""" TODO """
+		"""
+		Returns the ordered set of edges as a numpy array.
+			If the nodes are a Sized Iterable (e.g. tuple(x, y, z)), the array
+			will contain 2 * len(nodes[i]) columns. Otherwise, the array will contain 2 column.
+		"""
 		if self._edges_array is None:
-			pass  # TODO: ... 
-
+			cols = self._array_cols
+			array = np.empty(shape=(self._array_rows, 2 * cols), dtype=self._array_dtype)
+			for i, (node0, node1) in enumerate(self.edges):
+				array[i, :cols] = node0
+				array[i, cols:] = node1
+			self._edges_array = array
 		return self._edges_array
 
 	def __getitem__(self, attr: str):
