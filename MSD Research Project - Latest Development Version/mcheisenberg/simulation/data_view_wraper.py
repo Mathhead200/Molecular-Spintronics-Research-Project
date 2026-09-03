@@ -3,13 +3,13 @@ from ..runtime import DataView
 from ..util import ordered_set, ReadOnlyOrderedSet, ReadOnlyDict, PARAMETERS
 from .simulation_proxies import *
 from .from_config import from_config
+from collections.abc import Sized, Iterable
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
 	from ..driver import Driver
 	from ..runtime import MutableStateBuffer
 	from .from_config import GrowableBuffer
 	from .simulation_util import Parameter
-	from collections.abc import Iterable
 	from numpy.typing import NDArray
 
 STATES = ordered_set(["n", "s", "f", "m", "u"])
@@ -104,7 +104,7 @@ class DataViewWrapper[T=Driver|MutableStateBuffer]:
 
 		config_data = from_config(view.config)  # employs caching
 		for attr in config_data.__slots__:
-			setattr(self, attr, getattr(config_data, attr))  # e.g. self._nodes = config_data.nodes; etc.
+			setattr(self, attr, getattr(config_data, attr))  # e.g. self.nodes = config_data.nodes; etc.
 
 		# proxies
 		for param in ["A", "B", "dB"]:
@@ -126,6 +126,9 @@ class DataViewWrapper[T=Driver|MutableStateBuffer]:
 			setattr(buf, attr, getattr(config_data, f"buf_{attr}"))  # e.g. buf.mat_node = config_data.buf_mat_node; etc.
 		self._ready_buffers = buf
 		self._ready_cache: dict[Parameter, NDArray] = {}
+
+		self._nodes_array = None  # lazy constuction
+		self._edges_array = None
 
 	def ready(self, *params: Parameter) -> None:
 		"""
@@ -167,6 +170,29 @@ class DataViewWrapper[T=Driver|MutableStateBuffer]:
 					del cache[p]
 
 	# @properties added below: Simulation.s, .f, .m, .u, .n, .J, .B, etc.
+
+	def nodes_array(self) -> NDArray:
+		"""
+		Returns the ordered set of nodeds as a numpy array.
+			If the nodes are a Sized Iterable (e.g. tuple(x, y, z)), the array
+			will contain len(nodes[i]) columns. Otherwise, the array will contain 1 column.
+		"""
+		if self._nodes_array is None:
+			nodes = self.nodes
+			first_node = next(iter(nodes))
+			can_expand = all(isinstance(first_node, T) for T in [Sized, Iterable])
+
+			rows = len(nodes)
+			cols = len(first_node) if can_expand else 1
+			dtype = type( next(iter(first_node)) if can_expand else first_node )
+
+			array = np.empty(shape=(rows, cols), dtype=dtype)
+			for i, node in enumerate(nodes):
+				array[i] = node  # raises exception if node can not be broadcast into array[i] (i.e. ragged nodes array)
+
+			self._nodes_array = array  # cache only after initialization is complete to avoid setting invalid empty array on error
+		
+		return self._nodes_array
 
 	def __getitem__(self, attr: str):
 		if attr not in ALL_PROXIES:
