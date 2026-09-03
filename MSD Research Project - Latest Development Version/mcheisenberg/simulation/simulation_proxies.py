@@ -272,7 +272,8 @@ class ParameterProxy[E: Node|Edge, K: Node|Edge|Region|ERegion, V: numpy_vec|flo
 		if self._parent is None:
 			values = self._data._ready_cache.get(self._name, None)
 			if values is not None:
-				return values  # Note: out is not used/modified in this case
+				# TODO: augment array
+				return self._data.nodes_array() (augment) values
 		keys = self._elements
 		# Don't bother using the buffer if we are in a sub-proxy since it's more
 		#	work to build the dict then to just read these values from memory directly.
@@ -282,6 +283,19 @@ class ParameterProxy[E: Node|Edge, K: Node|Edge|Region|ERegion, V: numpy_vec|flo
 		for idx, key in enumerate(keys):
 			self._to_sim(self._runtime_proxy[key], out=(out[idx] if _mat else out[idx:idx+1]))
 		return out
+
+	def array(self, out: NDArray=None) -> NDArray:
+		"""
+		Similar to values(), but always returns a 2D matrix who's first three columns
+		contain all the coordinates, x[i], y[i], z[i], associated with each value.
+		"""
+		if self._parent is None:
+			values = self._data._ready_cache.get(self._name, None)
+			if values is not None:
+				return keys | values  # TODO
+		# Don't bother using the buffer if we are in a sub-proxy since it's more
+		#	work to build the dict then to just read these values from memory directly.
+		keys = self._elements
 	
 	def _get_consistant_value(self, snapshot: Snapshot) -> V:
 		result = None

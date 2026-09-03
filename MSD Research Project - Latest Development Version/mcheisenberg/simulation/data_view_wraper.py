@@ -194,6 +194,13 @@ class DataViewWrapper[T=Driver|MutableStateBuffer]:
 		
 		return self._nodes_array
 
+	def edges_array(self) -> NDArray:
+		""" TODO """
+		if self._edges_array is None:
+			pass  # TODO: ... 
+
+		return self._edges_array
+
 	def __getitem__(self, attr: str):
 		if attr not in ALL_PROXIES:
 			raise KeyError(f"{attr} is an unrecognized parameter or state")
