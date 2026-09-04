@@ -251,6 +251,7 @@ Second bug fix. In MSD::setParameters()
 	The autocorrelation is normalized, but biased.
 (8-28-2026) autocorrelation now computes cumulative integrated autocorrelation time for temporal (acft) signal.
 (9-4-2026) Maybe fixed problem with NaN energy being caused by NaN parameter values.
+	plot3D working!
 # TODO: sim.u.values() is now working, but something is causing NaN durring sum when calling .value
 
 ------------------------------------ TODOs ------------------------------------
