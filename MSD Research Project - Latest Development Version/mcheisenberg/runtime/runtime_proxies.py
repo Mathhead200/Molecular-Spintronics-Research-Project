@@ -447,6 +447,13 @@ class StateListProxy(AbstractReadableDict):
 
 # Acts like the global parameter when used as a value, but allows the lookup
 #	for local/region parameters via __getitem__/__setitem__.
+#
+# Resolves hierarchically. e.g. runtime.J[a, b] for (a, b) in runtime.edges
+#	First check if (a, b) is a defined edge with a defined J.
+#	If it's not, next check if (a, b) in defined in any regions with defined J's.
+#		If J is defined in multiple regions containing (a, b), make sure they stay consistant. e.g.
+#		Can't modify this region parameter since it would create an inconsistancy.
+#	Lastly, if (a, b) is not defined at the region level, check if it's defined globally.
 class ParameterProxy:
 	def __init__(self, data: DataView, param: str):
 		self._data = data
@@ -468,29 +475,51 @@ class ParameterProxy:
 		param = self.name
 		data = self._data
 		config = data.config
-		if param in config.localNodeParameters.get(key, {}):
-			return getattr(data.node[key], param)
-		if param in config.localEdgeParameters.get(key, {}):
-			return getattr(data.edge[key], param)
-		if param in config.regionNodeParameters.get(key, {}):
-			return getattr(data.region[key], param)
-		if param in config.regionEdgeParameters.get(key, {}):
-			return getattr(data.eregion[key], param)
-		return self.value  # global parameter
+		if key in config.nodeIndex:
+			if param in config.localNodeParameters.get(key, {}):
+				return getattr(data.node[key], param)
+			for region in config.getRegions(key):
+				if param in config.regionNodeParameters.get(region, {}):
+					return getattr(data.region[region], param)  # use any of the available regions since they must be consistent
+			return self.value  # global
+		if key in config.edges:
+			if param in config.localEdgeParameters.get(key, {}):
+				return getattr(data.edge[key], param)
+			for eregion in config.getRegionCombos(key):
+				if param in config.regionEdgeParameters.get(eregion, {}):
+					return getattr(data.eregion[eregion], param)  # use any of the available eregions since they must be consistent
+			return self.value  # global
+		if key in config.regions:
+			if param in config.regionNodeParameters.get(key, {}):
+				return getattr(data.region[key], param)
+			return self.value  # global
+		if key in config.regionCombos:
+			if param in config.regionEdgeParameters.get(key, {}):
+				return getattr(data.eregion[key], param)
+			return self.value  # global
+		raise KeyError(f"Unrecognized as node, edge, region, or edge-region: {key}")
 
 	def __setitem__(self, key, value) -> None:
 		param = self.name
 		data = self._data
 		config = data.config
-		if param in config.localNodeParameters.get(key, {}):
+		if key in config.nodeIndex:
+			# if param in config.localNodeParameters.get(key, {}):
 			return setattr(data.node[key], param, value)
-		if param in config.localEdgeParameters.get(key, {}):
+			# raise ValueError(f"{param} is not defined at the local level for node: {key}")
+		if key in config.edgeIndex:
+			# if param in config.localEdgeParameters.get(key, {}):
 			return setattr(data.edge[key], param, value)
-		if param in config.regionNodeParameters.get(key, {}):
+			# raise ValueError(f"{param} is not defined at the local level for edge: {key}")
+		if key in config.regions:
+			# if param in config.regionNodeParameters.get(key, {}):
 			return setattr(data.region[key], param, value)
-		if param in config.regionEdgeParameters.get(key, {}):
+			# raise ValueError(f"{param} is not defined for region: {key}")
+		if key in config.regionCombos:
+			# if param in config.regionEdgeParameters.get(key, {}):
 			return setattr(data.eregion[key], param, value)
-		raise KeyError(f"Parameter {param} is not defined for (node, edge, region, or edge-region) {key}")
+			# raise ValueError(f"{param} is not defined for edge-region: {key}")
+		raise KeyError(f"Unrecognized as node, edge, region, or edge-region: {key}")
 	
 	def __str__(self) -> str:  return str(self.value)
 	def __repr__(self) -> str: return repr(self.value)

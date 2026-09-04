@@ -106,6 +106,11 @@ class DataViewWrapper[T=Driver|MutableStateBuffer]:
 		for attr in config_data.__slots__:
 			setattr(self, attr, getattr(config_data, attr))  # e.g. self.nodes = config_data.nodes; etc.
 
+		self._nodes_array = np.array(self.view.nodes)
+		self._edges_array = np.array(self.view.edges)
+		if self._nodes_array.ndim > 1:
+			self._edges_array = self._edges_array.reshape(-1, 2 * self._nodes_array.shape[1])
+
 		# proxies
 		for param in ["A", "B", "dB"]:
 			setattr(self, f"_{param}_proxy", VectorNodeParameterProxy(self, param))
@@ -126,17 +131,6 @@ class DataViewWrapper[T=Driver|MutableStateBuffer]:
 			setattr(buf, attr, getattr(config_data, f"buf_{attr}"))  # e.g. buf.mat_node = config_data.buf_mat_node; etc.
 		self._ready_buffers = buf
 		self._ready_cache: dict[Parameter, NDArray] = {}
-
-		self._nodes_array = None  # lazy constuction
-		self._edges_array = None
-		try:
-			node = next(iter(self.nodes))  # first node used as representative
-		except StopIteration:
-			node = None
-		can_expand = all(isinstance(node, T) for T in [Sized, Iterable])
-		self._array_rows = len(self.nodes)
-		self._array_cols = len(node) if can_expand else 1  # double for edges
-		self._array_dtype = type( next(iter(node)) if can_expand else node )
 
 	def ready(self, *params: Parameter) -> None:
 		"""
@@ -179,32 +173,12 @@ class DataViewWrapper[T=Driver|MutableStateBuffer]:
 
 	# @properties added below: Simulation.s, .f, .m, .u, .n, .J, .B, etc.
 
-	def nodes_array(self) -> NDArray:
-		"""
-		Returns the ordered set of nodeds as a numpy array.
-			If the nodes are a Sized Iterable (e.g. tuple(x, y, z)), the array
-			will contain len(nodes[i]) columns. Otherwise, the array will contain 1 column.
-		"""
-		if self._nodes_array is None:
-			array = np.empty(shape=(self._array_rows, self._array_cols), dtype=self._array_dtype)
-			for i, node in enumerate(self.nodes):
-				array[i] = node  # raises exception if node can not be broadcast into array[i] (i.e. ragged nodes array)
-			self._nodes_array = array  # cache only after initialization is complete to avoid setting invalid empty array on error
+	@property
+	def nodes_array(self):
 		return self._nodes_array
 
-	def edges_array(self) -> NDArray:
-		"""
-		Returns the ordered set of edges as a numpy array.
-			If the nodes are a Sized Iterable (e.g. tuple(x, y, z)), the array
-			will contain 2 * len(nodes[i]) columns. Otherwise, the array will contain 2 column.
-		"""
-		if self._edges_array is None:
-			cols = self._array_cols
-			array = np.empty(shape=(self._array_rows, 2 * cols), dtype=self._array_dtype)
-			for i, (node0, node1) in enumerate(self.edges):
-				array[i, :cols] = node0
-				array[i, cols:] = node1
-			self._edges_array = array
+	@property
+	def edges_array(self):
 		return self._edges_array
 
 	def __getitem__(self, attr: str):

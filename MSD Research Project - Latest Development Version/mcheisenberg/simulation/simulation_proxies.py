@@ -226,6 +226,23 @@ class Historical[H]:
 class HistoricalNumericProxy[E, K, V](NumericProxy[E, K, V], Historical[V]):  pass
 
 
+def _build_kv_array(proxy: NumericProxy, V: int, keys_array: NDArray, v_dtype: type, out: NDArray) -> NDArray:
+	"""
+	Similar to values(), but always returns a 2D matrix who's first columns
+	contain all the coordinates, e.g. x[i], y[i], z[i], associated with each value.
+	See: DataViewWrapper.nodes_array / edges_array
+	"""
+	N = len(proxy._elements)
+	K = keys_array.shape[1]
+	if out is None:
+		out = np.empty(shape=(N, K+V), dtype=np.result_type(keys_array.dtype, v_dtype))
+	if proxy._parent is not None:
+		keys_array = np.array(proxy._elements).reshape(N, K)  # can't use cache
+	out[0:N, 0:K] = keys_array
+	proxy.values(out[0:N, K:K+V])
+	return out
+
+
 # Proxy for parameters, e.g. J, B, kT, n, etc. Parameters do not aggrigate like
 #	"states", e.g. n, s, f, m, u. Instead they access location specific
 #	information, e.g. J["FML"] would get the J value used in region "FML", and
@@ -239,15 +256,13 @@ class ParameterProxy[E: Node|Edge, K: Node|Edge|Region|ERegion, V: numpy_vec|flo
 		to_sim: Callable[[R_out], V],  # for getting simulation value from runtime
 		to_rt: Callable[[V], R_in],    # for updating runtime value from simualtion
 		shape: Callable[[int], tuple],  # for values shape (given len(_elements))
-		keys_cols: int,                     # number of columns needed for keys
-		keys_array: Callable[[], NDArray]]  # either DataViewWrapper.nodes_array or DataViewWrapper.edges_array
+		keys_array: NDArray,  # either DataViewWrapper.nodes_array or DataViewWrapper.edges_array
 	):
 		super().__init__(data, param, elements, filter)
 		self._runtime_proxy = getattr(data.view, param)  # Returned proxy should be const(-esk). Get once and store.
 		self._to_sim = to_sim
 		self._to_rt = to_rt
 		self._shape = shape
-		self._keys_cols = keys_cols
 		self._keys_array = keys_array
 	
 	@property
@@ -272,7 +287,7 @@ class ParameterProxy[E: Node|Edge, K: Node|Edge|Region|ERegion, V: numpy_vec|flo
 			self._runtime_proxy[self._key] = value
 	
 	@override
-	def values(self, out: NDArray) -> NDArray:
+	def values(self, out: NDArray=None) -> NDArray:
 		if self._parent is None:
 			values = self._data._ready_cache.get(self._name, None)
 			if values is not None:
@@ -286,25 +301,6 @@ class ParameterProxy[E: Node|Edge, K: Node|Edge|Region|ERegion, V: numpy_vec|flo
 		for idx, key in enumerate(keys):
 			self._to_sim(self._runtime_proxy[key], out=(out[idx] if _mat else out[idx:idx+1]))
 		return out
-
-	def array(self, out: NDArray=None) -> NDArray:
-		"""
-		Similar to values(), but always returns a 2D matrix who's first three columns
-		contain all the coordinates, x[i], y[i], z[i], associated with each value.
-		"""
-		keys = self._elements
-		if out is None:
-			rows, value_cols = self._shape(len(keys))
-			out = np.empty(shape=(rows, self._key_cols + value_cols), dtype=np.result_type(self._data._array_dtype, float))
-		if self._parent is None:
-			values = self._data._ready_cache.get(self._name, None)
-			if values is not None:
-				out[:, :self._keys_cols] = self._keys_array
-				out[:, self._keys_cols:] = values
-				return out
-		# Don't bother using the buffer if we are in a sub-proxy since it's more
-		#	work to build the dict then to just read these values from memory directly.
-		# TODO: ...
 	
 	def _get_consistant_value(self, snapshot: Snapshot) -> V:
 		result = None
@@ -315,6 +311,17 @@ class ParameterProxy[E: Node|Edge, K: Node|Edge|Region|ERegion, V: numpy_vec|flo
 			elif result != value:  # for global or region selections, make sure all values are equal
 				raise KeyError(f"Parameter {self._name} is not consistant across selection from subscript [{self._subscripts}]")
 		return result
+
+	def array(self, out: NDArray=None) -> NDArray:
+		"""
+		Similar to values(), but always returns a 2D matrix who's first columns
+		contain all the coordinates, e.g. x[i], y[i], z[i], associated with each value.
+		See: DataViewWrapper.nodes_array / edges_array
+		"""
+		keys = self._elements
+		shape = self._shape(len(keys))
+		N, V = shape if len(shape) > 1 else (shape[0], 1)
+		return _build_kv_array(self, V, self._keys_array, float, out)
 	
 	@override
 	@property
@@ -327,19 +334,19 @@ SHAPE_2D = lambda n: (n, 3)
 
 class VectorNodeParameterProxy(ParameterProxy[Node, Node|Region, numpy_vec, vec_in, vec_out], Vector):
 	def __init__(self, sim: Simulation, param: str):
-		super().__init__(sim, param, elements=sim.nodes, filter=_node_filter, to_sim=simvec, to_rt=rtvec, shape=SHAPE_2D)
+		super().__init__(sim, param, elements=sim.nodes, filter=_node_filter, to_sim=simvec, to_rt=rtvec, shape=SHAPE_2D, keys_array=sim.nodes_array)
 
 class ScalarNodeParameterProxy(ParameterProxy[Node, Node|Region, float, scal_in, scal_out], Scalar):
 	def __init__(self, sim: Simulation, param: str):
-		super().__init__(sim, param, elements=sim.nodes, filter=_node_filter, to_sim=simscal, to_rt=rtscal, shape=SHAPE_1D)
+		super().__init__(sim, param, elements=sim.nodes, filter=_node_filter, to_sim=simscal, to_rt=rtscal, shape=SHAPE_1D, keys_array=sim.nodes_array)
 
 class VectorEdgeParameterProxy(ParameterProxy[Edge, Edge|ERegion, numpy_vec, vec_in, vec_out], Vector):
 	def __init__(self, sim: Simulation, param: str):
-		super().__init__(sim, param, elements=sim.edges, filter=_edge_filter, to_sim=simvec, to_rt=rtvec, shape=SHAPE_2D)
+		super().__init__(sim, param, elements=sim.edges, filter=_edge_filter, to_sim=simvec, to_rt=rtvec, shape=SHAPE_2D, keys_array=sim.edges_array)
 
 class ScalarEdgeParameterProxy(ParameterProxy[Edge, Edge|ERegion, float, scal_in, scal_out], Scalar):
 	def __init__(self, sim: Simulation, param: str):
-		super().__init__(sim, param, elements=sim.edges, filter=_edge_filter, to_sim=simscal, to_rt=rtscal, shape=SHAPE_1D)
+		super().__init__(sim, param, elements=sim.edges, filter=_edge_filter, to_sim=simscal, to_rt=rtscal, shape=SHAPE_1D, keys_array=sim.edges_array)
 
 
 def _sum(proxy: Proxy, snapshot: Snapshot):
@@ -389,6 +396,9 @@ class StateProxy(SumProxy[Node, Node|Region, numpy_vec], Vector):
 			simvec(self._runtime_proxy[i], out=out[idx])  # copy rt values directly into row view of pre-allocated output matrix
 		return out
 
+	def array(self, out: NDArray=None) -> NDArray:
+		return _build_kv_array(self, 3, self._data.nodes_array, float, out)
+
 class MProxy(SumProxy[Node, Node|Region, numpy_vec], Vector):
 	def __init__(self, data: DataViewWrapper, sim_name: str="m"):
 		super().__init__(data, sim_name, elements=data.nodes, filter=_node_filter)
@@ -422,6 +432,9 @@ class MProxy(SumProxy[Node, Node|Region, numpy_vec], Vector):
 		if f is None:  f = data.f.sub(nodes).values(data._ready_buffers.mat_node[:len(nodes)])
 		return np.add(s, f, out=out)
 
+	def array(self, out: NDArray=None) -> NDArray:
+		return _build_kv_array(self, 3, self._data.nodes_array, float, out)
+
 # Number of nodes in selection
 class NProxy(HistoricalNumericProxy[Node|Edge, Node|Edge|Region|ERegion, int], IInt):
 	def __init__(self, data: DataViewWrapper, sim_name: str="n"):
@@ -450,6 +463,9 @@ class NProxy(HistoricalNumericProxy[Node|Edge, Node|Edge|Region|ERegion, int], I
 	def history(self) -> HistoryProxy[int]:
 		# n can't change over time
 		return HistoryProxy(self._data, self._name, SHAPE_1D, lambda snapshot: self.value)
+
+	# def array(self, out: NDArray=None) -> NDArray:
+	#	TODO: same issue as U where we might need sperate nodes, and edges versions
 
 
 class UTypeProxy(NumericProxy[Node|Edge|Parameter, Node|Edge|Region|ERegion|Parameter, float], Scalar):
@@ -621,6 +637,11 @@ class UProxy(UTypeProxy, Historical[float]):
 				out[N:L] -= dot(D, np.cross(m_i, m_j), temp=buf_mat)
 
 		return out
+
+	# def array(self, out: NDArray=None) -> NDArray:
+	#	TODO: nodes and edges have different format for data. Handle this in implementation, or split into two
+	#	_build_kv_array(self.sub(sim.nodes), ...)
+	#	_build_kv_array(self.sub(sim.edges), ...)
 	
 	@override
 	@property

@@ -279,6 +279,8 @@ class Config:
 
 	def getRegions(self, node) -> list:
 		""" Get the list of all regions containing this node. May be empty list []. """
+		# TODO: Optimize. This function is now used by the runtime as well.
+		#	subnodes data structure is not nessesarily optimized for the "in" operation.
 		return [label for label, subnodes in self.regions.items() if node in subnodes]
 	
 	def getRegionCombos(self, edge) -> list:

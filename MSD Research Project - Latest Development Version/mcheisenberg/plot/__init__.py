@@ -1,4 +1,3 @@
-from matplotlib.cm import ColormapRegistry
 import matplotlib.pyplot as plt
 import numpy as np
 from pathlib import Path
@@ -35,7 +34,7 @@ def plot3D(data: NDArray, ind: int=3, dep: int=1, cmap=DEFAULT_CMAP, size: float
 		magnitudes = np.sqrt(sum(vec**2 for vec in uvw))
 		vmin, vmax = np.min(magnitudes), np.max(magnitudes)  # shortest and longest vectors
 		lerp = plt.Normalize(vmin, vmax)  # lineral interpolation
-		colors = ColormapRegistry.get_cmap(cmap)(lerp(magnitudes))   # TODO: is this right?
+		colors = plt.get_cmap(cmap)(lerp(magnitudes))   # TODO: is this right?
 		plot.quiver(*xyz, *uvw, colors=colors, length=size / vmax, normalize=False)
 
 	# save as file
