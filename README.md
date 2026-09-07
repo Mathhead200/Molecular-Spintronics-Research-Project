@@ -54,3 +54,4 @@ Version history (see ~/change-log.txt for more details):
 (1-4-2024) Version 6.3.0 Created HTTP Server to run simulations concurrently  
 (3-5-2026) Version 7.0.0 mcheisenberg Python/x64 rebuild  
 (7-1-2026) Version 7.1.0 Added dB and dkT, and fixed bug
+(9-7-2026) Version 7.1.1 Fixes u NaN bug, adds autocorrelation (app), plot3D, and AsymmetricTwoLayerMSD

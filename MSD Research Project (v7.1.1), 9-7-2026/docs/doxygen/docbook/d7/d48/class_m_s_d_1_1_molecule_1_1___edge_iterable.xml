@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_class_m_s_d_1_1_molecule_1_1___edge_iterable" xml:lang="en-US">
+<title>MSD.Molecule._EdgeIterable Class Reference</title>
+<indexterm><primary>MSD.Molecule._EdgeIterable</primary></indexterm>
+<para>
+
+<para>Represents an iterable collection of molecule edges. </para>
+ 
+</para>
+<simplesect>
+    <title>Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_molecule_1_1___edge_iterable_1a605393c96e6609c864cfc22c5d76a525">__init__</link> (self, <link linkend="_class_m_s_d_1_1_molecule_1a9f39385fd994d8ed25c77703263e8a31">edges</link>)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_molecule_1_1___edge_iterable_1a83ab806392ca4b176318bbce228d6e3b">__del__</link> (self)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_molecule_1_1___edge_iterable_1a3ebaad07fdd8d3c0bbd29199b1d48167">__iter__</link> (self)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_molecule_1_1___edge_iterable_1ac036139df4e304e4923a48d3eb02e1d0">__reversed__</link> (self)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_molecule_1_1___edge_iterable_1a8399949b981a3ff9686c3b794606d12c">__len__</link> (self)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_molecule_1_1___edge_iterable_1a1fc0d647a78a24cd30a35e4a2fde4c0b">__getitem__</link> (self, index)</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Properties    </title>
+        <itemizedlist>
+            <listitem><para><link linkend="_class_m_s_d_1_1_molecule_1_1___edge_iterable_1a6f61a3060f8d17ccda6deaea9bf5b919">begin</link> = property(fget = lambda self: <link linkend="_class_m_s_d_1_1_molecule_1_1___edge">Molecule._Edge</link>(iterable = self))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_molecule_1_1___edge_iterable_1a27d7056e02499e050d41779111a696dd">end</link> = property(fget = lambda self: <link linkend="_class_m_s_d_1_1_molecule_1_1___edge">Molecule._Edge</link>(iterable = self, start = (self._end, len(self))))</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Detailed Description</title>
+
+<para>Represents an iterable collection of molecule edges. </para>
+
+
+
+<para>Do not construct directly! Should be constructed using <link linkend="_class_m_s_d_1_1_molecule">Molecule</link> methods/properties, namely: <link linkend="_class_m_s_d_1_1_molecule_1a9f39385fd994d8ed25c77703263e8a31">Molecule.edges</link> and <link linkend="_class_m_s_d_1_1_molecule_1a3a171b9340edf8212a9261b1126770e3">Molecule.getAdjacencyList()</link> </para>
+</section>
+<section>
+<title>Constructor &amp; Destructor Documentation</title>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___edge_iterable_1a605393c96e6609c864cfc22c5d76a525"/><section>
+    <title>__init__()</title>
+<indexterm><primary>__init__</primary><secondary>MSD.Molecule._EdgeIterable</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._EdgeIterable</primary><secondary>__init__</secondary></indexterm>
+<para><computeroutput>def MSD.Molecule._EdgeIterable.__init__ ( self,  edges)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___edge_iterable_1a83ab806392ca4b176318bbce228d6e3b"/><section>
+    <title>__del__()</title>
+<indexterm><primary>__del__</primary><secondary>MSD.Molecule._EdgeIterable</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._EdgeIterable</primary><secondary>__del__</secondary></indexterm>
+<para><computeroutput>def MSD.Molecule._EdgeIterable.__del__ ( self)</computeroutput></para></section>
+</section>
+<section>
+<title>Member Function Documentation</title>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___edge_iterable_1a1fc0d647a78a24cd30a35e4a2fde4c0b"/><section>
+    <title>__getitem__()</title>
+<indexterm><primary>__getitem__</primary><secondary>MSD.Molecule._EdgeIterable</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._EdgeIterable</primary><secondary>__getitem__</secondary></indexterm>
+<para><computeroutput>def MSD.Molecule._EdgeIterable.__getitem__ ( self,  index)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___edge_iterable_1a3ebaad07fdd8d3c0bbd29199b1d48167"/><section>
+    <title>__iter__()</title>
+<indexterm><primary>__iter__</primary><secondary>MSD.Molecule._EdgeIterable</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._EdgeIterable</primary><secondary>__iter__</secondary></indexterm>
+<para><computeroutput>def MSD.Molecule._EdgeIterable.__iter__ ( self)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___edge_iterable_1a8399949b981a3ff9686c3b794606d12c"/><section>
+    <title>__len__()</title>
+<indexterm><primary>__len__</primary><secondary>MSD.Molecule._EdgeIterable</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._EdgeIterable</primary><secondary>__len__</secondary></indexterm>
+<para><computeroutput>def MSD.Molecule._EdgeIterable.__len__ ( self)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___edge_iterable_1ac036139df4e304e4923a48d3eb02e1d0"/><section>
+    <title>__reversed__()</title>
+<indexterm><primary>__reversed__</primary><secondary>MSD.Molecule._EdgeIterable</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._EdgeIterable</primary><secondary>__reversed__</secondary></indexterm>
+<para><computeroutput>def MSD.Molecule._EdgeIterable.__reversed__ ( self)</computeroutput></para></section>
+</section>
+<section>
+<title>Property Documentation</title>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___edge_iterable_1a6f61a3060f8d17ccda6deaea9bf5b919"/><section>
+    <title>begin</title>
+<indexterm><primary>begin</primary><secondary>MSD.Molecule._EdgeIterable</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._EdgeIterable</primary><secondary>begin</secondary></indexterm>
+<para><computeroutput>MSD.Molecule._EdgeIterable.begin = property(fget = lambda self: <link linkend="_class_m_s_d_1_1_molecule_1_1___edge">Molecule._Edge</link>(iterable = self))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___edge_iterable_1a27d7056e02499e050d41779111a696dd"/><section>
+    <title>end</title>
+<indexterm><primary>end</primary><secondary>MSD.Molecule._EdgeIterable</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._EdgeIterable</primary><secondary>end</secondary></indexterm>
+<para><computeroutput>MSD.Molecule._EdgeIterable.end = property(fget = lambda self: <link linkend="_class_m_s_d_1_1_molecule_1_1___edge">Molecule._Edge</link>(iterable = self, start = (self._end, len(self))))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<para>
+The documentation for this class was generated from the following file:</para>
+C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/lib/python/<link linkend="__m_s_d_8py">MSD.py</link></section>
+</section>

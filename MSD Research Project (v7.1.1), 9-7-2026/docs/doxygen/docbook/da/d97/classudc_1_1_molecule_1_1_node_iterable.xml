@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_classudc_1_1_molecule_1_1_node_iterable" xml:lang="en-US">
+<title>udc::Molecule::NodeIterable Class Reference</title>
+<indexterm><primary>udc::Molecule::NodeIterable</primary></indexterm>
+<para>
+<computeroutput>#include &lt;MSD.h&gt;</computeroutput>
+</para>
+<simplesect>
+    <title>Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para><link linkend="_classudc_1_1_molecule_1_1_node_iterator">NodeIterator</link> <link linkend="_classudc_1_1_molecule_1_1_node_iterable_1a93ca9f19d78899a40883db494030f979">begin</link> () const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_molecule_1_1_node_iterator">NodeIterator</link> <link linkend="_classudc_1_1_molecule_1_1_node_iterable_1a767f322c4ff11ee1186d25c7b7f9cbba">end</link> () const</para>
+</listitem>
+            <listitem><para>unsigned int <link linkend="_classudc_1_1_molecule_1_1_node_iterable_1ac011c126be9e17781413d20b3a948a80">size</link> () const</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Friends    </title>
+        <itemizedlist>
+            <listitem><para>class <link linkend="_classudc_1_1_molecule_1_1_node_iterable_1ae0d120b8bbafe454abebd374e2402082">Molecule</link></para>
+</listitem>
+            <listitem><para>class <link linkend="_classudc_1_1_molecule_1_1_node_iterable_1ac5a1d2c6036b7ba1894a7c3b8d96a312">NodeIterator</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Member Function Documentation</title>
+<anchor xml:id="_classudc_1_1_molecule_1_1_node_iterable_1a93ca9f19d78899a40883db494030f979"/><section>
+    <title>begin()</title>
+<indexterm><primary>begin</primary><secondary>udc::Molecule::NodeIterable</secondary></indexterm>
+<indexterm><primary>udc::Molecule::NodeIterable</primary><secondary>begin</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_molecule_1_1_node_iterator">Molecule::NodeIterator</link> udc::Molecule::NodeIterable::begin ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1_1_node_iterable_1a767f322c4ff11ee1186d25c7b7f9cbba"/><section>
+    <title>end()</title>
+<indexterm><primary>end</primary><secondary>udc::Molecule::NodeIterable</secondary></indexterm>
+<indexterm><primary>udc::Molecule::NodeIterable</primary><secondary>end</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_molecule_1_1_node_iterator">Molecule::NodeIterator</link> udc::Molecule::NodeIterable::end ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1_1_node_iterable_1ac011c126be9e17781413d20b3a948a80"/><section>
+    <title>size()</title>
+<indexterm><primary>size</primary><secondary>udc::Molecule::NodeIterable</secondary></indexterm>
+<indexterm><primary>udc::Molecule::NodeIterable</primary><secondary>size</secondary></indexterm>
+<para><computeroutput>unsigned int udc::Molecule::NodeIterable::size ( ) const</computeroutput></para></section>
+</section>
+<section>
+<title>Friends And Related Function Documentation</title>
+<anchor xml:id="_classudc_1_1_molecule_1_1_node_iterable_1ae0d120b8bbafe454abebd374e2402082"/><section>
+    <title>Molecule</title>
+<indexterm><primary>Molecule</primary><secondary>udc::Molecule::NodeIterable</secondary></indexterm>
+<indexterm><primary>udc::Molecule::NodeIterable</primary><secondary>Molecule</secondary></indexterm>
+<para><computeroutput>friend class <link linkend="_classudc_1_1_molecule">Molecule</link><computeroutput>[friend]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_molecule_1_1_node_iterable_1ac5a1d2c6036b7ba1894a7c3b8d96a312"/><section>
+    <title>NodeIterator</title>
+<indexterm><primary>NodeIterator</primary><secondary>udc::Molecule::NodeIterable</secondary></indexterm>
+<indexterm><primary>udc::Molecule::NodeIterable</primary><secondary>NodeIterator</secondary></indexterm>
+<para><computeroutput>friend class <link linkend="_classudc_1_1_molecule_1_1_node_iterator">NodeIterator</link><computeroutput>[friend]</computeroutput></computeroutput></para></section>
+<para>
+The documentation for this class was generated from the following file:</para>
+C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/src/<link linkend="__m_s_d_8h">MSD.h</link></section>
+</section>

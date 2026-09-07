@@ -1,0 +1,201 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_classudc_1_1_m_s_d_1_1_iterator" xml:lang="en-US">
+<title>udc::MSD::Iterator Class Reference</title>
+<indexterm><primary>udc::MSD::Iterator</primary></indexterm>
+<para>
+<computeroutput>#include &lt;MSD.h&gt;</computeroutput>
+</para>
+<simplesect>
+    <title>Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para>unsigned int <link linkend="_classudc_1_1_m_s_d_1_1_iterator_1a8ad36deb75ea34c351470a210dc5f8df">getIndex</link> () const</para>
+</listitem>
+            <listitem><para>unsigned int <link linkend="_classudc_1_1_m_s_d_1_1_iterator_1aff3d00d1f3d3abc57ab3e1708f22046e">getX</link> () const</para>
+</listitem>
+            <listitem><para>unsigned int <link linkend="_classudc_1_1_m_s_d_1_1_iterator_1a74a04cdef90898fe9ecac8fe91a67cec">getY</link> () const</para>
+</listitem>
+            <listitem><para>unsigned int <link linkend="_classudc_1_1_m_s_d_1_1_iterator_1a6b7cdba16db28e6b16dbf1f60361a83b">getZ</link> () const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_m_s_d_1_1_iterator_1afea68bb7dba79b2747964d9d1d52cdfe">getSpin</link> () const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_m_s_d_1_1_iterator_1abd996192129eb23f7679d731bb831e08">getFlux</link> () const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_m_s_d_1_1_iterator_1a8c8ea6d938c5e7497e26d36bd603c7b3">getLocalM</link> () const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_m_s_d_1_1_iterator_1abb6e962e7a330c8a6deb53b4af1a33eb">operator*</link> () const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_m_s_d_1_1_iterator_1a9d84bb256488be2f19c519c1edc94bf2">operator[]</link> (int) const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_m_s_d_1_1_iterator_1af0350276abbd1b17b8bf1e2b8d41f05a">operator unsigned int</link> () const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_m_s_d_1_1_iterator">Iterator</link> &amp; <link linkend="_classudc_1_1_m_s_d_1_1_iterator_1aa2acdacfb5a3b245e86d52caf6ccee5b">operator++</link> ()</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_m_s_d_1_1_iterator">Iterator</link> <link linkend="_classudc_1_1_m_s_d_1_1_iterator_1a467d4aee65da91546a9a91e9e7d63d29">operator++</link> (int)</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_m_s_d_1_1_iterator">Iterator</link> &amp; <link linkend="_classudc_1_1_m_s_d_1_1_iterator_1a9b7068af2426eff599c7898cc556d80c">operator--</link> ()</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_m_s_d_1_1_iterator">Iterator</link> <link linkend="_classudc_1_1_m_s_d_1_1_iterator_1abdd2b47851c5593a0cab01750004bcdf">operator--</link> (int)</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_m_s_d_1_1_iterator">Iterator</link> &amp; <link linkend="_classudc_1_1_m_s_d_1_1_iterator_1ae6a30558ca84c5c83e220f5f565c9337">operator+=</link> (int)</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_m_s_d_1_1_iterator">Iterator</link> &amp; <link linkend="_classudc_1_1_m_s_d_1_1_iterator_1ae815a105b76ecd74ffbca42059dd66d5">operator-=</link> (int)</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_m_s_d_1_1_iterator">Iterator</link> <link linkend="_classudc_1_1_m_s_d_1_1_iterator_1a36610ced86cca4e0b20b3cae881bc949">operator+</link> (int) const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_m_s_d_1_1_iterator">Iterator</link> <link linkend="_classudc_1_1_m_s_d_1_1_iterator_1ad552ff63add04ee2f65ce2b635c82a3f">operator-</link> (int) const</para>
+</listitem>
+            <listitem><para>bool <link linkend="_classudc_1_1_m_s_d_1_1_iterator_1aa5f4db2e3ab06026529de54a9c22b7a4">operator==</link> (const <link linkend="_classudc_1_1_m_s_d_1_1_iterator">Iterator</link> &amp;) const</para>
+</listitem>
+            <listitem><para>bool <link linkend="_classudc_1_1_m_s_d_1_1_iterator_1abfe94ce7e6d750efea5d32a705fe3cd3">operator!=</link> (const <link linkend="_classudc_1_1_m_s_d_1_1_iterator">Iterator</link> &amp;) const</para>
+</listitem>
+            <listitem><para>bool <link linkend="_classudc_1_1_m_s_d_1_1_iterator_1a066d2acce9354012cdbf70dcc7b4cc99">operator&gt;</link> (const <link linkend="_classudc_1_1_m_s_d_1_1_iterator">Iterator</link> &amp;) const</para>
+</listitem>
+            <listitem><para>bool <link linkend="_classudc_1_1_m_s_d_1_1_iterator_1aa1571de940e3cd6061568b26f6fd27c8">operator&lt;</link> (const <link linkend="_classudc_1_1_m_s_d_1_1_iterator">Iterator</link> &amp;) const</para>
+</listitem>
+            <listitem><para>bool <link linkend="_classudc_1_1_m_s_d_1_1_iterator_1a62aed3f164b19a1581de95ddee11cde9">operator&gt;=</link> (const <link linkend="_classudc_1_1_m_s_d_1_1_iterator">Iterator</link> &amp;) const</para>
+</listitem>
+            <listitem><para>bool <link linkend="_classudc_1_1_m_s_d_1_1_iterator_1a7c6a05177dd8932f7baa9aa441a59096">operator&lt;=</link> (const <link linkend="_classudc_1_1_m_s_d_1_1_iterator">Iterator</link> &amp;) const</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Friends    </title>
+        <itemizedlist>
+            <listitem><para>class <link linkend="_classudc_1_1_m_s_d_1_1_iterator_1ae07ea2a91e156116726c0b3533020fdb">MSD</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Member Function Documentation</title>
+<anchor xml:id="_classudc_1_1_m_s_d_1_1_iterator_1abd996192129eb23f7679d731bb831e08"/><section>
+    <title>getFlux()</title>
+<indexterm><primary>getFlux</primary><secondary>udc::MSD::Iterator</secondary></indexterm>
+<indexterm><primary>udc::MSD::Iterator</primary><secondary>getFlux</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::Iterator::getFlux ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1_1_iterator_1a8ad36deb75ea34c351470a210dc5f8df"/><section>
+    <title>getIndex()</title>
+<indexterm><primary>getIndex</primary><secondary>udc::MSD::Iterator</secondary></indexterm>
+<indexterm><primary>udc::MSD::Iterator</primary><secondary>getIndex</secondary></indexterm>
+<para><computeroutput>unsigned int udc::MSD::Iterator::getIndex ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1_1_iterator_1a8c8ea6d938c5e7497e26d36bd603c7b3"/><section>
+    <title>getLocalM()</title>
+<indexterm><primary>getLocalM</primary><secondary>udc::MSD::Iterator</secondary></indexterm>
+<indexterm><primary>udc::MSD::Iterator</primary><secondary>getLocalM</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::Iterator::getLocalM ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1_1_iterator_1afea68bb7dba79b2747964d9d1d52cdfe"/><section>
+    <title>getSpin()</title>
+<indexterm><primary>getSpin</primary><secondary>udc::MSD::Iterator</secondary></indexterm>
+<indexterm><primary>udc::MSD::Iterator</primary><secondary>getSpin</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::Iterator::getSpin ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1_1_iterator_1aff3d00d1f3d3abc57ab3e1708f22046e"/><section>
+    <title>getX()</title>
+<indexterm><primary>getX</primary><secondary>udc::MSD::Iterator</secondary></indexterm>
+<indexterm><primary>udc::MSD::Iterator</primary><secondary>getX</secondary></indexterm>
+<para><computeroutput>unsigned int udc::MSD::Iterator::getX ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1_1_iterator_1a74a04cdef90898fe9ecac8fe91a67cec"/><section>
+    <title>getY()</title>
+<indexterm><primary>getY</primary><secondary>udc::MSD::Iterator</secondary></indexterm>
+<indexterm><primary>udc::MSD::Iterator</primary><secondary>getY</secondary></indexterm>
+<para><computeroutput>unsigned int udc::MSD::Iterator::getY ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1_1_iterator_1a6b7cdba16db28e6b16dbf1f60361a83b"/><section>
+    <title>getZ()</title>
+<indexterm><primary>getZ</primary><secondary>udc::MSD::Iterator</secondary></indexterm>
+<indexterm><primary>udc::MSD::Iterator</primary><secondary>getZ</secondary></indexterm>
+<para><computeroutput>unsigned int udc::MSD::Iterator::getZ ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1_1_iterator_1af0350276abbd1b17b8bf1e2b8d41f05a"/><section>
+    <title>operator unsigned int()</title>
+<indexterm><primary>operator unsigned int</primary><secondary>udc::MSD::Iterator</secondary></indexterm>
+<indexterm><primary>udc::MSD::Iterator</primary><secondary>operator unsigned int</secondary></indexterm>
+<para><computeroutput>udc::MSD::Iterator::operator unsigned int ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1_1_iterator_1abfe94ce7e6d750efea5d32a705fe3cd3"/><section>
+    <title>operator!=()</title>
+<indexterm><primary>operator!=</primary><secondary>udc::MSD::Iterator</secondary></indexterm>
+<indexterm><primary>udc::MSD::Iterator</primary><secondary>operator!=</secondary></indexterm>
+<para><computeroutput>bool udc::MSD::Iterator::operator!= (const <link linkend="_classudc_1_1_m_s_d_1_1_iterator">Iterator</link> &amp; iter) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1_1_iterator_1abb6e962e7a330c8a6deb53b4af1a33eb"/><section>
+    <title>operator*()</title>
+<indexterm><primary>operator*</primary><secondary>udc::MSD::Iterator</secondary></indexterm>
+<indexterm><primary>udc::MSD::Iterator</primary><secondary>operator*</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::Iterator::operator* ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1_1_iterator_1a36610ced86cca4e0b20b3cae881bc949"/><section>
+    <title>operator+()</title>
+<indexterm><primary>operator+</primary><secondary>udc::MSD::Iterator</secondary></indexterm>
+<indexterm><primary>udc::MSD::Iterator</primary><secondary>operator+</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_m_s_d_1_1_iterator">MSD::Iterator</link> udc::MSD::Iterator::operator+ (int n) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1_1_iterator_1aa2acdacfb5a3b245e86d52caf6ccee5b"/><section>
+    <title>operator++()<computeroutput>[1/2]</computeroutput></title>
+<indexterm><primary>operator++</primary><secondary>udc::MSD::Iterator</secondary></indexterm>
+<indexterm><primary>udc::MSD::Iterator</primary><secondary>operator++</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_m_s_d_1_1_iterator">MSD::Iterator</link> &amp; udc::MSD::Iterator::operator++ ( )</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1_1_iterator_1a467d4aee65da91546a9a91e9e7d63d29"/><section>
+    <title>operator++()<computeroutput>[2/2]</computeroutput></title>
+<indexterm><primary>operator++</primary><secondary>udc::MSD::Iterator</secondary></indexterm>
+<indexterm><primary>udc::MSD::Iterator</primary><secondary>operator++</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_m_s_d_1_1_iterator">MSD::Iterator</link> udc::MSD::Iterator::operator++ (int )</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1_1_iterator_1ae6a30558ca84c5c83e220f5f565c9337"/><section>
+    <title>operator+=()</title>
+<indexterm><primary>operator+=</primary><secondary>udc::MSD::Iterator</secondary></indexterm>
+<indexterm><primary>udc::MSD::Iterator</primary><secondary>operator+=</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_m_s_d_1_1_iterator">MSD::Iterator</link> &amp; udc::MSD::Iterator::operator+= (int n)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1_1_iterator_1ad552ff63add04ee2f65ce2b635c82a3f"/><section>
+    <title>operator-()</title>
+<indexterm><primary>operator-</primary><secondary>udc::MSD::Iterator</secondary></indexterm>
+<indexterm><primary>udc::MSD::Iterator</primary><secondary>operator-</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_m_s_d_1_1_iterator">MSD::Iterator</link> udc::MSD::Iterator::operator- (int n) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1_1_iterator_1a9b7068af2426eff599c7898cc556d80c"/><section>
+    <title>operator--()<computeroutput>[1/2]</computeroutput></title>
+<indexterm><primary>operator--</primary><secondary>udc::MSD::Iterator</secondary></indexterm>
+<indexterm><primary>udc::MSD::Iterator</primary><secondary>operator--</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_m_s_d_1_1_iterator">MSD::Iterator</link> &amp; udc::MSD::Iterator::operator-- ( )</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1_1_iterator_1abdd2b47851c5593a0cab01750004bcdf"/><section>
+    <title>operator--()<computeroutput>[2/2]</computeroutput></title>
+<indexterm><primary>operator--</primary><secondary>udc::MSD::Iterator</secondary></indexterm>
+<indexterm><primary>udc::MSD::Iterator</primary><secondary>operator--</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_m_s_d_1_1_iterator">MSD::Iterator</link> udc::MSD::Iterator::operator-- (int )</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1_1_iterator_1ae815a105b76ecd74ffbca42059dd66d5"/><section>
+    <title>operator-=()</title>
+<indexterm><primary>operator-=</primary><secondary>udc::MSD::Iterator</secondary></indexterm>
+<indexterm><primary>udc::MSD::Iterator</primary><secondary>operator-=</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_m_s_d_1_1_iterator">MSD::Iterator</link> &amp; udc::MSD::Iterator::operator-= (int n)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1_1_iterator_1aa1571de940e3cd6061568b26f6fd27c8"/><section>
+    <title>operator&lt;()</title>
+<indexterm><primary>operator&lt;</primary><secondary>udc::MSD::Iterator</secondary></indexterm>
+<indexterm><primary>udc::MSD::Iterator</primary><secondary>operator&lt;</secondary></indexterm>
+<para><computeroutput>bool udc::MSD::Iterator::operator&lt; (const <link linkend="_classudc_1_1_m_s_d_1_1_iterator">Iterator</link> &amp; iter) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1_1_iterator_1a7c6a05177dd8932f7baa9aa441a59096"/><section>
+    <title>operator&lt;=()</title>
+<indexterm><primary>operator&lt;=</primary><secondary>udc::MSD::Iterator</secondary></indexterm>
+<indexterm><primary>udc::MSD::Iterator</primary><secondary>operator&lt;=</secondary></indexterm>
+<para><computeroutput>bool udc::MSD::Iterator::operator&lt;= (const <link linkend="_classudc_1_1_m_s_d_1_1_iterator">Iterator</link> &amp; iter) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1_1_iterator_1aa5f4db2e3ab06026529de54a9c22b7a4"/><section>
+    <title>operator==()</title>
+<indexterm><primary>operator==</primary><secondary>udc::MSD::Iterator</secondary></indexterm>
+<indexterm><primary>udc::MSD::Iterator</primary><secondary>operator==</secondary></indexterm>
+<para><computeroutput>bool udc::MSD::Iterator::operator== (const <link linkend="_classudc_1_1_m_s_d_1_1_iterator">Iterator</link> &amp; iter) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1_1_iterator_1a066d2acce9354012cdbf70dcc7b4cc99"/><section>
+    <title>operator&gt;()</title>
+<indexterm><primary>operator&gt;</primary><secondary>udc::MSD::Iterator</secondary></indexterm>
+<indexterm><primary>udc::MSD::Iterator</primary><secondary>operator&gt;</secondary></indexterm>
+<para><computeroutput>bool udc::MSD::Iterator::operator&gt; (const <link linkend="_classudc_1_1_m_s_d_1_1_iterator">Iterator</link> &amp; iter) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1_1_iterator_1a62aed3f164b19a1581de95ddee11cde9"/><section>
+    <title>operator&gt;=()</title>
+<indexterm><primary>operator&gt;=</primary><secondary>udc::MSD::Iterator</secondary></indexterm>
+<indexterm><primary>udc::MSD::Iterator</primary><secondary>operator&gt;=</secondary></indexterm>
+<para><computeroutput>bool udc::MSD::Iterator::operator&gt;= (const <link linkend="_classudc_1_1_m_s_d_1_1_iterator">Iterator</link> &amp; iter) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_m_s_d_1_1_iterator_1a9d84bb256488be2f19c519c1edc94bf2"/><section>
+    <title>operator[]()</title>
+<indexterm><primary>operator[]</primary><secondary>udc::MSD::Iterator</secondary></indexterm>
+<indexterm><primary>udc::MSD::Iterator</primary><secondary>operator[]</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::Iterator::operator[] (int n) const</computeroutput></para></section>
+</section>
+<section>
+<title>Friends And Related Function Documentation</title>
+<anchor xml:id="_classudc_1_1_m_s_d_1_1_iterator_1ae07ea2a91e156116726c0b3533020fdb"/><section>
+    <title>MSD</title>
+<indexterm><primary>MSD</primary><secondary>udc::MSD::Iterator</secondary></indexterm>
+<indexterm><primary>udc::MSD::Iterator</primary><secondary>MSD</secondary></indexterm>
+<para><computeroutput>friend class <link linkend="_classudc_1_1_m_s_d">MSD</link><computeroutput>[friend]</computeroutput></computeroutput></para></section>
+<para>
+The documentation for this class was generated from the following file:</para>
+C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/src/<link linkend="__m_s_d_8h">MSD.h</link></section>
+</section>

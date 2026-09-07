@@ -1,0 +1,295 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_structudc_1_1_m_s_d_1_1_parameters" xml:lang="en-US">
+<title>udc::MSD::Parameters Struct Reference</title>
+<indexterm><primary>udc::MSD::Parameters</primary></indexterm>
+<para>
+<computeroutput>#include &lt;MSD.h&gt;</computeroutput>
+</para>
+<simplesect>
+    <title>Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para><link linkend="_structudc_1_1_m_s_d_1_1_parameters_1ad972cfd353c72aa28063ac74d9bed3cf">Parameters</link> ()</para>
+</listitem>
+            <listitem><para>bool <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1a7a0a0b93af506366c206f39a8adabfa9">operator==</link> (const <link linkend="_structudc_1_1_m_s_d_1_1_parameters">Parameters</link> &amp;) const</para>
+</listitem>
+            <listitem><para>bool <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1ae6d8e34b3fb5bf65b69b8fd7b870d71a">operator!=</link> (const <link linkend="_structudc_1_1_m_s_d_1_1_parameters">Parameters</link> &amp;) const</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Public Attributes    </title>
+        <itemizedlist>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1aea19a4bd6b6b630bb5255c6f3206d67d">kT</link></para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1a7df654a8138c850e64de4adea7c5776a">B</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1a9347bd5ecace963e09c974e2e6236f40">SL</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1aad0f4bd2d0ba9b01de8f6830b4d77f09">SR</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1a55712b42b9d9460519b2ffc4a24cdd96">FL</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1a3b84c7bdff2e5acbf7e2aee9f4f87380">FR</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1a4de534ffb37d66a609206ecfbc79a4a3">JL</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1a626eb888da1ae30b0fd04fd60bbf5b4a">JR</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1a570769f809bfc17b833b760025d54635">JmL</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1a11d9a80a263371635f53ad14232b7c10">JmR</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1a876665131291f40627d234de2636e7a5">JLR</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1a38fbdb6de5465d21767e5acdd70e4e46">Je0L</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1a0fd1a65ab83a4cfc0aed753762a71f1c">Je0R</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1adab3e0cfbf9f3c60b828d70e9a7853cd">Je1L</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1a1f5a1b2902f4152f4027c9a6d66546dd">Je1R</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1acf66b51f1494866fe609eabf57790989">Je1mL</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1a6357fcbf8fe7d799c10bb33853fe5fd7">Je1mR</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1afe51f061d0cda85616e3a04ecb34cb85">Je1LR</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1a01e7b66d243045c1253a7f2e8c70ab03">JeeL</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1a4d3e4c3b64dfded7ac1c07c45f71fb6e">JeeR</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1aed49e5aed77920be09b8323a0cee2781">JeemL</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1aa2775ee2661215984de3caf7832c0f13">JeemR</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1a316117cf75ee335416c34e938960b8a1">JeeLR</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1afe3cfa8886ebb734fbe817c8dd254d8f">bL</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1a9e807cec26c1219ef16f3e26f67a926a">bR</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1ac35c301b854f5d76621b39774776bf22">bmL</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1a0f4027af582ca01b7db0941641227ac5">bmR</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1a022b5b93636d04f81172635825796469">bLR</link></para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1a9d8c4ad2396d258736c0d5985feaca55">AL</link></para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1aa97373f0348686a6f2c1abbbf35aeb1a">AR</link></para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1af8bbfb0d4941170abb9cb20874d37177">DL</link></para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1a6c585701e1e89a881bbfe9d1eee5d64c">DR</link></para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1af0493729f1925de734f4d595643fa09f">DmL</link></para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1a2bf4786615f44fd118d255aa59bf8190">DmR</link></para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_structudc_1_1_m_s_d_1_1_parameters_1ab293ea7698715b6f29b0c0b007a85a4e">DLR</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Constructor &amp; Destructor Documentation</title>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1ad972cfd353c72aa28063ac74d9bed3cf"/><section>
+    <title>Parameters()</title>
+<indexterm><primary>Parameters</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>Parameters</secondary></indexterm>
+<para><computeroutput>udc::MSD::Parameters::Parameters ( )</computeroutput></para></section>
+</section>
+<section>
+<title>Member Function Documentation</title>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1ae6d8e34b3fb5bf65b69b8fd7b870d71a"/><section>
+    <title>operator!=()</title>
+<indexterm><primary>operator!=</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>operator!=</secondary></indexterm>
+<para><computeroutput>bool udc::MSD::Parameters::operator!= (const <link linkend="_structudc_1_1_m_s_d_1_1_parameters">Parameters</link> &amp; p) const</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1a7a0a0b93af506366c206f39a8adabfa9"/><section>
+    <title>operator==()</title>
+<indexterm><primary>operator==</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>operator==</secondary></indexterm>
+<para><computeroutput>bool udc::MSD::Parameters::operator== (const <link linkend="_structudc_1_1_m_s_d_1_1_parameters">Parameters</link> &amp; p) const</computeroutput></para></section>
+</section>
+<section>
+<title>Member Data Documentation</title>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1a9d8c4ad2396d258736c0d5985feaca55"/><section>
+    <title>AL</title>
+<indexterm><primary>AL</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>AL</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::Parameters::AL</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1aa97373f0348686a6f2c1abbbf35aeb1a"/><section>
+    <title>AR</title>
+<indexterm><primary>AR</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>AR</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::Parameters::AR</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1a7df654a8138c850e64de4adea7c5776a"/><section>
+    <title>B</title>
+<indexterm><primary>B</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>B</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::Parameters::B</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1afe3cfa8886ebb734fbe817c8dd254d8f"/><section>
+    <title>bL</title>
+<indexterm><primary>bL</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>bL</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Parameters::bL</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1a022b5b93636d04f81172635825796469"/><section>
+    <title>bLR</title>
+<indexterm><primary>bLR</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>bLR</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Parameters::bLR</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1ac35c301b854f5d76621b39774776bf22"/><section>
+    <title>bmL</title>
+<indexterm><primary>bmL</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>bmL</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Parameters::bmL</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1a0f4027af582ca01b7db0941641227ac5"/><section>
+    <title>bmR</title>
+<indexterm><primary>bmR</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>bmR</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Parameters::bmR</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1a9e807cec26c1219ef16f3e26f67a926a"/><section>
+    <title>bR</title>
+<indexterm><primary>bR</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>bR</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Parameters::bR</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1af8bbfb0d4941170abb9cb20874d37177"/><section>
+    <title>DL</title>
+<indexterm><primary>DL</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>DL</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::Parameters::DL</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1ab293ea7698715b6f29b0c0b007a85a4e"/><section>
+    <title>DLR</title>
+<indexterm><primary>DLR</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>DLR</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::Parameters::DLR</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1af0493729f1925de734f4d595643fa09f"/><section>
+    <title>DmL</title>
+<indexterm><primary>DmL</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>DmL</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::Parameters::DmL</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1a2bf4786615f44fd118d255aa59bf8190"/><section>
+    <title>DmR</title>
+<indexterm><primary>DmR</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>DmR</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::Parameters::DmR</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1a6c585701e1e89a881bbfe9d1eee5d64c"/><section>
+    <title>DR</title>
+<indexterm><primary>DR</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>DR</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::MSD::Parameters::DR</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1a55712b42b9d9460519b2ffc4a24cdd96"/><section>
+    <title>FL</title>
+<indexterm><primary>FL</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>FL</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Parameters::FL</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1a3b84c7bdff2e5acbf7e2aee9f4f87380"/><section>
+    <title>FR</title>
+<indexterm><primary>FR</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>FR</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Parameters::FR</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1a38fbdb6de5465d21767e5acdd70e4e46"/><section>
+    <title>Je0L</title>
+<indexterm><primary>Je0L</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>Je0L</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Parameters::Je0L</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1a0fd1a65ab83a4cfc0aed753762a71f1c"/><section>
+    <title>Je0R</title>
+<indexterm><primary>Je0R</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>Je0R</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Parameters::Je0R</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1adab3e0cfbf9f3c60b828d70e9a7853cd"/><section>
+    <title>Je1L</title>
+<indexterm><primary>Je1L</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>Je1L</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Parameters::Je1L</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1afe51f061d0cda85616e3a04ecb34cb85"/><section>
+    <title>Je1LR</title>
+<indexterm><primary>Je1LR</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>Je1LR</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Parameters::Je1LR</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1acf66b51f1494866fe609eabf57790989"/><section>
+    <title>Je1mL</title>
+<indexterm><primary>Je1mL</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>Je1mL</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Parameters::Je1mL</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1a6357fcbf8fe7d799c10bb33853fe5fd7"/><section>
+    <title>Je1mR</title>
+<indexterm><primary>Je1mR</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>Je1mR</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Parameters::Je1mR</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1a1f5a1b2902f4152f4027c9a6d66546dd"/><section>
+    <title>Je1R</title>
+<indexterm><primary>Je1R</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>Je1R</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Parameters::Je1R</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1a01e7b66d243045c1253a7f2e8c70ab03"/><section>
+    <title>JeeL</title>
+<indexterm><primary>JeeL</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>JeeL</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Parameters::JeeL</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1a316117cf75ee335416c34e938960b8a1"/><section>
+    <title>JeeLR</title>
+<indexterm><primary>JeeLR</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>JeeLR</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Parameters::JeeLR</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1aed49e5aed77920be09b8323a0cee2781"/><section>
+    <title>JeemL</title>
+<indexterm><primary>JeemL</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>JeemL</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Parameters::JeemL</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1aa2775ee2661215984de3caf7832c0f13"/><section>
+    <title>JeemR</title>
+<indexterm><primary>JeemR</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>JeemR</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Parameters::JeemR</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1a4d3e4c3b64dfded7ac1c07c45f71fb6e"/><section>
+    <title>JeeR</title>
+<indexterm><primary>JeeR</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>JeeR</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Parameters::JeeR</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1a4de534ffb37d66a609206ecfbc79a4a3"/><section>
+    <title>JL</title>
+<indexterm><primary>JL</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>JL</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Parameters::JL</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1a876665131291f40627d234de2636e7a5"/><section>
+    <title>JLR</title>
+<indexterm><primary>JLR</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>JLR</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Parameters::JLR</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1a570769f809bfc17b833b760025d54635"/><section>
+    <title>JmL</title>
+<indexterm><primary>JmL</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>JmL</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Parameters::JmL</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1a11d9a80a263371635f53ad14232b7c10"/><section>
+    <title>JmR</title>
+<indexterm><primary>JmR</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>JmR</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Parameters::JmR</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1a626eb888da1ae30b0fd04fd60bbf5b4a"/><section>
+    <title>JR</title>
+<indexterm><primary>JR</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>JR</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Parameters::JR</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1aea19a4bd6b6b630bb5255c6f3206d67d"/><section>
+    <title>kT</title>
+<indexterm><primary>kT</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>kT</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Parameters::kT</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1a9347bd5ecace963e09c974e2e6236f40"/><section>
+    <title>SL</title>
+<indexterm><primary>SL</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>SL</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Parameters::SL</computeroutput></para></section>
+<anchor xml:id="_structudc_1_1_m_s_d_1_1_parameters_1aad0f4bd2d0ba9b01de8f6830b4d77f09"/><section>
+    <title>SR</title>
+<indexterm><primary>SR</primary><secondary>udc::MSD::Parameters</secondary></indexterm>
+<indexterm><primary>udc::MSD::Parameters</primary><secondary>SR</secondary></indexterm>
+<para><computeroutput>double udc::MSD::Parameters::SR</computeroutput></para></section>
+<para>
+The documentation for this struct was generated from the following file:</para>
+C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/src/<link linkend="__m_s_d_8h">MSD.h</link></section>
+</section>

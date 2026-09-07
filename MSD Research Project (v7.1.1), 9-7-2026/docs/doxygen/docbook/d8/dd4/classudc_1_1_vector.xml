@@ -1,0 +1,291 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_classudc_1_1_vector" xml:lang="en-US">
+<title>udc::Vector Class Reference</title>
+<indexterm><primary>udc::Vector</primary></indexterm>
+<para>
+<computeroutput>#include &lt;Vector.h&gt;</computeroutput>
+</para>
+<simplesect>
+    <title>Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para><link linkend="_classudc_1_1_vector_1ae04c82f1475c537a4c31b2489e088134">Vector</link> (double <link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>, double <link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>, double <link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>)</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector_1a77d31b8c68c2b5cf617f055c89c32a61">Vector</link> (double <link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link>, double <link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link>)</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector_1a8c4d5f7db83f0cef1c07b4b42f78e0e3">Vector</link> ()</para>
+</listitem>
+            <listitem><para>double <link linkend="_classudc_1_1_vector_1a5c3eb6000799a6fc4756f029b9b67e98">normSq</link> () const</para>
+</listitem>
+            <listitem><para>double <link linkend="_classudc_1_1_vector_1ad0a32e923bceab96a3a1eb36b9cc5e3a">norm</link> () const</para>
+</listitem>
+            <listitem><para>double <link linkend="_classudc_1_1_vector_1aa8f4197da79290967d284765240a2551">theta</link> () const</para>
+</listitem>
+            <listitem><para>double <link linkend="_classudc_1_1_vector_1ad5b5e60153daf6afab0122028700ae2f">phi</link> () const</para>
+</listitem>
+            <listitem><para>bool <link linkend="_classudc_1_1_vector_1afadaf3cac73f92d1dc3a549a468a23f2">operator==</link> (const <link linkend="_classudc_1_1_vector">Vector</link> &amp;) const</para>
+</listitem>
+            <listitem><para>bool <link linkend="_classudc_1_1_vector_1aebb8fa9252c42fc1fe5a232f3bda3957">operator!=</link> (const <link linkend="_classudc_1_1_vector">Vector</link> &amp;) const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_vector_1a798f07e0b0e18f6a3171f6f4939ac065">operator+</link> (const <link linkend="_classudc_1_1_vector">Vector</link> &amp;) const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_vector_1a7447d65cc9637c6638fc2455b0b4aaeb">operator-</link> () const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_vector_1aa1903b4c2a0a4e06f009fd6876524972">operator-</link> (const <link linkend="_classudc_1_1_vector">Vector</link> &amp;) const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_vector_1a3158bde8e319b0e79a36b2ad7c775846">operator*</link> (double) const</para>
+</listitem>
+            <listitem><para>double <link linkend="_classudc_1_1_vector_1aa71524242cdda6c4154ee2cd35a670fe">operator*</link> (const <link linkend="_classudc_1_1_vector">Vector</link> &amp;) const</para>
+</listitem>
+            <listitem><para>double <link linkend="_classudc_1_1_vector_1a159fb5e0fc16d4acbe6fb1a62cdd401c">distanceSq</link> (const <link linkend="_classudc_1_1_vector">Vector</link> &amp;) const</para>
+</listitem>
+            <listitem><para>double <link linkend="_classudc_1_1_vector_1a881c949c7af45c78a3ef96169fa288de">distance</link> (const <link linkend="_classudc_1_1_vector">Vector</link> &amp;) const</para>
+</listitem>
+            <listitem><para>double <link linkend="_classudc_1_1_vector_1a9e68392b62678f54eb7ad7a21091dab7">dotProduct</link> (const <link linkend="_classudc_1_1_vector">Vector</link> &amp;) const</para>
+</listitem>
+            <listitem><para>double <link linkend="_classudc_1_1_vector_1a201525a4474e786eada5fe7243225230">angleBetween</link> (const <link linkend="_classudc_1_1_vector">Vector</link> &amp;) const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_vector_1a5e5018a08cc0c3988f7a47243943e530">crossProduct</link> (<link linkend="_classudc_1_1_vector">Vector</link> v) const</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> &amp; <link linkend="_classudc_1_1_vector_1a3dfb48ed1a5d372c126d770c4a99ba12">operator+=</link> (const <link linkend="_classudc_1_1_vector">Vector</link> &amp;)</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> &amp; <link linkend="_classudc_1_1_vector_1a8f044be5579888dc19c2754f3d436064">operator-=</link> (const <link linkend="_classudc_1_1_vector">Vector</link> &amp;)</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> &amp; <link linkend="_classudc_1_1_vector_1a35e41ab5ba8f980219e09eb8b164cb65">operator*=</link> (double)</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> &amp; <link linkend="_classudc_1_1_vector_1a470e0981589813bdb73d63fcdee26d30">negate</link> ()</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> &amp; <link linkend="_classudc_1_1_vector_1a1d615c52f81858b3d65fea669c2630d7">rotate</link> (double <link linkend="_classudc_1_1_vector_1aa8f4197da79290967d284765240a2551">theta</link>, double <link linkend="_classudc_1_1_vector_1ad5b5e60153daf6afab0122028700ae2f">phi</link>)</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> &amp; <link linkend="_classudc_1_1_vector_1abb37807c389b08257735c7077f0e5c9c">rotate</link> (double <link linkend="_classudc_1_1_vector_1aa8f4197da79290967d284765240a2551">theta</link>)</para>
+</listitem>
+            <listitem><para><link linkend="_classudc_1_1_vector">Vector</link> &amp; <link linkend="_classudc_1_1_vector_1ac385aa5781a8b72847e6b28dcaa5e917">normalize</link> ()</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Static Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para>static <link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_vector_1a8d2d80545ccc58ea8a5fa8fca5f51a91">cylindricalForm</link> (double r, double <link linkend="_classudc_1_1_vector_1aa8f4197da79290967d284765240a2551">theta</link>, double <link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link>)</para>
+</listitem>
+            <listitem><para>static <link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_vector_1ab7647edf7b8e9b71ebee3df8362c5e52">polarForm</link> (double r, double <link linkend="_classudc_1_1_vector_1aa8f4197da79290967d284765240a2551">theta</link>)</para>
+</listitem>
+            <listitem><para>static <link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_vector_1a89b43ddd10a372d584a03a5583ad5652">sphericalForm</link> (double rho, double <link linkend="_classudc_1_1_vector_1aa8f4197da79290967d284765240a2551">theta</link>, double <link linkend="_classudc_1_1_vector_1ad5b5e60153daf6afab0122028700ae2f">phi</link>)</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Public Attributes    </title>
+        <itemizedlist>
+            <listitem><para>double <link linkend="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c">x</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb">y</link></para>
+</listitem>
+            <listitem><para>double <link linkend="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251">z</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Static Public Attributes    </title>
+        <itemizedlist>
+            <listitem><para>static const <link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_vector_1a9e75b0360efe22b62f12b7988cac26b8">ZERO</link></para>
+</listitem>
+            <listitem><para>static const <link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_vector_1a6d438b86c88ac12f037a45d4af1953a8">I</link></para>
+</listitem>
+            <listitem><para>static const <link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_vector_1a969618e05cff7f052ae3e9fcf7b49104">J</link></para>
+</listitem>
+            <listitem><para>static const <link linkend="_classudc_1_1_vector">Vector</link> <link linkend="_classudc_1_1_vector_1ac57b86ef94fc93ce70a804f7130b7fba">K</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Constructor &amp; Destructor Documentation</title>
+<anchor xml:id="_classudc_1_1_vector_1ae04c82f1475c537a4c31b2489e088134"/><section>
+    <title>Vector()<computeroutput>[1/3]</computeroutput></title>
+<indexterm><primary>Vector</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>Vector</secondary></indexterm>
+<para><computeroutput>udc::Vector::Vector (double x, double y, double z)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1a77d31b8c68c2b5cf617f055c89c32a61"/><section>
+    <title>Vector()<computeroutput>[2/3]</computeroutput></title>
+<indexterm><primary>Vector</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>Vector</secondary></indexterm>
+<para><computeroutput>udc::Vector::Vector (double x, double y)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1a8c4d5f7db83f0cef1c07b4b42f78e0e3"/><section>
+    <title>Vector()<computeroutput>[3/3]</computeroutput></title>
+<indexterm><primary>Vector</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>Vector</secondary></indexterm>
+<para><computeroutput>udc::Vector::Vector ( )</computeroutput></para></section>
+</section>
+<section>
+<title>Member Function Documentation</title>
+<anchor xml:id="_classudc_1_1_vector_1a201525a4474e786eada5fe7243225230"/><section>
+    <title>angleBetween()</title>
+<indexterm><primary>angleBetween</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>angleBetween</secondary></indexterm>
+<para><computeroutput>double udc::Vector::angleBetween (const <link linkend="_classudc_1_1_vector">Vector</link> &amp; v) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1a5e5018a08cc0c3988f7a47243943e530"/><section>
+    <title>crossProduct()</title>
+<indexterm><primary>crossProduct</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>crossProduct</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::Vector::crossProduct (<link linkend="_classudc_1_1_vector">Vector</link> v) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1a8d2d80545ccc58ea8a5fa8fca5f51a91"/><section>
+    <title>cylindricalForm()</title>
+<indexterm><primary>cylindricalForm</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>cylindricalForm</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::Vector::cylindricalForm (double r, double theta, double z)<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1a881c949c7af45c78a3ef96169fa288de"/><section>
+    <title>distance()</title>
+<indexterm><primary>distance</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>distance</secondary></indexterm>
+<para><computeroutput>double udc::Vector::distance (const <link linkend="_classudc_1_1_vector">Vector</link> &amp; v) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1a159fb5e0fc16d4acbe6fb1a62cdd401c"/><section>
+    <title>distanceSq()</title>
+<indexterm><primary>distanceSq</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>distanceSq</secondary></indexterm>
+<para><computeroutput>double udc::Vector::distanceSq (const <link linkend="_classudc_1_1_vector">Vector</link> &amp; v) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1a9e68392b62678f54eb7ad7a21091dab7"/><section>
+    <title>dotProduct()</title>
+<indexterm><primary>dotProduct</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>dotProduct</secondary></indexterm>
+<para><computeroutput>double udc::Vector::dotProduct (const <link linkend="_classudc_1_1_vector">Vector</link> &amp; v) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1a470e0981589813bdb73d63fcdee26d30"/><section>
+    <title>negate()</title>
+<indexterm><primary>negate</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>negate</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> &amp; udc::Vector::negate ( )</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1ad0a32e923bceab96a3a1eb36b9cc5e3a"/><section>
+    <title>norm()</title>
+<indexterm><primary>norm</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>norm</secondary></indexterm>
+<para><computeroutput>double udc::Vector::norm ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1ac385aa5781a8b72847e6b28dcaa5e917"/><section>
+    <title>normalize()</title>
+<indexterm><primary>normalize</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>normalize</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> &amp; udc::Vector::normalize ( )</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1a5c3eb6000799a6fc4756f029b9b67e98"/><section>
+    <title>normSq()</title>
+<indexterm><primary>normSq</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>normSq</secondary></indexterm>
+<para><computeroutput>double udc::Vector::normSq ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1aebb8fa9252c42fc1fe5a232f3bda3957"/><section>
+    <title>operator!=()</title>
+<indexterm><primary>operator!=</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>operator!=</secondary></indexterm>
+<para><computeroutput>bool udc::Vector::operator!= (const <link linkend="_classudc_1_1_vector">Vector</link> &amp; v) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1aa71524242cdda6c4154ee2cd35a670fe"/><section>
+    <title>operator*()<computeroutput>[1/2]</computeroutput></title>
+<indexterm><primary>operator*</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>operator*</secondary></indexterm>
+<para><computeroutput>double udc::Vector::operator* (const <link linkend="_classudc_1_1_vector">Vector</link> &amp; v) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1a3158bde8e319b0e79a36b2ad7c775846"/><section>
+    <title>operator*()<computeroutput>[2/2]</computeroutput></title>
+<indexterm><primary>operator*</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>operator*</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::Vector::operator* (double k) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1a35e41ab5ba8f980219e09eb8b164cb65"/><section>
+    <title>operator*=()</title>
+<indexterm><primary>operator*=</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>operator*=</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> &amp; udc::Vector::operator*= (double k)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1a798f07e0b0e18f6a3171f6f4939ac065"/><section>
+    <title>operator+()</title>
+<indexterm><primary>operator+</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>operator+</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::Vector::operator+ (const <link linkend="_classudc_1_1_vector">Vector</link> &amp; v) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1a3dfb48ed1a5d372c126d770c4a99ba12"/><section>
+    <title>operator+=()</title>
+<indexterm><primary>operator+=</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>operator+=</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> &amp; udc::Vector::operator+= (const <link linkend="_classudc_1_1_vector">Vector</link> &amp; v)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1a7447d65cc9637c6638fc2455b0b4aaeb"/><section>
+    <title>operator-()<computeroutput>[1/2]</computeroutput></title>
+<indexterm><primary>operator-</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>operator-</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::Vector::operator- ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1aa1903b4c2a0a4e06f009fd6876524972"/><section>
+    <title>operator-()<computeroutput>[2/2]</computeroutput></title>
+<indexterm><primary>operator-</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>operator-</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::Vector::operator- (const <link linkend="_classudc_1_1_vector">Vector</link> &amp; v) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1a8f044be5579888dc19c2754f3d436064"/><section>
+    <title>operator-=()</title>
+<indexterm><primary>operator-=</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>operator-=</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> &amp; udc::Vector::operator-= (const <link linkend="_classudc_1_1_vector">Vector</link> &amp; v)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1afadaf3cac73f92d1dc3a549a468a23f2"/><section>
+    <title>operator==()</title>
+<indexterm><primary>operator==</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>operator==</secondary></indexterm>
+<para><computeroutput>bool udc::Vector::operator== (const <link linkend="_classudc_1_1_vector">Vector</link> &amp; v) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1ad5b5e60153daf6afab0122028700ae2f"/><section>
+    <title>phi()</title>
+<indexterm><primary>phi</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>phi</secondary></indexterm>
+<para><computeroutput>double udc::Vector::phi ( ) const</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1ab7647edf7b8e9b71ebee3df8362c5e52"/><section>
+    <title>polarForm()</title>
+<indexterm><primary>polarForm</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>polarForm</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::Vector::polarForm (double r, double theta)<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1abb37807c389b08257735c7077f0e5c9c"/><section>
+    <title>rotate()<computeroutput>[1/2]</computeroutput></title>
+<indexterm><primary>rotate</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>rotate</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> &amp; udc::Vector::rotate (double theta)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1a1d615c52f81858b3d65fea669c2630d7"/><section>
+    <title>rotate()<computeroutput>[2/2]</computeroutput></title>
+<indexterm><primary>rotate</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>rotate</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> &amp; udc::Vector::rotate (double theta, double phi)</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1a89b43ddd10a372d584a03a5583ad5652"/><section>
+    <title>sphericalForm()</title>
+<indexterm><primary>sphericalForm</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>sphericalForm</secondary></indexterm>
+<para><computeroutput><link linkend="_classudc_1_1_vector">Vector</link> udc::Vector::sphericalForm (double rho, double theta, double phi)<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1aa8f4197da79290967d284765240a2551"/><section>
+    <title>theta()</title>
+<indexterm><primary>theta</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>theta</secondary></indexterm>
+<para><computeroutput>double udc::Vector::theta ( ) const</computeroutput></para></section>
+</section>
+<section>
+<title>Member Data Documentation</title>
+<anchor xml:id="_classudc_1_1_vector_1a6d438b86c88ac12f037a45d4af1953a8"/><section>
+    <title>I</title>
+<indexterm><primary>I</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>I</secondary></indexterm>
+<para><computeroutput>const <link linkend="_classudc_1_1_vector">Vector</link> udc::Vector::I<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1a969618e05cff7f052ae3e9fcf7b49104"/><section>
+    <title>J</title>
+<indexterm><primary>J</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>J</secondary></indexterm>
+<para><computeroutput>const <link linkend="_classudc_1_1_vector">Vector</link> udc::Vector::J<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1ac57b86ef94fc93ce70a804f7130b7fba"/><section>
+    <title>K</title>
+<indexterm><primary>K</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>K</secondary></indexterm>
+<para><computeroutput>const <link linkend="_classudc_1_1_vector">Vector</link> udc::Vector::K<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1ab974b6088fa419c17752cdf46fffd09c"/><section>
+    <title>x</title>
+<indexterm><primary>x</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>x</secondary></indexterm>
+<para><computeroutput>double udc::Vector::x</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1a136129725de33fe61592c3d5c5a485eb"/><section>
+    <title>y</title>
+<indexterm><primary>y</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>y</secondary></indexterm>
+<para><computeroutput>double udc::Vector::y</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1af5787922cda40c2139abdd31cd2f6251"/><section>
+    <title>z</title>
+<indexterm><primary>z</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>z</secondary></indexterm>
+<para><computeroutput>double udc::Vector::z</computeroutput></para></section>
+<anchor xml:id="_classudc_1_1_vector_1a9e75b0360efe22b62f12b7988cac26b8"/><section>
+    <title>ZERO</title>
+<indexterm><primary>ZERO</primary><secondary>udc::Vector</secondary></indexterm>
+<indexterm><primary>udc::Vector</primary><secondary>ZERO</secondary></indexterm>
+<para><computeroutput>const <link linkend="_classudc_1_1_vector">Vector</link> udc::Vector::ZERO<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<para>
+The documentation for this class was generated from the following file:</para>
+C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/src/<link linkend="__vector_8h">Vector.h</link></section>
+</section>

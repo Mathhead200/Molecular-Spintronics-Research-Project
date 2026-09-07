@@ -1,0 +1,204 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_class_m_s_d_1_1_molecule_1_1___node" xml:lang="en-US">
+<title>MSD.Molecule._Node Class Reference</title>
+<indexterm><primary>MSD.Molecule._Node</primary></indexterm>
+<para>
+
+<para>Represents a specific molecule node. </para>
+ 
+</para>
+<simplesect>
+    <title>Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_molecule_1_1___node_1a4ccb0e20eb95923666e2628e8fe3d5ce">next</link> (self)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_molecule_1_1___node_1a30f43875e77697a6ad2f54933b21515d">prev</link> (self)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_molecule_1_1___node_1a408adebe35535074ce6e84b945174c98">__init__</link> (self, iterable, start=(None, 0), direction=<link linkend="_class_m_s_d_1_1_molecule_1_1___node_1a10df7c1f535a9aecfe6633a1d82888fc">FORWARD</link>)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_molecule_1_1___node_1a6f51452b254d10258126a3f99d623434">__del__</link> (self)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_molecule_1_1___node_1a1acc26bfae5219e1288b3e9d6395b9a3">clone</link> (self)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_molecule_1_1___node_1a9b25d673a07097899e55e898e77a32c5">getParameters</link> (self)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_molecule_1_1___node_1a8ef8d8413274bd1475449c4ff3fc031c">__eq__</link> (self, other)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_molecule_1_1___node_1a07c2aba66a15a9cb09c8e54961bb962a">__ne__</link> (self, other)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_molecule_1_1___node_1ac1d9fab42318d68b705d8a65fd725682">__lt__</link> (self, other)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_molecule_1_1___node_1afd335e9ee2b1a348821fdacad0240aa5">__gt__</link> (self, other)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_molecule_1_1___node_1a6fc230a2d08386b015017d117ae3702b">__le__</link> (self, other)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_molecule_1_1___node_1ab26a9ff64b83f8143c435ef7623e6393">__ge__</link> (self, other)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_molecule_1_1___node_1aa450cda5a7727c7d5886c58a337da225">__next__</link> (self)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_molecule_1_1___node_1a7b127a203dfbdf2014f00ca489a4e2be">__iadd__</link> (self, offset)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_molecule_1_1___node_1ae929cac72f6a7d103c93210de9f3e21a">__isub__</link> (self, offset)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_molecule_1_1___node_1a13a67a615921aab22173221065d28cf2">__add__</link> (self, offset)</para>
+</listitem>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_molecule_1_1___node_1af3254b8dc7c6dea8e446a37122d8483d">__sub__</link> (self, offset)</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Static Public Attributes    </title>
+        <itemizedlist>
+            <listitem><para>tuple <link linkend="_class_m_s_d_1_1_molecule_1_1___node_1a10df7c1f535a9aecfe6633a1d82888fc">FORWARD</link> = (<link linkend="_class_m_s_d_1_1_molecule_1_1___node_1a4ccb0e20eb95923666e2628e8fe3d5ce">next</link>,)</para>
+</listitem>
+            <listitem><para>tuple <link linkend="_class_m_s_d_1_1_molecule_1_1___node_1add76894914294eb78a53820937e80d1d">BACKWARD</link> = (<link linkend="_class_m_s_d_1_1_molecule_1_1___node_1a30f43875e77697a6ad2f54933b21515d">prev</link>,)</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Properties    </title>
+        <itemizedlist>
+            <listitem><para><link linkend="_class_m_s_d_1_1_molecule_1_1___node_1a503073b1b99906edeb150677cea80c16">metaIndex</link> = property(fget = lambda self: self._i)</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_molecule_1_1___node_1a2768ddf2cf912c24cb3e26116e3bdeab">index</link> = property(fget = lambda self: msd_clib.nodeIndex_i(self._node))</para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_molecule_1_1___node_1a1dccc5159bd8bacae66c6f293c84cbf3">neighbors</link> = property(fget = lambda self: <link linkend="_class_m_s_d_1_1_molecule_1_1___edge_iterable">Molecule._EdgeIterable</link>(msd_clib.getNeighbors(self._node)))</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Detailed Description</title>
+
+<para>Represents a specific molecule node. </para>
+
+
+
+<para>Also acts as a node iterator. Should not be construct directly! Should be constructed using <link linkend="_class_m_s_d_1_1_molecule_1_1___node_iterable">Molecule._NodeIterable</link> methods/properties. </para>
+</section>
+<section>
+<title>Constructor &amp; Destructor Documentation</title>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___node_1a408adebe35535074ce6e84b945174c98"/><section>
+    <title>__init__()</title>
+<indexterm><primary>__init__</primary><secondary>MSD.Molecule._Node</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._Node</primary><secondary>__init__</secondary></indexterm>
+<para><computeroutput>def MSD.Molecule._Node.__init__ ( self,  iterable,  start = <computeroutput>(None,&#160;0)</computeroutput>
+,  direction = <computeroutput><link linkend="_class_m_s_d_1_1_molecule_1_1___node_1a10df7c1f535a9aecfe6633a1d82888fc">FORWARD</link></computeroutput>
+)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___node_1a6f51452b254d10258126a3f99d623434"/><section>
+    <title>__del__()</title>
+<indexterm><primary>__del__</primary><secondary>MSD.Molecule._Node</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._Node</primary><secondary>__del__</secondary></indexterm>
+<para><computeroutput>def MSD.Molecule._Node.__del__ ( self)</computeroutput></para></section>
+</section>
+<section>
+<title>Member Function Documentation</title>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___node_1a13a67a615921aab22173221065d28cf2"/><section>
+    <title>__add__()</title>
+<indexterm><primary>__add__</primary><secondary>MSD.Molecule._Node</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._Node</primary><secondary>__add__</secondary></indexterm>
+<para><computeroutput>def MSD.Molecule._Node.__add__ ( self,  offset)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___node_1a8ef8d8413274bd1475449c4ff3fc031c"/><section>
+    <title>__eq__()</title>
+<indexterm><primary>__eq__</primary><secondary>MSD.Molecule._Node</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._Node</primary><secondary>__eq__</secondary></indexterm>
+<para><computeroutput>def MSD.Molecule._Node.__eq__ ( self,  other)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___node_1ab26a9ff64b83f8143c435ef7623e6393"/><section>
+    <title>__ge__()</title>
+<indexterm><primary>__ge__</primary><secondary>MSD.Molecule._Node</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._Node</primary><secondary>__ge__</secondary></indexterm>
+<para><computeroutput>def MSD.Molecule._Node.__ge__ ( self,  other)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___node_1afd335e9ee2b1a348821fdacad0240aa5"/><section>
+    <title>__gt__()</title>
+<indexterm><primary>__gt__</primary><secondary>MSD.Molecule._Node</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._Node</primary><secondary>__gt__</secondary></indexterm>
+<para><computeroutput>def MSD.Molecule._Node.__gt__ ( self,  other)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___node_1a7b127a203dfbdf2014f00ca489a4e2be"/><section>
+    <title>__iadd__()</title>
+<indexterm><primary>__iadd__</primary><secondary>MSD.Molecule._Node</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._Node</primary><secondary>__iadd__</secondary></indexterm>
+<para><computeroutput>def MSD.Molecule._Node.__iadd__ ( self,  offset)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___node_1ae929cac72f6a7d103c93210de9f3e21a"/><section>
+    <title>__isub__()</title>
+<indexterm><primary>__isub__</primary><secondary>MSD.Molecule._Node</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._Node</primary><secondary>__isub__</secondary></indexterm>
+<para><computeroutput>def MSD.Molecule._Node.__isub__ ( self,  offset)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___node_1a6fc230a2d08386b015017d117ae3702b"/><section>
+    <title>__le__()</title>
+<indexterm><primary>__le__</primary><secondary>MSD.Molecule._Node</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._Node</primary><secondary>__le__</secondary></indexterm>
+<para><computeroutput>def MSD.Molecule._Node.__le__ ( self,  other)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___node_1ac1d9fab42318d68b705d8a65fd725682"/><section>
+    <title>__lt__()</title>
+<indexterm><primary>__lt__</primary><secondary>MSD.Molecule._Node</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._Node</primary><secondary>__lt__</secondary></indexterm>
+<para><computeroutput>def MSD.Molecule._Node.__lt__ ( self,  other)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___node_1a07c2aba66a15a9cb09c8e54961bb962a"/><section>
+    <title>__ne__()</title>
+<indexterm><primary>__ne__</primary><secondary>MSD.Molecule._Node</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._Node</primary><secondary>__ne__</secondary></indexterm>
+<para><computeroutput>def MSD.Molecule._Node.__ne__ ( self,  other)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___node_1aa450cda5a7727c7d5886c58a337da225"/><section>
+    <title>__next__()</title>
+<indexterm><primary>__next__</primary><secondary>MSD.Molecule._Node</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._Node</primary><secondary>__next__</secondary></indexterm>
+<para><computeroutput>def MSD.Molecule._Node.__next__ ( self)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___node_1af3254b8dc7c6dea8e446a37122d8483d"/><section>
+    <title>__sub__()</title>
+<indexterm><primary>__sub__</primary><secondary>MSD.Molecule._Node</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._Node</primary><secondary>__sub__</secondary></indexterm>
+<para><computeroutput>def MSD.Molecule._Node.__sub__ ( self,  offset)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___node_1a1acc26bfae5219e1288b3e9d6395b9a3"/><section>
+    <title>clone()</title>
+<indexterm><primary>clone</primary><secondary>MSD.Molecule._Node</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._Node</primary><secondary>clone</secondary></indexterm>
+<para><computeroutput>def MSD.Molecule._Node.clone ( self)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___node_1a9b25d673a07097899e55e898e77a32c5"/><section>
+    <title>getParameters()</title>
+<indexterm><primary>getParameters</primary><secondary>MSD.Molecule._Node</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._Node</primary><secondary>getParameters</secondary></indexterm>
+<para><computeroutput>def MSD.Molecule._Node.getParameters ( self)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___node_1a4ccb0e20eb95923666e2628e8fe3d5ce"/><section>
+    <title>next()</title>
+<indexterm><primary>next</primary><secondary>MSD.Molecule._Node</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._Node</primary><secondary>next</secondary></indexterm>
+<para><computeroutput>def MSD.Molecule._Node.next ( self)</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___node_1a30f43875e77697a6ad2f54933b21515d"/><section>
+    <title>prev()</title>
+<indexterm><primary>prev</primary><secondary>MSD.Molecule._Node</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._Node</primary><secondary>prev</secondary></indexterm>
+<para><computeroutput>def MSD.Molecule._Node.prev ( self)</computeroutput></para></section>
+</section>
+<section>
+<title>Member Data Documentation</title>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___node_1add76894914294eb78a53820937e80d1d"/><section>
+    <title>BACKWARD</title>
+<indexterm><primary>BACKWARD</primary><secondary>MSD.Molecule._Node</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._Node</primary><secondary>BACKWARD</secondary></indexterm>
+<para><computeroutput>tuple MSD.Molecule._Node.BACKWARD = (<link linkend="_class_m_s_d_1_1_molecule_1_1___node_1a30f43875e77697a6ad2f54933b21515d">prev</link>,)<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___node_1a10df7c1f535a9aecfe6633a1d82888fc"/><section>
+    <title>FORWARD</title>
+<indexterm><primary>FORWARD</primary><secondary>MSD.Molecule._Node</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._Node</primary><secondary>FORWARD</secondary></indexterm>
+<para><computeroutput>tuple MSD.Molecule._Node.FORWARD = (<link linkend="_class_m_s_d_1_1_molecule_1_1___node_1a4ccb0e20eb95923666e2628e8fe3d5ce">next</link>,)<computeroutput>[static]</computeroutput></computeroutput></para></section>
+</section>
+<section>
+<title>Property Documentation</title>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___node_1a2768ddf2cf912c24cb3e26116e3bdeab"/><section>
+    <title>index</title>
+<indexterm><primary>index</primary><secondary>MSD.Molecule._Node</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._Node</primary><secondary>index</secondary></indexterm>
+<para><computeroutput>MSD.Molecule._Node.index = property(fget = lambda self: msd_clib.nodeIndex_i(self._node))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___node_1a503073b1b99906edeb150677cea80c16"/><section>
+    <title>metaIndex</title>
+<indexterm><primary>metaIndex</primary><secondary>MSD.Molecule._Node</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._Node</primary><secondary>metaIndex</secondary></indexterm>
+<para><computeroutput>MSD.Molecule._Node.metaIndex = property(fget = lambda self: self._i)<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1___node_1a1dccc5159bd8bacae66c6f293c84cbf3"/><section>
+    <title>neighbors</title>
+<indexterm><primary>neighbors</primary><secondary>MSD.Molecule._Node</secondary></indexterm>
+<indexterm><primary>MSD.Molecule._Node</primary><secondary>neighbors</secondary></indexterm>
+<para><computeroutput>MSD.Molecule._Node.neighbors = property(fget = lambda self: <link linkend="_class_m_s_d_1_1_molecule_1_1___edge_iterable">Molecule._EdgeIterable</link>(msd_clib.getNeighbors(self._node)))<computeroutput>[static]</computeroutput></computeroutput></para></section>
+<para>
+The documentation for this class was generated from the following file:</para>
+C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/lib/python/<link linkend="__m_s_d_8py">MSD.py</link></section>
+</section>

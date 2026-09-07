@@ -34,8 +34,12 @@ def plot3D(data: NDArray, ind: int=3, dep: int=1, cmap=DEFAULT_CMAP, size: float
 		magnitudes = np.sqrt(sum(vec**2 for vec in uvw))
 		vmin, vmax = np.min(magnitudes), np.max(magnitudes)  # shortest and longest vectors
 		lerp = plt.Normalize(vmin, vmax)  # lineral interpolation
-		colors = plt.get_cmap(cmap)(lerp(magnitudes))   # TODO: is this right?
+		colors = plt.get_cmap(cmap)(lerp(magnitudes))
 		plot.quiver(*xyz, *uvw, colors=colors, length=size / vmax, normalize=False)
+
+		for x in "xyz":  # need to accont for quivers' lengths in window
+			xmin, xmax = getattr(plot, f"get_{x}lim")()  # e.g. plot.get_xlim()
+			getattr(plot, f"set_{x}lim")(xmin - vmax, xmax + vmax)
 
 	# save as file
 	path = None

@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_class_m_s_d_1_1_molecule_1_1_node_parameters" xml:lang="en-US">
+<title>MSD.Molecule.NodeParameters Class Reference</title>
+<indexterm><primary>MSD.Molecule.NodeParameters</primary></indexterm>
+<para>Inheritance diagram for MSD.Molecule.NodeParameters:    <informalfigure>
+        <mediaobject>
+            <imageobject>
+                <imagedata width="50%" align="center" valign="middle" scalefit="0" fileref="../../d1/d6e/class_m_s_d_1_1_molecule_1_1_node_parameters.png"></imagedata>
+            </imageobject>
+        </mediaobject>
+    </informalfigure>
+</para>
+<simplesect>
+    <title>Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para>def <link linkend="_class_m_s_d_1_1_molecule_1_1_node_parameters_1a009d75e5ee73aa7f7538680f9862c38b">__init__</link> (self, *args, **kw)</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Public Attributes    </title>
+        <itemizedlist>
+            <listitem><para><link linkend="_class_m_s_d_1_1_molecule_1_1_node_parameters_1afb521b3509f58de9c4f5fb8faaf0cc85">Sm</link></para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_molecule_1_1_node_parameters_1a16679a35e97c7115c0233af67565e1fe">Fm</link></para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_molecule_1_1_node_parameters_1a3ef481b3b2c432e46b943a4a271d2a2d">Je0m</link></para>
+</listitem>
+            <listitem><para><link linkend="_class_m_s_d_1_1_molecule_1_1_node_parameters_1a2067118feb5826d86a40dcb65b66cd2a">Am</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Constructor &amp; Destructor Documentation</title>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1_node_parameters_1a009d75e5ee73aa7f7538680f9862c38b"/><section>
+    <title>__init__()</title>
+<indexterm><primary>__init__</primary><secondary>MSD.Molecule.NodeParameters</secondary></indexterm>
+<indexterm><primary>MSD.Molecule.NodeParameters</primary><secondary>__init__</secondary></indexterm>
+<para><computeroutput>def MSD.Molecule.NodeParameters.__init__ ( self, * args, ** kw)</computeroutput></para><para>
+Reimplemented from <link linkend="_class_m_s_d_1_1___m_m_t_struct_1ab6c981d00a7ba900181ec80e644f60ba">MSD._MMTStruct</link>.</para>
+</section>
+</section>
+<section>
+<title>Member Data Documentation</title>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1_node_parameters_1a2067118feb5826d86a40dcb65b66cd2a"/><section>
+    <title>Am</title>
+<indexterm><primary>Am</primary><secondary>MSD.Molecule.NodeParameters</secondary></indexterm>
+<indexterm><primary>MSD.Molecule.NodeParameters</primary><secondary>Am</secondary></indexterm>
+<para><computeroutput>MSD.Molecule.NodeParameters.Am</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1_node_parameters_1a16679a35e97c7115c0233af67565e1fe"/><section>
+    <title>Fm</title>
+<indexterm><primary>Fm</primary><secondary>MSD.Molecule.NodeParameters</secondary></indexterm>
+<indexterm><primary>MSD.Molecule.NodeParameters</primary><secondary>Fm</secondary></indexterm>
+<para><computeroutput>MSD.Molecule.NodeParameters.Fm</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1_node_parameters_1a3ef481b3b2c432e46b943a4a271d2a2d"/><section>
+    <title>Je0m</title>
+<indexterm><primary>Je0m</primary><secondary>MSD.Molecule.NodeParameters</secondary></indexterm>
+<indexterm><primary>MSD.Molecule.NodeParameters</primary><secondary>Je0m</secondary></indexterm>
+<para><computeroutput>MSD.Molecule.NodeParameters.Je0m</computeroutput></para></section>
+<anchor xml:id="_class_m_s_d_1_1_molecule_1_1_node_parameters_1afb521b3509f58de9c4f5fb8faaf0cc85"/><section>
+    <title>Sm</title>
+<indexterm><primary>Sm</primary><secondary>MSD.Molecule.NodeParameters</secondary></indexterm>
+<indexterm><primary>MSD.Molecule.NodeParameters</primary><secondary>Sm</secondary></indexterm>
+<para><computeroutput>MSD.Molecule.NodeParameters.Sm</computeroutput></para></section>
+<para>
+The documentation for this class was generated from the following file:</para>
+C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/lib/python/<link linkend="__m_s_d_8py">MSD.py</link></section>
+</section>

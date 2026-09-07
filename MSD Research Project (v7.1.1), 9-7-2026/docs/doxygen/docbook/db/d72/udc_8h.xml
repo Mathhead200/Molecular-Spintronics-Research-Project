@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_udc_8h" xml:lang="en-US">
+<title>C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/src/udc.h File Reference</title>
+<indexterm><primary>C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/src/udc.h</primary></indexterm>
+<programlisting linenumbering="unnumbered">#include &lt;cstring&gt;<?linebreak?>#include &lt;exception&gt;<?linebreak?></programlisting><simplesect>
+    <title>Classes    </title>
+        <itemizedlist>
+            <listitem><para>class <link linkend="_classudc_1_1_u_d_c_exception">udc::UDCException</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Namespaces    </title>
+        <itemizedlist>
+            <listitem><para>namespace <link linkend="_namespaceudc">udc</link></para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Functions    </title>
+        <itemizedlist>
+            <listitem><para>double <link linkend="_namespaceudc_1aa7cee595bc6a15bdd189f00553c92349">udc::sq</link> (double x)</para>
+
+<para>square a number fast </para>
+</listitem>
+            <listitem><para>double <link linkend="_namespaceudc_1a6d899413865bed9b0346dc4a2b6ed4b5">udc::cube</link> (double x)</para>
+
+<para>cube a number fast </para>
+</listitem>
+            <listitem><para>void <link linkend="_namespaceudc_1a51cb94811213523405b27e375b7a1b33">udc::bread</link> (void *destination, size_t dSize, const unsigned char *&amp;buffer)</para>
+
+<para>Buffer/Binary Read: </para>
+</listitem>
+            <listitem><para>template&lt;typename T &gt; </para><para>void <link linkend="_namespaceudc_1a6f17d107671fb6c3d5e2044d346e45c5">udc::bread</link> (T &amp;destination, const unsigned char *&amp;buffer)</para>
+
+<para>Templated version: determines the approprate number of bytes by calling &quot;sizeof(T)&quot;. </para>
+</listitem>
+            <listitem><para>void <link linkend="_namespaceudc_1a1e040d8326f2ad3b600f8f66a8de6305">udc::bwrite</link> (const void *source, size_t sSize, unsigned char *&amp;buffer)</para>
+
+<para>Buffer/Binary Write: </para>
+</listitem>
+            <listitem><para>template&lt;typename T &gt; </para><para>void <link linkend="_namespaceudc_1a0a7d84b783b302ce21db57fd497817d0">udc::bwrite</link> (const T &amp;source, unsigned char *&amp;buffer)</para>
+
+<para>Templated version: determines the approprate number of bytes by calling &quot;sizeof(T)&quot;. </para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<simplesect>
+    <title>Variables    </title>
+        <itemizedlist>
+            <listitem><para>const double <link linkend="_namespaceudc_1aa4b4d55516f1e34de5dc8b228f160597">udc::E</link> = 2.71828182845904523536</para>
+
+<para>Mathematical constant: Euler&apos;s Number. </para>
+</listitem>
+            <listitem><para>const double <link linkend="_namespaceudc_1a1757f9fc50446243658974977dd95e7c">udc::PI</link> = 3.14159265358979323846</para>
+
+<para>Mathematical constant. </para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+</section>

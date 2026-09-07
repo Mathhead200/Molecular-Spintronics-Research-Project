@@ -1,0 +1,53 @@
+\hypertarget{mmt_8h}{}\doxysection{C\+:/\+Users/mathh/\+Git\+Hub/\+Molecular-\/\+Spintronics-\/\+Research-\/\+Project/\+MSD Research Project -\/ Latest Development Version/src/mmt.h File Reference}
+\label{mmt_8h}\index{C:/Users/mathh/GitHub/Molecular-\/Spintronics-\/Research-\/Project/MSD Research Project -\/ Latest Development Version/src/mmt.h@{C:/Users/mathh/GitHub/Molecular-\/Spintronics-\/Research-\/Project/MSD Research Project -\/ Latest Development Version/src/mmt.h}}
+
+
+Contains functions for reading and parsing MMT (\mbox{\hyperlink{namespace_m_s_d}{MSD}} Molecule Text) files, such as those created by the \mbox{\hyperlink{namespace_m_s_d}{MSD}} Molecule Builder webtool.  
+
+
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+{\ttfamily \#include \char`\"{}MSD.\+h\char`\"{}}\newline
+\doxysubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespaceudc}{udc}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename T $>$ }\\T \mbox{\hyperlink{namespaceudc_a03752c8f5c571a06fc1c32e823a319a5}{udc\+::parseline}} (istream \&in)
+\item 
+template$<$$>$ string \mbox{\hyperlink{namespaceudc_aa53d390897b2cbbeb3f336b31ca8b121}{udc\+::parseline}} (istream \&in)
+\item 
+template$<$$>$ istringstream \mbox{\hyperlink{namespaceudc_aa3ecd4349a02127aebcf910ebab2e4e4}{udc\+::parseline}} (istream \&in)
+\item 
+template$<$$>$ void \mbox{\hyperlink{namespaceudc_a502730a2d07ef150a01ed02b6c116846}{udc\+::parseline}} (istream \&in)
+\item 
+{\footnotesize template$<$typename T $>$ }\\T \mbox{\hyperlink{namespaceudc_ab5d1642f2042aa4f999a47f2de0db959}{udc\+::parseline}} (const string \&str)
+\item 
+istream \& \mbox{\hyperlink{namespaceudc_a6a73767fbbacbcfa2f4d7db36e6c4230}{udc\+::operator$>$$>$}} (istream \&in, \mbox{\hyperlink{classudc_1_1_vector}{udc\+::\+Vector}} \&v)
+\item 
+\mbox{\hyperlink{_m_s_d-export_8cpp_aec2cc3918e5933a0bad019dd661cdbef}{MSD\+::\+Mol\+Proto}} \mbox{\hyperlink{namespaceudc_a2479706554f64b21239dca95b3c1465c}{udc\+::read\+MMT}} (istream \&src)
+\begin{DoxyCompactList}\small\item\em Parses MMT file data from the given text istream, and saves it as a \mbox{\hyperlink{classudc_1_1_m_s_d_a7266f08d021d5a06960b152c95a9213e}{MSD\+::\+Mol\+Proto}} object. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Contains functions for reading and parsing MMT (\mbox{\hyperlink{namespace_m_s_d}{MSD}} Molecule Text) files, such as those created by the \mbox{\hyperlink{namespace_m_s_d}{MSD}} Molecule Builder webtool. 
+
+\begin{DoxyAuthor}{Author}
+Christopher D\textquotesingle{}Angelo (\href{mailto:chris@mathhead200.com}{\texttt{ chris@mathhead200.\+com}}) 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+0.\+1 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+September 2, 2022
+\end{DoxyDate}
+
+
+\begin{DoxyCopyright}{Copyright}
+Copyright (c) 2022 
+\end{DoxyCopyright}

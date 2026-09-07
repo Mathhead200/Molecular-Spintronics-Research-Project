@@ -1,0 +1,70 @@
+C:\Users\mathh\GitHub\Molecular-Spintronics-Research-Project\MSD Research Project (v5.4.3), 5-27-2021\src\benchmarks>vector_benchmark 10000
+Running...
+Algorithm 1: sphericalForm()
+Clock time: 3.968 seconds
+Maximum single vector errors: (xy=3.33067e-16, yz=2.77556e-16, zx=0.499754)
+Average error per vector: (xy=1.85242e-17, yz=1.30839e-17, zx=0.106068)
+
+Algorithm 2: divide by norm()
+Clock time: 1.393 seconds
+Maximum single vector errors: (xy=1.11022e-16, yz=1.11022e-16, zx=0.499685)
+Average error per vector: (xy=5.55212e-18, yz=5.51526e-18, zx=0.106191)
+
+
+
+
+
+
+C:\Users\mathh\GitHub\Molecular-Spintronics-Research-Project\MSD Research Project (v5.4.3), 5-27-2021\src\benchmarks>vector_normalize_benchmark 3000
+(N=3000) Running...
+Algorithm 1: sphericalForm()
+Clock time: 1.137 seconds
+Maximum single vector errors: (xy=3.33067e-16, yz=2.77556e-16, zx=0.499653)
+Average error per vector: (xy=1.85032e-17, yz=1.30741e-17, zx=0.106111)    
+
+Algorithm 2: divide by norm()
+Clock time: 0.349 seconds
+Maximum single vector errors: (xy=1.11022e-16, yz=1.11022e-16, zx=0.499185)
+Average error per vector: (xy=5.54537e-18, yz=5.51332e-18, zx=0.106022)    
+
+Algorithm 3: using intrinsics for sqrt
+Clock time: 0.386 seconds
+Maximum single vector errors: (xy=1.11022e-16, yz=1.11022e-16, zx=0.499533)
+Average error per vector: (xy=5.54182e-18, yz=5.50869e-18, zx=0.106024)    
+
+Algorithm 4: using 32-bit (single-precision) float intrinsics for rsqrt    
+Clock time: 0.34 seconds
+Maximum single vector errors: (xy=1.11022e-16, yz=1.11022e-16, zx=0.499752)
+Average error per vector: (xy=5.55787e-18, yz=5.54066e-18, zx=0.106138)
+
+
+
+
+
+
+C:\Users\mathh\GitHub\Molecular-Spintronics-Research-Project\MSD Research Project (v5.4.3), 5-27-2021\src\benchmarks>vector_normalize_benchmark 500
+(N=500) Running...
+Algorithm 1: sphericalForm()
+Clock time: 0.196 seconds
+Maximum single vector errors: (xy=3.33067e-16, yz=2.22045e-16, zx=0.497155)
+Average error per vector: (xy=1.85373e-17, yz=1.30774e-17, zx=0.105998)
+
+Algorithm 2: divide by norm()
+Clock time: 0.066 seconds
+Maximum single vector errors: (xy=1.11022e-16, yz=1.11022e-16, zx=0.499016)
+Average error per vector: (xy=5.51811e-18, yz=5.51666e-18, zx=0.106155)
+
+Algorithm 3: using intrinsics for sqrt
+Clock time: 0.059 seconds
+Maximum single vector errors: (xy=1.11022e-16, yz=1.11022e-16, zx=0.499284)
+Average error per vector: (xy=5.54673e-18, yz=5.53616e-18, zx=0.105932)    
+
+Algorithm 4: using 32-bit (single-precision) float intrinsics for rsqrt   
+Clock time: 0.046 seconds
+Maximum single vector errors: (xy=1.11022e-16, yz=1.11022e-16, zx=0.49966)
+Average error per vector: (xy=5.57349e-18, yz=5.5443e-18, zx=0.10621)
+
+Algorithm 5: actual implementation of normalize() in Vector.h
+Clock time: 0.072 seconds
+Maximum single vector errors: (xy=1.11022e-16, yz=1.11022e-16, zx=0.497917)
+Average error per vector: (xy=5.5375e-18, yz=5.49546e-18, zx=0.106035)

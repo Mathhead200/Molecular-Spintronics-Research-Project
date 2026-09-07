@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<section xmlns="http://docbook.org/ns/docbook" version="5.0" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="_classudc_1_1_m_s_d_1_1_molecule_exception" xml:lang="en-US">
+<title>udc::MSD::MoleculeException Class Reference</title>
+<indexterm><primary>udc::MSD::MoleculeException</primary></indexterm>
+<para>
+<computeroutput>#include &lt;MSD.h&gt;</computeroutput>
+</para>
+<para>Inheritance diagram for udc::MSD::MoleculeException:    <informalfigure>
+        <mediaobject>
+            <imageobject>
+                <imagedata width="50%" align="center" valign="middle" scalefit="0" fileref="../../de/da1/classudc_1_1_m_s_d_1_1_molecule_exception.png"></imagedata>
+            </imageobject>
+        </mediaobject>
+    </informalfigure>
+</para>
+<simplesect>
+    <title>Public Member Functions    </title>
+        <itemizedlist>
+            <listitem><para><link linkend="_classudc_1_1_m_s_d_1_1_molecule_exception_1a368380a2e67e7ed48071a43c9dab6613">MoleculeException</link> (const char *message)</para>
+</listitem>
+        </itemizedlist>
+</simplesect>
+<section>
+<title>Constructor &amp; Destructor Documentation</title>
+<anchor xml:id="_classudc_1_1_m_s_d_1_1_molecule_exception_1a368380a2e67e7ed48071a43c9dab6613"/><section>
+    <title>MoleculeException()</title>
+<indexterm><primary>MoleculeException</primary><secondary>udc::MSD::MoleculeException</secondary></indexterm>
+<indexterm><primary>udc::MSD::MoleculeException</primary><secondary>MoleculeException</secondary></indexterm>
+<para><computeroutput>udc::MSD::MoleculeException::MoleculeException (const char * message)<computeroutput>[inline]</computeroutput></computeroutput></para></section>
+<para>
+The documentation for this class was generated from the following file:</para>
+C:/Users/mathh/GitHub/Molecular-Spintronics-Research-Project/MSD Research Project - Latest Development Version/src/<link linkend="__m_s_d_8h">MSD.h</link></section>
+</section>
